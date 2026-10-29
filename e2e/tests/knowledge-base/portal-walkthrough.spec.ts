@@ -823,7 +823,7 @@ test.describe("knowledge base settings", () => {
       await dialog.getByRole("radio", { name: "Blue" }).click();
       await expect(dialog.getByText("Unsaved")).toBeVisible();
       // Pins save from their own dialog, apart from the draft.
-      await dialog.getByRole("button", { name: "Customize" }).click();
+      await dialog.getByRole("button", { name: "Customize pinned categories" }).click();
       const pins = page.getByRole("dialog", { name: "Pinned categories" });
       await pins.getByRole("button", { name: `Pin ${category.category_name}`, exact: true }).click();
       await pins.getByRole("button", { name: "Save" }).click();
@@ -870,7 +870,7 @@ test.describe("knowledge base settings: pins on the home page", () => {
       // The settings dialog hides the page from the accessibility tree, so match by CSS.
       const cards = grid.locator("a");
       await expect.poll(() => cards.count()).toBeGreaterThan(2);
-      await page.getByRole("dialog").getByRole("button", { name: "Customize" }).click();
+      await page.getByRole("dialog").getByRole("button", { name: "Customize pinned categories" }).click();
       const pins = page.getByRole("dialog", { name: "Pinned categories" });
       for (const category of pinned) {
         await pins.getByRole("button", { name: `Pin ${category.category_name}`, exact: true }).click();

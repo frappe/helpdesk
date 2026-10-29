@@ -36,6 +36,15 @@ function parseLinks(script: string): Link[] {
   }
 }
 
+export type PinKind = "categories" | "articles";
+
+function getPinned(rows: { name: string; pinned: number; pinned_order: number }[]) {
+  return rows
+    .filter((row) => row.pinned)
+    .sort((a, b) => a.pinned_order - b.pinned_order)
+    .map((row) => row.name);
+}
+
 // Lazy singleton shared by desk and portal settings.
 export const knowledgeBaseDraft = shallowRef<ReturnType<
   typeof createDraft
@@ -65,6 +74,16 @@ function createDraft() {
     pageLength: 99999,
     auto: true,
   });
+  // Only Published articles stay pinned.
+  // ponytail: loads every published title; page it if a KB outgrows that
+  const articles = createListResource({
+    doctype: "HD Article",
+    fields: ["name", "title", "visibility", "pinned", "pinned_order"],
+    filters: { status: "Published" },
+    orderBy: "title asc",
+    pageLength: 99999,
+    auto: true,
+  });
   const accessRows = createResource({
     url: "frappe.client.get_list",
     params: {
@@ -87,15 +106,14 @@ function createDraft() {
   });
 
   const saved = computed<Draft | null>(() => {
-    if (!settings.doc || !categories.data || !linksScript.data) return null;
+    if (!settings.doc || !categories.data || !articles.data || !linksScript.data)
+      return null;
     const script: string = linksScript.data.script || "";
     return {
       banner_image: settings.doc.banner_image || "",
       banner_preset: settings.doc.banner_preset || "",
-      pinned: categories.data
-        .filter((row) => row.pinned)
-        .sort((a, b) => a.pinned_order - b.pinned_order)
-        .map((row) => row.name),
+      pinned: getPinned(categories.data),
+      pinned_articles: getPinned(articles.data),
       links: parseLinks(script),
     };
   });
@@ -153,6 +171,18 @@ function createDraft() {
       }))
   );
 
+  // Customers never see Private articles; already pinned ones stay to unpin.
+  const articleOptions = computed(() =>
+    (articles.data || [])
+      .filter((row) => row.visibility !== "Private" || row.pinned)
+      .map((row) => ({
+        label: row.title,
+        value: row.name,
+        icon: "lucide-file-text",
+        access: row.visibility,
+      }))
+  );
+
   const changed = computed(() => {
     if (!draft.value || !saved.value) return [];
     const now = normalize(draft.value);
@@ -191,12 +221,18 @@ function createDraft() {
         });
       }
       if (changed.value.includes("links")) await saveLinks(value.links);
-      if (changed.value.includes("pinned")) await savePinned(value.pinned);
+      if (changed.value.includes("pinned")) {
+        await savePinned("categories", value.pinned);
+      }
+      if (changed.value.includes("pinned_articles")) {
+        await savePinned("articles", value.pinned_articles);
+      }
       clearPreview();
       await Promise.all([
         settings.reload(),
         linksScript.reload(),
         categories.reload(),
+        articles.reload(),
       ]);
       toast.success(__("Settings updated"));
       return true;
@@ -207,25 +243,41 @@ function createDraft() {
     }
   }
 
+  const pinLists = {
+    categories: {
+      rows: categories,
+      doctype: "HD Article Category",
+      draftKey: "pinned",
+      saved: () => __("Pinned categories updated"),
+      failed: () => __("Could not update the pinned categories"),
+    },
+    articles: {
+      rows: articles,
+      doctype: "HD Article",
+      draftKey: "pinned_articles",
+      saved: () => __("Pinned articles updated"),
+      failed: () => __("Could not update the pinned articles"),
+    },
+  } as const;
+
   // Order is 1-based; 0 means unpinned.
-  async function savePinned(pinned: string[]) {
+  async function savePinned(kind: PinKind, pinned: string[]) {
+    const { rows, doctype, failed } = pinLists[kind];
     const { failed_docs } = await call("frappe.client.bulk_update", {
-      docs: categories.data
+      docs: rows.data
         .map((row) => ({ row, order: pinned.indexOf(row.name) + 1 }))
         .filter(
           ({ row, order }) =>
             Boolean(row.pinned) !== order > 0 || row.pinned_order !== order
         )
         .map(({ row, order }) => ({
-          doctype: "HD Article Category",
+          doctype,
           docname: row.name,
           pinned: order > 0 ? 1 : 0,
           pinned_order: order,
         })),
     });
-    if (failed_docs.length) {
-      throw new Error(__("Could not update the pinned categories"));
-    }
+    if (failed_docs.length) throw new Error(failed());
   }
 
   function saveLinks(links: Link[]) {
@@ -251,13 +303,14 @@ function createDraft() {
     });
   }
 
-  async function savePins(pinned: string[]) {
+  async function savePins(kind: PinKind, pinned: string[]) {
+    const { rows, draftKey, saved } = pinLists[kind];
     try {
-      await savePinned(pinned);
+      await savePinned(kind, pinned);
       // The merge watch keeps a draft that differs from the old saved order.
-      draft.value!.pinned = [...pinned];
-      await categories.reload();
-      toast.success(__("Pinned categories updated"));
+      draft.value![draftKey] = [...pinned];
+      await rows.reload();
+      toast.success(saved());
       return true;
     } catch (error) {
       getErrorMessage(error, true);
@@ -303,6 +356,7 @@ function createDraft() {
     setToggle,
     savePins,
     categoryOptions,
+    articleOptions,
     isDirty,
     saving,
     save,

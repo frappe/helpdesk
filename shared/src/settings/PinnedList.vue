@@ -3,17 +3,16 @@
     <div class="flex items-start justify-between gap-4">
       <div class="flex min-w-0 flex-col">
         <h3 class="text-base-medium text-ink-gray-8">
-          {{ __("Pinned categories") }}
+          {{ text.title }}
         </h3>
         <span class="mt-1 text-base leading-5 text-ink-gray-6">
-          {{
-            __(
-              "Pinned categories will appear first on your knowledge base home page, in this order."
-            )
-          }}
+          {{ text.description }}
         </span>
       </div>
-      <Button class="shrink-0" :label="__('Customize')" @click="open = true" />
+      <!-- Named apart: the form has a Customize per list. -->
+      <Button class="shrink-0" :label="text.customize" @click="open = true">
+        {{ __("Customize") }}
+      </Button>
     </div>
     <div
       v-if="pinned.length"
@@ -28,7 +27,7 @@
           class="group flex h-11 items-center gap-2.5 rounded-4 pl-2 pr-1.5 hover:bg-surface-gray-1 sm:h-10"
         >
           <span
-            :class="byName[name]?.icon || 'lucide-folder'"
+            :class="byName[name]?.icon || text.defaultIcon"
             class="size-4 shrink-0 text-ink-gray-6"
           />
           <span class="min-w-0 flex-1 truncate text-base text-ink-gray-8">
@@ -50,16 +49,13 @@
       <div
         class="flex min-h-11 items-center justify-center px-3 text-center text-p-base text-ink-gray-6 sm:min-h-10"
       >
-        {{
-          __(
-            "Nothing pinned yet. The home page will list all categories alphabetically."
-          )
-        }}
+        {{ text.empty }}
       </div>
     </div>
-    <PinnedCategoriesDialog
+    <PinnedListDialog
       v-model:open="open"
-      :categories="categories"
+      :kind="kind"
+      :items="items"
       :pinned="pinned"
       :save="save"
     />
@@ -71,9 +67,11 @@ import { __ } from "../translation";
 import { Button, Dropdown } from "frappe-ui";
 import { computed, ref } from "vue";
 import CategoryAccessBadge from "./CategoryAccessBadge.vue";
-import PinnedCategoriesDialog from "./PinnedCategoriesDialog.vue";
+import type { PinKind } from "./knowledgeBaseDraft";
+import PinnedListDialog from "./PinnedListDialog.vue";
+import { pinnedListText } from "./pinnedListText";
 
-type Category = {
+type Item = {
   label: string;
   value: string;
   icon: string;
@@ -81,7 +79,8 @@ type Category = {
 };
 
 const props = defineProps<{
-  categories: Category[];
+  kind: PinKind;
+  items: Item[];
   pinned: string[];
   // The Customize dialog saves at once; resolves true on success.
   save: (pinned: string[]) => Promise<boolean>;
@@ -91,9 +90,10 @@ const props = defineProps<{
 const emit = defineEmits<{ "update:pinned": [pinned: string[]] }>();
 
 const open = ref(false);
+const text = computed(() => pinnedListText(props.kind));
 
 const byName = computed(() =>
-  Object.fromEntries(props.categories.map((row) => [row.value, row]))
+  Object.fromEntries(props.items.map((row) => [row.value, row]))
 );
 
 function labelOf(name: string) {

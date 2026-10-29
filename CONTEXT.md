@@ -18,6 +18,14 @@ _Avoid_: Child category, sub-section, nested category
 **Pinned category**:
 A top-level Category featured on the knowledge base home in a chosen order. Subcategories cannot be pinned.
 
+**Pinned article**:
+A Published Article listed under the Featured tab on the knowledge base home, in a chosen order. While any are pinned, Featured replaces the Latest tab. Unpublishing or archiving it unpins it.
+_Avoid_: Promoted article, featured article (that is only the portal's tab)
+
+**Article weight**:
+A whole number on an Article. Inside its Category, a heavier Article lists first; equal weights keep the usual order (newest, or most viewed). Pinning sets it from the pin order: the first of N Pinned articles weighs N, the last 1, and unpinning resets it to 0. It has no effect on search or the home page's Popular and Latest lists.
+_Avoid_: Priority, rank, position
+
 **General**:
 The reserved Category that receives the Articles of a deleted Category. It cannot be renamed or deleted, but it can hold Subcategories like any Category.
 

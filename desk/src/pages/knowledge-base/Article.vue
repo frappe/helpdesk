@@ -64,6 +64,21 @@
                     {{ access.label }}
                   </span>
                 </template>
+                <template v-if="article.data.pinned">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
+                  />
+                  <span class="flex items-center gap-1.5">
+                    <Icon icon="lucide-pin" class="size-4 shrink-0" />
+                    {{ __("Pinned to home page") }}
+                  </span>
+                </template>
+                <template v-if="article.data.weight">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
+                  />
+                  <span>{{ __("Weight {0}", [article.data.weight]) }}</span>
+                </template>
               </div>
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
@@ -230,6 +245,14 @@
         </p>
       </template>
     </ArticleAccessModal>
+    <ArticleWeightModal
+      v-if="article.data"
+      v-model="showWeightModal"
+      :articles="[article.data.name]"
+      :category="article.data.category"
+      :initial-weight="article.data.weight"
+      @save="saveWeight"
+    />
   </div>
 </template>
 
@@ -240,6 +263,7 @@ import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { ARTICLE_IMAGE_CLASSES } from "@helpdesk/shared/tiptap";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@/components/icons";
 import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
+import ArticleWeightModal from "@/components/knowledge-base/ArticleWeightModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
@@ -435,13 +459,16 @@ function publishArticle(visibility: string) {
 
 // Show the new status at once. A reload would wait a second round trip and
 // swap the page for the loading state.
-function save(values: Record<string, string>, message: string) {
+function save(values: Record<string, string | number>, message: string) {
   Object.assign(article.data, values);
   updateArticle.submit(
     { doctype: "HD Article", name: article.data.name, fieldname: values },
     {
       onSuccess: (doc: Article) => {
         article.data.modified = doc.modified;
+        // unpublishing unpins; pins set the weight
+        article.data.pinned = doc.pinned;
+        article.data.weight = doc.weight;
         toast.success(message);
       },
       onError: (error: Error) => {
@@ -452,6 +479,13 @@ function save(values: Record<string, string>, message: string) {
   );
 }
 const isDirty = ref(false);
+
+const showWeightModal = ref(false);
+
+function saveWeight(weight: number) {
+  if (weight === (article.data.weight || 0)) return;
+  save({ weight }, __("Weight updated."));
+}
 
 const moveToModal = ref(false);
 
@@ -644,8 +678,23 @@ const articleActions = computed(() => [
           icon: "lucide-lock",
           onClick: () => (showAccessModal.value = true),
         },
+        {
+          label: article.data?.pinned
+            ? __("Unpin from home page")
+            : __("Pin to home page"),
+          icon: article.data?.pinned ? "lucide-pin-off" : "lucide-pin",
+          onClick: () =>
+            article.data.pinned
+              ? save({ pinned: 0 }, __("Article unpinned from the home page."))
+              : save({ pinned: 1 }, __("Article pinned to the home page.")),
+        },
       ]
     : []),
+  {
+    label: __("Set weight"),
+    icon: "lucide-arrow-up-narrow-wide",
+    onClick: () => (showWeightModal.value = true),
+  },
   {
     label: __("Copy link"),
     icon: "lucide-link",

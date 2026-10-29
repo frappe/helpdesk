@@ -362,6 +362,8 @@ export interface Article {
   creation: string;
   content: string;
   modified: string;
+  weight: number;
+  pinned: 0 | 1;
 }
 
 export interface Author {

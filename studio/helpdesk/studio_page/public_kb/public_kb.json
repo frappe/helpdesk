@@ -438,7 +438,7 @@
              "$type": "variable",
              "name": "sort"
             },
-            "options": "{{ [{ label: t(\"Popular\"), value: \"popular\" }, { label: t(\"Latest\"), value: \"latest\" }] }}",
+            "options": "{{ [...(hasFeatured ? [{ label: t(\"Featured\"), value: \"featured\" }] : []), { label: t(\"Popular\"), value: \"popular\" }, ...(hasFeatured ? [] : [{ label: t(\"Latest\"), value: \"latest\" }])] }}",
             "size": "sm",
             "type": "subtle",
             "vertical": false
@@ -490,7 +490,7 @@
             "count": 5,
             "instant": true
            },
-           "visibilityCondition": "{{ !articles.data }}"
+           "visibilityCondition": "{{ !homeArticles }}"
           },
           {
            "baseStyles": {
@@ -615,10 +615,10 @@
            "componentId": "Repeater-9o4hxaycp",
            "componentName": "Repeater",
            "componentProps": {
-            "data": "{{ articles.data }}",
+            "data": "{{ homeArticles }}",
             "dataKey": "name"
            },
-           "visibilityCondition": "{{ articles.data && articles.data.length }}",
+           "visibilityCondition": "{{ homeArticles && homeArticles.length }}",
            "rawStyles": {
             "overflow": "hidden"
            },
@@ -657,7 +657,7 @@
           "title": "{{ t(\"No articles yet\") }}"
          },
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ articles.data && !articles.data.length }}"
+         "visibilityCondition": "{{ homeArticles && !homeArticles.length }}"
         }
        ],
        "classes": [
@@ -716,7 +716,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-23 13:00:00.000000",
+ "modified": "2026-10-28 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
@@ -741,6 +741,16 @@
    "method": "GET",
    "params": "{}",
    "resource_name": "articles",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_articles"
+  },
+  {
+   "auto": 0,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{}",
+   "resource_name": "pinnedArticles",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_articles"
   }
