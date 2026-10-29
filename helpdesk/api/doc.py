@@ -4,7 +4,6 @@ from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
 from frappe.query_builder.functions import Date
-from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
@@ -252,17 +251,6 @@ def get_filterable_fields(
     ignore_team_restrictions: bool = False,
 ):
     check_permissions(doctype, None)
-    return _get_filterable_fields(
-        doctype, show_customer_portal_fields, ignore_team_restrictions
-    )
-
-
-@redis_cache()
-def _get_filterable_fields(
-    doctype: str,
-    show_customer_portal_fields: bool = False,
-    ignore_team_restrictions: bool = False,
-):
     QBDocField = frappe.qb.DocType("DocField")
     QBCustomField = frappe.qb.DocType("Custom Field")
     allowed_fieldtypes = [
@@ -300,7 +288,6 @@ def _get_filterable_fields(
             QBDocField.fieldname,
             QBDocField.fieldtype,
             QBDocField.label,
-            QBDocField.name,
             QBDocField.options,
         )
         .where(QBDocField.parent == doctype)
@@ -314,7 +301,6 @@ def _get_filterable_fields(
             QBCustomField.fieldname,
             QBCustomField.fieldtype,
             QBCustomField.label,
-            QBCustomField.name,
             QBCustomField.options,
         )
         .where(QBCustomField.dt == doctype)
@@ -354,7 +340,6 @@ def _get_filterable_fields(
                 "fieldname": "_assign",
                 "fieldtype": "Link",
                 "label": "Assigned to",
-                "name": "_assign",
                 "options": "HD Agent",
             }
         )
@@ -363,7 +348,6 @@ def _get_filterable_fields(
                 "fieldname": "_user_tags",
                 "fieldtype": "Link",
                 "label": "Tags",
-                "name": "_user_tags",
                 "options": "Tag",
             }
         )
@@ -395,7 +379,6 @@ def _get_filterable_fields(
             "fieldname": "__assigned_on",
             "fieldtype": "Date",
             "label": "Assigned on",
-            "name": "__assigned_on",
         },
     ]
     for field in standard_fields:
@@ -495,10 +478,10 @@ def get_customer_portal_fields(doctype, fields):
     return fields
 
 
-def get_visible_custom_fields():
+def get_visible_custom_fields() -> list[str]:
     return frappe.db.get_all(
         "HD Ticket Template Field",
-        {"parent": "Default", "hide_from_customer": 0},
+        {"parent": "Default", "visible_to": "Everyone"},
         pluck="fieldname",
     )
 
