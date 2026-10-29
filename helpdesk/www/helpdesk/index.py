@@ -49,9 +49,41 @@ def get_boot():
             "lang": frappe.local.lang,
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
+<<<<<<< HEAD
+=======
+            "telemetry": get_telemetry_boot(),
+            "cloud_settings": get_cloud_settings_boot(),
+>>>>>>> 34738e9 (feat(sidebar): trial card on Frappe Cloud v2)
         }
     )
 
 
 def get_default_route():
     return "/helpdesk"
+<<<<<<< HEAD
+=======
+
+
+def get_telemetry_boot():
+    """Direct-mode config for the browser telemetry client, as a boot value.
+
+    Telemetry must never break the page: older frappe versions have no pulse
+    module, and any boot_config error degrades to "disabled". The key it
+    ships is a public write-only ingest key (same as desk boot).
+    """
+    try:
+        from frappe.utils.telemetry.pulse.client import boot_config
+
+        return boot_config()
+    except Exception:
+        return {"enabled": False}
+
+
+def get_cloud_settings_boot():
+    """Frappe Cloud v2 settings context; enabled only for System Managers on a Pilot-managed site."""
+    try:
+        from frappe.integrations.frappe_providers.cloud_settings import get_boot_context
+    except ImportError:
+        return {"enabled": False}
+    return get_boot_context()
+>>>>>>> 34738e9 (feat(sidebar): trial card on Frappe Cloud v2)
