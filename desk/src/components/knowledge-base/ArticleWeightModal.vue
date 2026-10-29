@@ -75,12 +75,16 @@ const title = computed(() =>
     : __("Set weight")
 );
 
-// Published only: what customers see, in the portal's order.
+// Published and not Private: what customers see, in the portal's order.
 const siblings = createResource({
   url: "frappe.client.get_list",
   makeParams: () => ({
     doctype: "HD Article",
-    filters: { category: props.category, status: "Published" },
+    filters: {
+      category: props.category,
+      status: "Published",
+      visibility: ["!=", "Private"],
+    },
     fields: ["name", "title", "weight", "published_on"],
     order_by: "weight desc, published_on desc",
     limit_page_length: 0,
