@@ -47,11 +47,14 @@ def drop_unknown_list_fields(
         part = part.strip()
         if not part:
             continue
-        # strip the direction keyword, then the backticked `tabDocType`. prefix
+        # strip the direction keyword, then only judge plainly resolvable keys
+        # (`field`, field, `tabDocType`.`field`); anything more complex - child-table
+        # references, function expressions - is left to the query layer unchanged
         expr = re.sub(r"\s+(asc|desc)$", "", part, flags=re.IGNORECASE).strip()
-        field = expr.rsplit(".", 1)[-1].strip("`")
-        if field in valid:
-            order_keys.append(part)
+        m = re.fullmatch(r"(?:`[^`]+`\.)?`?(\w+)`?", expr)
+        if m and m.group(1) not in valid:
+            continue
+        order_keys.append(part)
     order_by = ", ".join(order_keys) or "modified desc"
 
     return rows, order_by
@@ -786,4 +789,4 @@ def remove_assignments(doctype: str, name: str, assignees: list[str]):
             todo=None,
             assign_to=assign_to,
             status="Cancelled",
-    )
+        )
