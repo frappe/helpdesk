@@ -1,3 +1,4 @@
+import unittest
 from collections.abc import Callable
 
 import frappe
@@ -18,6 +19,7 @@ from helpdesk.test_utils import (
     unique_email,
     unique_name,
 )
+from helpdesk.utils import is_frappe_version
 
 # notification name: (update function, enabled field, content field)
 SIMPLE_NOTIFICATIONS: dict[str, tuple[Callable, str, str]] = {
@@ -153,12 +155,14 @@ class TestEmailNotifications(FrappeTestCase):
             self.saved("send_email_feedback_on_status"), self.resolved_status
         )
 
+    @unittest.skipIf(is_frappe_version("15"), "v15 only_for is a no-op in tests")
     def test_agent_cannot_read_notification_settings(self) -> None:
         with self.set_user(create_agent(unique_email("notify-agent")).name):
             for name in [*SIMPLE_NOTIFICATIONS, "share_feedback"]:
                 with self.assertRaises(frappe.PermissionError):
                     get_data(name)
 
+    @unittest.skipIf(is_frappe_version("15"), "v15 only_for is a no-op in tests")
     def test_agent_cannot_update_notification_settings(self) -> None:
         before = self.current_notification_settings()
 

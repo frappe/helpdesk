@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - develop
+      - main-hotfix
     paths:
       - "desk/**"
       - "e2e/**"
@@ -18,7 +19,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FRAPPE_BRANCH: develop
+  FRAPPE_BRANCH: version-16
   SITE: helpdesk.test
 
 jobs:
@@ -104,6 +105,8 @@ jobs:
           bench new-site --db-root-password root --admin-password admin --install-app helpdesk $SITE
           bench use $SITE
           bench --site $SITE set-config host_name "http://localhost:8000"
+          # invites send mail at once; the seed's SMTP is fake, so keep mail queued
+          bench --site $SITE set-config -p mute_emails 1
           bench build --apps frappe,helpdesk
         env:
           CI: "Yes"

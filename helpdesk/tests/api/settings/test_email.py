@@ -1,4 +1,5 @@
 import imaplib
+import unittest
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -16,6 +17,7 @@ from helpdesk.test_utils import (
     make_email_account_data,
     unique_email,
 )
+from helpdesk.utils import is_frappe_version
 
 EMAIL_ACCOUNT_MODULE = "frappe.email.doctype.email_account.email_account"
 
@@ -86,9 +88,11 @@ class TestCreateEmailAccount(FrappeTestCase):
         self.assertEqual(account.smtp_server, "smtp.example.com")
         self.assertEqual(account.smtp_port, "587")
         self.assertEqual((account.use_ssl, account.use_tls), (1, 0))
-        self.assertEqual(account.validate_ssl_certificate, 1)
+        if not is_frappe_version("15"):  # field added in v16
+            self.assertEqual(account.validate_ssl_certificate, 1)
         self.assert_ticket_inbox_folder(account)
 
+    @unittest.skipIf(is_frappe_version("15"), "Frappe Mail needs frappe v16")
     def test_frappe_mail_saves_api_credentials_without_imap(self) -> None:
         data = make_email_account_data(
             "Frappe Mail",
