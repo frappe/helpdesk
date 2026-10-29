@@ -148,7 +148,10 @@ for (const [label, viewport] of [
     await expect(page.getByText("Break applied to 2 workdays. Skipped Wednesday: outside working hours.")).toBeVisible();
     await expect(tableRow(dialog, "Tuesday")).toContainText(/1:00 PM\s*–\s*2:00 PM/);
     await expect(tableRow(dialog, "Wednesday")).not.toContainText(/PM\s*–/);
-    await dialog.getByRole("button", { name: "Save", exact: true }).click();
+    // Once the policy is dirty its Save must sit inside the panel, not clipped past its edge.
+    const [saveBox, panelBox] = await Promise.all([savePolicy.boundingBox(), dialog.boundingBox()]);
+    expect(saveBox!.x + saveBox!.width).toBeLessThanOrEqual(panelBox!.x + panelBox!.width);
+    await savePolicy.click();
 
     await expect.poll(async () => breaksOf(await api.get(SLA, sla))).toEqual([
       ["Monday", "13:00:00", "14:00:00"],
