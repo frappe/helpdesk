@@ -1362,6 +1362,18 @@ class TestHDTicket(IntegrationTestCase):
 
         self.assertTrue(get_one(ticket.name)["has_agent_replied"])
 
+    def test_reply_via_agent_without_recipients_goes_to_the_customer(self):
+        ticket = make_ticket(raised_by="customer@test.com")
+        ticket.reply_via_agent(message="Test reply")
+        communication = get_latest_ticket_communication(ticket.name)
+        self.assertEqual(communication.recipients, "customer@test.com")
+
+    def test_reply_via_agent_with_only_cc_leaves_out_the_customer(self):
+        ticket = make_ticket()
+        ticket.reply_via_agent(message="Test reply", cc="cc_only@test.com")
+        communication = get_latest_ticket_communication(ticket.name)
+        self.assertFalse(communication.recipients)
+
     def test_reply_via_agent_with_only_cc(self):
         """
         reply_via_agent should succeed when only cc is provided and to is empty/None

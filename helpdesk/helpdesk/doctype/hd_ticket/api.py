@@ -271,8 +271,8 @@ def get_attachments(doctype, name):
 def merge_ticket(source: str, target: str):
     """Merge ticket `source` into `target`, closing `source` and marking it merged.
     Copies its comments, emails and files to the target, then posts a reply on
-    the source and a comment on the target linking the two. Agents with write on
-    both."""
+    the source, emailed to its customer, and a comment on the target linking the
+    two. Agents with write on both."""
     # check if source and target exists
     if not frappe.db.exists("HD Ticket", source):
         frappe.throw(_("Source ticket does not exist"))
@@ -405,7 +405,7 @@ def split_ticket(subject: str, communication_id: str):
     """Split a ticket at an email into a new ticket and return the new ticket's name.
     The new ticket copies the original with `subject`, status Open and no SLA, and
     takes that email and every later email, comment and file. Posts a reply on
-    the original pointing to it. Agents only."""
+    the original pointing to it, emailed to its customer. Agents only."""
     communicaton_creation_time = frappe.db.get_value(
         "Communication", communication_id, "creation"
     )

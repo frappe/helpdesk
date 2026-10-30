@@ -709,7 +709,8 @@ class HDTicket(Document, CustomerEditController):
         """Reply on the ticket as an agent and return the Communication name.
         Agents only. Emails `to`/`cc`/`bcc` from `from_email` (`email_id`,
         `email_account`) or the default account, unless HD Settings skips email or
-        has agent reply emails off. `attachments` are File names."""
+        has agent reply emails off. With no recipient given, `to` is the ticket's
+        `raised_by`. `attachments` are File names."""
         if not is_agent():
             frappe.throw(
                 _("You are not permitted to reply as an agent"), frappe.PermissionError
@@ -720,6 +721,9 @@ class HDTicket(Document, CustomerEditController):
         from_email_id = from_email.get("email_id") if from_email else None
         email_account_name = from_email.get("email_account") if from_email else None
         sender = from_email_id or frappe.session.user
+        # the UI always sends `to`; a caller that names nobody means the customer
+        if to is None and not cc and not bcc:
+            to = self.raised_by
         recipients = to
 
         sender_email = None
