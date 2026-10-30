@@ -18,7 +18,7 @@ frappectl -s <p> method call helpdesk.api.dashboard.get_dashboard_data -f dashbo
 | `master` | Ticket counts by team, type, priority and other breakdowns |
 | `tags` | The most used tags |
 
-All four filters are optional; the dates default to the last 30 days. An agent who is not an Agent Manager can only pass their own user as `agent`, with no `team`. Use their email: `@me` is refused.
+All four filters are optional; the dates default to the last 30 days. An agent who is not an Agent Manager can only pass their own user as `agent`, with no `team`. Use their email: `@me` is refused. A `delta` of null means the period before had nothing to compare with, not that nothing changed.
 
 ## Compare agents (Agent Managers)
 
@@ -26,13 +26,13 @@ All four filters are optional; the dates default to the last 30 days. An agent w
 frappectl -s <p> method call helpdesk.api.ticket_stats.get_agent_performance -f team=<team> -f from_date=2026-01-01 -f to_date=2026-01-31
 ```
 
-Leave out `team` for every active agent, and the dates for the last 30 days. It returns one row per agent, with `agent_name`, `tickets`, `sla_fulfilled_percent`, `avg_first_response_hours`, `avg_resolution_days` and `avg_feedback_stars`, worked out as the dashboard does. Only an Agent Manager can call it; tell anyone else that comparing agents needs that role.
+Leave out `team` for every active agent, and the dates for the last 30 days. `team` picks the team's members, not the tickets in that team: an empty list means the team has no members, so check `doc get "HD Team" <team>` and tell the human. It returns one row per agent, with `agent_name`, `tickets`, `sla_fulfilled_percent`, `avg_first_response_hours`, `avg_resolution_days` and `avg_feedback_stars`, worked out as the dashboard does. Only an Agent Manager can call it; tell anyone else that comparing agents needs that role.
 
 To answer "who is the best or worst":
 
 1. Show the whole table, with each agent's ticket count.
-2. Say what you ranked on. Unless the human says otherwise, rank on `sla_fulfilled_percent`, then `avg_first_response_hours`. Most tickets handled gives a different answer; offer it.
-3. Leave out an agent with far fewer tickets than the rest, and say why: a 5.0 rating from 4 tickets says little.
+2. Say what you ranked on. Unless the human says otherwise, rank on `sla_fulfilled_percent`. On a tie, the lower `avg_first_response_hours` wins, then the lower `avg_resolution_days`, then the higher `avg_feedback_stars`. Most tickets handled gives a different answer; offer it.
+3. Leave out an agent with fewer than half the median ticket count, and say why: a 5.0 rating from one ticket says little.
 4. Tickets count for the agents assigned now. A reassigned ticket counts only for its latest agent, and one with two assignees counts for both.
 
 ## A customer or a contact

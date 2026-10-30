@@ -32,6 +32,8 @@ frappectl -s <p> doc create "HD Team" --input team.json
 
 A new team gets an `Assignment Rule` named `<team> - Support Rotation`, which assigns the team's tickets to its members in turn. Changing the team's `users` updates the rule. Edit the rule itself (Agent Manager) to change how tickets are shared out.
 
+`doc update "HD Team" <team> --input team.json` replaces the whole `users` list with the one you send. To add or remove one agent, `doc get` the team first and send its full list with that change. To move an agent, do that on both teams. Their open tickets stay assigned to them; reassign those only if the human asks.
+
 ## SLAs
 
 An SLA needs a holiday list. Create the list first:

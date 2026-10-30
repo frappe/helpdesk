@@ -65,19 +65,20 @@ To explain a date, read the SLA named in `sla` with `doc get "HD Service Level A
 
 | Task | Call |
 |---|---|
-| Reply to the customer | `method call reply_via_agent --doctype "HD Ticket" --name <t> -F message="<html>"`. Add `cc`, `bcc` or `attachments` (File names) when needed. |
+| Pick what to work on next | `doc list "HD Ticket" -f status_category=Open -f '_assign like %<user>%' --order-by "response_by asc" --fields name,subject,priority,response_by,resolution_by,first_responded_on`. A ticket already answered is due by its `resolution_by`. Put the earliest due first. |
+| Reply to the customer | `method call reply_via_agent --doctype "HD Ticket" --name <t> -F message="<html>"`. Add `cc`, `bcc` or `attachments` (File names) when needed. A reply changes the status only when HD Settings `auto_update_status` is on. Read the ticket after sending, tell the human its status, and offer to change it. |
 | Add an internal note | `method call new_comment --doctype "HD Ticket" --name <t> -F content="<html>"` |
 | Assign an agent | `method call assign_agent --doctype "HD Ticket" --name <t> -f agent=<user>`. It adds to the current assignees and notifies the agent. |
 | Change status, priority, team or type | `doc update "HD Ticket" <t> --set status=<status> < /dev/null`. List the statuses with `doc list "HD Ticket Status" --fields name,category`. |
 | Reply with a saved reply | `method call helpdesk.api.saved_replies.get_rendered_saved_reply -f ticket_id=<t> -f saved_reply_id=<name>`, send its `message` with `reply_via_agent`, then pass its `actions` to `apply_saved_reply_actions -f ticket_id=<t> -F 'actions:=<actions>'` |
-| Tag a ticket | `method call helpdesk.api.tags.update_tags -f doctype="HD Ticket" -f name=<t> -F 'added:=[{"name": "<tag>"}]' -F 'removed:=["<tag>"]'` |
+| Tag a ticket | `method call helpdesk.api.tags.update_tags -f doctype="HD Ticket" -f name=<t> -F 'added:=[{"name": "<tag>"}]' -F 'removed:=["<tag>"]'`. Send only the one you need; a new tag is created. |
 | Create a ticket for a contact | `doc create "HD Ticket" --input <file>` with `subject`, `description` (HTML), `raised_by` (their email), `contact` and, when they have one, `customer`. See `reference/tickets.md`. |
 | Merge two tickets | `method call helpdesk.helpdesk.doctype.hd_ticket.api.merge_ticket -f source=<t> -f target=<t>` |
 | Split a ticket | `method call helpdesk.helpdesk.doctype.hd_ticket.api.split_ticket -f subject=<s> -f communication_id=<email>`. The email and every email and comment after it move to a new ticket. |
 | Find a contact | `method call -X GET helpdesk.api.contact.search_contacts -f txt=<text>` |
 | Create a contact | `method call helpdesk.api.contact.create_contact -F 'doc:={"first_name": "...", "last_name": "...", "email": "..."}'`. Add `-F invite:=true` to invite them to the portal. |
 | Create a customer | `method call helpdesk.api.customer.create_customer -F 'customer:={"customer_name": "...", "domain": "..."}'`. Add `-F 'primary_contact:={"email": "...", "first_name": "..."}'` to create and invite its first contact. |
-| Add contacts to a customer | `method call add_contacts --doctype "HD Customer" --name <c> -F 'contacts:=["<contact or email>"]'`. Contacts without a user are invited by email. |
+| Add contacts to a customer | `method call add_contacts --doctype "HD Customer" --name <c> -F 'contacts:=["<contact or email>"]'`. Contacts without a user are not added but invited by email, and come back under `invite_result`. Add `-F invite:=false` to add them without an invite; a contact must exist for each email. |
 | Set up the helpdesk | `reference/setup.md` |
 
 ## 5. Traps
