@@ -79,7 +79,7 @@ Get the template's fields first (see Fields). A field is required in three ways,
 - **`required` in the template.** Ask for it before you create the ticket.
 - **`mandatory_depends_on`** on a template field, such as `eval:doc.ticket_type=="Bug"`. Work it out against the values you have, and ask for the field when it is true.
 
-Skip template fields whose `depends_on` is false: the app hides them. The app's forms check the last two, so a ticket created here without them is saved without complaint.
+Skip template fields whose `depends_on` is false: the app hides them. Only the portal's new-ticket form checks the last two, so a ticket created here without them is saved without complaint.
 
 Beyond those, only `subject` and `raised_by` are needed: `contact` is filled in from a contact with that email, and `status` and `priority` from the defaults. Create the contact first with `create_contact` when there is none. A new ticket can send the contact an acknowledgement email, depending on the site's email settings.
 
