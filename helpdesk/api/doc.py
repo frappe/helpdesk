@@ -1,7 +1,9 @@
+import re
+
 import frappe
 from frappe import _
 from frappe.desk.form.assign_to import set_status
-from frappe.model import no_value_fields
+from frappe.model import OPTIONAL_FIELDS, no_value_fields
 from frappe.model.document import get_controller
 from frappe.query_builder.functions import Date
 from pypika import Criterion
@@ -17,6 +19,45 @@ from helpdesk.utils import (
 )
 
 SLA_ROW_FIELDS = ["sla", "status", "first_responded_on", "resolution_date"]
+
+
+def drop_unknown_list_fields(
+    doctype: str, rows: list, order_by: str
+) -> tuple[list, str]:
+    """Drop names that no longer exist on the doctype from a saved view's selection.
+
+    Saved views store their columns and sort order verbatim; after a field is
+    renamed or removed, one stale name fails the whole `frappe.get_list` call and
+    the list will not load at all - which also removes the UI that could fix the
+    view. Check against the doctype's schema only, never the caller's permissions:
+    a field that exists but is not readable by this user is passed through so
+    Frappe's own field-level permission handling applies unchanged. Filters are
+    not touched: dropping a predicate would silently widen the result set.
+    """
+    valid = set(frappe.get_meta(doctype).get_valid_columns()) | set(OPTIONAL_FIELDS)
+
+    def exists(name: str) -> bool:
+        # dotted "table.field" references are validated by the query layer itself
+        return name in valid or "." in name
+
+    rows = [row for row in rows if exists(row)] or ["name"]
+
+    order_keys = []
+    for part in (order_by or "").split(","):
+        part = part.strip()
+        if not part:
+            continue
+        # strip the direction keyword, then only judge plainly resolvable keys
+        # (`field`, field, `tabDocType`.`field`); anything more complex - child-table
+        # references, function expressions - is left to the query layer unchanged
+        expr = re.sub(r"\s+(asc|desc)$", "", part, flags=re.IGNORECASE).strip()
+        m = re.fullmatch(r"(?:`[^`]+`\.)?`?(\w+)`?", expr)
+        if m and m.group(1) not in valid:
+            continue
+        order_keys.append(part)
+    order_by = ", ".join(order_keys) or "modified desc"
+
+    return rows, order_by
 
 
 @frappe.whitelist()
@@ -120,6 +161,8 @@ def get_list_data(
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
+    rows, order_by = drop_unknown_list_fields(doctype, rows, order_by)
+
     data = (
         frappe.get_list(
             doctype,
