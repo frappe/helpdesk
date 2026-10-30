@@ -47,7 +47,7 @@ frappectl -s <p> method call helpdesk.api.ticket_stats.get_ticket_stats -f dt="H
 
 ## The signed-in agent
 
-All in `helpdesk.api.agent_home.agent_home`, for the profile's own user:
+For their own % SLA fulfilled, average first response, resolution and feedback over any dates, use the dashboard above with `agent` set to their email. The rest are all in `helpdesk.api.agent_home.agent_home`, for the profile's own user:
 
 | Method | Returns |
 |---|---|

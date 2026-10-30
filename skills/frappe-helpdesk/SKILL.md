@@ -76,16 +76,16 @@ To explain a date, read the SLA named in `sla` with `doc get "HD Service Level A
 | Merge two tickets | `method call helpdesk.helpdesk.doctype.hd_ticket.api.merge_ticket -f source=<t> -f target=<t>` |
 | Split a ticket | `method call helpdesk.helpdesk.doctype.hd_ticket.api.split_ticket -f subject=<s> -f communication_id=<email>`. The email and every email and comment after it move to a new ticket. |
 | Find a contact | `method call -X GET helpdesk.api.contact.search_contacts -f txt=<text>` |
-| Create a contact | `method call helpdesk.api.contact.create_contact -F 'doc:={"first_name": "...", "last_name": "...", "email": "..."}'`. Add `-F invite:=true` to invite them to the portal. |
+| Create a contact | `method call helpdesk.api.contact.create_contact -F 'doc:={"first_name": "...", "last_name": "...", "email": "..."}'`. Put `"customer": "<c>"` in `doc` to add them to that customer. Add `-F invite:=true` to invite them to the portal instead. |
 | Create a customer | `method call helpdesk.api.customer.create_customer -F 'customer:={"customer_name": "...", "domain": "..."}'`. Add `-F 'primary_contact:={"email": "...", "first_name": "..."}'` to create and invite its first contact. |
-| Add contacts to a customer | `method call add_contacts --doctype "HD Customer" --name <c> -F 'contacts:=["<contact or email>"]'`. A contact with a user is added. One without a user is emailed an invite instead, and comes back under `invite_result`, not `added`. With `-F invite:=false`, every contact is added and nobody is emailed; create a missing contact with `create_contact` first. |
+| Add contacts to a customer | `method call add_contacts --doctype "HD Customer" --name <c> -F 'contacts:=["<contact or email>"]'`. A contact with a user is added. One without a user is emailed an invite instead, and comes back under `invite_result`, not `added`. With `-F invite:=false`, every contact is added and nobody is emailed; a missing contact can be created with its customer in one step ("Create a contact"). |
 | Set up the helpdesk | `reference/setup.md` |
 
 ## 5. Traps
 
 - **A reply emails the customer** when HD Settings `enable_reply_email_via_agent` is on. Show the human the reply and ask before you send it.
 - **Never insert a `Communication` to reply.** The ticket still updates, but no email goes out and the reply is not threaded. An agent replies with `reply_via_agent`; a customer replies with `create_communication_via_contact` (`reference/customer.md`).
-- **A merge cannot be undone.** It copies the source's emails, comments and files into the target, closes the source with `merged_with` set, and emails the customer that it was merged. Ask first.
+- **A merge cannot be undone.** It copies the source's emails, comments and files into the target, closes the source with `merged_with` set, and emails the customer that it was merged. `doc get` both first: when their `raised_by` or `customer` differ, tell the human, because the target's contact will see the source's emails. Ask first.
 - **Deletes can take tickets with them.** `delete_contact` and `delete_customer` with `delete_tickets` delete every linked ticket. Ask first, and name what will go.
 - **Every save picks the SLA again and recalculates its dates.** Changing the priority, or a field an SLA condition reads, can switch the ticket to another SLA.
 - **A contact sees a ticket** only when they are its `contact`, its `raised_by` or its owner. A customer's managers also see every ticket of that `customer`. Set these right on a ticket you create.

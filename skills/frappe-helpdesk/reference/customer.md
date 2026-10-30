@@ -18,6 +18,8 @@ frappectl -s <p> method call frappe.client.get_list -f doctype="HD Ticket" -F 'f
   -F 'filters:={"status_category": "Open"}' -f order_by="modified desc"
 frappectl -s <p> method call frappe.client.get_list -f doctype="HD Ticket" -F 'fields:=["name","subject","status","raised_by"]' \
   -F 'filters:={"customer": "<organization>"}'                                  # a Manager's view
+frappectl -s <p> method call frappe.client.get_list -f doctype="HD Ticket" -F 'fields:=["name","subject","status"]' \
+  -F 'filters:={"subject": ["like", "%<words>%"]}'                              # search by subject
 frappectl -s <p> method call frappe.client.get -f doctype="HD Ticket" -f name=<ticket>      # the ticket's fields
 frappectl -s <p> method call frappe.desk.form.activity.get_activity_timeline -f doctype="HD Ticket" -f name=<ticket>   # its emails and status changes
 ```
@@ -30,7 +32,7 @@ A status falls in one of three categories, kept in `status_category`: Open, Paus
 
 | Task | Call |
 |---|---|
-| Raise a ticket | First get the template's fields (next row). Write the subject and description from what the human said, and show them before you raise it. Then `method call helpdesk.helpdesk.doctype.hd_ticket.api.new -F 'doc:={"subject": "...", "description": "<p>...</p>"}'`. It returns the new ticket. |
+| Raise a ticket | First get the template's fields (next row). Write the subject and description from what the human said. Show them and wait for a yes before you raise it, even when the human already asked you to raise it. Then `method call helpdesk.helpdesk.doctype.hd_ticket.api.new -F 'doc:={"subject": "...", "description": "<p>...</p>"}'`. It returns the new ticket. |
 | Fields a new ticket asks for | `method call helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one -f name=Default`. Its `fields` are the portal's new-ticket form, in order, each with `label`, `fieldtype`, `options`, `placeholder` (the hint the portal shows) and `required`. Ask the human for each one with `required` 1, or whose `mandatory_depends_on` (such as `eval:doc.ticket_type=="Bug"`) is true for the values so far, and put them in `doc`. Skip any whose `depends_on` is false. The portal checks these; the server does not. A field mandatory on the doctype itself is refused by the server with "Value missing for HD Ticket: <field>": ask for it and try again. Add `customer` when the contact is in more than one organization. |
 | Reply | `method call create_communication_via_contact --doctype "HD Ticket" --name <t> -F message="<html>"`. The ticket moves back to an Open status. |
 | Close a ticket | First check `method call helpdesk.api.config.get_config`. If `is_feedback_mandatory` is 1 and an agent has replied on the ticket, use "Close and rate it" instead. Otherwise `method call frappe.client.set_value -f doctype="HD Ticket" -f name=<t> -f fieldname=status -f value=Closed` |
