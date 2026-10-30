@@ -62,6 +62,29 @@ class TestHDCustomer(IntegrationTestCase):
         self.assertEqual(invitation.customer, customer.name)
         self.assertEqual(invitation.contact, contact["contact"])
 
+    def test_contact_without_user_is_added_when_invite_is_off(self) -> None:
+        customer = create_customer("Test Customer No Invite")
+        email = "no-invite-contact@example.com"
+        contact = create_contact("NoInvite", email, user=False)
+
+        result = customer.add_contacts(
+            [contact["contact"]], "HD Customer", invite=False
+        )
+
+        self.assertIn(contact["contact"], result["added"])
+        self.assertEqual(result["invite_result"]["invited_emails"], [])
+        member_names = [row.contact_name for row in customer.contacts]
+        self.assertIn(contact["contact"], member_names)
+        self.assertFalse(get_invitation(email), "No invitation expected")
+
+    def test_unknown_email_is_refused_when_invite_is_off(self) -> None:
+        customer = create_customer("Test Customer No Invite Unknown")
+
+        with self.assertRaises(frappe.ValidationError):
+            customer.add_contacts(
+                ["nobody-here@example.com"], "HD Customer", invite=False
+            )
+
     def test_unknown_email_gets_invited(self) -> None:
         customer = create_customer("Test Customer Invite Email")
 
