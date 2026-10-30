@@ -32,8 +32,9 @@ function refreshTrial() {
     .then(({ trial }) => {
       cachedTrial.value = { trial: trial ?? null, fetchedAt: Date.now() };
     })
-    // The card is a reminder: if billing can't be read, show nothing
-    .catch(() => (cachedTrial.value = { trial: null, fetchedAt: 0 }))
+    // The card is a reminder: if billing can't be read, keep the last known
+    // trial on screen and try again on the next mount
+    .catch(() => {})
     .finally(() => (pending = null));
   return pending;
 }
