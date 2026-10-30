@@ -18,7 +18,7 @@
 | `ticket_split_from` | Set on a ticket split from another |
 | `_user_tags` | The tags, comma-separated |
 
-Sites add their own fields. `frappectl -s <p> doctype show "HD Ticket"` lists them all.
+Sites add their own fields. The ticket template, `HD Ticket Template` "Default", says which ones the app uses: `method call helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one -f name=Default` returns them in the app's order, each with its `label`, `fieldtype`, `options` and `required`. `frappectl -s <p> doctype show "HD Ticket"` lists every field, including the ones the template leaves out.
 
 ## Filters
 
@@ -73,7 +73,7 @@ Write the ticket to a file and create it:
 frappectl -s <p> doc create "HD Ticket" --input ticket.json
 ```
 
-Only `subject` and `raised_by` are needed: `contact` is filled in from a contact with that email, and `status` and `priority` from the defaults. Create the contact first with `create_contact` when there is none. A new ticket can send the contact an acknowledgement email, depending on the site's email settings.
+Get the template's fields first (see Fields), and ask the human for each one with `required` 1. The app's form insists on them, but the server does not check them, so a ticket created here can quietly miss them. The server itself needs only `subject` and `raised_by`: `contact` is filled in from a contact with that email, and `status` and `priority` from the defaults. Create the contact first with `create_contact` when there is none. A new ticket can send the contact an acknowledgement email, depending on the site's email settings.
 
 ## Merging and splitting
 

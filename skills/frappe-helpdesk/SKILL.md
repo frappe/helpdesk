@@ -26,7 +26,7 @@ A call refused with "does not have doctype access" needs a role the profile lack
 - Some methods accept only GET. Call those with `method call -X GET`. This file marks them.
 - `doc create` and `doc update` read stdin when it is not a terminal, and hang in an agent's shell. Pass `--input <file>`, or `< /dev/null` with `--set`.
 - Send dict and list arguments as JSON: `-F 'filters:={"agent":"<user>"}'`.
-- Sites add their own fields to `HD Ticket`. Run `frappectl -s <p> doctype show "HD Ticket"` before you guess a field name.
+- Sites add their own fields to `HD Ticket`. The ticket template, `HD Ticket Template` "Default", says which ones the app uses, in the order it shows them, and which are required: `method call helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one -f name=Default`. `frappectl -s <p> doctype show "HD Ticket"` lists every field. Check one of them before you guess a field name.
 
 ## 2. Find tickets and their data
 

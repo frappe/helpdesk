@@ -30,8 +30,8 @@ A status falls in one of three categories, kept in `status_category`: Open, Paus
 
 | Task | Call |
 |---|---|
-| Raise a ticket | `method call helpdesk.helpdesk.doctype.hd_ticket.api.new -F 'doc:={"subject": "...", "description": "<p>...</p>"}'`. It returns the new ticket. |
-| See what else a new ticket can carry | `method call helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one -f name=Default`. Its `fields` (such as `priority` and `ticket_type`) can go in `doc`. Add `customer` when the contact is in more than one organization. |
+| Raise a ticket | First get the template's fields (next row). Then `method call helpdesk.helpdesk.doctype.hd_ticket.api.new -F 'doc:={"subject": "...", "description": "<p>...</p>"}'`. It returns the new ticket. |
+| Fields a new ticket asks for | `method call helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one -f name=Default`. Its `fields` are the portal's new-ticket form, in order, each with `label`, `fieldtype`, `options`, `placeholder` (the hint the portal shows) and `required`. Ask the human for each one with `required` 1 and put them in `doc`: the portal insists on them, but the server does not. Add `customer` when the contact is in more than one organization. |
 | Reply | `method call create_communication_via_contact --doctype "HD Ticket" --name <t> -F message="<html>"`. The ticket moves back to an Open status. |
 | Close a ticket | `method call frappe.client.set_value -f doctype="HD Ticket" -f name=<t> -f fieldname=status -f value=Closed` |
 | Close and rate it | `method call frappe.client.set_value -f doctype="HD Ticket" -f name=<t> -F 'fieldname:={"status": "Closed", "feedback": "<option>", "feedback_extra": "<comment>"}'`. List the options with `method call frappe.client.get_list -f doctype="HD Ticket Feedback Option" -F 'fields:=["name","rating"]' -F 'filters:={"disabled": 0}'`; `rating` runs from 0.2 (one star) to 1 (five). |
