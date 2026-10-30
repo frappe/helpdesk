@@ -14,25 +14,23 @@ A customer is a contact with a user on the site. They raise tickets and talk to 
 ## 2. Find tickets
 
 ```sh
-T=helpdesk.helpdesk.doctype.hd_ticket.api
-C=frappe.client
-frappectl -s <p> method call $C.get_list -f doctype="HD Ticket" -F 'fields:=["name","subject","status","modified"]' \
+frappectl -s <p> method call frappe.client.get_list -f doctype="HD Ticket" -F 'fields:=["name","subject","status","modified"]' \
   -F 'filters:={"status_category": "Open"}' -f order_by="modified desc"
-frappectl -s <p> method call $C.get_list -f doctype="HD Ticket" -F 'fields:=["name","subject","status","raised_by"]' \
+frappectl -s <p> method call frappe.client.get_list -f doctype="HD Ticket" -F 'fields:=["name","subject","status","raised_by"]' \
   -F 'filters:={"customer": "<organization>"}'                                  # a Manager's view
-frappectl -s <p> method call $C.get -f doctype="HD Ticket" -f name=<ticket>      # the ticket's fields
+frappectl -s <p> method call frappe.client.get -f doctype="HD Ticket" -f name=<ticket>      # the ticket's fields
 frappectl -s <p> method call frappe.desk.form.activity.get_activity_timeline -f doctype="HD Ticket" -f name=<ticket>   # its emails and status changes
 ```
 
 The ticket has `response_by` and `resolution_by`, when the team is due to answer and to resolve, and `first_responded_on`. The timeline lists the emails from both sides (`email`, with `sender` and `content`) and the changes to fields the customer can see (`version`), oldest first. It holds the latest 20 emails; `SKILL.md` says how to get older ones.
 
-A status falls in one of three categories, kept in `status_category`: Open, Paused or Resolved. Paused usually means the team is waiting for the customer. The app shows a status by its `label_customer` when it has one: `method call $C.get_list -f doctype="HD Ticket Status" -F 'fields:=["name","label_customer","category"]'`.
+A status falls in one of three categories, kept in `status_category`: Open, Paused or Resolved. Paused usually means the team is waiting for the customer. The app shows a status by its `label_customer` when it has one: `method call frappe.client.get_list -f doctype="HD Ticket Status" -F 'fields:=["name","label_customer","category"]'`.
 
 ## 3. Common tasks
 
 | Task | Call |
 |---|---|
-| Raise a ticket | `method call $T.new -F 'doc:={"subject": "...", "description": "<p>...</p>"}'`. It returns the new ticket. |
+| Raise a ticket | `method call helpdesk.helpdesk.doctype.hd_ticket.api.new -F 'doc:={"subject": "...", "description": "<p>...</p>"}'`. It returns the new ticket. |
 | See what else a new ticket can carry | `method call helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one -f name=Default`. Its `fields` (such as `priority` and `ticket_type`) can go in `doc`. Add `customer` when the contact is in more than one organization. |
 | Reply | `method call create_communication_via_contact --doctype "HD Ticket" --name <t> -F message="<html>"`. The ticket moves back to an Open status. |
 | Close a ticket | `method call frappe.client.set_value -f doctype="HD Ticket" -f name=<t> -f fieldname=status -f value=Closed` |

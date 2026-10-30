@@ -31,14 +31,12 @@ A call refused with "does not have doctype access" needs a role the profile lack
 ## 2. Find tickets and their data
 
 ```sh
-T=helpdesk.helpdesk.doctype.hd_ticket.api
-A=frappe.desk.form.activity
 frappectl -s <p> doc list "HD Ticket" -f status_category=Open -f agent_group=<team> \
   --fields name,subject,status,priority,_assign,customer,response_by,agreement_status
 frappectl -s <p> method call helpdesk.api.search.search -F query=<words>     # subjects, descriptions, emails and comments
 frappectl -s <p> doc get "HD Ticket" <ticket>                                 # the ticket's fields
-frappectl -s <p> method call $A.get_activity_timeline -f doctype="HD Ticket" -f name=<ticket>   # its emails, notes and changes
-frappectl -s <p> method call $T.get_recent_similar_tickets -f ticket=<ticket>
+frappectl -s <p> method call frappe.desk.form.activity.get_activity_timeline -f doctype="HD Ticket" -f name=<ticket>   # its emails, notes and changes
+frappectl -s <p> method call helpdesk.helpdesk.doctype.hd_ticket.api.get_recent_similar_tickets -f ticket=<ticket>
 frappectl -s <p> method call -X GET helpdesk.api.contact.get_contact_info -f name=<contact>
 ```
 
@@ -59,7 +57,7 @@ For numbers across many tickets (counts, average response and resolution time, S
 
 ## 3. SLA: when is it due, why is it late
 
-`method call $T.get_one -f name=<ticket>` returns `overdue_by`, with `response` and `resolution` in working seconds past due. It is empty while the ticket is paused. `get_one` also marks the ticket as seen by the caller. The ticket itself has `sla`, `agreement_status` (First Response Due, Resolution Due, Paused, Failed or Fulfilled), `response_by`, `resolution_by`, `first_responded_on`, `on_hold_since`, `total_hold_time`, `first_response_failed_by` and `resolution_failed_by`.
+`method call helpdesk.helpdesk.doctype.hd_ticket.api.get_one -f name=<ticket>` returns `overdue_by`, with `response` and `resolution` in working seconds past due. It is empty while the ticket is paused. `get_one` also marks the ticket as seen by the caller. The ticket itself has `sla`, `agreement_status` (First Response Due, Resolution Due, Paused, Failed or Fulfilled), `response_by`, `resolution_by`, `first_responded_on`, `on_hold_since`, `total_hold_time`, `first_response_failed_by` and `resolution_failed_by`.
 
 To explain a date, read the SLA named in `sla` with `doc get "HD Service Level Agreement" <sla>` (Agent Manager only): its priorities, working hours and holiday list. Without that role, `get_ticket_analytics` (`reference/tickets.md`) still gives each target and how far it was missed. `reference/sla.md` explains how the SLA is picked and the dates are worked out.
 
@@ -74,8 +72,8 @@ To explain a date, read the SLA named in `sla` with `doc get "HD Service Level A
 | Reply with a saved reply | `method call helpdesk.api.saved_replies.get_rendered_saved_reply -f ticket_id=<t> -f saved_reply_id=<name>`, send its `message` with `reply_via_agent`, then pass its `actions` to `apply_saved_reply_actions -f ticket_id=<t> -F 'actions:=<actions>'` |
 | Tag a ticket | `method call helpdesk.api.tags.update_tags -f doctype="HD Ticket" -f name=<t> -F 'added:=[{"name": "<tag>"}]' -F 'removed:=["<tag>"]'` |
 | Create a ticket for a contact | `doc create "HD Ticket" --input <file>` with `subject`, `description` (HTML), `raised_by` (their email), `contact` and, when they have one, `customer`. See `reference/tickets.md`. |
-| Merge two tickets | `method call $T.merge_ticket -f source=<t> -f target=<t>` |
-| Split a ticket | `method call $T.split_ticket -f subject=<s> -f communication_id=<email>`. The email and every email and comment after it move to a new ticket. |
+| Merge two tickets | `method call helpdesk.helpdesk.doctype.hd_ticket.api.merge_ticket -f source=<t> -f target=<t>` |
+| Split a ticket | `method call helpdesk.helpdesk.doctype.hd_ticket.api.split_ticket -f subject=<s> -f communication_id=<email>`. The email and every email and comment after it move to a new ticket. |
 | Find a contact | `method call -X GET helpdesk.api.contact.search_contacts -f txt=<text>` |
 | Create a contact | `method call helpdesk.api.contact.create_contact -F 'doc:={"first_name": "...", "last_name": "...", "email": "..."}'`. Add `-F invite:=true` to invite them to the portal. |
 | Create a customer | `method call helpdesk.api.customer.create_customer -F 'customer:={"customer_name": "...", "domain": "..."}'`. Add `-F 'primary_contact:={"email": "...", "first_name": "..."}'` to create and invite its first contact. |
