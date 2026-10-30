@@ -91,7 +91,7 @@
               variant="subtle"
               :label="__('Break end')"
               v-model="workDayData.break_end"
-              @change="validateBreak"
+              @blur="validateBreak"
             />
           </div>
           <ErrorMessage :message="errors.break" class="mt-2" />
