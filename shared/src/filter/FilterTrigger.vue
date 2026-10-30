@@ -9,10 +9,14 @@
       <template #suffix>
         <!-- -ms-2 cancels the Button's gap while the badge is closed -->
         <span
-          :class="[REVEAL, count ? 'grid-cols-[1fr]' : '-ms-2 grid-cols-[0fr]']"
+          :class="[
+            REVEAL,
+            count ? 'grid-cols-[1fr]' : 'invisible -ms-2 grid-cols-[0fr]',
+          ]"
           :aria-hidden="!count"
         >
-          <span class="min-w-0 overflow-hidden">
+          <!-- -m-1 p-1: room for the badge shadow inside the clip -->
+          <span class="-m-1 min-w-0 overflow-hidden p-1">
             <span
               class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
             >
