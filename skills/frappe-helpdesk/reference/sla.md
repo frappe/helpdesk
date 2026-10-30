@@ -52,6 +52,6 @@ So changing a ticket's priority, or any field a condition reads, can move it to 
 ## Answering "why is this ticket late?"
 
 1. `get_one` the ticket. Read `sla`, `priority`, `service_level_agreement_creation`, `response_by`, `resolution_by`, `first_responded_on`, `total_hold_time` and `overdue_by`.
-2. `doc get "HD Service Level Agreement" <sla>` for its targets, working hours and holiday list. Reading it needs the Agent Manager role.
+2. `doc get "HD Service Level Agreement" <sla>` for its targets, working hours and holiday list. Reading it needs the Agent Manager role. Then `doc get "HD Service Holiday List" <holiday_list>` for the dates that don't count.
 3. `get_activity_timeline` with `-F 'visible_types:=[{"version": ["status"]}]'` for when the status changed, which explains pauses.
 4. `helpdesk.api.ticket_analytics.get_ticket_analytics -f ticket=<t>` sums it up: each target, when it was met, and by how much it was missed.

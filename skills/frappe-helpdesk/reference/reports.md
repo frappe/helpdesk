@@ -18,7 +18,7 @@ frappectl -s <p> method call helpdesk.api.dashboard.get_dashboard_data -f dashbo
 | `master` | Ticket counts by team, type, priority and other breakdowns |
 | `tags` | The most used tags |
 
-All four filters are optional; the dates default to the last 30 days. An agent who is not an Agent Manager can only pass their own user as `agent`, with no `team`. Use their email: `@me` is refused. A `delta` of null means the period before had nothing to compare with, not that nothing changed.
+All four filters are optional; the dates default to the last 30 days. An agent who is not an Agent Manager can only pass their own user as `agent`, with no `team`. Use their email: `@me` is refused. A `delta` of null means the period before had nothing to compare with, not that nothing changed. Here `team` means the tickets in that team. % SLA fulfilled counts only resolved tickets that have an SLA.
 
 ## Compare agents (Agent Managers)
 
@@ -30,9 +30,9 @@ Leave out `team` for every active agent, and the dates for the last 30 days. `te
 
 To answer "who is the best or worst":
 
-1. Show the whole table, with each agent's ticket count.
-2. Say what you ranked on. Unless the human says otherwise, rank on `sla_fulfilled_percent`. On a tie, the lower `avg_first_response_hours` wins, then the lower `avg_resolution_days`, then the higher `avg_feedback_stars`. Most tickets handled gives a different answer; offer it.
-3. Leave out an agent with fewer than half the median ticket count, and say why: a 5.0 rating from one ticket says little.
+1. Show the whole table, with each agent's ticket count. `tickets` counts all of them; `sla_fulfilled_percent` counts only the resolved ones.
+2. Before you rank, leave out any agent with fewer than half the median `tickets` of the table, and say why: a 5.0 rating from one ticket says little.
+3. Rank the rest. Unless the human says otherwise, rank on `sla_fulfilled_percent`. On a tie, the lower `avg_first_response_hours` wins, then the lower `avg_resolution_days`, then the higher `avg_feedback_stars`. Say what you ranked on. Most tickets handled gives a different answer; offer it.
 4. Tickets count for the agents assigned now. A reassigned ticket counts only for its latest agent, and one with two assignees counts for both.
 
 ## A customer or a contact
