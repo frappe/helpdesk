@@ -42,6 +42,9 @@ def redirect_customer_home():
 
 @frappe.whitelist(methods=["POST"], allow_guest=True)
 def get_context_for_dev():
+    """The helpdesk app's boot data, for the frontend dev server.
+    Session user, agent, site, formats, timezone, CSRF token and installed apps.
+    Developer mode only."""
     if not frappe.conf.developer_mode:
         frappe.throw(_("This method is only meant for developer mode"))
     return get_boot()

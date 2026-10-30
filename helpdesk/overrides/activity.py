@@ -14,12 +14,16 @@ def get_activity_timeline(
     name: str | int,
     visible_types: list[str | dict[str, list[str]]] | str | None = None,
 ) -> dict:
+    """Desk's activity timeline for a document, minus email recipients for customers.
+    On HD Ticket, non-agents get email rows without to, cc and bcc."""
     result = activity.get_activity_timeline(doctype, name, visible_types)
     return strip_recipients(doctype, result)
 
 
 @frappe.whitelist()
 def get_more_email_activities(doctype: str, name: str | int, start: int) -> dict:
+    """Desk's email activities from `start`, without recipients for customers.
+    On HD Ticket, non-agents get them without to, cc and bcc."""
     result = activity.get_more_email_activities(doctype, name, start)
     return strip_recipients(doctype, result)
 
@@ -37,6 +41,7 @@ def strip_recipients(doctype: str, result: dict) -> dict:
 # The desk form loaders send docinfo (recipients, assignments, versions); customers have no desk form.
 @frappe.whitelist()
 def getdoc(doctype: str, name: str | int):
+    """Desk's getdoc (document plus docinfo), refused on HD Ticket to non-agents."""
     deny_ticket_form_to_customers(doctype)
     return load.getdoc(doctype, name)
 
@@ -47,6 +52,8 @@ def get_docinfo(
     doctype: str | None = None,
     name: str | int | None = None,
 ):
+    """Desk's docinfo for a document: versions, assignments, emails and more.
+    Refused on HD Ticket to non-agents."""
     if isinstance(doc, dict):
         doctype = doctype or doc.get("doctype")
     deny_ticket_form_to_customers(doctype)
@@ -57,6 +64,8 @@ def get_docinfo(
 def get_communications(
     doctype: str, name: str | int, start: str | int = 0, limit: str | int = 20
 ):
+    """Desk's communications for a document, `limit` of them from `start`.
+    Refused on HD Ticket to non-agents."""
     deny_ticket_form_to_customers(doctype)
     return load.get_communications(doctype, name, start, limit)
 

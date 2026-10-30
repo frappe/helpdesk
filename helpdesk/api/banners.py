@@ -12,6 +12,9 @@ BANNERS = {
 
 @frappe.whitelist()
 def get_banners() -> list[str]:
+    """Names of the setup notices still to show to the current user.
+    "customer_portal_permission" or "ticket_field_permission". Always empty for anyone
+    but agent managers and admins."""
     if not is_agent_manager():
         return []
 
@@ -25,6 +28,9 @@ def get_banners() -> list[str]:
 @frappe.whitelist(methods=["POST"])
 @agent_manager_only
 def dismiss_banner(banner: str) -> None:
+    """Turn off a setup notice for everyone. Agent managers only.
+    `banner`: "customer_portal_permission" or "ticket_field_permission". Tells open
+    clients that settings changed."""
     if banner not in BANNERS:
         frappe.throw(_("Unknown banner {0}").format(banner))
 

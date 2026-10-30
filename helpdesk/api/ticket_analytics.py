@@ -41,6 +41,10 @@ TICKET_FIELDS = [
 @frappe.whitelist()
 @agent_only
 def get_ticket_analytics(ticket: str) -> dict:
+    """One ticket's SLA timeline, reply-gap metrics, events and conversation summary.
+    Keys: has_sla, timeline (created, first response, hold, resolution), metrics,
+    events, summary. Durations are seconds, business hours under the ticket's SLA.
+    Agents who can read the ticket only."""
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     details = frappe.db.get_value("HD Ticket", ticket, TICKET_FIELDS, as_dict=True)
     if not details:

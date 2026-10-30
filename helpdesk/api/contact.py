@@ -16,6 +16,9 @@ from helpdesk.utils import (
 def search_contacts(
     txt: str, additional_filters: str | list | None = None
 ) -> list[dict[Literal["full_name", "name", "email_id"], str]]:
+    """Up to 10 contacts with an email matching `txt` by full name, email or name.
+    As {full_name, name, email_id}. `additional_filters` adds filters (a list or its
+    JSON). Respects Contact permissions."""
     doctype = "Contact"
     filters: list[list] = [[doctype, "email_id", "is", "set"]]
     if additional_filters:
@@ -42,6 +45,9 @@ def search_contacts(
 
 @frappe.whitelist()
 def delete_contact(name: str, delete_tickets: bool = False):
+    """Delete a contact, unlinking it from its tickets, organizations and invitations.
+    `delete_tickets` deletes those tickets too. Needs delete on Contact and write on HD
+    Ticket, plus delete on HD Ticket with `delete_tickets`."""
     frappe.has_permission("Contact", "delete", throw=True)
 
     tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")
@@ -79,6 +85,10 @@ def unlink_from_customers(name: str):
 
 @frappe.whitelist()
 def create_contact(doc: dict, invite: bool = False) -> str:
+    """Create a contact from `doc` and return its name.
+    `doc`: first_name, last_name, image, email, phone, customer. With `invite`, emails
+    `email` a portal invitation for `customer`; otherwise adds the contact to `customer`
+    directly. Needs create on Contact."""
     frappe.has_permission("Contact", "create", throw=True)
     phone = doc.get("phone")
     if phone:
@@ -123,6 +133,9 @@ def create_contact(doc: dict, invite: bool = False) -> str:
 
 @frappe.whitelist(methods=["POST"])
 def edit_contact(name: str, doc: dict):
+    """Update a contact's name, image, emails and phones, and return its name.
+    `email_ids` and `phone_nos`, when given, replace all rows. Also copies the image and
+    `timezone` to its linked user. Needs write on Contact."""
     frappe.has_permission("Contact", "write", throw=True)
     contact_doc = frappe.get_doc("Contact", name)
 
@@ -169,6 +182,9 @@ def edit_contact(name: str, doc: dict):
 
 @frappe.whitelist(methods=["GET"])
 def get_contact_info(name: str) -> dict:
+    """A contact's organizations, last active time, time zone and country.
+    Organizations come with images. Last active, time zone and country come from its
+    user; without one, its unaccepted portal invitation is returned. Needs read."""
     frappe.has_permission("Contact", "read", doc=name, throw=True)
     contact = frappe.get_doc("Contact", name)
     primary_email = contact.email_ids[0].email_id if contact.email_ids else None

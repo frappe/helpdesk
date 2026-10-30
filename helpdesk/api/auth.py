@@ -8,6 +8,9 @@ from helpdesk.utils import is_agent as _is_agent
 
 @frappe.whitelist()
 def get_user():
+    """The session user's profile and role flags, loaded when the app boots.
+    Name, image, language, time zone, teams, agent availability, and whether they are an
+    agent, agent manager or admin and have desk access."""
     current_user = frappe.session.user
     filters = {"name": current_user}
     fields = [
@@ -88,6 +91,10 @@ def update_profile(
     language: str | None = None,
     time_zone: str | None = None,
 ) -> None:
+    """Update the current user's name, image, language and time zone.
+    Also copies name and image to their contact. None leaves a field as is; an empty
+    `image` removes it. The image must be an uploaded /files/ path and the time zone a
+    known one."""
     user = frappe.get_doc("User", frappe.session.user)
     if first_name is not None:
         user.first_name = first_name
@@ -132,6 +139,9 @@ def _sync_contact(user) -> None:
 @frappe.whitelist()
 @agent_only
 def get_current_user_email_info():
+    """The current agent's email signature, email and outgoing email accounts.
+    Returns {email_signature, email, outgoing_emails (linked to them), available_emails
+    (every account with outgoing enabled)}. Agents only."""
     user = frappe.session.user
 
     email_signature, email = frappe.db.get_value(

@@ -95,6 +95,10 @@ def get_reply_via_agent_data():
 
 @frappe.whitelist(methods=["GET"])
 def get_data(notification: str):
+    """Get one notification email's settings: enabled, content and default content.
+    `notification` is share_feedback, acknowledgement, reply_to_agents or
+    reply_via_agent; share_feedback adds ticket_status, the status that sends it.
+    Agent Managers and System Managers only."""
     only_for_managers()
 
     if notification == "share_feedback":
@@ -142,6 +146,10 @@ def update_share_feedback(
     enabled: bool,
     content: str,
 ):
+    """Turn the feedback request email on or off and set its template and status.
+    The status that sends it (`ticket_status["value"]`) must be of the Resolved
+    category. Returns enabled, content and ticket_status. Agent Managers and System
+    Managers only."""
     only_for_managers()
     settings = frappe.get_single("HD Settings")
     settings.enable_email_ticket_feedback = enabled
@@ -163,6 +171,9 @@ def update_share_feedback(
 
 @frappe.whitelist(methods=["PUT"])
 def update_acknowledgement(enabled: bool, content: str):
+    """Turn the new-ticket acknowledgement email on or off and set its template.
+    Not sent for tickets raised in the portal. Returns enabled and content. Agent
+    Managers and System Managers only."""
     only_for_managers()
     return set_common_settings(
         "send_acknowledgement_email",
@@ -174,6 +185,8 @@ def update_acknowledgement(enabled: bool, content: str):
 
 @frappe.whitelist(methods=["PUT"])
 def update_reply_to_agents(enabled: bool, content: str):
+    """Set whether assigned agents get an email on a customer reply, and its template.
+    Returns enabled and content. Agent Managers and System Managers only."""
     only_for_managers()
     return set_common_settings(
         "enable_reply_email_to_agent",
@@ -185,6 +198,8 @@ def update_reply_to_agents(enabled: bool, content: str):
 
 @frappe.whitelist(methods=["PUT"])
 def update_reply_via_agent(enabled: bool, content: str):
+    """Set whether an agent's reply is emailed to the customer, and the template.
+    Returns enabled and content. Agent Managers and System Managers only."""
     only_for_managers()
     return set_common_settings(
         "enable_reply_email_via_agent",

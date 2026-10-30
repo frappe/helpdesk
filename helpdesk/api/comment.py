@@ -9,6 +9,10 @@ PRESET_EMOJIS = ["👍", "👎", "❤️", "🎉", "👀", "✅"]
 
 @frappe.whitelist()
 def toggle_reaction(comment: str, emoji: str) -> dict | None:
+    """Add, change or remove the current user's emoji reaction on a ticket comment.
+    The same emoji again removes it. Returns {action, emoji}, or None if reactions are
+    disabled. `emoji` must be a preset one. Needs write on the ticket; notifies the
+    comment author."""
     doc = frappe.get_doc("Comment", comment)
     if doc.reference_doctype != "HD Ticket":
         frappe.throw(_("Reactions are only supported on ticket comments"))
@@ -70,6 +74,9 @@ def toggle_reaction(comment: str, emoji: str) -> dict | None:
 
 @frappe.whitelist()
 def get_reactions(comment: str) -> list[dict]:
+    """Reactions on a comment grouped by emoji, with who reacted and counts.
+    Rows: {emoji, users [{user, full_name}], count, current_user_reacted}. Empty when
+    reactions are disabled in HD Settings."""
     if not frappe.db.get_single_value("HD Settings", "enable_comment_reactions"):
         return []
 
@@ -102,4 +109,5 @@ def get_reactions(comment: str) -> list[dict]:
 
 @frappe.whitelist()
 def get_preset_emojis() -> list[str]:
+    """The emojis allowed as comment reactions."""
     return PRESET_EMOJIS

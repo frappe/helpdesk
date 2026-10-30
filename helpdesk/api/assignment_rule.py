@@ -3,6 +3,9 @@ import frappe
 
 @frappe.whitelist()
 def get_assignment_rules_list():
+    """HD Ticket assignment rules, with whether each has users, last modified first.
+    Each row: name, description, disabled, priority and users_exists. Needs read on
+    Assignment Rule."""
     if not frappe.has_permission("Assignment Rule", "read"):
         frappe.throw(
             frappe._("You do not have permission to access Assignment Rules"),

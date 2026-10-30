@@ -187,6 +187,9 @@ class HDCustomer(Document):
     @frappe.whitelist()
     @agent_only
     def get_contacts(self):
+        """The customer's contacts with their details; primary first, then managers.
+        Each has email, phone, image, last active, manager and primary flags, and open
+        or paused ticket count. Agents only."""
         contact_names = [contact.contact_name for contact in self.contacts]
         details = self.get_contact_details(contact_names)
         ticket_counts = self.get_pending_ticket_counts(contact_names)
@@ -366,6 +369,8 @@ class HDCustomer(Document):
     @frappe.whitelist()
     @agent_manager_only
     def get_pending_invites(self):
+        """Pending helpdesk invitations to this customer: email, inviter, date, roles.
+        Agent managers only."""
         return self.list_pending_invitations()
 
     def list_pending_invitations(self) -> list[dict]:

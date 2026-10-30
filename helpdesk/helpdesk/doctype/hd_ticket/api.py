@@ -25,6 +25,10 @@ TIMELINE_FIELDS = ("status",)
 @rate_limit(limit=300, seconds=60, user_based=True)
 # flake8: noqa
 def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
+    """Create a ticket raised by the session user and return it.
+    `doc` holds the ticket fields; `attachments` are the File records
+    `upload_file` returned. Fields hidden from the caller are left out of the
+    result. Needs create on HD Ticket; rate limited to 300 a minute per user."""
     _validate_attachments(attachments)
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
@@ -46,6 +50,8 @@ def _validate_attachments(attachments: list) -> None:
 
 @frappe.whitelist(methods=["GET"])
 def get_timeline_changes(name: str) -> list[dict]:
+    """A ticket's status changes, oldest first, each with from, to, when and who.
+    Who is a name and image only. Needs read on the ticket."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     versions = frappe.get_all(
         "Version",
@@ -78,8 +84,10 @@ def get_name_and_image(user: str) -> dict:
 
 @frappe.whitelist()
 def get_one(name: str):
-    """The customer portal's ticket page: the ticket as this user may read it,
-    its conversation, the contact card, the template rows and the form script."""
+    """A ticket with its conversation, as the customer portal's ticket page shows it.
+    The ticket as this user may read it, its conversation, the contact card, the
+    template rows, the form script and `overdue_by`. Marks the ticket seen by the
+    caller."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     fields = TicketFields()
 
@@ -261,6 +269,10 @@ def get_attachments(doctype, name):
 @frappe.whitelist()
 @agent_only
 def merge_ticket(source: str, target: str):
+    """Merge ticket `source` into `target`, closing `source` and marking it merged.
+    Copies its comments, emails and files to the target, then posts a reply on
+    the source and a comment on the target linking the two. Agents with write on
+    both."""
     # check if source and target exists
     if not frappe.db.exists("HD Ticket", source):
         frappe.throw(_("Source ticket does not exist"))
@@ -390,6 +402,10 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: str, cont
 @frappe.whitelist()
 @agent_only
 def split_ticket(subject: str, communication_id: str):
+    """Split a ticket at an email into a new ticket and return the new ticket's name.
+    The new ticket copies the original with `subject`, status Open and no SLA, and
+    takes that email and every later email, comment and file. Posts a reply on
+    the original pointing to it. Agents only."""
     communicaton_creation_time = frappe.db.get_value(
         "Communication", communication_id, "creation"
     )
@@ -588,6 +604,8 @@ def get_navigation_order_by(view):
 
 @frappe.whitelist()
 def get_ticket_contact(ticket: str):
+    """A ticket's contact: name, email, phone, mobile and image.
+    A stand-in built from `raised_by` when it has none. Needs read on the ticket."""
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return None
@@ -608,6 +626,9 @@ def get_ticket_contact(ticket: str):
 
 @frappe.whitelist()
 def get_recent_similar_tickets(ticket: str):
+    """Up to 4 recent tickets from the same customer or raiser, as `recent_tickets`.
+    At most 2 by customer, newest first, never the ticket itself. `similar_tickets`
+    is always empty. Needs read on the ticket."""
     frappe.has_permission("HD Ticket", "read", str(ticket), throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return {"recent_tickets": [], "similar_tickets": []}
@@ -663,6 +684,8 @@ def get_recent_tickets(ticket: str):
 
 @frappe.whitelist()
 def get_ticket_assignees(ticket: str) -> list[dict]:
+    """A ticket's assignees; agent callers also get each one's image and availability.
+    Anyone else gets names only. Needs read on the ticket."""
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     assignee_names = json.loads(
         frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
