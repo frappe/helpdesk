@@ -83,7 +83,7 @@ To explain a date, read the SLA named in `sla` with `doc get "HD Service Level A
 ## 5. Traps
 
 - **A reply emails the customer** when HD Settings `enable_reply_email_via_agent` is on. Show the human the reply and ask before you send it.
-- **Never insert a `Communication` to reply.** The ticket still updates, but no email goes out and the reply is not threaded. Use `reply_via_agent`.
+- **Never insert a `Communication` to reply.** The ticket still updates, but no email goes out and the reply is not threaded. An agent replies with `reply_via_agent`; a customer replies with `create_communication_via_contact` (`reference/customer.md`).
 - **A merge cannot be undone.** It copies the source's emails, comments and files into the target, closes the source with `merged_with` set, and emails the customer that it was merged. Ask first.
 - **Deletes can take tickets with them.** `delete_contact` and `delete_customer` with `delete_tickets` delete every linked ticket. Ask first, and name what will go.
 - **Every save picks the SLA again and recalculates its dates.** Changing the priority, or a field an SLA condition reads, can switch the ticket to another SLA.
