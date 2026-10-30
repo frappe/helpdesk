@@ -1,6 +1,8 @@
 import frappe
 from frappe import _
 from frappe.desk.form import activity, load
+from frappe.model.utils.user_settings import get_user_settings
+from frappe.utils.user import is_website_user
 
 from helpdesk.utils import is_agent
 
@@ -39,6 +41,14 @@ def strip_recipients(doctype: str, result: dict) -> dict:
 def getdoc(doctype: str, name: str | int):
     deny_ticket_form_to_customers(doctype)
     return load.getdoc(doctype, name)
+
+
+@frappe.whitelist()
+def getdoctype(doctype: str, with_parent: int | bool = False):
+    if doctype != "HD Ticket" or not is_website_user():
+        return load.getdoctype(doctype, with_parent)
+    frappe.response["user_settings"] = get_user_settings(doctype)
+    frappe.response.docs.extend(load.get_meta_bundle(doctype))
 
 
 @frappe.whitelist()
