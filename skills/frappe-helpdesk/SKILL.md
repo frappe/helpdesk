@@ -66,7 +66,7 @@ To explain a date, read the SLA named in `sla` with `doc get "HD Service Level A
 | Task | Call |
 |---|---|
 | Pick what to work on next | `doc list "HD Ticket" -f status_category=Open -f '_assign like %<user>%' --fields name,subject,priority,response_by,resolution_by,first_responded_on`. Each ticket is next due by its `response_by`, or by its `resolution_by` once `first_responded_on` is set. Sort on that and put the earliest first. With none of their own, offer their team's unassigned tickets (`reference/tickets.md`). |
-| Reply to the customer | `method call reply_via_agent --doctype "HD Ticket" --name <t> -F message="<html>"`. Add `cc`, `bcc` or `attachments` (File names) when needed. A reply changes the status only when HD Settings `auto_update_status` is on. Read the ticket after sending, tell the human its status, and offer to change it: a Paused status such as Replied stops the SLA clock while you wait for the customer. |
+| Reply to the customer | `method call reply_via_agent --doctype "HD Ticket" --name <t> -F message="<html>" -f to=<raised_by>`. Only the addresses in `to` are emailed: without it the reply is logged on the ticket and nobody gets it. Add `cc`, `bcc` or `attachments` (File names) when needed. A reply changes the status only when HD Settings `auto_update_status` is on. Read the ticket after sending, tell the human its status, and offer to change it: a Paused status such as Replied stops the SLA clock while you wait for the customer. |
 | Add an internal note | `method call new_comment --doctype "HD Ticket" --name <t> -F content="<html>"` |
 | Assign an agent | `method call assign_agent --doctype "HD Ticket" --name <t> -f agent=<user>`. It adds to the current assignees and notifies the agent. |
 | Change status, priority, team or type | `doc update "HD Ticket" <t> --set status=<status> < /dev/null`. List the statuses with `doc list "HD Ticket Status" --fields name,category`. |
@@ -81,11 +81,13 @@ To explain a date, read the SLA named in `sla` with `doc get "HD Service Level A
 | Add contacts to a customer | `method call add_contacts --doctype "HD Customer" --name <c> -F 'contacts:=["<contact or email>"]'`. A contact with a user is added. One without a user is emailed an invite instead, and comes back under `invite_result`, not `added`. With `-F invite:=false`, every contact is added and nobody is emailed; a missing contact can be created with its customer in one step ("Create a contact"). |
 | Set up the helpdesk | `reference/setup.md` |
 
+For anything this file doesn't cover, find the method: `frappectl -s <p> method search -q "<one or two words>"` (every word must match), then `method show <path>` for its arguments, who may call it and what it returns. Read that before you call it, and still mind the traps below. When nothing matches, the task is usually a field change: use `doctype show` and the `doc` commands. Search is for agents; a customer's profile is refused it, and a site on an older Frappe doesn't have it.
+
 ## 5. Traps
 
 - **A reply emails the customer** when HD Settings `enable_reply_email_via_agent` is on. Show the human the reply and ask before you send it.
 - **Never insert a `Communication` to reply.** The ticket still updates, but no email goes out and the reply is not threaded. An agent replies with `reply_via_agent`; a customer replies with `create_communication_via_contact` (`reference/customer.md`).
-- **A merge cannot be undone.** It copies the source's emails, comments and files into the target, closes the source with `merged_with` set, and emails the customer that it was merged. `doc get` both first: when their `raised_by` or `customer` differ, tell the human, because the target's contact will see the source's emails. Ask first.
+- **A merge cannot be undone.** It copies the source's emails, comments and files into the target, closes the source with `merged_with` set, and posts a reply on the source saying so, which is not emailed. `doc get` both first: when their `raised_by` or `customer` differ, tell the human, because the target's contact will see the source's emails. Ask first.
 - **Deletes can take tickets with them.** `delete_contact` and `delete_customer` with `delete_tickets` delete every linked ticket. Ask first, and name what will go.
 - **Every save picks the SLA again and recalculates its dates.** Changing the priority, or a field an SLA condition reads, can switch the ticket to another SLA.
 - **A contact sees a ticket** only when they are its `contact`, its `raised_by` or its owner. A customer's managers also see every ticket of that `customer`. Set these right on a ticket you create.
