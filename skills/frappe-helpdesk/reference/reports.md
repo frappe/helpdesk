@@ -1,5 +1,7 @@
 # Numbers across tickets
 
+Agents only. A customer's profile is refused ("You are not permitted to access this resource."). For a customer, read the due dates on their own tickets as `customer.md` shows.
+
 These methods count response and resolution time in the SLA's working hours, and read the right statuses for each category. Use them before you add up `doc list` rows yourself. Times come back in seconds.
 
 ## The dashboard: the whole helpdesk, a team or an agent
