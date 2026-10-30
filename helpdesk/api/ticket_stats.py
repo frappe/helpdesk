@@ -8,6 +8,7 @@ from frappe.utils import add_days, nowdate
 
 from helpdesk.api.agent_home.utils import calculate_percentage_change
 from helpdesk.api.analytics_utils import _apply_scope, get_avg_time_metric
+from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.utils import agent_only
 
 Scope = str  # Literal["agent", "customer", "contact"]
@@ -246,3 +247,59 @@ def get_ticket_stats(
     )
 
     return stats
+
+
+@frappe.whitelist()
+@agent_only
+def get_agent_performance(
+    team: str | None = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
+) -> list[dict]:
+    """The dashboard's numbers for each agent of a team, or every active agent,
+    so an Agent Manager can compare them. Agents are credited by `_assign`, as the
+    dashboard does. Defaults to the last 30 days."""
+    if "Agent Manager" not in frappe.get_roles():
+        frappe.throw(
+            _("Only an Agent Manager can compare agents."), frappe.PermissionError
+        )
+
+    to_date = to_date or nowdate()
+    from_date = from_date or add_days(to_date, -29)
+    if team:
+        agents = frappe.get_all(
+            "HD Team Member",
+            filters={"parent": team, "parenttype": "HD Team"},
+            pluck="user",
+        )
+    else:
+        agents = frappe.get_all("HD Agent", filters={"is_active": 1}, pluck="user")
+    names = dict(
+        frappe.get_all(
+            "HD Agent",
+            filters={"user": ["in", agents]},
+            fields=["user", "agent_name"],
+            as_list=True,
+        )
+    )
+
+    # ponytail: one dashboard pass per agent; group by agent in SQL if teams pass ~50
+    rows = []
+    for agent in agents:
+        dashboard = HelpdeskDashboard(
+            frappe._dict(from_date=from_date, to_date=to_date, team=team, agent=agent)
+        )
+        rows.append(
+            {
+                "agent": agent,
+                "agent_name": names.get(agent),
+                "tickets": dashboard.get_ticket_count()["value"],
+                "sla_fulfilled_percent": dashboard.get_sla_fulfilled_count()["value"],
+                "avg_first_response_hours": dashboard.get_avg_first_response_time()[
+                    "value"
+                ],
+                "avg_resolution_days": dashboard.get_avg_resolution_time()["value"],
+                "avg_feedback_stars": dashboard.get_avg_feedback_score()["value"],
+            }
+        )
+    return rows
