@@ -10,12 +10,13 @@
       loading: opening,
       onClick: openBilling,
     }"
-    @dismiss="dismiss"
+    @dismiss="dismiss('trial')"
   />
 </template>
 
 <script setup lang="ts">
-import { useCloudSettings, useTrialCard } from "@/composables/cloudSettings";
+import { useCloudSettings } from "@/composables/cloudSettings";
+import { useBanners } from "@/composables/useBanners";
 import { __ } from "@/translation";
 import type { BillingTrial } from "@frappe/cloud-sdk";
 import { dayjsLocal, SidebarCard } from "frappe-ui";
@@ -24,10 +25,13 @@ import { computed } from "vue";
 // From this many days left, the card turns amber
 const URGENT_DAYS = 3;
 
-const { trial, dismiss } = useTrialCard();
+const { banner, dismiss } = useBanners();
 const { opening, openBilling } = useCloudSettings();
 
-const content = computed(() => trial.value && trialCardContent(trial.value));
+const content = computed(() => {
+  const trial = banner("trial")?.trial;
+  return trial && trialCardContent(trial);
+});
 
 function trialCardContent(trial: BillingTrial): {
   theme: "gray" | "amber" | "red";

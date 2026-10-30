@@ -1,7 +1,12 @@
 import { globalStore } from "@/stores/globalStore";
+import type { BillingTrial } from "@frappe/cloud-sdk";
 import { createResource } from "frappe-ui";
 
-export type BannerName = "customer_portal_permission" | "ticket_field_permission";
+export type BannerName =
+  | "customer_portal_permission"
+  | "ticket_field_permission"
+  | "trial";
+export type Banner = { name: BannerName; trial?: BillingTrial };
 
 const banners = createResource({
   url: "helpdesk.api.banners.get_banners",
@@ -21,14 +26,18 @@ export function useBanners() {
     );
   }
 
-  function isVisible(banner: BannerName): boolean {
-    return banners.data.includes(banner);
+  function banner(name: BannerName): Banner | undefined {
+    return banners.data.find((b: Banner) => b.name === name);
   }
 
-  async function dismiss(banner: BannerName): Promise<void> {
-    await dismissResource.submit({ banner });
+  function isVisible(name: BannerName): boolean {
+    return !!banner(name);
+  }
+
+  async function dismiss(name: BannerName): Promise<void> {
+    await dismissResource.submit({ banner: name });
     banners.reload();
   }
 
-  return { isVisible, dismiss };
+  return { banner, isVisible, dismiss, reload: () => banners.reload() };
 }

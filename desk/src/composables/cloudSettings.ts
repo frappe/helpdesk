@@ -1,43 +1,15 @@
 import { mobileSidebarOpened } from "@/composables/mobile";
-import { userStorage } from "@/composables/userStorage";
+import { useBanners } from "@/composables/useBanners";
 import { __ } from "@/translation";
-import {
-  getBilling,
-  openCloudSettings,
-  type BillingTrial,
-} from "@frappe/cloud-sdk";
+import { openCloudSettings } from "@frappe/cloud-sdk";
 import { toast } from "frappe-ui";
-import { computed, ref } from "vue";
-
-// Days left change once a day, and each fetch goes through Pilot and Central uncached
-const CACHE_MS = 6 * 60 * 60 * 1000;
-const DISMISS_MS = 24 * 60 * 60 * 1000;
+import { ref } from "vue";
 
 /** Frappe enables it only for System Managers on a Frappe Cloud v2 site. */
 export const isCloudSettingsAvailable = () =>
   window.cloud_settings?.enabled === true;
 
-const cachedTrial = userStorage<{
-  trial: BillingTrial | null;
-  fetchedAt: number;
-}>("helpdesk-trial-card", { trial: null, fetchedAt: 0 });
-const dismissedAt = userStorage("helpdesk-trial-card-dismissed-at", 0);
 const opening = ref(false);
-
-// Overlapping callers share one request
-let pending: Promise<void> | null = null;
-
-function refreshTrial() {
-  pending ??= getBilling()
-    .then(({ trial }) => {
-      cachedTrial.value = { trial: trial ?? null, fetchedAt: Date.now() };
-    })
-    // The card is a reminder: if billing can't be read, keep the last known
-    // trial on screen and try again on the next mount
-    .catch(() => {})
-    .finally(() => (pending = null));
-  return pending;
-}
 
 async function openBilling() {
   if (opening.value) return;
@@ -50,7 +22,7 @@ async function openBilling() {
       tab: "billing",
       theme: "auto",
       // Choosing a plan in the dialog ends the trial
-      onClose: refreshTrial,
+      onClose: () => useBanners().reload(),
     });
   } catch (error) {
     toast.error(
@@ -65,19 +37,4 @@ async function openBilling() {
 
 export function useCloudSettings() {
   return { opening, openBilling };
-}
-
-export function useTrialCard() {
-  const stale = Date.now() - cachedTrial.value.fetchedAt > CACHE_MS;
-  if (isCloudSettingsAvailable() && stale) refreshTrial();
-
-  const trial = computed(() => {
-    const trial = isCloudSettingsAvailable() ? cachedTrial.value.trial : null;
-    if (!trial) return null;
-    // An ended trial cannot be dismissed
-    const dismissed = Date.now() - dismissedAt.value < DISMISS_MS;
-    return dismissed && trial.state !== "Ended" ? null : trial;
-  });
-
-  return { trial, dismiss: () => (dismissedAt.value = Date.now()) };
 }
