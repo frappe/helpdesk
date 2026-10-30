@@ -1,19 +1,19 @@
 import { EditIcon, PinIcon, UnpinIcon } from "@/components/icons";
+import {
+  getActiveView,
+  setActiveView,
+  useActiveView,
+} from "@/composables/useActiveView";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { View } from "@/types";
 import { getIcon } from "@/utils";
 import { useDebounceFn } from "@vueuse/core";
-import {
-  call,
-  createListResource,
-  createResource,
-  toast,
-} from "frappe-ui";
+import { call, createListResource, createResource, toast } from "frappe-ui";
 import { Icon } from "frappe-ui/experimental";
 import { computed, h, ref, unref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const debouncedSetValue = useDebounceFn(
   (doctype: string, name: string, fieldname: any, cb?: Function) => {
@@ -46,7 +46,7 @@ export const currentView = ref({
 export function useView(dt: string = null) {
   const auth = useAuthStore();
   const router = useRouter();
-  const route = useRoute();
+  const { openView } = useActiveView();
   const { $dialog } = globalStore();
   function callGetViews() {
     if (
@@ -303,10 +303,8 @@ export function useView(dt: string = null) {
           iconLeft: "lucide-trash-2",
           theme: "red",
           onClick({ close }: any) {
-            if (route.query.view === _view.name) {
-              router.push({
-                name: "TicketsAgent",
-              });
+            if (getActiveView(_view.route_name) === _view.name) {
+              setActiveView(_view.route_name);
             }
             deleteView(_view.name);
             toast.success(__("View {0}", [__("deleted")]));
@@ -401,10 +399,7 @@ export function useView(dt: string = null) {
         label: d.label || __("List"),
         icon: getIcon(d.icon),
       };
-      router.push({
-        name: "TicketsAgent",
-        query: { view: d.name },
-      });
+      openView("TicketsAgent", d.name);
       handleViewSuccess(viewDialogConfig);
     });
   }

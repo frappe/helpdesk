@@ -295,6 +295,7 @@ import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 import { parseField } from "@/composables/fieldDependsOn";
 import { setupCustomizations } from "@helpdesk/shared/formScripts";
 import { useScreenSize } from "@/composables/screen";
+import { useActiveView } from "@/composables/useActiveView";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import {
   reloadTicket,
@@ -324,6 +325,7 @@ const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const ticketStatusStore = useTicketStatusStore();
 const router = useRouter();
+const { openView } = useActiveView();
 const { $dialog } = globalStore();
 
 const timelineRef = ref<InstanceType<typeof TicketTimeline>[]>([]);
@@ -491,7 +493,13 @@ const { isMobileView } = useScreenSize();
 const showSubjectDialog = ref(false);
 
 const breadcrumbs = computed(() => {
-  let items = [{ label: __("Tickets"), route: { name: "TicketsAgent" } }];
+  let items = [
+    {
+      label: __("Tickets"),
+      href: router.resolve({ name: "TicketsAgent" }).href,
+      onClick: () => openView("TicketsAgent"),
+    },
+  ];
   items.push({
     label: ticket.value.doc?.subject,
     route: { name: "TicketAgent" },
