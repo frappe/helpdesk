@@ -85,5 +85,5 @@ Beyond those, only `subject` and `raised_by` are needed: `contact` is filled in 
 
 ## Merging and splitting
 
-- **Merge** (`merge_ticket -f source=<t> -f target=<t>`): the source's emails, comments and files are copied into the target. The source is closed, with `is_merged` 1 and `merged_with` set, and a reply saying so is posted on it, not emailed. A ticket already merged cannot be merged again. There is no unmerge.
-- **Split** (`split_ticket -f subject=<s> -f communication_id=<email>`): the email you name, and every email, comment and file after it, move to a new ticket with that subject. The new ticket has `ticket_split_from` set. A reply pointing to it is posted on the original, not emailed. It returns the new ticket's name. Take the email's `name` from its `email` activity in the timeline.
+- **Merge** (`merge_ticket -f source=<t> -f target=<t>`): the source's emails, comments and files are copied into the target. The source is closed, with `is_merged` 1 and `merged_with` set, and the customer is emailed on it. A ticket already merged cannot be merged again. There is no unmerge.
+- **Split** (`split_ticket -f subject=<s> -f communication_id=<email>`): the email you name, and every email, comment and file after it, move to a new ticket with that subject. The new ticket has `ticket_split_from` set. The customer is emailed on the original, pointing to it. It returns the new ticket's name. Take the email's `name` from its `email` activity in the timeline.
