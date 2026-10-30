@@ -31,10 +31,12 @@ def default_ticket_outgoing_email_account():
     r = (
         frappe.qb.from_(QBEmailAccount)
         .select(QBEmailAccount.star)
-        .where(QBEmailAccount.default_outgoing == 1)
+        .where(QBEmailAccount.enable_incoming == 1)
+        .where(QBEmailAccount.enable_outgoing == 1)
         .inner_join(QBImapFolder)
         .on(QBImapFolder.parent == QBEmailAccount.name)
         .where(QBImapFolder.append_to == "HD Ticket")
+        .orderby(QBEmailAccount.default_outgoing, order=frappe.qb.desc)
         .limit(1)
     )
 
