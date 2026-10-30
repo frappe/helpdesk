@@ -961,7 +961,7 @@ class TestHDTicket(IntegrationTestCase):
         ticket1 = make_ticket(description="Test Desc for split")
         ticket1.db_set({"entry_point": "External", "utm_source": "frappe-cloud"})
 
-        ticket1.reply_via_agent(message="Test reply to split")
+        ticket1.reply_via_agent(message="Test reply to split", to="customer@test.com")
         communcation_name = frappe.get_all(
             "Communication",
             filters={
@@ -1062,7 +1062,7 @@ class TestHDTicket(IntegrationTestCase):
         outside_working_hour = get_current_week_monday(hours=8)
         with self.freeze_time(outside_working_hour):
             ticket = make_ticket(priority="High")
-            ticket.reply_via_agent(message="Test reply to split")
+            ticket.reply_via_agent(message="Test reply to split", to="customer@test.com")
             banner_shown = is_outside_hours_banner_shown(ticket.name)
             self.assertTrue(ticket.raised_outside_working_hours)
             self.assertFalse(banner_shown)
@@ -1358,7 +1358,7 @@ class TestHDTicket(IntegrationTestCase):
         ticket = make_ticket()
         self.assertFalse(get_one(ticket.name)["has_agent_replied"])
 
-        ticket.reply_via_agent(message="Test reply")
+        ticket.reply_via_agent(message="Test reply", to="customer@test.com")
 
         self.assertTrue(get_one(ticket.name)["has_agent_replied"])
 
@@ -1408,6 +1408,18 @@ class TestHDTicket(IntegrationTestCase):
             self.assertEqual(communication_doc.cc, cc_recipient)
         if hasattr(communication_doc, "bcc") and communication_doc.bcc:
             self.assertEqual(communication_doc.bcc, bcc_recipient)
+
+    def test_reply_via_agent_throws_without_recipients(self):
+        """When no to, cc, or bcc are provided, throw ValidationError."""
+        ticket = make_ticket()
+
+        with self.assertRaises(frappe.ValidationError):
+            ticket.reply_via_agent(message="No recipient reply")
+
+        self.assertEqual(len(sent_replies(ticket.name)), 0)
+        ticket.reload()
+        self.assertFalse(ticket.first_responded_on)
+        self.assertFalse(ticket.last_agent_response)
 
     def test_agent_reply_stores_unique_message_id_and_threads_onto_previous(self):
         """Without this, every agent reply arrives as a new thread."""
@@ -1584,7 +1596,7 @@ class TestHDTicket(IntegrationTestCase):
         frappe.db.set_single_value("HD Settings", "enable_reply_email_via_agent", 0)
         try:
             ticket = make_ticket()
-            ticket.reply_via_agent(message="Not emailed")
+            ticket.reply_via_agent(message="Not emailed", to="customer@test.com")
             self.assertFalse(get_latest_ticket_communication(ticket.name).message_id)
         finally:
             # rollback is per test class, so restore or later tests inherit this
@@ -1798,7 +1810,7 @@ class TestHDTicket(IntegrationTestCase):
 
         with self.freeze_time(add_to_date(date, minutes=39)):
             frappe.set_user(agent)
-            ticket.reply_via_agent(message="Test reply after response by")
+            ticket.reply_via_agent(message="Test reply after response by", to="customer@test.com")
             ticket.reload()
 
             ticket.status = "Replied"
@@ -1819,7 +1831,7 @@ class TestHDTicket(IntegrationTestCase):
 
         with self.freeze_time(add_to_date(date2, hours=1, minutes=5)):
             frappe.set_user(agent)
-            ticket2.reply_via_agent(message="Test reply after response by")
+            ticket2.reply_via_agent(message="Test reply after response by", to="customer@test.com")
             ticket2.reload()
 
             ticket2.status = "Replied"
@@ -1852,7 +1864,7 @@ class TestHDTicket(IntegrationTestCase):
 
         with self.freeze_time(add_to_date(date, minutes=39)):
             frappe.set_user(agent)
-            ticket.reply_via_agent(message="Late reply")
+            ticket.reply_via_agent(message="Late reply", to="customer@test.com")
             frappe.set_user("Administrator")
             ticket.reload()
             self.assertEqual(ticket.first_response_failed_by, 9 * 60)
@@ -1886,7 +1898,7 @@ class TestHDTicket(IntegrationTestCase):
 
         frappe.set_user(agent)
         try:
-            ticket.reply_via_agent(message="Reply with default sender")
+            ticket.reply_via_agent(message="Reply with default sender", to="customer@test.com")
         finally:
             frappe.set_user("Administrator")
 
@@ -1919,6 +1931,7 @@ class TestHDTicket(IntegrationTestCase):
                     "email_id": email_account.email_id,
                     "email_account": email_account.name,
                 },
+                to="customer@test.com",
             )
         finally:
             frappe.set_user("Administrator")
@@ -2271,7 +2284,7 @@ class TestHDTicket(IntegrationTestCase):
 
         with self.freeze_time(add_to_date(raised_at, minutes=39)):
             frappe.set_user(agent)
-            ticket.reply_via_agent(message="Late reply")
+            ticket.reply_via_agent(message="Late reply", to="customer@test.com")
             ticket.reload()
             ticket.status = "Replied"
             ticket.save()
