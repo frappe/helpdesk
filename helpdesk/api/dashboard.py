@@ -20,6 +20,20 @@ COUNT_NAME = (
 COUNT_DESC = "count desc"
 
 
+CAREVERSE_BRAND = "Careverse"
+CAREVERSE_CARE_TEAM = "Careverse Care Team"
+
+
+def _locked_brand(user=None):
+    """Brand this user's dashboards are locked to, or None.
+    Members of Careverse Care Team who are in no other team only see Careverse."""
+    user = user or frappe.session.user
+    teams = frappe.get_all("HD Team Member", filters={"user": user}, pluck="parent")
+    if teams and set(teams) == {CAREVERSE_CARE_TEAM}:
+        return CAREVERSE_BRAND
+    return None
+
+
 @frappe.whitelist()
 @agent_only
 def get_dashboard_data(
@@ -29,7 +43,7 @@ def get_dashboard_data(
     Get dashboard data based on the type and date range.
     """
     user = frappe.session.user
-    is_manager = "Agent Manager" in frappe.get_roles(user)
+    is_manager = "Agent Manager" in frappe.get_roles(user) or bool(_locked_brand(user))
 
     if not is_manager and (filters.get("agent") != user or filters.get("team")):
         frappe.throw(
@@ -45,6 +59,9 @@ def get_dashboard_data(
 
     if agent == "@me":
         agent = frappe.session.user
+    if _locked_brand(user):
+        agent = None
+        team = None
 
     if not from_date:
         from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
@@ -105,6 +122,9 @@ class HelpdeskDashboard:
 
     def _get_conditions(self):
         conds = []
+        _brand = _locked_brand()
+        if _brand:
+            conds.append(self.ticket.brand == _brand)
         if self.team:
             conds.append(self.ticket.agent_group == self.team)
         if self.agent:
@@ -468,6 +488,8 @@ def get_master_dashboard_data(
     filters = {
         "creation": ["between", [from_date, to_date]],
     }
+    if _locked_brand():
+        filters["brand"] = _locked_brand()
     if team:
         filters["agent_group"] = team
     if agent:
@@ -679,6 +701,8 @@ def get_county_dashboard_data(
         filters["county"] = county
     if support_level:
         filters["support_level"] = support_level
+    if _locked_brand():
+        filters["brand"] = _locked_brand()
 
     _filters = frappe._dict(
         from_date=from_date,
@@ -697,7 +721,7 @@ def get_county_dashboard_data(
         "priority_chart": get_ticket_priority_chart_data(from_date, to_date, filters),
         "type_chart": get_ticket_type_chart_data(from_date, to_date, filters),
         "channel_chart": get_ticket_channel_chart_data(from_date, to_date, filters),
-        "implementers": get_county_implementers(county),
+        "implementers": [] if _locked_brand() else get_county_implementers(county),
     }
 
 

@@ -83,7 +83,7 @@ class CustomEmailAccount(EmailAccount):
                 else:
                     # process the pop3 account
                     messages = email_server.get_messages() or {}
-                    process_mail(messages)
+                    process_mail(messages, self.append_to)
 
                 # close connection to mailserver
                 email_server.logout()

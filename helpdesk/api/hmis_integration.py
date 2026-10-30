@@ -31,6 +31,9 @@ _STATUS_MAP = {
 }
 
 
+SOURCE_BRANDS = {"HMIS": None, "F360": "F360", "P360": "P360", "Admin Central": "Admin Central"}
+
+
 def _map_status(internal_status: str) -> str:
     return _STATUS_MAP.get(internal_status, internal_status)
 
@@ -108,7 +111,7 @@ def create_ticket(
 ):
     """POST /api/tickets equivalent. See module docstring for contract."""
 
-    if source != "HMIS":
+    if source not in SOURCE_BRANDS:
         frappe.throw(_("Unsupported source: {0}").format(source), frappe.ValidationError)
 
     if not reporter or not reporter.get("email"):
@@ -152,9 +155,17 @@ def create_ticket(
         "facility": facility_name,
         "ticket_type": ticket_type,
         "priority": priority_value,
-        "source": "HMIS",
+        "source": source,
         "external_reference_id": external_reference_id,
     })
+    _brand = SOURCE_BRANDS.get(source)
+    if _brand:
+        _b = frappe.db.get_value("HD Brand", _brand, ["default_team", "default_sla"], as_dict=True) or {}
+        doc.brand = _brand
+        if _b.get("default_team"):
+            doc.agent_group = _b["default_team"]
+        if _b.get("default_sla"):
+            doc.sla = _b["default_sla"]
     doc.insert(ignore_permissions=True)
     frappe.db.commit()
 

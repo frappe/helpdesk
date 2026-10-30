@@ -98,6 +98,14 @@ class HDTicket(Document):
         if not raised_by or raised_by == "Guest":
             return
 
+        # Skip entirely for tickets raised by an L2 agent -- l2_raised_routing.py
+        # (before_insert) has already forced this ticket to National Support, and
+        # facility/county geography should not override that business rule.
+        if frappe.db.exists("HD Agent", raised_by) and self.get("brand") not in self.PRODUCT_BRANDS:
+            agent_teams = frappe.get_all("HD Team Member", filters={"user": raised_by}, pluck="parent")
+            if any(t not in ("National Support", "Engineering Team") for t in agent_teams):
+                return
+
         # Step 1: get facility from user profile; form-supplied facility takes priority
         user_facility = frappe.db.get_value("User", raised_by, "facility")
         effective_facility = self.facility or user_facility
@@ -115,10 +123,19 @@ class HDTicket(Document):
                 as_dict=True,
             )
             if fac:
-                if fac.county and not self.county:
+                if  fac.county and not self.county:
                     self.county = fac.county
                 if fac.subcounty and not self.sub_county:
                     self.sub_county = fac.subcounty
+
+        # Careverse tickets keep Careverse Team regardless of facility geography.
+        # (County/sub-county were already filled in above, for reporting.)
+        if self._is_careverse_ticket():
+            team = frappe.db.get_value("HD Brand", "Careverse", "default_team")
+            if team:
+                self.agent_group = team
+                self.support_level = frappe.db.get_value("HD Team", team, "support_level")
+            return
 
         mapping = None
 
@@ -126,7 +143,7 @@ class HDTicket(Document):
             # Step 2a: look up HD Facility Mapping by facility name
             mapping = frappe.db.get_value(
                 "HD Facility Mapping",
-                {"facility_name": effective_facility},
+                self._mapping_filters({"facility_name": effective_facility}),
                 ["sub_county", "county", "l0_team", "l1_team", "l2_team"],
                 as_dict=True,
             )
@@ -136,10 +153,17 @@ class HDTicket(Document):
             # (user explicitly chose them via the ticket creation form or facility picker)
             mapping = frappe.db.get_value(
                 "HD Facility Mapping",
-                {"county": self.county, "sub_county": self.sub_county},
+                self._mapping_filters({"county": self.county, "sub_county": self.sub_county}),
                 ["sub_county", "county", "l0_team", "l1_team", "l2_team"],
                 as_dict=True,
             )
+
+        if not mapping and self.get("brand") in self.PRODUCT_BRANDS:
+            team = frappe.db.get_value("HD Brand", self.brand, "default_team")
+            if team:
+                self.agent_group = team
+                self.support_level = frappe.db.get_value("HD Team", team, "support_level")
+            return
 
         if mapping:
             # Step 3: populate geography — don't overwrite user-supplied values
@@ -174,6 +198,32 @@ class HDTicket(Document):
                 national_team = _get_default_national_team()
                 if national_team:
                     self.agent_group = national_team
+
+    PRODUCT_BRANDS = ("Admin Central", "F360", "P360")
+
+    def _mapping_filters(self, base):
+        """Facility Mapping lookups are per product: product brands only see their own
+        mappings; everything else only sees mappings with no product."""
+        flt = [[k, "=", v] for k, v in base.items()]
+        if self.get("brand") in self.PRODUCT_BRANDS:
+            flt.append(["product", "=", self.brand])
+        else:
+            flt.append(["product", "is", "not set"])
+        return flt
+
+    def _is_careverse_ticket(self):
+        """True if this ticket belongs to the Careverse workflow: brand set, or
+        received on the Careverse brand's support mailbox. Works whether or not
+        the brand hook has already run."""
+        if self.get("brand") == "Careverse":
+            return True
+        if self.get("email_account"):
+            addr = frappe.db.get_value("Email Account", self.email_account, "email_id")
+            if addr:
+                return frappe.db.get_value(
+                    "HD Brand", {"support_email": addr, "is_active": 1}, "name"
+                ) == "Careverse"
+        return False
 
     def _remember_contact_location(self):
         """Persist county + sub_county to HD Customer after ticket insert.
@@ -1867,6 +1917,16 @@ class HDTicket(Document):
             )
 
 
+CAREVERSE_BRAND = "Careverse"
+CAREVERSE_CARE_TEAM = "Careverse Care Team"
+
+
+def _is_careverse_viewer(user):
+    return bool(
+        frappe.db.exists("HD Team Member", {"parent": CAREVERSE_CARE_TEAM, "user": user})
+    )
+
+
 def has_permission(doc, user=None):
     if not user:
         user = frappe.session.user
@@ -1892,6 +1952,9 @@ def has_permission(doc, user=None):
         "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
     )
     if show_tickets_without_team and not doc.get("agent_group"):
+        return True
+
+    if doc.get("brand") == CAREVERSE_BRAND and _is_careverse_viewer(user):
         return True
 
     if doc.get("_assign", None):
@@ -1964,6 +2027,9 @@ def permission_query(user):
     show_tickets_without_team = frappe.db.get_single_value(
         "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
     )
+
+    if _is_careverse_viewer(user):
+        query += " OR (`tabHD Ticket`.brand = {b})".format(b=frappe.db.escape(CAREVERSE_BRAND))
 
     teams = get_agents_team()
 

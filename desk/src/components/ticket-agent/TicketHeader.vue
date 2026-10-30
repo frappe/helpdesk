@@ -149,8 +149,6 @@ const statusDropdown = computed(() => {
   const statuses =
     ticketStatusStore.statuses.data?.filter((s) => {
       if (!s.enabled) return false;
-      // Only L2 National agents can manually set Closed
-      if (s.label_agent === "Closed" && !isNationalAgent.value) return false;
       return true;
     }) || [];
   return statuses.map((o: HDTicketStatus) => ({

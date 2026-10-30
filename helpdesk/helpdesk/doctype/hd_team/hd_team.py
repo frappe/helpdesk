@@ -71,7 +71,19 @@ class HDTeam(Document):
             )
 
     def create_assignment_rule(self):
-        """Creates the assignment rule for this group"""
+        """Creates the assignment rule for this group (idempotent)."""
+        # Reuse the existing rule if this team already has a working one --
+        # without this guard, any repeat call (fixture resync, re-insert,
+        # etc.) spawns a new "<name> - Support Rotation-N" rule and orphans
+        # the old one, which stays enabled and keeps double-assigning tickets.
+        if self.assignment_rule and frappe.db.exists("Assignment Rule", self.assignment_rule):
+            return
+
+        existing = frappe.db.exists("Assignment Rule", f"{self.name} - Support Rotation")
+        if existing:
+            self.assignment_rule = existing
+            self.save(ignore_permissions=True)
+            return
 
         rule_doc = frappe.new_doc("Assignment Rule")
         rule_doc.name = append_number_if_name_exists(
@@ -122,6 +134,12 @@ class HDTeam(Document):
             return
 
         previous_doc = self.get_doc_before_save()
+        if not previous_doc:
+            # No prior version to diff against -- e.g. a fixture import or any
+            # fresh insert still routes through on_update, but there is
+            # nothing to sync yet on a brand-new document.
+            return
+
         diff = get_diff(previous_doc, self)
         if not diff:
             return

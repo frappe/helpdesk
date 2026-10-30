@@ -52,9 +52,13 @@ scheduler_events = {
         "*/5 * * * *": [
             "helpdesk.helpdesk.doctype.hd_service_level_agreement.sla_monitor.check_sla_breaches",
             "helpdesk.helpdesk.chat.session_cleanup.cleanup_inactive_sessions",
-            "helpdesk.helpdesk.doctype.hd_ticket.escalation_scheduler.auto_escalate_tickets",
-            "helpdesk.helpdesk.doctype.hd_ticket.escalation_rule_engine.run_age_based_rules",
-            "helpdesk.helpdesk.doctype.hd_ticket.agent_rotation.run_agent_rotation",
+            "helpdesk.integrations.zenhub.retry_failed",
+            # PAUSED 2026-09-28 -- mass reassignment/notification flooding from a
+            # large SLA-breach backlog (180 tickets). Re-enable once the backlog
+            # is triaged/closed and the L1-L4 tier structure is finalized.
+            # "helpdesk.helpdesk.doctype.hd_ticket.escalation_scheduler.auto_escalate_tickets",
+            # "helpdesk.helpdesk.doctype.hd_ticket.escalation_rule_engine.run_age_based_rules",
+            # "helpdesk.helpdesk.doctype.hd_ticket.agent_rotation.run_agent_rotation",
         ],
         # Chat response timeout: sends auto-message after 2 min with no agent reply (Story 3.4)
         "*/1 * * * *": [
@@ -100,11 +104,15 @@ doc_events = {
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
     "HD Ticket": {
-        "before_insert": "helpdesk.overrides.hd_ticket_brand.assign_brand_from_email",
+        "before_insert": [
+            "helpdesk.overrides.l1_raised_routing.route_l1_raised_tickets",
+            "helpdesk.overrides.l2_raised_routing.route_l2_raised_tickets",
+            "helpdesk.overrides.hd_ticket_brand.assign_brand_from_email",
+        ],
         "validate": "helpdesk.overrides.hd_ticket_phone.validate_phone_format",
         "after_insert": [
             "helpdesk.helpdesk.automation.engine.on_ticket_created",
-            "frappe.automation.doctype.assignment_rule.assignment_rule.apply",
+            "helpdesk.overrides.assignment_rule_dedupe.apply_once",
             "helpdesk.overrides.report_registration_routing.route_report_registration_tickets",
             "helpdesk.overrides.feature_request_routing.route_feature_requests",
             "helpdesk.search.build_index_in_background", # <-- ADD THIS
@@ -112,8 +120,9 @@ doc_events = {
         ],
         "on_update": [
             "helpdesk.helpdesk.automation.engine.on_ticket_updated",
-            "frappe.automation.doctype.assignment_rule.assignment_rule.apply",
+            "helpdesk.overrides.assignment_rule_dedupe.apply_once",
             "helpdesk.search.build_index_in_background", # <-- ADD THIS
+            "helpdesk.overrides.feature_request_routing.route_changed_to_feature_request",
         ],
 
         "on_trash": [
@@ -128,18 +137,25 @@ doc_events = {
     "ToDo": {
         "after_insert": "helpdesk.overrides.todo_assignment.notify_hd_ticket_assignment",
     },
+    "HD Agent Absence": {
+        "validate": "helpdesk.integrations.agent_absence.validate",
+    },
 }
 
 has_permission = {
     "HD Ticket Activity": "helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity.has_permission",
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
+    "HD Agent": "helpdesk.overrides.hd_agent_permission.has_permission",
 }
 
 permission_query_conditions = {
     "HD Ticket Activity": "helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity.permission_query",
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
+    "HD Agent": "helpdesk.overrides.hd_agent_permission.permission_query",
+    "Contact": "helpdesk.overrides.contact_scope.permission_query",
+    "HD Brand": "helpdesk.overrides.brand_scope.permission_query",
 }
 
 # DocType Class
@@ -149,6 +165,7 @@ override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
     "Email Queue": "helpdesk.email.email_queue_override.SesAwareEmailQueue",
     "User": "helpdesk.overrides.user.HelpdeskUser",
+    "Assignment Rule": "helpdesk.overrides.assignment_rule_absence.AbsenceAwareAssignmentRule",
 }
 
 # Email Override
@@ -180,6 +197,7 @@ fixtures = [
     {"dt": "HD Incident Model"},
     {"dt": "HD Support Level"},
     {"dt": "Workflow", "filters": [["document_type", "=", "HD Article"]]},
+    {"dt": "HD Team"},  # includes HD Team Member child rows (regional/county assignments)
 ]
 
 # CLI Commands

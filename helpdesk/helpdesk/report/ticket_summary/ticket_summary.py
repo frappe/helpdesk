@@ -26,6 +26,10 @@ class TicketSummary:
         self.get_chart_data()
         self.get_report_summary()
 
+        total_row = self.get_total_row()
+        if total_row:
+            self.data.append(total_row)
+
         return self.columns, self.data, None, self.chart, self.report_summary
 
     def get_ticket_statuses(self):
@@ -239,6 +243,48 @@ class TicketSummary:
                 row[scrub(metric)] = value
 
             self.data.append(row)
+
+    def get_total_row(self):
+        """Grand-total row appended under all the group rows: sums the
+        status/SLA counts, and recomputes each duration metric as a true
+        ticket-weighted average across all rows (not an average of the
+        per-row averages)."""
+        if not self.data:
+            return None
+
+        entity_field = {
+            "Contact": "contact",
+            "Assigned To": "user",
+            "Ticket Type": "ticket_type",
+            "Ticket Priority": "priority",
+        }.get(self.filters.based_on)
+
+        total_row = {}
+        if entity_field:
+            total_row[entity_field] = _("Total")
+
+        for status in self.statuses:
+            fieldname = scrub(status)
+            total_row[fieldname] = sum(flt(row.get(fieldname, 0)) for row in self.data)
+
+        total_row["total_tickets"] = sum(flt(row.get("total_tickets", 0)) for row in self.data)
+
+        for sla_status in self.sla_status_map.values():
+            total_row[sla_status] = sum(flt(row.get(sla_status, 0)) for row in self.data)
+
+        total_tickets_sum = total_row["total_tickets"]
+        for metric in self.metrics:
+            fieldname = scrub(metric)
+            if total_tickets_sum:
+                weighted_sum = sum(
+                    flt(row.get(fieldname, 0)) * flt(row.get("total_tickets", 0))
+                    for row in self.data
+                )
+                total_row[fieldname] = weighted_sum / total_tickets_sum
+            else:
+                total_row[fieldname] = 0.0
+
+        return total_row
 
     def get_summary_data(self):
         self.ticket_summary_data = frappe._dict()
