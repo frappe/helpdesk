@@ -3,7 +3,7 @@
 An SLA (`HD Service Level Agreement`) has:
 
 - `priorities`: one row per ticket priority, with `response_time` and `resolution_time` in seconds. One row is the `default_priority`.
-- `support_and_resolution`: the working hours, one row per `workday` with a `start_time` and `end_time`.
+- `support_and_resolution`: the working hours, one row per `workday` with a `start_time` and `end_time`. A day with no row, such as Saturday, does not count.
 - `holiday_list`: an `HD Service Holiday List` whose dates do not count.
 - `condition`: a Python expression on the ticket, written against `doc`, such as `doc.customer == 'Acme'`.
 - `default_sla`, `rank`, `enabled`, `start_date`, `end_date` and `apply_sla_for_resolution`.

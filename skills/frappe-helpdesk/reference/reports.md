@@ -26,7 +26,7 @@ All four filters are optional; the dates default to the last 30 days. An agent w
 frappectl -s <p> method call helpdesk.api.ticket_stats.get_agent_performance -f team=<team> -f from_date=2026-01-01 -f to_date=2026-01-31
 ```
 
-Leave out `team` for every active agent, and the dates for the last 30 days. `team` picks the team's members, not the tickets in that team: an empty list means the team has no members, so check `doc get "HD Team" <team>` and tell the human. It returns one row per agent, with `agent_name`, `tickets`, `sla_fulfilled_percent`, `avg_first_response_hours`, `avg_resolution_days` and `avg_feedback_stars`, worked out as the dashboard does. Only an Agent Manager can call it; tell anyone else that comparing agents needs that role.
+Leave out `team` for every active agent, and the dates for the last 30 days. `team` picks the team's members and counts only that team's tickets: an empty list means the team has no members, so check `doc get "HD Team" <team>` and tell the human. It returns one row per agent, with `agent_name`, `tickets`, `sla_fulfilled_percent`, `avg_first_response_hours`, `avg_resolution_days` and `avg_feedback_stars`, worked out as the dashboard does. Only an Agent Manager can call it; tell anyone else that comparing agents needs that role.
 
 To answer "who is the best or worst":
 
