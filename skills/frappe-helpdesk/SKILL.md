@@ -81,7 +81,7 @@ To explain a date, read the SLA named in `sla` with `doc get "HD Service Level A
 | Add contacts to a customer | `method call add_contacts --doctype "HD Customer" --name <c> -F 'contacts:=["<contact or email>"]'`. A contact with a user is added. One without a user is emailed an invite instead, and comes back under `invite_result`, not `added`. With `-F invite:=false`, every contact is added and nobody is emailed; a missing contact can be created with its customer in one step ("Create a contact"). |
 | Set up the helpdesk | `reference/setup.md` |
 
-For anything this file doesn't cover, find the method: `frappectl -s <p> method search -q "<one or two words>"` (every word must match), then `method show <path>` for its arguments, who may call it and what it returns. Read that before you call it, and still mind the traps below. When nothing matches, the task is usually a field change: use `doctype show` and the `doc` commands. Search is for agents; a customer's profile is refused it, and a site on an older Frappe doesn't have it.
+For anything this file doesn't cover, find the method: `frappectl -s <p> method search -q "<one or two words>"` (every word must match), then `method show <path>` for its arguments, who may call it, what it returns and its code. Read that before you call it, and still mind the traps below. When nothing matches, the task is usually a field change: use `doctype show` and the `doc` commands. Search is for agents; a customer's profile is refused it, and a site on an older Frappe doesn't have it.
 
 ## 5. Traps
 
