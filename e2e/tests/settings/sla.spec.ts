@@ -66,13 +66,26 @@ test("an SLA's targets, work days and holiday list are edited and saved", async 
 
   await rowMenu(page, tableRow(dialog, "Tuesday"), "Edit");
   const workday = page.getByRole("dialog", { name: "Edit workday" });
-  await workday.getByLabel("End Time").fill("08:00");
+  await workday.getByLabel("End time").fill("08:00");
   await workday.getByRole("button", { name: "Save" }).click();
   await expect(workday.getByText("End time must be after start time")).toBeVisible();
-  await workday.getByLabel("End Time").fill("18:30");
+  await workday.getByLabel("End time").fill("18:30");
+  await workday.getByLabel("Break start").fill("17:30");
+  await workday.getByLabel("Break end").fill("18:00");
+  await workday.getByLabel("Break end").press("Tab");
+  await workday.getByRole("checkbox", { name: "Apply break to all workdays" }).check();
   await workday.getByRole("button", { name: "Save" }).click();
   await expect(workday).toBeHidden();
-  await deleteFromMenu(page, tableRow(dialog, "Monday").getByRole("button"));
+  await expect(page.getByText("Break applied to 1 workday. Skipped Monday: outside working hours.")).toBeVisible();
+  // Delete removes the row being edited, even after the Workday select names another day.
+  await rowMenu(page, tableRow(dialog, "Monday"), "Edit");
+  await workday.getByRole("combobox", { name: "Workday" }).click();
+  await page.getByRole("option", { name: "Tuesday" }).click();
+  await workday.getByRole("button", { name: "Delete" }).click();
+  await workday.getByRole("button", { name: "Confirm Delete" }).click();
+  await expect(workday).toBeHidden();
+  await expect(tableRow(dialog, "Monday")).toHaveCount(0);
+  await expect(tableRow(dialog, "Tuesday")).toHaveCount(1);
   await dialog.getByRole("button", { name: "Add row" }).last().click();
 
   await dialog.getByRole("button", { name: firstList, exact: true }).click();
@@ -93,6 +106,89 @@ test("an SLA's targets, work days and holiday list are edited and saved", async 
     ["Monday", "9:00:00", "17:00:00"],
   ]);
 });
+
+// Settings has no entry point below 640px (MobileLayout mounts no SettingsModal), so "phone" is the narrowest width it opens at.
+for (const [label, viewport] of [
+  ["desktop", null],
+  ["phone", { width: 640, height: 900 }],
+] as const) {
+  test(`a workday's lunch break is validated, copied to the other workdays and cleared (${label})`, async ({ page, api }) => {
+    if (viewport) await page.setViewportSize(viewport);
+    const sla = await createSla(api, await createHolidayList(api), [
+      ["Monday", "17:00:00"],
+      ["Tuesday", "17:00:00"],
+      ["Wednesday", "12:00:00"],
+    ]);
+    await page.goto("/helpdesk/tickets");
+    const dialog = await openSettings(page, "SLA Policies");
+    await listRow(dialog, sla).getByText(sla, { exact: true }).click();
+    const savePolicy = dialog.getByRole("button", { name: "Save", exact: true });
+
+    // Saving a workday without changes leaves the policy clean.
+    await expect(savePolicy).toBeDisabled();
+    await rowMenu(page, tableRow(dialog, "Wednesday"), "Edit");
+    const workday = page.getByRole("dialog", { name: "Edit workday" });
+    await workday.getByRole("button", { name: "Save" }).click();
+    await expect(workday).toBeHidden();
+    await expect(savePolicy).toBeDisabled();
+
+    await rowMenu(page, tableRow(dialog, "Monday"), "Edit");
+    await workday.getByLabel("Break start").fill("13:00");
+    await workday.getByRole("button", { name: "Save" }).click();
+    await expect(workday.getByText("Set both break start and break end, or neither.")).toBeVisible();
+    await workday.getByLabel("Break end").fill("12:30");
+    await workday.getByRole("button", { name: "Save" }).click();
+    await expect(workday.getByText("Break end must be after break start.")).toBeVisible();
+    await workday.getByLabel("Break end").fill("14:00");
+    await workday.getByLabel("Break end").press("Tab");
+    await expect(workday.getByText("Break end must be after break start.")).toBeHidden();
+    await workday.getByRole("checkbox", { name: "Apply break to all workdays" }).check();
+    await workday.getByRole("button", { name: "Save" }).click();
+    await expect(workday).toBeHidden();
+    await expect(page.getByText("Break applied to 2 workdays. Skipped Wednesday: outside working hours.")).toBeVisible();
+    await expect(tableRow(dialog, "Tuesday")).toContainText(/13:00(:00)?\s*–\s*14:00(:00)?/);
+    await expect(tableRow(dialog, "Wednesday")).not.toContainText(/\d\s*–\s*\d/);
+    // Once the policy is dirty its Save must sit inside the panel, not clipped past its edge.
+    const [saveBox, panelBox] = await Promise.all([savePolicy.boundingBox(), dialog.boundingBox()]);
+    expect(saveBox!.x + saveBox!.width).toBeLessThanOrEqual(panelBox!.x + panelBox!.width);
+    await savePolicy.click();
+
+    await expect.poll(async () => breaksOf(await api.get(SLA, sla))).toEqual([
+      ["Monday", "13:00:00", "14:00:00"],
+      ["Tuesday", "13:00:00", "14:00:00"],
+      ["Wednesday", null, null],
+    ]);
+
+    await rowMenu(page, tableRow(dialog, "Tuesday"), "Edit");
+    await expect(workday.getByLabel("Break start")).toHaveValue("13:00");
+    await workday.getByLabel("Break start").fill("");
+    await workday.getByLabel("Break end").fill("");
+    await workday.getByRole("button", { name: "Save" }).click();
+    await expect(workday).toBeHidden();
+    await dialog.getByRole("button", { name: "Save", exact: true }).click();
+
+    await expect.poll(async () => breaksOf(await api.get(SLA, sla))).toEqual([
+      ["Monday", "13:00:00", "14:00:00"],
+      ["Tuesday", null, null],
+      ["Wednesday", null, null],
+    ]);
+
+    // A break set on a discarded new policy must not leak into the next one.
+    await dialog.getByRole("button", { name: sla, exact: true }).click();
+    await dialog.getByRole("button", { name: "New", exact: true }).click();
+    await rowMenu(page, tableRow(dialog, "Monday"), "Edit");
+    await workday.getByLabel("Break start").fill("13:00");
+    await workday.getByLabel("Break end").fill("14:00");
+    await workday.getByLabel("Break end").press("Tab");
+    await workday.getByRole("checkbox", { name: "Apply break to all workdays" }).check();
+    await workday.getByRole("button", { name: "Save" }).click();
+    await expect(tableRow(dialog, "Tuesday")).toContainText(/13:00(:00)?\s*–\s*14:00(:00)?/);
+    await dialog.getByRole("button", { name: "New SLA Policy" }).click();
+    await page.getByRole("button", { name: "Confirm" }).click();
+    await dialog.getByRole("button", { name: "New", exact: true }).click();
+    await expect(tableRow(dialog, "Tuesday")).not.toContainText(/\d\s*–\s*\d/);
+  });
+}
 
 test("a holiday list gets a recurring weekend and its holidays are edited", async ({ page, api }) => {
   const list = await createHolidayList(api);
@@ -212,7 +308,7 @@ async function createHolidayList(api: Api, overrides: Record<string, unknown> = 
   return name;
 }
 
-async function createSla(api: Api, holidayList: string) {
+async function createSla(api: Api, holidayList: string, workdays: [string, string][] = [["Monday", "17:00:00"], ["Tuesday", "17:00:00"]]) {
   const name = `E2E SLA ${uid()}`;
   created.push({ doctype: SLA, name });
   await api.insert(SLA, {
@@ -227,13 +323,18 @@ async function createSla(api: Api, holidayList: string) {
       resolution_time: 86400,
       default_priority: priority === "Medium" ? 1 : 0,
     })),
-    support_and_resolution: ["Monday", "Tuesday"].map((workday) => ({
+    support_and_resolution: workdays.map(([workday, end_time]) => ({
       workday,
       start_time: "09:00:00",
-      end_time: "17:00:00",
+      end_time,
     })),
   });
   return name;
+}
+
+function breaksOf(sla: { support_and_resolution: Record<string, string | null>[] }) {
+  // REST leaves out empty fields, so a missing break reads as null.
+  return sla.support_and_resolution.map((row) => [row.workday, row.break_start ?? null, row.break_end ?? null]);
 }
 
 /** A row of the SLA or holiday list, found by its exact name. */

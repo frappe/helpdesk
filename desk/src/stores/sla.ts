@@ -1,40 +1,17 @@
 import { SlaValidationErrors } from "@/components/Settings/Sla/types";
 import { __ } from "@/translation";
+import type { HDServiceDay } from "@/types/doctypes";
 import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
-const defaultSupportAndResolution = [
-  {
-    workday: "Monday",
+/** Fresh rows each call, so edits to one new policy never leak into the next. */
+const getDefaultSupportAndResolution = () =>
+  ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((workday) => ({
+    workday,
     start_time: "09:00:00",
     end_time: "17:00:00",
     id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Tuesday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Wednesday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Thursday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Friday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-];
+  }));
 
 export const slaData = ref({
   name: "",
@@ -50,7 +27,7 @@ export const slaData = ref({
   start_date: "",
   end_date: "",
   loading: false,
-  support_and_resolution: defaultSupportAndResolution,
+  support_and_resolution: getDefaultSupportAndResolution(),
   default_ticket_status: "",
   reopen_ticket_status: "",
   condition: [],
@@ -72,7 +49,7 @@ export const resetSlaData = () => {
     start_date: "",
     end_date: "",
     loading: false,
-    support_and_resolution: defaultSupportAndResolution,
+    support_and_resolution: getDefaultSupportAndResolution(),
     default_ticket_status: "",
     reopen_ticket_status: "",
     condition: [],
@@ -283,32 +260,24 @@ export function validateSlaData(
             const startTimeStr = day.start_time.trim();
             const endTimeStr = day.end_time.trim();
 
-            const parseTime = (timeStr: string) => {
-              const [hours, minutes] = timeStr.split(":").map(Number);
-              const date = new Date();
-              date.setHours(hours, minutes || 0, 0, 0);
-              return date;
-            };
-
-            try {
-              const startTime = parseTime(startTimeStr);
-              const endTime = parseTime(endTimeStr);
-
-              if (startTime >= endTime) {
-                invalidTimeRanges.push(
-                  `${day.workday} (${startTimeStr} - ${endTimeStr})`
-                );
-              }
-            } catch (error) {
-              // If time parsing fails, mark as invalid
-              invalidTimeRanges.push(`${day.workday} (Invalid time format)`);
+            if (toMinutes(startTimeStr) >= toMinutes(endTimeStr)) {
+              invalidTimeRanges.push(
+                `${day.workday} (${startTimeStr} - ${endTimeStr})`
+              );
             }
           }
+
+          const invalidBreaks = slaData.value.support_and_resolution
+            .filter((day) => getBreakError(day))
+            .map((day) => `${day.workday}: ${getBreakError(day)}`);
 
           if (invalidTimeRanges.length > 0) {
             slaDataErrors.value.support_and_resolution = `End time must be after start time for: ${invalidTimeRanges.join(
               ", "
             )}`;
+          } else if (invalidBreaks.length > 0) {
+            slaDataErrors.value.support_and_resolution =
+              invalidBreaks.join(" ");
           } else {
             slaDataErrors.value.support_and_resolution = "";
           }
@@ -327,4 +296,33 @@ export function validateSlaData(
   }
 
   return slaDataErrors.value;
+}
+
+/** Why a workday's break is invalid, or "" when it is valid or there is none. */
+export function getBreakError(
+  day: Partial<
+    Pick<HDServiceDay, "start_time" | "end_time" | "break_start" | "break_end">
+  >
+): string {
+  if (!day.break_start && !day.break_end) return "";
+  if (!day.break_start || !day.break_end) {
+    return __("Set both break start and break end, or neither.");
+  }
+  const [start, end, breakStart, breakEnd] = [
+    day.start_time,
+    day.end_time,
+    day.break_start,
+    day.break_end,
+  ].map(toMinutes);
+  if (breakEnd <= breakStart) return __("Break end must be after break start.");
+  if (breakStart <= start || breakEnd >= end) {
+    return __("Break must be within working hours.");
+  }
+  return "";
+}
+
+/** Minutes since midnight for an "H:MM" or "H:MM:SS" time. */
+export function toMinutes(time?: string | null): number {
+  const [hours, minutes] = (time || "").split(":").map(Number);
+  return (hours || 0) * 60 + (minutes || 0);
 }

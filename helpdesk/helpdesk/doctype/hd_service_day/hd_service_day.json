@@ -9,7 +9,11 @@
   "section_break_2",
   "start_time",
   "column_break_3",
-  "end_time"
+  "end_time",
+  "section_break_break",
+  "break_start",
+  "column_break_break",
+  "break_end"
  ],
  "fields": [
   {
@@ -41,12 +45,34 @@
    "in_list_view": 1,
    "label": "End Time",
    "reqd": 1
+  },
+  {
+   "fieldname": "section_break_break",
+   "fieldtype": "Section Break",
+   "label": "Break"
+  },
+  {
+   "description": "Optional. The SLA clock stops between break start and break end.",
+   "fieldname": "break_start",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "Break Start"
+  },
+  {
+   "fieldname": "column_break_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "break_end",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "Break End"
   }
  ],
  "istable": 1,
  "links": [],
  "migration_hash": "496266f1e7762d83bdd34c7359c26cff",
- "modified": "2021-10-21 14:27:08.190239",
+ "modified": "2026-10-28 15:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Service Day",

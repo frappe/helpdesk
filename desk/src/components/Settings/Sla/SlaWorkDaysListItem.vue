@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid gap-2 py-3.5 px-4 items-center"
+    class="grid gap-2 py-3.5 px-2 md:px-4 items-center"
     :style="{
       gridTemplateColumns: getGridTemplateColumnsForTable(props.columns),
     }"
@@ -10,12 +10,29 @@
       :key="column.key"
       class="w-full overflow-hidden whitespace-nowrap text-ellipsis"
     >
-      <div v-if="column.key === 'start_time' || column.key === 'end_time'">
+      <div
+        v-if="column.key === 'start_time' || column.key === 'end_time'"
+        class="whitespace-normal"
+      >
         {{ formatTime(props.row[column.key]) }}
+      </div>
+      <div
+        v-else-if="column.key === 'break'"
+        class="flex flex-wrap gap-x-1 whitespace-normal"
+      >
+        <template v-if="hasBreak">
+          <span class="whitespace-nowrap">
+            {{ formatTime(props.row.break_start) }}
+          </span>
+          <span class="whitespace-nowrap">
+            – {{ formatTime(props.row.break_end) }}
+          </span>
+        </template>
+        <span v-else class="text-ink-gray-4">—</span>
       </div>
       <div v-else class="ms-2">
         <select
-          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-5 p-0 ps-2 pe-5 bg-transparent -ms-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
+          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-5 p-0 ps-2 pe-2 bg-transparent -ms-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
           v-model="props.row[column.key]"
         >
           <option
@@ -37,6 +54,13 @@
         <Button icon="lucide-more-horizontal" variant="ghost" />
       </Dropdown>
     </div>
+    <div
+      v-if="hasBreak && !hasBreakColumn"
+      class="col-span-full -mt-1 ms-2 text-ink-gray-5"
+    >
+      {{ __("Break") }} {{ formatTime(props.row.break_start) }} –
+      {{ formatTime(props.row.break_end) }}
+    </div>
   </div>
   <hr v-if="!props.isLast" />
   <WorkDayModal
@@ -46,11 +70,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Button, Dropdown } from "frappe-ui";
+import { computed, ref } from "vue";
+import { Button, dayjs, Dropdown } from "frappe-ui";
 import WorkDayModal from "./Modals/WorkDayModal.vue";
-import { ConfirmDelete, getGridTemplateColumnsForTable } from "@/utils";
+import {
+  ConfirmDelete,
+  getGridTemplateColumnsForTable,
+  getTimeFormat,
+} from "@/utils";
 import { slaData } from "@/stores/sla";
+import { __ } from "@/translation";
 
 interface Column {
   key: string;
@@ -63,6 +92,8 @@ interface WorkDay {
   workday: string;
   start_time: string;
   end_time: string;
+  break_start?: string | null;
+  break_end?: string | null;
 }
 
 const props = defineProps<{
@@ -88,6 +119,12 @@ const dialog = ref({
 });
 
 const isConfirmingDelete = ref(false);
+const hasBreak = computed(() =>
+  Boolean(props.row.break_start && props.row.break_end)
+);
+const hasBreakColumn = computed(() =>
+  props.columns.some((column) => column.key === "break")
+);
 
 const dropdownOptions = [
   {
@@ -120,19 +157,11 @@ const editWorkDay = () => {
     workday: props.row.workday,
     start_time: props.row.start_time,
     end_time: props.row.end_time,
+    break_start: props.row.break_start,
+    break_end: props.row.break_end,
   };
 };
 
-const formatTime = (time) => {
-  if (!time) return "00:00";
-  const [hours, minutes] = time.split(":");
-  const date = new Date();
-  date.setHours(parseInt(hours) || 0, parseInt(minutes) || 0, 0);
-
-  return date.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-};
+const formatTime = (time) =>
+  dayjs(`2000-01-01 ${time || "00:00"}`).format(getTimeFormat());
 </script>
