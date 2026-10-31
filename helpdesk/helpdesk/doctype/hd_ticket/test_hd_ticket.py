@@ -2683,6 +2683,7 @@ class TestEmailRecipientsStayWithAgents(IntegrationTestCase):
             activity.getdoctype("HD Ticket", with_parent=1)
             self.assertRaises(frappe.PermissionError, activity.getdoctype, "User")
         self.assertEqual(frappe.response.docs[0]["name"], "HD Ticket")
+        self.assertNotIn("__custom_js", frappe.response.docs[0])
 
 
 class TestCustomerPing(IntegrationTestCase):
