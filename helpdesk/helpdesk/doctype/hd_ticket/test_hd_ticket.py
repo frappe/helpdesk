@@ -2672,6 +2672,19 @@ class TestEmailRecipientsStayWithAgents(IntegrationTestCase):
             with self.assertRaises(frappe.PermissionError):
                 load()
 
+    def test_a_customer_can_load_the_ticket_meta(self) -> None:
+        from helpdesk.overrides import activity
+
+        frappe.set_user(self.customer)
+        frappe.response.docs = []
+        with patch.object(
+            activity.load, "getdoctype", side_effect=frappe.PermissionError
+        ):
+            activity.getdoctype("HD Ticket", with_parent=1)
+            self.assertRaises(frappe.PermissionError, activity.getdoctype, "User")
+        self.assertEqual(frappe.response.docs[0]["name"], "HD Ticket")
+        self.assertNotIn("__custom_js", frappe.response.docs[0])
+
 
 class TestCustomerPing(IntegrationTestCase):
     def save_and_count_pings(self, **values) -> int:
