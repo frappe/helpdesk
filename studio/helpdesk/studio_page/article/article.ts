@@ -51,18 +51,6 @@ export default function setup(context) {
       .slice(0, RELATED_LIMIT)
   })
 
-  const breadcrumbs = computed(() => {
-    const { category, category_name, parent_article_category, parent_category_name, title } = article.data || {}
-    return [
-      { label: __('Help'), route: ROUTES.home },
-      ...(parent_article_category
-        ? [{ label: parent_category_name, route: ROUTES.category(parent_article_category) }]
-        : []),
-      ...(category ? [{ label: category_name, route: ROUTES.category(category) }] : []),
-      { label: title },
-    ]
-  })
-
   // Pre-slug links carry the bare name.
   function isCurrentArticle(routeName) {
     const name = article.data?.name
@@ -146,7 +134,6 @@ export default function setup(context) {
     readingTime,
     publishedOn,
     relatedArticles,
-    breadcrumbs,
     submitFeedback,
     copyPageLink,
     isPublicArticle,
