@@ -218,7 +218,7 @@ def get_subcategory_articles(category: str) -> dict[str, list[dict]]:
         rows = frappe.get_all(
             "HD Article",
             filters=make_article_filters(category=subcategory),
-            fields=["name", "title", "excerpt"],
+            fields=["name", "title"],
             order_by="published_on desc",
             limit_page_length=SUBCATEGORY_ARTICLES_LIMIT,
         )
@@ -329,17 +329,23 @@ def get_categories() -> list[dict]:
 
 
 def _get_categories(with_creators: bool = False) -> list[dict]:
-    counts, authors = {}, {}
-    for category, author, total in frappe.get_all(
+    counts, authors, updated = {}, {}, {}
+    for category, author, total, modified in frappe.get_all(
         "HD Article",
         filters=make_article_filters(category=["is", "set"]),
-        fields=["category", "author", {"COUNT": "*", "as": "total"}],
+        fields=[
+            "category",
+            "author",
+            {"COUNT": "*", "as": "total"},
+            {"MAX": "modified", "as": "modified"},
+        ],
         group_by="category, author",
         order_by="total desc",
         as_list=True,
     ):
         counts[category] = counts.get(category, 0) + total
         authors.setdefault(category, []).append(author)
+        updated[category] = max(updated.get(category, modified), modified)
     if not counts:
         return []
     parents = dict(
@@ -357,6 +363,7 @@ def _get_categories(with_creators: bool = False) -> list[dict]:
     for sub, parent in parents.items():
         counts[parent] = counts.get(parent, 0) + counts[sub]
         authors.setdefault(parent, []).extend(authors[sub])
+        updated[parent] = max(updated.get(parent, updated[sub]), updated[sub])
     categories = frappe.get_all(
         "HD Article Category",
         filters={"name": ["in", list(counts)]},
@@ -366,6 +373,7 @@ def _get_categories(with_creators: bool = False) -> list[dict]:
     labels = get_category_labels([category.name for category in categories])
     for category in categories:
         category.article_count = counts[category.name]
+        category.last_updated = updated[category.name]
         category.label = labels[category.name]
         if with_creators:
             category.creators = [

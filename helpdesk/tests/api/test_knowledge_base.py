@@ -251,7 +251,25 @@ class TestPublicReads(IntegrationTestCase):
         category = category_row(self.category.name)
 
         self.assertEqual(
-            set(category), {*PUBLIC_CATEGORY_FIELDS, "article_count", "label"}
+            set(category),
+            {*PUBLIC_CATEGORY_FIELDS, "article_count", "label", "last_updated"},
+        )
+
+    def test_last_updated_is_the_newest_readable_article_in_the_branch(
+        self,
+    ) -> None:
+        sub = make_subcategory(self.category.name).name
+        newest = make_article("Fixture in sub", category=sub)
+        for name, modified in (
+            (newest, "2099-01-01 10:00:00"),
+            (self.draft, "2099-06-01 10:00:00"),
+        ):
+            frappe.db.set_value(
+                "HD Article", name, "modified", modified, update_modified=False
+            )
+
+        self.assertEqual(
+            str(category_row(self.category.name).last_updated), "2099-01-01 10:00:00"
         )
 
     def test_a_category_counts_only_its_published_articles(self) -> None:
@@ -1014,7 +1032,7 @@ class TestSubcategoryReads(IntegrationTestCase):
         rows = get_subcategory_articles(self.parent)[self.sub]
 
         self.assertEqual([row.name for row in rows], names[:0:-1])
-        self.assertEqual(set(rows[0]), LIST_ROW_FIELDS)
+        self.assertEqual(set(rows[0]), {"name", "title"})
 
     def test_subcategory_articles_hide_unreadable_rows_from_guests(self) -> None:
         other = make_subcategory(self.parent).name
