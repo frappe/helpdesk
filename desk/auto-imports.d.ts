@@ -10,5 +10,7 @@ declare global {
   const LucideCornerUpLeft: typeof import('~icons/lucide/corner-up-left')['default']
   const LucideFileSearch: typeof import('~icons/lucide/file-search')['default']
   const LucideMessageCircle: typeof import('~icons/lucide/message-circle')['default']
+  const LucideMoon: typeof import('~icons/lucide/moon')['default']
+  const LucideSun: typeof import('~icons/lucide/sun')['default']
   const LucideTag: typeof import('~icons/lucide/tag')['default']
 }
