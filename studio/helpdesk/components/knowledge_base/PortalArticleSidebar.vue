@@ -57,13 +57,13 @@
         <!-- A group: its own articles, then its Subcategories' groups. -->
         <DefineGroup v-slot="{ category, nested }">
           <div :class="!nested && revealed && 'portal-reveal'">
+            <!-- The row opens the category's page and keeps it open; the chevron folds. -->
             <SidebarItem
               class="max-md:h-11"
               :active="false"
-              :aria-expanded="category.isOpen"
-              :aria-controls="`kb-sidebar-${category.name}`"
+              :route="ROUTES.category(category.name)"
               :data-current="category.name === currentCategory || undefined"
-              @click="toggle(category.name, nested)"
+              @click="expand(category.name, nested)"
             >
               <template #prefix>
                 <Icon
@@ -82,11 +82,25 @@
               >
                 {{ category.label }}
               </span>
-              <!-- Not #suffix: only the button takes the click. -->
-              <span
-                class="lucide-chevron-right mr-[3px] size-4 shrink-0 text-ink-gray-5 transition-transform duration-150"
-                :class="category.isOpen && 'rotate-90'"
-              />
+              <template #suffix>
+                <button
+                  type="button"
+                  class="mr-0.5 grid size-6 place-items-center rounded-4 text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-7 focus-visible:focus-ring max-md:size-10"
+                  :aria-expanded="category.isOpen"
+                  :aria-controls="`kb-sidebar-${category.name}`"
+                  :aria-label="
+                    category.isOpen
+                      ? __('Collapse {0}', [category.label])
+                      : __('Expand {0}', [category.label])
+                  "
+                  @click="toggle(category.name, nested)"
+                >
+                  <span
+                    class="lucide-chevron-right size-4 transition-transform duration-150"
+                    :class="category.isOpen && 'rotate-90'"
+                  />
+                </button>
+              </template>
             </SidebarItem>
 
             <PortalCollapse
@@ -104,12 +118,13 @@
                   :route="ROUTES.article(article)"
                   :active="article.name === activeName"
                   :title="article.title"
-                  class="max-md:h-11 data-[state=active]:bg-surface-gray-2 data-[state=active]:shadow-none"
+                  class="!h-auto min-h-7 max-md:min-h-11 data-[state=active]:bg-surface-gray-2 data-[state=active]:shadow-none"
                 >
                   <template #prefix />
-                  <!-- -ml-2 undoes SidebarItem's icon gap; pr-2 mirrors its pl-2. -->
+                  <!-- -ml-2 undoes SidebarItem's icon gap; pr-2 mirrors its pl-2.
+                       Long titles wrap to two lines, then clamp; :title has the rest. -->
                   <span
-                    class="-ml-2 min-w-0 truncate pr-2 text-sm max-md:text-[15px]"
+                    class="-ml-2 line-clamp-2 min-w-0 py-1 pr-2 text-p-sm max-md:text-p-base"
                   >
                     <template
                       v-for="(part, i) in splitMatch(article.title)"
@@ -225,7 +240,7 @@ const props = withDefaults(
     activeCategory: "",
     open: false,
     searchShortcut: true,
-  }
+  },
 );
 
 const emit = defineEmits<{ close: [] }>();
@@ -242,7 +257,7 @@ const wrapperProps = computed(() =>
     : {
         ...attrs,
         class: [attrs.class, "flex h-full w-[239px] shrink-0 flex-col"],
-      }
+      },
 );
 
 // Fade in only rows that replace the skeleton.
@@ -258,13 +273,13 @@ const currentCategory = computed(
   () =>
     props.activeCategory ||
     props.categories.find((category) =>
-      category.articles?.some((article) => article.name === props.activeName)
-    )?.name
+      category.articles?.some((article) => article.name === props.activeName),
+    )?.name,
 );
 const currentParent = computed(
   () =>
     props.categories.find((category) => category.name === currentCategory.value)
-      ?.parent_article_category
+      ?.parent_article_category,
 );
 
 // A Subcategory opens with its parent.
@@ -275,7 +290,7 @@ watch(
     openName.value = parent || name;
     if (parent) openSubName.value = name;
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Search opens all matches; folds hold until the query changes.
@@ -290,6 +305,17 @@ function toggle(name: string, nested: boolean) {
   }
   const folded = new Set(foldedInSearch.value);
   folded.has(name) ? folded.delete(name) : folded.add(name);
+  foldedInSearch.value = folded;
+}
+
+// A second click on the row leaves it open; only the chevron folds.
+function expand(name: string, nested: boolean) {
+  if (!query.value.trim()) {
+    (nested ? openSubName : openName).value = name;
+    return;
+  }
+  const folded = new Set(foldedInSearch.value);
+  folded.delete(name);
   foldedInSearch.value = folded;
 }
 
@@ -316,7 +342,7 @@ function showMore(name: string) {
 function toGroup(
   category: Category,
   searching: boolean,
-  openRef: typeof openName
+  openRef: typeof openName,
 ): Group {
   const articles = category.articles || [];
   const matches = searching
@@ -324,11 +350,11 @@ function toGroup(
     : articles;
   // Always include the current article.
   const current = matches.findIndex(
-    (article) => article.name === props.activeName
+    (article) => article.name === props.activeName,
   );
   const limit = Math.max(
     sidebarState.shown[category.name] || SHOW_STEP,
-    current + 1
+    current + 1,
   );
   // Sidebar rows come sorted by `category_name`.
   const subcategories = props.categories
@@ -359,7 +385,7 @@ const visibleCategories = computed(() => {
     .map((category) => toGroup(category, searching, openName))
     .filter(
       (category) =>
-        !searching || category.matches.length || category.subcategories.length
+        !searching || category.matches.length || category.subcategories.length,
     );
 });
 
@@ -392,12 +418,12 @@ watch(
       element.scrollTop += top - box.height / 3;
     }
   },
-  { flush: "post" }
+  { flush: "post" },
 );
 
 function prefetchHovered(event: Event) {
   const row = (event.target as Element).closest?.(
-    "[data-article]"
+    "[data-article]",
   ) as HTMLElement | null;
   prefetchOnHover(row?.dataset.article);
 }
