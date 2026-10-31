@@ -372,6 +372,43 @@
        "blockName": "articles-section",
        "children": [
         {
+         "blockName": "featured-section",
+         "children": [
+          {
+           "classes": [
+            "text-ink-gray-9"
+           ],
+           "componentId": "TextBlock-lone-featured-heading",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-lg-semibold",
+            "tag": "h2",
+            "text": "{{ t(\"Featured\") }}"
+           }
+          },
+          {
+           "blockName": "Home article list",
+           "componentId": "home_article_list-featured",
+           "componentName": "home_article_list",
+           "componentProps": {
+            "articles": "{{ pinnedArticles.data }}"
+           },
+           "isStudioComponent": true
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-col",
+          "gap-4",
+          "w-full",
+          "pb-4"
+         ],
+         "componentId": "container-lone-featured",
+         "componentName": "container",
+         "originalElement": "div",
+         "visibilityCondition": "{{ hasLoneFeatured }}"
+        },
+        {
          "blockName": "articles-header",
          "children": [
           {
@@ -438,7 +475,7 @@
              "$type": "variable",
              "name": "sort"
             },
-            "options": "{{ [{ label: t(\"Popular\"), value: \"popular\" }, { label: t(\"Latest\"), value: \"latest\" }] }}",
+            "options": "{{ sortOptions }}",
             "size": "sm",
             "type": "subtle",
             "vertical": false
@@ -490,141 +527,16 @@
             "count": 5,
             "instant": true
            },
-           "visibilityCondition": "{{ !articles.data }}"
+           "visibilityCondition": "{{ !homeArticles }}"
           },
           {
-           "baseStyles": {
-            "borderColor": "var(--outline-gray-1, oklch(0.946 0 0))",
-            "borderRadius": "12px",
-            "borderStyle": "solid",
-            "borderWidth": "1px",
-            "display": "flex",
-            "flexDirection": "column",
-            "gap": "0px"
-           },
-           "children": [
-            {
-             "blockName": "article-row",
-             "children": [
-              {
-               "blockName": "container",
-               "children": [
-                {
-                 "blockName": "container",
-                 "children": [
-                  {
-                   "baseStyles": {
-                    "flexShrink": 0,
-                    "marginRight": "8px"
-                   },
-                   "classes": [
-                    "size-4",
-                    "text-ink-gray-6",
-                    "mt-px"
-                   ],
-                   "componentId": "HTML-home-article-icon",
-                   "componentName": "PortalArticleIcon",
-                   "isCustomVueComponent": true
-                  },
-                  {
-                   "classes": [
-                    "text-ink-gray-8",
-                    "flex-1"
-                   ],
-                   "componentId": "TextBlock-okskr3j72",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-p-sm",
-                    "tag": "span",
-                    "text": "{{ dataItem.title }}"
-                   }
-                  }
-                 ],
-                 "classes": [
-                  "flex",
-                  "flex-row",
-                  "shrink",
-                  "h-fit",
-                  "w-fit",
-                  "min-w-0"
-                 ],
-                 "componentId": "container-b3ofn4yxu",
-                 "componentName": "container",
-                 "originalElement": "div"
-                },
-                {
-                 "classes": [
-                  "size-3.5",
-                  "shrink-0",
-                  "text-ink-gray-4"
-                 ],
-                 "componentId": "Icon-home-article-chevron",
-                 "componentName": "Icon",
-                 "componentProps": {
-                  "icon": "lucide-chevron-right"
-                 }
-                }
-               ],
-               "classes": [
-                "items-center",
-                "flex",
-                "flex-row",
-                "shrink",
-                "h-fit",
-                "justify-between",
-                "w-full"
-               ],
-               "componentId": "container-24f1icia3",
-               "componentName": "container",
-               "originalElement": "div"
-              }
-             ],
-             "classes": [
-              "transition",
-              "hover:bg-surface-gray-1",
-              "items-center",
-              "rounded-none",
-              "cursor-pointer",
-              "flex",
-              "flex-row",
-              "py-3",
-              "px-4",
-              "sm:px-5",
-              "w-full",
-              "border-t",
-              "border-outline-gray-2",
-              "-mt-px",
-              "focus-visible:focus-ring",
-              "focus-visible:-outline-offset-2"
-             ],
-             "componentEvents": {
-              "mouseenter": {
-               "action": "Run Script",
-               "event": "mouseenter",
-               "script": "prefetchOnHover(dataItem.name)"
-              }
-             },
-             "componentId": "container-ijrf3qvaj",
-             "componentName": "PortalLink",
-             "componentProps": {
-              "to": "{{ routes.article(dataItem) }}"
-             },
-             "isCustomVueComponent": true
-            }
-           ],
-           "componentId": "Repeater-9o4hxaycp",
-           "componentName": "Repeater",
+           "blockName": "Home article list",
+           "componentId": "home_article_list-tabbed",
+           "componentName": "home_article_list",
            "componentProps": {
-            "data": "{{ articles.data }}",
-            "dataKey": "name"
+            "articles": "{{ homeArticles }}"
            },
-           "visibilityCondition": "{{ articles.data && articles.data.length }}",
-           "rawStyles": {
-            "overflow": "hidden"
-           },
-           "classes": [
-            "portal-reveal"
-           ]
+           "isStudioComponent": true
           }
          ],
          "classes": [
@@ -657,7 +569,7 @@
           "title": "{{ t(\"No articles yet\") }}"
          },
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ articles.data && !articles.data.length }}"
+         "visibilityCondition": "{{ homeArticles && !homeArticles.length }}"
         }
        ],
        "classes": [
@@ -716,7 +628,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-23 13:00:00.000000",
+ "modified": "2026-10-30 14:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
@@ -743,6 +655,16 @@
    "resource_name": "articles",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_articles"
+  },
+  {
+   "auto": 0,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{}",
+   "resource_name": "pinnedArticles",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_featured_articles"
   }
  ],
  "route": "/",

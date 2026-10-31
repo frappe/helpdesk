@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
@@ -14,6 +16,7 @@ from frappe.website.utils import cleanup_page_name, find_first_image
 
 from helpdesk.api.article import search_accessible_articles
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
+    PRIVATE,
     can_view_article,
     get_voter,
     make_article_filters,
@@ -57,6 +60,8 @@ LIST_LIMIT = 100
 SUBCATEGORY_ARTICLES_LIMIT = 5
 # the sidebar reads its titles in one request; newer ones win past this
 TITLES_LIMIT = 1000
+# within a category, heavier articles list first
+WEIGHT_ORDER = "weight desc"
 
 VISITOR_COOKIE = "hd_visitor"
 VISITOR_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
@@ -198,15 +203,58 @@ def get_articles(
 ) -> list[dict]:
     validate_public_access()
     filters = make_article_filters()
+    order_by = "views desc" if sort == "popular" else "published_on desc"
     if category:
         filters["category"] = category
+        order_by = f"{WEIGHT_ORDER}, {order_by}"
     return frappe.get_all(
         "HD Article",
         filters=filters,
         fields=["name", "title", "excerpt"],
-        order_by="views desc" if sort == "popular" else "published_on desc",
+        order_by=order_by,
         limit_page_length=min(cint(limit) or LIST_LIMIT, LIST_LIMIT),
     )
+
+
+@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+def get_featured_articles(
+    names: str | list | None = None, limit: int | None = None
+) -> list[dict]:
+    """The home page's pins in order; `names`, Settings Preview's unsaved ones."""
+    validate_public_access()
+    filters = make_article_filters()
+    # Featured is for customers, so agents skip Private too; others keep their narrower filter.
+    filters.setdefault("visibility", ["!=", PRIVATE])
+    limit = min(cint(limit) or LIST_LIMIT, LIST_LIMIT)
+    fields = ["name", "title", "excerpt"]
+    if names is None:
+        filters["pinned"] = 1
+        return frappe.get_all(
+            "HD Article",
+            filters=filters,
+            fields=fields,
+            order_by="pinned_order asc",
+            limit_page_length=limit,
+        )
+    names = _parse_guest_names(names, LIST_LIMIT)
+    if not names:
+        return []
+    filters["name"] = ["in", names]
+    # the limit cuts after their order
+    rows = frappe.get_all("HD Article", filters=filters, fields=fields)
+    rows.sort(key=lambda row: names.index(row.name))
+    return rows[:limit]
+
+
+def _parse_guest_names(value, limit: int) -> list[str]:
+    """Guest input: a name or a JSON list of names. Bad JSON is a plain name, junk is dropped."""
+    if isinstance(value, str) and value.lstrip().startswith("["):
+        with suppress(Exception):
+            value = frappe.parse_json(value)
+    names = [value] if isinstance(value, str) else value
+    if not isinstance(names, list):
+        return []
+    return [name for name in names if isinstance(name, str) and name][:limit]
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
@@ -219,7 +267,7 @@ def get_subcategory_articles(category: str) -> dict[str, list[dict]]:
             "HD Article",
             filters=make_article_filters(category=subcategory),
             fields=["name", "title"],
-            order_by="published_on desc",
+            order_by=f"{WEIGHT_ORDER}, published_on desc",
             limit_page_length=SUBCATEGORY_ARTICLES_LIMIT,
         )
         if rows:
@@ -246,7 +294,7 @@ def get_kb_sidebar() -> list[dict]:
         "HD Article",
         filters=make_article_filters(category=["is", "set"]),
         fields=["name", "title", "category"],
-        order_by="published_on desc",
+        order_by=f"{WEIGHT_ORDER}, published_on desc",
         limit_page_length=TITLES_LIMIT,
     ):
         articles.setdefault(row.pop("category"), []).append(row)

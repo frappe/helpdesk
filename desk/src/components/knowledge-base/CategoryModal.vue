@@ -23,23 +23,6 @@
           />
         </div>
         <div>
-          <div class="mb-1.5 text-base text-ink-gray-5">
-            {{ __("Parent Category") }}
-          </div>
-          <Combobox
-            class="w-full"
-            v-model="parent"
-            :options="parentOptions"
-            :placeholder="__('Select Category')"
-            :disabled="hasSubcategories"
-          />
-          <p v-if="hasSubcategories" class="mt-1.5 text-p-sm text-ink-gray-5">
-            {{
-              __("A category with subcategories can't become a subcategory.")
-            }}
-          </p>
-        </div>
-        <div>
           <div class="mb-1.5 text-base text-ink-gray-5">{{ __("Icon") }}</div>
           <Combobox
             class="w-full"
@@ -47,6 +30,24 @@
             :options="iconOptions"
             :placeholder="__('Select an icon')"
           />
+        </div>
+        <div>
+          <div class="mb-1.5 flex items-center justify-between">
+            <span class="text-base text-ink-gray-5">
+              {{ __("Parent category") }}
+            </span>
+            <span class="text-sm text-ink-gray-4">{{ __("Optional") }}</span>
+          </div>
+          <Combobox
+            class="w-full"
+            v-model="parent"
+            :options="parentOptions"
+            :disabled="hasSubcategories"
+          />
+          <p class="mt-1.5 flex items-center gap-1.5 text-p-sm text-ink-gray-5">
+            <LucideInfo class="size-3.5 shrink-0" />
+            {{ parentHint }}
+          </p>
         </div>
       </div>
     </template>
@@ -56,6 +57,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Combobox, Dialog } from "frappe-ui";
+import LucideInfo from "~icons/lucide/info";
 import { categoryOptions } from "@/stores/knowledgeBase";
 import { CATEGORY_ICONS } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
@@ -90,7 +92,7 @@ const icon = defineModel<string>("icon");
 const parent = defineModel<string>("parent", { default: "" });
 
 const parentOptions = computed(() => [
-  { label: __("None"), value: "" },
+  { label: __("None (top level)"), value: "", icon: "lucide-house" },
   ...(categoryOptions.data || [])
     .filter(
       (option) =>
@@ -98,6 +100,17 @@ const parentOptions = computed(() => [
     )
     .map(({ value, label }) => ({ value, label })),
 ]);
+
+const parentHint = computed(() => {
+  if (props.hasSubcategories)
+    return __("A category with subcategories can't become a subcategory.");
+  const label = parentOptions.value.find(
+    (option) => option.value && option.value === parent.value
+  )?.label;
+  return label
+    ? __("Appears inside {0} in your help center.", [label])
+    : __("Appears as a main section of your help center.");
+});
 
 watch(showDialog, (open) => {
   if (open) categoryOptions.submit();

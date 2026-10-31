@@ -36,6 +36,13 @@
       @update="handleCategoryUpdate"
       @create="handleCategoryCreate"
     />
+    <ArticleWeightModal
+      v-model="weightModal"
+      :articles="[...listSelections]"
+      :category="selectionCategory"
+      :initial-weight="selectionWeight"
+      @save="handleSetWeight"
+    />
     <MoveToCategoryModal
       v-model="moveToModal"
       :exclude-category="selectionCategory"
@@ -84,6 +91,7 @@ import { ArticleIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
+import ArticleWeightModal from "@/components/knowledge-base/ArticleWeightModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import DeleteCategoryModal from "@/components/knowledge-base/DeleteCategoryModal.vue";
 import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
@@ -369,15 +377,21 @@ function articlesAccessNote(access: string | null) {
   }[access];
 }
 
-async function changeArticlesAccess(selections: Set<string>) {
-  listSelections.value = new Set(selections);
+// The selected articles' value of `field`, if they all share one.
+async function readSharedValue(selections: Set<string>, field: string) {
   const rows = await call("frappe.client.get_list", {
     doctype: "HD Article",
     filters: { name: ["in", Array.from(selections)] },
-    fields: ["visibility"],
+    fields: [field],
     limit_page_length: 0,
   });
-  const current = new Set(rows.map((row) => row.visibility));
+  const values = new Set(rows.map((row) => row[field]));
+  return values.size === 1 ? [...values][0] : null;
+}
+
+async function changeArticlesAccess(selections: Set<string>) {
+  listSelections.value = new Set(selections);
+  const visibility = await readSharedValue(selections, "visibility");
   Object.assign(accessDialog, {
     open: true,
     forCategory: false,
@@ -385,29 +399,43 @@ async function changeArticlesAccess(selections: Set<string>) {
       selections.size === 1
         ? __("Change access for 1 article")
         : __("Change access for {0} articles", [selections.size]),
-    visibility: current.size === 1 ? [...current][0] : null,
+    visibility,
   });
 }
 
-async function updateArticlesAccess(visibility: string) {
+function updateArticlesAccess(visibility: string) {
+  return bulkUpdateArticles(
+    { visibility },
+    {
+      failed: __("Could not update access"),
+      partlyFailed: __("Could not update access for some articles."),
+      saved: __("Access updated for the selected articles."),
+    }
+  );
+}
+
+async function bulkUpdateArticles(
+  values: Record<string, unknown>,
+  messages: { failed: string; partlyFailed: string; saved: string }
+) {
   let failed_docs;
   try {
     ({ failed_docs } = await call("frappe.client.bulk_update", {
       docs: Array.from(listSelections.value).map((docname) => ({
         doctype: "HD Article",
         docname,
-        visibility,
+        ...values,
       })),
     }));
   } catch {
     // per-article failures come back in `failed_docs`
-    toast.error(__("Could not update access"));
+    toast.error(messages.failed);
     return;
   }
   if (failed_docs.length) {
-    toast.error(__("Could not update access for some articles."));
+    toast.error(messages.partlyFailed);
   } else {
-    toast.success(__("Access updated for the selected articles."));
+    toast.success(messages.saved);
   }
   listViewRef.value?.reload();
   listViewRef.value?.unselectAll();
@@ -439,6 +467,11 @@ const selectBannerActions = [
     },
   },
   {
+    label: __("Set weight"),
+    icon: "lucide-arrow-up-narrow-wide",
+    onClick: openWeightModal,
+  },
+  {
     label: __("Delete"),
     icon: "lucide-trash-2",
     onClick: (selections: Set<string>) => {
@@ -462,6 +495,28 @@ const selectBannerActions = [
     },
   },
 ];
+
+const weightModal = ref(false);
+const selectionWeight = ref(0);
+
+// Read, not taken from the rows: a saved list view may not fetch weight.
+async function openWeightModal(selections: Set<string>) {
+  listSelections.value = new Set(selections);
+  // Prefilled only when the selected articles share a weight.
+  selectionWeight.value = (await readSharedValue(selections, "weight")) || 0;
+  weightModal.value = true;
+}
+
+function handleSetWeight(weight: number) {
+  return bulkUpdateArticles(
+    { weight },
+    {
+      failed: __("Could not update the weight"),
+      partlyFailed: __("Could not update the weight for some articles."),
+      saved: __("Weight updated for the selected articles."),
+    }
+  );
+}
 
 function handleMoveToCategory(category: string) {
   moveToCategory.submit(
@@ -679,6 +734,11 @@ const options = computed(() => {
             ...statusMap[item],
           });
         },
+      },
+      // 0 is the default; only a set weight is worth reading
+      weight: {
+        custom: ({ item }) =>
+          h("span", { class: "text-ink-gray-7" }, item ? String(item) : ""),
       },
       visibility: {
         custom: ({ item }) =>

@@ -30,6 +30,26 @@ class HDArticle(Document):
             self.category = None
         self.validate_article_category()
         self.validate_published_content()
+        self.validate_pin()
+
+    def validate_pin(self):
+        """Order is 1-based; 0 means unpinned. Only Published articles stay pinned, and unpinning resets the weight."""
+        if self.status != "Published":
+            self.pinned = 0
+        if not self.pinned:
+            self.pinned_order = 0
+            # its weight came from the pin
+            before = self.get_doc_before_save()
+            if before and before.pinned:
+                self.weight = 0
+        elif cint(self.pinned_order) < 1:
+            # pinned from the article itself: it goes last
+            last = frappe.get_all(
+                "HD Article",
+                filters={"pinned": 1, "name": ["!=", self.name]},
+                fields=[{"MAX": "pinned_order", "as": "last"}],
+            )[0].last
+            self.pinned_order = cint(last) + 1
 
     def validate_article_category(self):
         if self.has_value_changed("category") and not self.is_new():
@@ -79,10 +99,31 @@ class HDArticle(Document):
 
     def on_update(self):
         self.update_search_index()
+        if self.has_value_changed("pinned") or self.has_value_changed("pinned_order"):
+            self.sync_pinned_weights()
 
     def on_trash(self):
         check_category_length(self.category)
         self.update_search_index()
+        if self.pinned:
+            self.sync_pinned_weights(leaving=self.name)
+
+    def sync_pinned_weights(self, leaving: str | None = None):
+        """Weights follow the pin order, so each pin lists in its category as on the home page: the first of N pins weighs N, the last 1."""
+        pins = frappe.get_all(
+            "HD Article",
+            filters={"pinned": 1, "name": ["!=", leaving or ""]},
+            fields=["name", "weight"],
+            order_by="pinned_order asc",
+        )
+        for rank, pin in enumerate(pins):
+            weight = len(pins) - rank
+            if pin.name == self.name:
+                self.weight = weight
+            if pin.weight != weight:
+                frappe.db.set_value(
+                    "HD Article", pin.name, "weight", weight, update_modified=False
+                )
 
     def update_search_index(self):
         # a bulk change sends one job for all its articles
@@ -116,6 +157,12 @@ class HDArticle(Document):
                 "type": "Select",
                 "key": "visibility",
                 "width": "10rem",
+            },
+            {
+                "label": "Weight",
+                "type": "Int",
+                "key": "weight",
+                "width": "6rem",
             },
             {
                 "label": "Author",

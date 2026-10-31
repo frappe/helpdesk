@@ -1,4 +1,5 @@
 import { computed, ref, watch } from 'vue'
+import { __ } from '@helpdesk/shared/translation'
 import { findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
@@ -7,7 +8,7 @@ import { prefetchOnHover } from '@app/stores/knowledgeBase'
 
 const ARTICLE_LIMIT = 5
 export default function setup(context) {
-  const { articles, categories } = context
+  const { articles, categories, pinnedArticles } = context
   const settings = useKnowledgeBaseHeader(context)
   const { config } = settings
 
@@ -24,6 +25,17 @@ export default function setup(context) {
 
   // Saving KB settings reloads the session; pins come with categories.
   watch(config, (_, previous) => previous && categories.reload())
+
+  // Featured articles: the preview's unsaved pins, else the saved ones.
+  watch(
+    config,
+    (value) => {
+      if (!value) return
+      const names = preview.value?.pinned_articles
+      pinnedArticles.fetch({ ...(names && { names: JSON.stringify(names) }), limit: ARTICLE_LIMIT })
+    },
+    { immediate: true },
+  )
 
   // Subcategories open from their parent's page.
   const topCategories = computed(() => (categories.data || []).filter((row) => !row.parent_article_category))
@@ -55,12 +67,37 @@ export default function setup(context) {
   const focusCategory = computed(() => (homeCategories.value.length === 1 ? homeCategories.value[0] : null))
   const isLoneCategory = computed(() => Boolean(focusCategory.value))
 
-  // Waits for categories: an earlier fetch could land after the right one.
-  const sort = ref('popular')
+  // Pins swap Latest for Featured, which leads; a lone category has no tabs, so lists them above its own.
+  const hasFeatured = computed(() => !focusCategory.value && Boolean(pinnedArticles.data?.length))
+  const hasLoneFeatured = computed(() => Boolean(focusCategory.value && pinnedArticles.data?.length))
+  const sortOptions = computed(() =>
+    hasFeatured.value
+      ? [
+          { label: __('Featured'), value: 'featured' },
+          { label: __('Popular'), value: 'popular' },
+        ]
+      : [
+          { label: __('Popular'), value: 'popular' },
+          { label: __('Latest'), value: 'latest' },
+        ],
+  )
+  // A pick whose tab went away falls back to the first tab.
+  const pickedSort = ref(null)
+  const sort = computed({
+    get: () =>
+      sortOptions.value.some((option) => option.value === pickedSort.value)
+        ? pickedSort.value
+        : sortOptions.value[0].value,
+    set: (value) => (pickedSort.value = value),
+  })
+  const homeArticles = computed(() => (sort.value === 'featured' ? pinnedArticles.data : articles.data))
+
+  // Waits for categories and pins: an earlier fetch could land after the right one.
+  const pinsSettled = computed(() => Boolean(pinnedArticles.data || pinnedArticles.error))
   watch(
-    [sort, focusCategory, () => categories.data],
-    ([value, category, loaded]) => {
-      if (!loaded) return
+    [sort, focusCategory, () => categories.data, pinsSettled],
+    ([value, category, loaded, settled]) => {
+      if (!loaded || !settled || value === 'featured') return
       if (!category) return articles.fetch({ limit: ARTICLE_LIMIT, sort: value })
       // A pinned lone category previews like the rest; a site's only category lists everything.
       const limit = hasHiddenCategories.value ? ARTICLE_LIMIT : 0
@@ -82,7 +119,10 @@ export default function setup(context) {
     skeletonCount,
     hasHiddenCategories,
     sort,
+    sortOptions,
+    homeArticles,
     focusCategory,
     isLoneCategory,
+    hasLoneFeatured,
   }
 }
