@@ -53,7 +53,14 @@ function createDraft() {
     createDocumentResource({ doctype: "HD Settings", name: "HD Settings" });
   const categories = createListResource({
     doctype: "HD Article Category",
-    fields: ["name", "category_name", "icon", "pinned", "pinned_order"],
+    fields: [
+      "name",
+      "category_name",
+      "icon",
+      "pinned",
+      "pinned_order",
+      "parent_article_category",
+    ],
     orderBy: "category_name asc",
     pageLength: 99999,
     auto: true,
@@ -62,8 +69,8 @@ function createDraft() {
     url: "frappe.client.get_list",
     params: {
       doctype: "HD Article",
-      fields: ["category", "visibility"],
-      group_by: "category, visibility",
+      fields: ["category", "visibility", "status"],
+      group_by: "category, visibility, status",
       order_by: "category asc",
       limit_page_length: 0,
     },
@@ -114,21 +121,37 @@ function createDraft() {
     { immediate: true }
   );
 
-  const categoryOptions = computed(() => {
-    const access: Record<string, string> = {};
-    for (const row of accessRows.data || []) {
-      access[row.category] = access[row.category] ? "Mixed" : row.visibility;
+  // The backend's get_category_visibility rule: read across the branch,
+  // Published articles decide, a branch of only drafts reads its drafts.
+  function getBranchAccess(category: string): string | undefined {
+    const branch = new Set([category]);
+    for (const row of categories.data || []) {
+      if (row.parent_article_category === category) branch.add(row.name);
     }
+    const rows = (accessRows.data || []).filter((row) =>
+      branch.has(row.category)
+    );
+    const published = rows.filter((row) => row.status === "Published");
+    const access = new Set(
+      (published.length ? published : rows).map((row) => row.visibility)
+    );
+    return access.size > 1 ? "Mixed" : [...access][0];
+  }
+
+  const categoryOptions = computed(() =>
     // Customers never see Private categories; already pinned ones stay to unpin.
-    return (categories.data || [])
-      .filter((row) => access[row.name] !== "Private" || row.pinned)
-      .map((row) => ({
+    // Subcategories are never pinned.
+    (categories.data || [])
+      .filter((row) => !row.parent_article_category)
+      .map((row) => ({ row, access: getBranchAccess(row.name) }))
+      .filter(({ row, access }) => access !== "Private" || row.pinned)
+      .map(({ row, access }) => ({
         label: row.category_name,
         value: row.name,
         icon: row.icon?.startsWith("lucide-") ? row.icon : "lucide-folder",
-        access: access[row.name],
-      }));
-  });
+        access,
+      }))
+  );
 
   const changed = computed(() => {
     if (!draft.value || !saved.value) return [];

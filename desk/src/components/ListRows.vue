@@ -9,7 +9,7 @@
             <component v-if="group.icon" :is="group.icon" />
             <div
               v-if="group.group.label != ''"
-              class="flex items-end gap-1 w-full"
+              class="flex items-baseline gap-2 w-full"
             >
               <span>{{ __(group.group.label) }}</span>
               <span class="text-xs text-ink-gray-5"
@@ -65,6 +65,7 @@ import {
   ListRows,
 } from "frappe-ui/experimental";
 import { computed, ref, watch } from "vue";
+import { __ } from "@/translation";
 
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 const props = defineProps({
@@ -81,14 +82,16 @@ const props = defineProps({
 const groupedRows = ref(props.rows);
 
 const actions = (group) => {
-  let _actions = props.groupByActions.map((action) => {
-    return {
+  let _actions = props.groupByActions
+    .filter((action) => action.condition?.(group) ?? true)
+    .map(({ condition, ...action }) => ({
       ...action,
       onClick: () => action.onClick(group),
-    };
-  });
+    }));
   if (group.group.label == "General") {
-    _actions = _actions.filter((action) => action.label === "Add New Article");
+    // General may hold Subcategories too
+    const allowed = [__("Add New Article"), __("New subcategory")];
+    _actions = _actions.filter((action) => allowed.includes(action.label));
   }
   return _actions;
 };

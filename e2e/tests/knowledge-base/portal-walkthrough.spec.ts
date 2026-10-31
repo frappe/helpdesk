@@ -585,11 +585,25 @@ test.describe("categories and category pages", () => {
 
     await page.goto(`/help/category/${category.name}`);
     const sidebar = page.getByRole("navigation", { name: "Knowledge base" });
-    await expect(sidebar.getByRole("button", { name: category.category_name })).toHaveAttribute("aria-expanded", "true");
-    await sidebar.getByRole("button", { name: other.category_name }).click();
-    await expect(sidebar.getByRole("button", { name: other.category_name })).toHaveAttribute("aria-expanded", "true");
-    await expect(sidebar.getByRole("button", { name: category.category_name })).toHaveAttribute("aria-expanded", "false");
+    const chevron = (row: { name: string }) => sidebar.locator(`[aria-controls="kb-sidebar-${row.name}"]`);
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "true");
+    // The chevron folds without leaving the page.
+    await chevron(category).click();
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "false");
+    await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
+    await chevron(other).click();
+    await expect(chevron(other)).toHaveAttribute("aria-expanded", "true");
     await expect(sidebar.getByRole("link", { name: otherArticle.title })).toBeVisible();
+    // The row opens the category's page, and a second click keeps it open.
+    const otherRow = sidebar.getByRole("link", { name: other.category_name, exact: true });
+    await otherRow.click();
+    await expect(page).toHaveURL(new RegExp(`/help/category/${other.name}$`));
+    await otherRow.click();
+    await expect(chevron(other)).toHaveAttribute("aria-expanded", "true");
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "false");
+    await sidebar.getByRole("link", { name: category.category_name, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "true");
 
     await page.locator("body").press("/");
     const search = sidebar.getByRole("textbox", { name: "Search articles" });
@@ -904,6 +918,46 @@ test.describe("knowledge base settings: pin row menu", () => {
         await api.update("HD Article Category", category.name, { pinned: 0, pinned_order: 0 });
       }
     }
+  });
+});
+
+test.describe("subcategories", () => {
+  usePersona("customer");
+
+  test("D32 a customer walks from a category into a subcategory and its article", async ({ page, api }) => {
+    const parent = await createCategory(api);
+    await createArticle(api, parent.name, { visibility: "Customers" });
+    const visible = await createCategory(api, `Visible Sub ${uid()}`, { parent_article_category: parent.name });
+    const article = await createArticle(api, visible.name, { title: `Sub article ${uid()}`, visibility: "Customers" });
+    const hidden = await createCategory(api, `Hidden Sub ${uid()}`, { parent_article_category: parent.name });
+    await createArticle(api, hidden.name, { visibility: "Private" });
+
+    // Pinned categories may keep the new parent off the home page.
+    await page.goto(`/help/category/${parent.name}`);
+    await expect(page.getByRole("heading", { name: parent.category_name, level: 1 })).toBeVisible();
+    const head = page.getByRole("heading", { name: visible.category_name, level: 2 });
+    await expect(head.getByRole("link", { name: visible.category_name })).toHaveAttribute("href", `/help/category/${visible.name}`);
+    await expect(page.getByRole("link", { name: article.title })).toBeVisible();
+    await expect(page.getByRole("heading", { name: hidden.category_name, level: 2 })).toHaveCount(0);
+    // the header dates the newest article, Subcategories' included
+    await expect(page.getByText(/^Last updated on /)).toBeVisible();
+
+    // a subcategory card lists 5 articles; its header opens the rest
+    const big = await createCategory(api, `Big Sub ${uid()}`, { parent_article_category: parent.name });
+    for (let i = 0; i < 6; i++) await createArticle(api, big.name, { visibility: "Customers" });
+    await page.reload();
+    const bigCard = page.locator("section", { has: page.getByRole("heading", { name: big.category_name, level: 2 }) });
+    await expect(bigCard.getByRole("link")).toHaveCount(6);
+    await bigCard.getByRole("link", { name: big.category_name }).click();
+    await expect(page.getByRole("heading", { name: big.category_name, level: 1 })).toBeVisible();
+    await page.goBack();
+
+    await head.getByRole("link", { name: visible.category_name }).click();
+    await expect(page.getByRole("heading", { name: visible.category_name, level: 1 })).toBeVisible();
+    await expect(page.getByRole("link", { name: article.title }).first()).toBeVisible();
+    await page.getByRole("link", { name: article.title }).first().click();
+    await expect(page.getByRole("heading", { name: article.title, level: 1 })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toHaveCount(0);
   });
 });
 

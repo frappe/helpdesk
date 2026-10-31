@@ -42,11 +42,14 @@ export default function setup(context) {
     () => article.data?.visibility === 'Public' && settings.isPublicKnowledgeBase.value,
   )
 
-  const relatedArticles = computed(() =>
-    (sidebar.data?.find((category) => category.name === article.data?.category)?.articles || [])
-      .filter((row) => row.name !== article.data.name)
-      .slice(0, RELATED_LIMIT),
-  )
+  // Same Subcategory first, then its parent's own Articles.
+  const relatedArticles = computed(() => {
+    const { category, parent_article_category, name } = article.data || {}
+    const articlesOf = (categoryName) => sidebar.data?.find((row) => row.name === categoryName)?.articles || []
+    return [...articlesOf(category), ...articlesOf(parent_article_category)]
+      .filter((row) => row.name !== name)
+      .slice(0, RELATED_LIMIT)
+  })
 
   // Pre-slug links carry the bare name.
   function isCurrentArticle(routeName) {
@@ -114,7 +117,7 @@ export default function setup(context) {
         name,
         title: article.data.title,
         title_slug: article.data.title_slug,
-        categoryName: article.data.category_name,
+        categoryName: article.data.category_label || article.data.category_name,
         minutes: minutes.value,
       })
     },

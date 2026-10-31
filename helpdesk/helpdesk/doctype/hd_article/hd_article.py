@@ -12,7 +12,7 @@ from frappe.website.utils import cleanup_page_name
 
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     check_category_length,
-    get_category_visibility,
+    get_joining_visibility,
 )
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
 from helpdesk.utils import capture_event, is_agent
@@ -25,6 +25,9 @@ EXCERPT_LENGTH = 140
 
 class HDArticle(Document):
     def validate(self):
+        # archived articles leave their category, so the length check sees it
+        if self.status == "Archived":
+            self.category = None
         self.validate_article_category()
         self.validate_published_content()
 
@@ -49,9 +52,6 @@ class HDArticle(Document):
         elif self.status == "Draft" and self.published_on:
             self.published_on = None
 
-        if self.status == "Archived" and self.category != None:
-            self.category = None
-
         # index is only set if its not set already, this allows defining index
         # at the time of creation itself if not set the index is set to the
         # last index + 1, i.e. the hd_article is added at the end
@@ -67,7 +67,7 @@ class HDArticle(Document):
         if (
             self.visibility == CUSTOMERS
             and self.category
-            and get_category_visibility(self.category) == PRIVATE
+            and get_joining_visibility(self.category) == PRIVATE
         ):
             self.visibility = PRIVATE
 
@@ -85,6 +85,10 @@ class HDArticle(Document):
         self.update_search_index()
 
     def update_search_index(self):
+        # a bulk change sends one job for all its articles
+        if (batch := frappe.flags.batch_article_index) is not None:
+            batch.append(self.name)
+            return
         frappe.enqueue(
             "helpdesk.search.update_article_index",
             article=self.name,

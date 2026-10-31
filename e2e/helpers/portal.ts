@@ -3,8 +3,12 @@ import type { Api } from "./api";
 import { uid } from "./factories";
 import { siteHeader } from "./site";
 
-export async function createCategory(api: Api, name = `E2E Category ${uid()}`) {
-  return api.insert("HD Article Category", { category_name: name });
+export async function createCategory(
+  api: Api,
+  name = `E2E Category ${uid()}`,
+  fields: Record<string, any> = {}
+) {
+  return api.insert("HD Article Category", { category_name: name, ...fields });
 }
 
 export async function createArticle(

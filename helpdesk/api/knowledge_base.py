@@ -20,10 +20,17 @@ from helpdesk.helpdesk.doctype.hd_article.hd_article import (
 )
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+    SEPARATOR,
+    batched_article_index,
+    get_category_labels,
+    get_parent,
     get_stricter_visibility,
+    get_subcategories,
     move_category_articles,
+    validate_parent_keeps_content,
 )
 from helpdesk.search import NUM_RESULTS
+from helpdesk.utils import is_agent
 
 PUBLIC_ARTICLE_FIELDS = [
     "name",
@@ -41,11 +48,13 @@ PUBLIC_CATEGORY_FIELDS = [
     "icon",
     "pinned",
     "pinned_order",
+    "parent_article_category",
 ]
 SEARCH_LIMIT = NUM_RESULTS
 SEARCH_QUERY_LENGTH = 200
 WORDS_PER_MINUTE = 200
 LIST_LIMIT = 100
+SUBCATEGORY_ARTICLES_LIMIT = 5
 # the sidebar reads its titles in one request; newer ones win past this
 TITLES_LIMIT = 1000
 
@@ -64,13 +73,26 @@ def validate_public_access():
 
 
 @frappe.whitelist(methods=["POST"])
-def delete_articles(articles: list[str]):
-    for article in articles:
-        frappe.delete_doc("HD Article", article)
+def delete_articles(articles: list[str]) -> dict:
+    return {"archived": sum(delete_or_archive_article(name) for name in articles)}
+
+
+def delete_or_archive_article(name: str) -> bool:
+    """A ticket cites it: archive instead, keeping the link. True when archived."""
+    if frappe.db.exists("HD Ticket", {"source_article": name}):
+        # a save, for version history and the search index
+        article = frappe.get_doc("HD Article", name)
+        article.status = "Archived"
+        article.save()
+        return True
+    # feedback would fail the link check
+    frappe.db.delete("HD Article Feedback", {"article": name})
+    frappe.delete_doc("HD Article", name)
+    return False
 
 
 @frappe.whitelist(methods=["POST"])
-def create_category(title: str, icon: str | None = None):
+def create_category(title: str, icon: str | None = None, parent: str | None = None):
     if title.strip().lower() == "general":
         frappe.throw(
             _(
@@ -78,7 +100,10 @@ def create_category(title: str, icon: str | None = None):
             )
         )
     category = frappe.new_doc(
-        "HD Article Category", category_name=title, icon=icon
+        "HD Article Category",
+        category_name=title,
+        icon=icon,
+        parent_article_category=parent,
     ).insert()
     article = frappe.new_doc(
         "HD Article", title="New Article", category=category.name
@@ -101,6 +126,33 @@ def get_category_visibility(category: str) -> str | None:
     return hd_article_category.get_category_visibility(category)
 
 
+def category_label_sort_key(label: str) -> tuple:
+    """General first, then by label parts so a Subcategory follows its parent."""
+    parts = label.split(SEPARATOR)
+    return (parts[0] != "General", [part.casefold() for part in parts])
+
+
+@frappe.whitelist()
+def get_category_options(exclude: str | None = None) -> list[dict]:
+    frappe.has_permission("HD Article", "write", throw=True)
+    rows = frappe.get_all(
+        "HD Article Category", fields=["name", "parent_article_category"]
+    )
+    labels = get_category_labels([row.name for row in rows])
+    parents = {row.parent_article_category for row in rows}
+    options = [
+        {
+            "value": row.name,
+            "label": labels[row.name],
+            "parent_article_category": row.parent_article_category,
+            "has_subcategories": row.name in parents,
+        }
+        for row in rows
+        if row.name != exclude
+    ]
+    return sorted(options, key=lambda option: category_label_sort_key(option["label"]))
+
+
 @frappe.whitelist(methods=["POST"])
 def set_category_visibility(category: str, visibility: str):
     frappe.has_permission("HD Article", "write", throw=True)
@@ -109,14 +161,18 @@ def set_category_visibility(category: str, visibility: str):
     if visibility not in options:
         frappe.throw(_("Invalid access: {0}").format(visibility))
     # saved one by one for version history
-    for name in frappe.get_all(
-        "HD Article",
-        filters={"category": category, "visibility": ["!=", visibility]},
-        pluck="name",
-    ):
-        article = frappe.get_doc("HD Article", name)
-        article.visibility = visibility
-        article.save()
+    with batched_article_index():
+        for name in frappe.get_all(
+            "HD Article",
+            filters={
+                "category": ["in", hd_article_category.get_branch(category)],
+                "visibility": ["!=", visibility],
+            },
+            pluck="name",
+        ):
+            article = frappe.get_doc("HD Article", name)
+            article.visibility = visibility
+            article.save()
 
 
 @frappe.whitelist(methods=["POST"])
@@ -125,7 +181,7 @@ def move_to_category(category: str, articles: list[str]):
     _validate_category(category)
 
     # read before the move changes it
-    category_visibility = hd_article_category.get_category_visibility(category)
+    category_visibility = hd_article_category.get_joining_visibility(category)
     for name in articles:
         article = frappe.get_doc("HD Article", name)
         article.category = category
@@ -151,6 +207,24 @@ def get_articles(
         order_by="views desc" if sort == "popular" else "published_on desc",
         limit_page_length=min(cint(limit) or LIST_LIMIT, LIST_LIMIT),
     )
+
+
+@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+def get_subcategory_articles(category: str) -> dict[str, list[dict]]:
+    """The newest articles of each Subcategory of `category`, skipping empty ones."""
+    validate_public_access()
+    result = {}
+    for subcategory in get_subcategories(category):
+        rows = frappe.get_all(
+            "HD Article",
+            filters=make_article_filters(category=subcategory),
+            fields=["name", "title"],
+            order_by="published_on desc",
+            limit_page_length=SUBCATEGORY_ARTICLES_LIMIT,
+        )
+        if rows:
+            result[subcategory] = rows
+    return result
 
 
 def _get_byline(user: str) -> dict:
@@ -188,8 +262,30 @@ def get_article(name: str) -> dict:
     article = _get_viewable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
     article.author = _get_byline(article.author)
     article.title_slug = cleanup_page_name(article.title)
-    article.category_name = frappe.db.get_value(
-        "HD Article Category", article.category, "category_name"
+    # archived articles have no category
+    category = (
+        frappe.db.get_value(
+            "HD Article Category",
+            article.category,
+            ["category_name", "parent_article_category"],
+            as_dict=True,
+        )
+        if article.category
+        else frappe._dict()
+    )
+    article.category_name = category.get("category_name")
+    article.category_label = (
+        get_category_labels([article.category])[article.category]
+        if article.category
+        else None
+    )
+    article.parent_article_category = category.get("parent_article_category")
+    article.parent_category_name = (
+        frappe.db.get_value(
+            "HD Article Category", category.parent_article_category, "category_name"
+        )
+        if category.get("parent_article_category")
+        else None
     )
     article.feedback = _get_own_feedback(name)
     article.minutes = _get_reading_minutes(
@@ -233,29 +329,56 @@ def get_categories() -> list[dict]:
 
 
 def _get_categories(with_creators: bool = False) -> list[dict]:
-    counts, authors = {}, {}
-    for category, author, total in frappe.get_all(
+    counts, authors, updated = {}, {}, {}
+    for category, author, total, modified in frappe.get_all(
         "HD Article",
         filters=make_article_filters(category=["is", "set"]),
-        fields=["category", "author", {"COUNT": "*", "as": "total"}],
+        fields=[
+            "category",
+            "author",
+            {"COUNT": "*", "as": "total"},
+            {"MAX": "modified", "as": "modified"},
+        ],
         group_by="category, author",
         order_by="total desc",
         as_list=True,
     ):
         counts[category] = counts.get(category, 0) + total
         authors.setdefault(category, []).append(author)
+        updated[category] = max(updated.get(category, modified), modified)
     if not counts:
         return []
+    parents = dict(
+        frappe.get_all(
+            "HD Article Category",
+            filters={
+                "name": ["in", list(counts)],
+                "parent_article_category": ["is", "set"],
+            },
+            fields=["name", "parent_article_category"],
+            as_list=True,
+        )
+    )
+    # a parent counts its Subcategories' readable Articles too
+    for sub, parent in parents.items():
+        counts[parent] = counts.get(parent, 0) + counts[sub]
+        authors.setdefault(parent, []).extend(authors[sub])
+        updated[parent] = max(updated.get(parent, updated[sub]), updated[sub])
     categories = frappe.get_all(
         "HD Article Category",
         filters={"name": ["in", list(counts)]},
         fields=PUBLIC_CATEGORY_FIELDS,
         order_by="category_name asc",
     )
+    labels = get_category_labels([category.name for category in categories])
     for category in categories:
         category.article_count = counts[category.name]
+        category.last_updated = updated[category.name]
+        category.label = labels[category.name]
         if with_creators:
-            category.creators = [_get_byline(name) for name in authors[category.name]]
+            category.creators = [
+                _get_byline(name) for name in dict.fromkeys(authors[category.name])
+            ]
     return categories
 
 
@@ -276,17 +399,23 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
         for article in frappe.get_all(
             "HD Article",
             filters={"name": ["in", [row["name"] for row in hits]]},
-            fields=["name", "content", "category.category_name as category_name"],
+            fields=[
+                "name",
+                "content",
+                "category",
+                "category.category_name as category_name",
+            ],
         )
     }
+    labels = get_category_labels(list({a.category for a in articles.values()}))
     return [
-        _get_search_hit(row, articles[row["name"]])
+        _get_search_hit(row, articles[row["name"]], labels)
         for row in hits
         if row["name"] in articles
     ]
 
 
-def _get_search_hit(row: dict, article: frappe._dict) -> dict:
+def _get_search_hit(row: dict, article: frappe._dict, labels: dict) -> dict:
     content = article.content or ""
     return {
         "name": row["name"],
@@ -297,6 +426,7 @@ def _get_search_hit(row: dict, article: frappe._dict) -> dict:
         "image": find_first_image(content),
         "minutes": _get_reading_minutes(BeautifulSoup(content, "html.parser")),
         "category_name": article.category_name,
+        "category_label": labels.get(article.category),
     }
 
 
@@ -359,8 +489,145 @@ def merge_category(source: str, target: str):
     _validate_category(target)
     if source == get_general_category():
         frappe.throw(_("Cannot merge General category"))
+    if (parent := get_parent(source)) != target:
+        validate_parent_keeps_content(parent, leaving=source)
+
+    # `source` may lose its last subcategory on the way out
+    frappe.flags.deleting_category = [source]
+    try:
+        with batched_article_index():
+            _merge_category(source, target)
+    finally:
+        frappe.flags.deleting_category = None
+
+
+def _merge_category(source: str, target: str) -> None:
+    if subcategories := get_subcategories(source):
+        if target in subcategories:
+            _set_parent(target, None)
+            subcategories.remove(target)
+        elif get_parent(target):
+            frappe.throw(_("Move its subcategories first"))
+        for subcategory in subcategories:
+            _set_parent(subcategory, target)
     move_category_articles(source, target)
     frappe.delete_doc("HD Article Category", source)
+
+
+def _set_parent(category: str, parent: str | None) -> None:
+    """Saves, so the parent rules and the article narrowing run."""
+    doc = frappe.get_doc("HD Article Category", category)
+    doc.parent_article_category = parent
+    doc.save()
+
+
+@frappe.whitelist()
+def get_category_delete_summary(category: str) -> dict:
+    frappe.has_permission("HD Article Category", "delete", throw=True)
+    _validate_category(category)
+    branch = hd_article_category.get_branch(category)
+    articles = frappe.get_all(
+        "HD Article", filters={"category": ["in", branch]}, pluck="name"
+    )
+    cited = (
+        frappe.get_all(
+            "HD Ticket",
+            filters={"source_article": ["in", articles]},
+            pluck="source_article",
+            distinct=True,
+        )
+        if articles
+        else []
+    )
+    return {
+        "articles": len(articles),
+        "subcategories": len(branch) - 1,
+        "cited": len(cited),
+    }
+
+
+@frappe.whitelist(methods=["POST"])
+def delete_category(category: str, with_articles: bool = False) -> dict:
+    """`with_articles` deletes the whole branch; cited articles are archived."""
+    frappe.has_permission("HD Article Category", "delete", throw=True)
+    _validate_category(category)
+    if category == get_general_category():
+        frappe.throw(_("General category can't be deleted"))
+    if not with_articles:
+        frappe.delete_doc("HD Article Category", category)
+        return {"archived": 0}
+
+    # on_trash checks it too, but only after every article is deleted
+    validate_parent_keeps_content(
+        get_parent(category),
+        leaving=category,
+        message=_("Delete the parent category instead"),
+    )
+    branch = hd_article_category.get_branch(category)
+    frappe.flags.deleting_category = branch
+    try:
+        with batched_article_index():
+            archived = sum(
+                delete_or_archive_article(name)
+                for name in frappe.get_all(
+                    "HD Article",
+                    filters={"category": ["in", branch]},
+                    pluck="name",
+                )
+            )
+        # subcategories first: the category's on_trash would promote them
+        for name in reversed(branch):
+            frappe.delete_doc("HD Article Category", name)
+    finally:
+        frappe.flags.deleting_category = None
+    return {"archived": archived}
+
+
+def get_category_group_options(options: list[dict]) -> list[dict]:
+    """Group options of the desk article list: labelled `Parent › Sub`, a Subcategory under its parent."""
+    groups = [option for option in options if option["value"]]
+    empty = [option for option in options if not option["value"]]
+    values = [option["value"] for option in groups]
+    parents = dict(
+        frappe.get_all(
+            "HD Article Category",
+            filters={"name": ["in", values]},
+            fields=["name", "parent_article_category"],
+            as_list=True,
+        )
+    )
+    # a parent's own group is there even when it has no rows
+    missing = {parent for parent in parents.values() if parent} - set(values)
+    groups += [
+        {"value": name, "icon": icon}
+        for name, icon in frappe.get_all(
+            "HD Article Category",
+            filters={"name": ["in", list(missing)]},
+            fields=["name", "icon"],
+            as_list=True,
+        )
+    ]
+    names = [group["value"] for group in groups]
+    labels = get_category_labels(names)
+    # read past permissions: would tell a customer a Private subcategory exists
+    with_subcategories = (
+        set(
+            frappe.get_all(
+                "HD Article Category",
+                filters={"parent_article_category": ["in", names]},
+                pluck="parent_article_category",
+            )
+        )
+        if is_agent()
+        else set()
+    )
+    for group in groups:
+        # a dangling link has no category to label it
+        group["label"] = labels.get(group["value"], group["value"])
+        group["parent_article_category"] = parents.get(group["value"])
+        group["has_subcategories"] = group["value"] in with_subcategories
+    groups.sort(key=lambda group: category_label_sort_key(group["label"]))
+    return groups + empty
 
 
 @frappe.whitelist()

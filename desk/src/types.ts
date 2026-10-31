@@ -350,6 +350,7 @@ export interface Article {
   title: string;
   title_slug: string;
   category_name: string;
+  parent_category_name?: string | null;
   category: string;
   published_on: string;
   author: Author;

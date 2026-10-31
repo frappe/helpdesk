@@ -9,13 +9,19 @@ from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
+    create_category,
+    delete_articles,
+    delete_category,
     get_article,
     get_article_markdown,
     get_articles,
     get_categories,
+    get_category_delete_summary,
+    get_category_options,
     get_category_visibility,
     get_general_category,
     get_kb_sidebar,
+    get_subcategory_articles,
     increment_views,
     merge_category,
     move_to_category,
@@ -25,17 +31,27 @@ from helpdesk.api.knowledge_base import (
 )
 from helpdesk.helpdesk.doctype.hd_article.hd_article import CUSTOMERS, PRIVATE, PUBLIC
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
+from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+    get_category_labels,
+    get_subcategories,
+)
 from helpdesk.test_utils import (
+    article_index_jobs,
     category_names,
     category_row,
     create_user,
     make_agent,
     make_article,
     make_article_category,
+    make_article_feedback,
     make_contact,
     make_search_hit,
     make_search_page,
+    make_subcategory,
+    make_ticket,
+    misplaced_categories,
     unique_email,
+    unique_name,
 )
 
 LIST_ROW_FIELDS = {"name", "title", "excerpt"}
@@ -67,6 +83,7 @@ class TestPublicReads(IntegrationTestCase):
             get_article_markdown,
             get_categories,
             get_kb_sidebar,
+            get_subcategory_articles,
             vote_on_article,
             increment_views,
         ):
@@ -79,6 +96,7 @@ class TestPublicReads(IntegrationTestCase):
                 (get_articles, ()),
                 (get_kb_sidebar, ()),
                 (get_categories, ()),
+                (get_subcategory_articles, (self.category.name,)),
                 (get_article, (self.published,)),
                 (get_article_markdown, (self.published,)),
                 (increment_views, (self.published,)),
@@ -182,6 +200,9 @@ class TestPublicReads(IntegrationTestCase):
                 "visibility",
                 "content",
                 "category_name",
+                "category_label",
+                "parent_article_category",
+                "parent_category_name",
                 "feedback",
                 "minutes",
                 "title_slug",
@@ -229,7 +250,27 @@ class TestPublicReads(IntegrationTestCase):
     def test_categories_carry_a_fixed_shape(self) -> None:
         category = category_row(self.category.name)
 
-        self.assertEqual(set(category), {*PUBLIC_CATEGORY_FIELDS, "article_count"})
+        self.assertEqual(
+            set(category),
+            {*PUBLIC_CATEGORY_FIELDS, "article_count", "label", "last_updated"},
+        )
+
+    def test_last_updated_is_the_newest_readable_article_in_the_branch(
+        self,
+    ) -> None:
+        sub = make_subcategory(self.category.name).name
+        newest = make_article("Fixture in sub", category=sub)
+        for name, modified in (
+            (newest, "2099-01-01 10:00:00"),
+            (self.draft, "2099-06-01 10:00:00"),
+        ):
+            frappe.db.set_value(
+                "HD Article", name, "modified", modified, update_modified=False
+            )
+
+        self.assertEqual(
+            str(category_row(self.category.name).last_updated), "2099-01-01 10:00:00"
+        )
 
     def test_a_category_counts_only_its_published_articles(self) -> None:
         category = category_row(self.category.name)
@@ -514,6 +555,56 @@ class TestCategoryAccess(IntegrationTestCase):
                 hd_article_category.get_category_visibility(self.category.name)
             )
 
+    def test_a_private_draft_does_not_make_access_mixed(self) -> None:
+        frappe.db.set_value("HD Article", self.articles[0], "visibility", CUSTOMERS)
+        frappe.db.set_value("HD Article", self.articles[1], "visibility", CUSTOMERS)
+        make_article(
+            "Fixture access draft",
+            status="Draft",
+            category=self.category.name,
+            visibility=PRIVATE,
+        )
+
+        self.assertEqual(
+            hd_article_category.get_category_visibility(self.category.name), CUSTOMERS
+        )
+
+    def test_a_category_of_drafts_reads_its_drafts(self) -> None:
+        category = make_article_category(unique_name("Drafts")).name
+        for _ in range(2):
+            make_article(status="Draft", category=category, visibility=PRIVATE)
+
+        self.assertEqual(hd_article_category.get_category_visibility(category), PRIVATE)
+
+    def test_merging_reindexes_the_moved_articles(self) -> None:
+        other = make_article_category(unique_name("Merged"))
+        moved = [make_article(category=other.name) for _ in range(2)]
+
+        with patch("frappe.enqueue") as enqueue:
+            merge_category(other.name, self.category.name)
+
+        # one job, and not for the target's own articles
+        self.assertEqual(article_index_jobs(enqueue), [set(moved)])
+
+    def test_deleting_a_category_reindexes_only_its_articles(self) -> None:
+        make_article(category=get_general_category())
+        other = make_article_category(unique_name("Deleted"))
+        moved = [make_article(category=other.name) for _ in range(2)]
+
+        with patch("frappe.enqueue") as enqueue:
+            delete_category(other.name)
+
+        self.assertEqual(article_index_jobs(enqueue), [set(moved)])
+
+    def test_renaming_a_category_reindexes_its_articles(self) -> None:
+        category = frappe.get_doc("HD Article Category", self.category.name)
+        category.category_name = unique_name("Renamed")
+
+        with patch("frappe.enqueue") as enqueue:
+            category.save()
+
+        self.assertEqual(article_index_jobs(enqueue), [set(self.articles)])
+
     def test_a_category_access_change_saves_each_article(self) -> None:
         before = {
             a: frappe.db.get_value("HD Article", a, "modified") for a in self.articles
@@ -707,6 +798,382 @@ class TestCategoryAccess(IntegrationTestCase):
         )
 
 
+class TestSubcategoryAccess(IntegrationTestCase):
+    def setUp(self) -> None:
+        self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
+        self.customer = make_contact("kb-branch-reader")["user"]
+        self.parent = make_article_category(unique_name("Fixture Parent")).name
+        self.sub = make_subcategory(self.parent).name
+
+    def visibility(self, name) -> str:
+        return frappe.db.get_value("HD Article", name, "visibility")
+
+    def readable(self, category) -> bool:
+        return category in frappe.get_list(
+            "HD Article Category", pluck="name"
+        ) and frappe.has_permission("HD Article Category", "read", category)
+
+    def test_a_parent_with_only_a_readable_subcategory_is_shown(self) -> None:
+        make_article(category=self.sub)
+
+        # a customer, not Guest: Guest has no role permission on categories
+        with self.set_user(self.customer):
+            self.assertTrue(self.readable(self.parent))
+
+    def test_a_private_subcategory_keeps_its_parent_hidden(self) -> None:
+        make_article(category=self.parent, visibility=PRIVATE)
+        make_article(category=self.sub, visibility=PRIVATE)
+
+        with self.set_user(self.customer):
+            self.assertFalse(self.readable(self.parent))
+            self.assertFalse(self.readable(self.sub))
+
+    def test_access_reads_the_whole_branch(self) -> None:
+        make_article(category=self.parent, visibility=CUSTOMERS)
+        make_article(category=self.sub, visibility=PUBLIC)
+
+        self.assertIsNone(hd_article_category.get_category_visibility(self.parent))
+        self.assertEqual(hd_article_category.get_category_visibility(self.sub), PUBLIC)
+
+    def test_setting_access_rewrites_subcategory_articles(self) -> None:
+        make_article(category=self.parent, visibility=PUBLIC)
+        make_article(category=self.sub, visibility=CUSTOMERS)
+
+        set_category_visibility(self.parent, PRIVATE)
+
+        self.assertEqual(
+            set(
+                frappe.get_all(
+                    "HD Article",
+                    {"category": ["in", [self.parent, self.sub]]},
+                    pluck="visibility",
+                    distinct=True,
+                )
+            ),
+            {PRIVATE},
+        )
+
+    def test_setting_access_queues_one_index_job_for_the_branch(self) -> None:
+        articles = [
+            make_article(category=self.parent),
+            make_article(category=self.sub),
+            make_article(category=self.sub),
+        ]
+
+        with patch("frappe.enqueue") as enqueue:
+            set_category_visibility(self.parent, PRIVATE)
+
+        self.assertEqual(article_index_jobs(enqueue), [set(articles)])
+
+    def test_getting_a_parent_queues_one_index_job(self) -> None:
+        make_article(category=self.parent, visibility=PRIVATE)
+        category = make_article_category(unique_name("Fixture Joining"))
+        articles = [make_article(category=category.name) for _ in range(2)]
+
+        with patch("frappe.enqueue") as enqueue:
+            category.update({"parent_article_category": self.parent}).save()
+
+        self.assertEqual(article_index_jobs(enqueue), [set(articles)])
+
+    def give_parent(self, visibility) -> str:
+        """A category with one `visibility` article, moved under the parent."""
+        category = make_article_category(unique_name("Fixture Joining"))
+        article = make_article(category=category.name, visibility=visibility)
+        category.update({"parent_article_category": self.parent}).save()
+        return article
+
+    def test_getting_a_parent_narrows_its_articles(self) -> None:
+        make_article(category=self.parent, visibility=CUSTOMERS)
+
+        self.assertEqual(self.visibility(self.give_parent(PUBLIC)), CUSTOMERS)
+
+    def test_getting_a_parent_never_widens(self) -> None:
+        make_article(category=self.parent, visibility=PUBLIC)
+
+        self.assertEqual(self.visibility(self.give_parent(PRIVATE)), PRIVATE)
+
+    def test_a_parent_may_lose_its_last_own_article(self) -> None:
+        make_article(category=self.sub)
+        article = frappe.get_doc("HD Article", make_article(category=self.parent))
+        other = make_article_category(unique_name("Fixture Elsewhere")).name
+
+        article.update({"category": other}).save()
+
+        self.assertEqual(frappe.db.count("HD Article", {"category": self.parent}), 0)
+
+    def test_a_first_article_in_a_new_subcategory_inherits_the_parent(self) -> None:
+        make_article(category=self.parent, visibility=PRIVATE)
+
+        article = make_article(category=self.sub, visibility=CUSTOMERS)
+
+        self.assertEqual(self.visibility(article), PRIVATE)
+
+    def test_moving_into_an_empty_subcategory_narrows_to_its_parent(self) -> None:
+        make_article(category=self.parent, visibility=PRIVATE)
+        other = make_article_category(unique_name("Fixture Source")).name
+        make_article(category=other)
+        article = make_article(category=other, visibility=CUSTOMERS)
+
+        move_to_category(self.sub, [article])
+
+        self.assertEqual(self.visibility(article), PRIVATE)
+
+    def test_a_new_subcategory_starts_with_an_article_under_its_parent(self) -> None:
+        created = create_category(unique_name("Fixture New Sub"), parent=self.parent)
+
+        self.assertEqual(
+            frappe.db.get_value(
+                "HD Article Category", created["category"], "parent_article_category"
+            ),
+            self.parent,
+        )
+        self.assertEqual(
+            frappe.db.get_value("HD Article", created["article"], "category"),
+            created["category"],
+        )
+
+    def private_general_with_a_customers_subcategory(self) -> tuple[str, str]:
+        """A sub of an all-Private General, holding one Customers article."""
+        general = get_general_category()
+        make_article(category=general)
+        set_category_visibility(general, PRIVATE)
+        sub = make_subcategory(general).name
+        article = make_article(category=sub)
+        frappe.db.set_value("HD Article", article, "visibility", CUSTOMERS)
+        return sub, article
+
+    def test_deleting_a_subcategory_of_general_never_widens(self) -> None:
+        sub, article = self.private_general_with_a_customers_subcategory()
+
+        frappe.delete_doc("HD Article Category", sub)
+
+        self.assertEqual(self.visibility(article), PRIVATE)
+
+    def test_merging_a_subcategory_into_its_parent_never_widens(self) -> None:
+        sub, article = self.private_general_with_a_customers_subcategory()
+
+        merge_category(sub, get_general_category())
+
+        self.assertEqual(self.visibility(article), PRIVATE)
+
+
+class TestParentKeepsContent(IntegrationTestCase):
+    """A parent keeps an article of its own or a Subcategory."""
+
+    def setUp(self) -> None:
+        self.parent = make_article_category(unique_name("Fixture Lone Parent")).name
+        self.sub = frappe.get_doc(
+            "HD Article Category", make_subcategory(self.parent).name
+        )
+        make_article(category=self.sub.name)
+
+    def assert_move_refused(self, parent) -> None:
+        self.sub.parent_article_category = parent
+
+        with self.assertRaisesRegex(frappe.ValidationError, "would be left empty"):
+            self.sub.save()
+
+        self.assertEqual(
+            frappe.db.get_value(
+                "HD Article Category", self.sub.name, "parent_article_category"
+            ),
+            self.parent,
+        )
+
+    def test_moving_the_only_subcategory_to_the_top_level_is_refused(self) -> None:
+        self.assert_move_refused(None)
+
+    def test_moving_the_only_subcategory_to_another_parent_is_refused(self) -> None:
+        self.assert_move_refused(
+            make_article_category(unique_name("Fixture Other Parent")).name
+        )
+
+    def test_a_parent_with_its_own_article_lets_it_go(self) -> None:
+        make_article(category=self.parent)
+        self.sub.parent_article_category = None
+
+        self.sub.save()
+
+        self.assertIsNone(
+            frappe.db.get_value(
+                "HD Article Category", self.sub.name, "parent_article_category"
+            )
+        )
+
+
+class TestSubcategoryReads(IntegrationTestCase):
+    def setUp(self) -> None:
+        self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
+        self.enterContext(patch("helpdesk.api.article.get_nouns", return_value=[]))
+        self.enterContext(
+            patch("helpdesk.api.article.get_noun_phrases", return_value=[])
+        )
+        self.hd_search = self.enterContext(patch("helpdesk.api.article.hd_search"))
+        self.parent_name = unique_name("Fixture Billing")
+        self.parent = make_article_category(self.parent_name).name
+        self.sub_name = unique_name("FAQ")
+        self.sub = make_article_category(
+            self.sub_name, parent_article_category=self.parent
+        ).name
+        self.sub_label = f"{self.parent_name} \u203a {self.sub_name}"
+
+    def test_labels_name_the_parent(self) -> None:
+        self.assertEqual(
+            get_category_labels([self.parent, self.sub]),
+            {self.parent: self.parent_name, self.sub: self.sub_label},
+        )
+
+    def test_subcategory_articles_are_newest_first_and_capped(self) -> None:
+        names = [
+            make_article(category=self.sub, published_on=f"2026-01-0{day} 10:00:00")
+            for day in range(1, 7)
+        ]
+
+        rows = get_subcategory_articles(self.parent)[self.sub]
+
+        self.assertEqual([row.name for row in rows], names[:0:-1])
+        self.assertEqual(set(rows[0]), {"name", "title"})
+
+    def test_subcategory_articles_hide_unreadable_rows_from_guests(self) -> None:
+        other = make_subcategory(self.parent).name
+        public = make_article(category=self.sub)
+        make_article(category=self.sub, visibility=PRIVATE)
+        make_article(category=other, visibility=PRIVATE)
+
+        with self.set_user("Guest"):
+            result = get_subcategory_articles(self.parent)
+
+        self.assertEqual(list(result), [self.sub])
+        self.assertEqual([row.name for row in result[self.sub]], [public])
+
+    def test_subcategory_articles_skip_other_categories(self) -> None:
+        make_article(category=self.parent)
+        sub_article = make_article(category=self.sub)
+
+        result = get_subcategory_articles(self.parent)
+
+        self.assertNotIn(self.parent, result)
+        self.assertEqual([row.name for row in result[self.sub]], [sub_article])
+
+    def test_a_parent_counts_its_subcategories(self) -> None:
+        make_article(category=self.parent)
+        make_article(category=self.sub)
+        make_article(category=self.sub)
+
+        self.assertEqual(category_row(self.parent).article_count, 3)
+        self.assertEqual(category_row(self.sub).article_count, 2)
+
+    def test_a_parent_counts_only_what_the_reader_reads(self) -> None:
+        make_article(category=self.parent)
+        make_article(category=self.sub)
+        make_article(category=self.sub, visibility=PRIVATE)
+        make_article(category=self.sub, visibility=CUSTOMERS)
+
+        with self.set_user("Guest"):
+            self.assertEqual(category_row(self.parent).article_count, 2)
+        self.assertEqual(category_row(self.parent).article_count, 4)
+
+    def test_a_guest_sees_a_parent_with_only_a_public_subcategory_article(
+        self,
+    ) -> None:
+        make_article(category=self.sub)
+
+        with self.set_user("Guest"):
+            self.assertIn(self.parent, category_names())
+            self.assertEqual(category_row(self.parent).article_count, 1)
+
+    def test_a_guest_sees_neither_when_the_subcategory_holds_no_public_article(
+        self,
+    ) -> None:
+        make_article(category=self.sub, visibility=PRIVATE)
+        make_article(category=self.sub, visibility=CUSTOMERS)
+
+        with self.set_user("Guest"):
+            self.assertNotIn(self.parent, category_names())
+            self.assertNotIn(self.sub, category_names())
+
+    def test_rows_carry_their_parent(self) -> None:
+        make_article(category=self.parent)
+        make_article(category=self.sub)
+
+        self.assertEqual(category_row(self.sub).parent_article_category, self.parent)
+        self.assertEqual(category_row(self.sub).label, self.sub_label)
+        self.assertFalse(category_row(self.parent).parent_article_category)
+        self.assertEqual(category_row(self.parent).label, self.parent_name)
+
+    def test_the_sidebar_lists_a_parent_with_only_a_subcategory_article(self) -> None:
+        article = make_article(category=self.sub)
+
+        rows = {row.name: row for row in get_kb_sidebar()}
+
+        self.assertEqual(rows[self.parent].article_count, 1)
+        self.assertEqual(rows[self.parent].articles, [])
+        self.assertEqual(rows[self.parent].creators, rows[self.sub].creators)
+        self.assertEqual([a.name for a in rows[self.sub].articles], [article])
+
+    def test_an_article_carries_its_category_label(self) -> None:
+        article = get_article(make_article(category=self.sub))
+
+        self.assertEqual(article.category_label, self.sub_label)
+        self.assertEqual(article.parent_article_category, self.parent)
+        self.assertEqual(article.parent_category_name, self.parent_name)
+        self.assertEqual(article.category_name, self.sub_name)
+
+    def test_an_article_without_a_category_has_no_category_fields(self) -> None:
+        article = make_article(status="Archived", category=None)
+
+        with self.set_user(make_agent(unique_email("kb-preview"))):
+            row = get_article(article)
+
+        for field in (
+            "category_name",
+            "category_label",
+            "parent_article_category",
+            "parent_category_name",
+        ):
+            self.assertIsNone(row[field])
+
+    def test_a_search_hit_carries_its_category_label(self) -> None:
+        article = make_article(category=self.sub)
+        self.hd_search.return_value = make_search_page(make_search_hit(article))
+
+        [row] = search_articles("anything")
+
+        self.assertEqual(row["category_label"], self.sub_label)
+        self.assertEqual(row["category_name"], self.sub_name)
+
+    def test_category_options_put_subcategories_after_their_parent(self) -> None:
+        extra = make_article_category(f"{self.parent_name} Extra").name
+        rows = {row["value"]: row for row in get_category_options()}
+        labels = [row["label"] for row in get_category_options()]
+
+        self.assertLess(labels.index(self.parent_name), labels.index(self.sub_label))
+        self.assertLess(
+            labels.index(self.sub_label), labels.index(f"{self.parent_name} Extra")
+        )
+        self.assertEqual(labels[0], "General")
+        make_subcategory(get_general_category())
+        labels = [row["label"] for row in get_category_options()]
+        general_subs = [
+            label for label in labels if label.startswith("General \u203a ")
+        ]
+        self.assertEqual(labels[1 : 1 + len(general_subs)], general_subs)
+        self.assertTrue(rows[self.parent]["has_subcategories"])
+        self.assertFalse(rows[extra]["has_subcategories"])
+        self.assertEqual(rows[self.sub]["parent_article_category"], self.parent)
+
+    def test_category_options_leave_out_the_excluded(self) -> None:
+        values = [row["value"] for row in get_category_options(exclude=self.sub)]
+
+        self.assertNotIn(self.sub, values)
+        self.assertIn(self.parent, values)
+
+    def test_a_customer_cannot_list_category_options(self) -> None:
+        with self.set_user(make_contact("kb-options")["user"]):
+            with self.assertRaises(frappe.PermissionError):
+                get_category_options()
+
+
 class TestSearch(IntegrationTestCase):
     def setUp(self) -> None:
         self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
@@ -823,4 +1290,271 @@ class TestSearch(IntegrationTestCase):
         self.hd_search.return_value = make_search_page(hit)
         self.assertEqual(
             get_related("zebra")[0]["title_slug"], "fixture-zebra-crossing"
+        )
+
+
+class TestCategoryDelete(IntegrationTestCase):
+    def setUp(self) -> None:
+        self.parent = make_article_category(unique_name("Fixture Doomed")).name
+        self.sub = make_subcategory(self.parent).name
+
+    def category(self, article) -> str | None:
+        return frappe.db.get_value("HD Article", article, "category")
+
+    def cite(self, article) -> None:
+        make_ticket(source_article=article)
+
+    def test_deleting_a_subcategory_moves_its_articles_to_the_parent(self) -> None:
+        article = make_article(category=self.sub)
+
+        delete_category(self.sub)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+        self.assertEqual(self.category(article), self.parent)
+
+    def test_deleting_a_category_promotes_its_subcategories(self) -> None:
+        own_article = make_article(category=self.parent)
+        sub_article = make_article(category=self.sub)
+
+        delete_category(self.parent)
+
+        self.assertIsNone(
+            frappe.db.get_value(
+                "HD Article Category", self.sub, "parent_article_category"
+            )
+        )
+        self.assertEqual(self.category(own_article), get_general_category())
+        self.assertEqual(self.category(sub_article), self.sub)
+        self.assertEqual(
+            frappe.db.get_value("HD Article Category", self.sub, "is_group"), 1
+        )
+        self.assertEqual(misplaced_categories(), [])
+
+    def test_deleting_a_subcategory_of_general_keeps_articles_in_general(self) -> None:
+        sub = make_subcategory(get_general_category()).name
+        article = make_article(category=sub)
+
+        delete_category(sub)
+
+        self.assertEqual(self.category(article), get_general_category())
+
+    def test_branch_delete_removes_subcategories_and_articles(self) -> None:
+        branch_articles = [
+            make_article(category=self.parent),
+            make_article(category=self.sub),
+            make_article(category=self.sub, status="Draft"),
+        ]
+
+        self.assertEqual(
+            delete_category(self.parent, with_articles=True), {"archived": 0}
+        )
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+        self.assertFalse(
+            frappe.db.exists("HD Article", {"name": ["in", branch_articles]})
+        )
+        self.assertFalse(frappe.flags.deleting_category)
+
+    def test_branch_delete_archives_cited_articles(self) -> None:
+        make_article(category=self.parent)
+        # the only article of its subcategory: the length guard must not fire
+        cited = make_article(category=self.sub)
+        self.cite(cited)
+
+        self.assertEqual(
+            delete_category(self.parent, with_articles=True), {"archived": 1}
+        )
+
+        self.assertEqual(
+            frappe.db.get_value("HD Article", cited, ["status", "category"]),
+            ("Archived", None),
+        )
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+
+    def test_deleting_an_article_with_feedback_removes_the_feedback(self) -> None:
+        make_article(category=self.parent)
+        article = make_article(category=self.parent)
+        make_article_feedback(article, 1)
+
+        delete_articles([article])
+
+        self.assertFalse(frappe.db.exists("HD Article", article))
+        self.assertFalse(frappe.db.exists("HD Article Feedback", {"article": article}))
+
+    def test_deleting_a_cited_article_archives_it(self) -> None:
+        make_article(category=self.parent)
+        cited = make_article(category=self.parent)
+        self.cite(cited)
+
+        self.assertEqual(delete_articles([cited]), {"archived": 1})
+
+        self.assertEqual(frappe.db.get_value("HD Article", cited, "status"), "Archived")
+
+    def test_archiving_the_last_article_outside_a_branch_delete_is_refused(
+        self,
+    ) -> None:
+        cited = make_article(category=self.sub)
+        self.cite(cited)
+
+        with self.assertRaisesRegex(frappe.ValidationError, "at least one article"):
+            delete_articles([cited])
+
+        self.assertEqual(self.category(cited), self.sub)
+
+    def test_the_summary_counts_the_branch(self) -> None:
+        cited = make_article(category=self.parent)
+        make_article(category=self.sub)
+        make_article(category=self.sub, status="Draft")
+        # two tickets, one cited article
+        self.cite(cited)
+        self.cite(cited)
+
+        self.assertEqual(
+            get_category_delete_summary(self.parent),
+            {"articles": 3, "subcategories": 1, "cited": 1},
+        )
+
+    def test_a_last_subcategory_branch_delete_is_refused(self) -> None:
+        article = make_article(category=self.sub)
+
+        with self.assertRaisesRegex(frappe.ValidationError, "Delete the parent"):
+            delete_category(self.sub, with_articles=True)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", self.sub))
+        self.assertEqual(self.category(article), self.sub)
+
+    def test_a_subcategory_is_deleted_when_the_parent_has_its_own_article(
+        self,
+    ) -> None:
+        make_article(category=self.parent)
+        own = make_article(category=self.sub)
+
+        delete_category(self.sub, with_articles=True)
+
+        self.assertFalse(frappe.db.exists("HD Article", own))
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+
+    def test_a_subcategory_is_deleted_when_a_sibling_keeps_the_parent_filled(
+        self,
+    ) -> None:
+        sibling = make_subcategory(self.parent).name
+        make_article(category=sibling)
+        own = make_article(category=self.sub)
+
+        delete_category(self.sub, with_articles=True)
+
+        self.assertFalse(frappe.db.exists("HD Article", own))
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+
+    def test_deleting_the_last_empty_subcategory_is_refused(self) -> None:
+        with self.assertRaisesRegex(frappe.ValidationError, "Delete the parent"):
+            delete_category(self.sub)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", self.sub))
+
+    def test_branch_delete_of_a_parent_with_only_subcategory_articles(self) -> None:
+        article = make_article(category=self.sub)
+
+        delete_category(self.parent, with_articles=True)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+        self.assertFalse(frappe.db.exists("HD Article", article))
+
+    def test_general_cannot_be_deleted(self) -> None:
+        general = get_general_category()
+
+        with self.assertRaises(frappe.ValidationError):
+            delete_category(general, with_articles=True)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", general))
+
+    def test_a_user_without_delete_permission_is_refused(self) -> None:
+        article = make_article(category=self.parent)
+        customer = make_contact("kb-deleter")["user"]
+
+        with self.set_user(customer):
+            with self.assertRaises(frappe.PermissionError):
+                delete_category(self.parent, with_articles=True)
+            with self.assertRaises(frappe.PermissionError):
+                get_category_delete_summary(self.parent)
+
+        self.assertTrue(frappe.db.exists("HD Article", article))
+
+
+class TestCategoryMerge(IntegrationTestCase):
+    def setUp(self) -> None:
+        self.parent = make_article_category(unique_name("Fixture Source")).name
+        self.sub = make_subcategory(self.parent).name
+        self.other_sub = make_subcategory(self.parent).name
+
+    def parent_of(self, category) -> str | None:
+        return frappe.db.get_value(
+            "HD Article Category", category, "parent_article_category"
+        )
+
+    def test_subcategories_follow_into_a_top_level_target(self) -> None:
+        target = make_article_category(unique_name("Fixture Target")).name
+
+        merge_category(self.parent, target)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
+        self.assertEqual(self.parent_of(self.sub), target)
+        self.assertEqual(self.parent_of(self.other_sub), target)
+        self.assertEqual(misplaced_categories(), [])
+
+    def test_merging_a_parent_into_another_subcategory_is_refused(self) -> None:
+        other_parent = make_article_category(unique_name("Fixture Other")).name
+        target = make_subcategory(other_parent).name
+
+        with self.assertRaisesRegex(frappe.ValidationError, "Move its subcategories"):
+            merge_category(self.parent, target)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", self.parent))
+        self.assertEqual(self.parent_of(self.sub), self.parent)
+
+    def test_merging_into_its_own_subcategory_promotes_it(self) -> None:
+        merge_category(self.parent, self.sub)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
+        self.assertIsNone(self.parent_of(self.sub))
+        self.assertEqual(set(get_subcategories(self.sub)), {self.other_sub})
+        self.assertEqual(
+            frappe.db.get_value("HD Article Category", self.sub, "is_group"), 1
+        )
+        self.assertEqual(misplaced_categories(), [])
+
+    def test_a_subcategory_merges_into_its_parent(self) -> None:
+        article = make_article(category=self.sub)
+
+        merge_category(self.sub, self.parent)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+        self.assertEqual(
+            frappe.db.get_value("HD Article", article, "category"), self.parent
+        )
+
+    def test_merging_the_only_subcategory_elsewhere_is_refused(self) -> None:
+        parent = make_article_category(unique_name("Fixture Lone")).name
+        sub = make_subcategory(parent).name
+        article = make_article(category=sub)
+        target = make_article_category(unique_name("Fixture Target")).name
+
+        with self.assertRaisesRegex(frappe.ValidationError, "would be left empty"):
+            merge_category(sub, target)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", sub))
+        self.assertEqual(frappe.db.get_value("HD Article", article, "category"), sub)
+
+    def test_merged_articles_narrow_to_the_target(self) -> None:
+        target = make_article_category(unique_name("Fixture Target")).name
+        make_article(category=target, visibility=PRIVATE)
+        article = make_article(category=self.parent)
+
+        merge_category(self.parent, target)
+
+        self.assertEqual(
+            frappe.db.get_value("HD Article", article, ["category", "visibility"]),
+            (target, PRIVATE),
         )

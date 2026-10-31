@@ -244,7 +244,7 @@ import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
 import {
-  deleteRes as deleteArticle,
+  deleteArticles,
   moveToCategory,
   newCategory,
   updateRes as updateArticle,
@@ -320,6 +320,7 @@ function handleCategoryCreate() {
         });
         //update category name in breadcrumb
         article.data.category_name = category.title;
+        article.data.parent_category_name = null;
         toast.success(__("Category created successfully."));
       },
       onError: (error: string) => {
@@ -547,11 +548,15 @@ function handleArticleUpdate() {
 }
 
 function handleDelete() {
-  deleteArticle.submit(
-    { doctype: "HD Article", name: article.data.name },
+  deleteArticles.submit(
+    { articles: [article.data.name] },
     {
-      onSuccess: () => {
-        toast.success(__("Article deleted successfully."));
+      onSuccess: ({ archived }: { archived: number }) => {
+        toast.success(
+          archived
+            ? __("Article is cited by tickets, so it was archived.")
+            : __("Article deleted successfully.")
+        );
         router.push({ name: "AgentKnowledgeBase" });
       },
     }
@@ -668,6 +673,12 @@ const breadcrumbs = computed(() => {
       route: { name: "AgentKnowledgeBase" },
     },
   ];
+  if (article.data?.parent_category_name) {
+    items.push({
+      label: article.data.parent_category_name,
+      route: { name: "AgentKnowledgeBase" },
+    });
+  }
   if (article.data?.category_name) {
     items.push({
       label: article.data?.category_name,

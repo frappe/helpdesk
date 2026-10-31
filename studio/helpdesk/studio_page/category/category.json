@@ -90,29 +90,41 @@
            "blockName": "category-header",
            "children": [
             {
-             "classes": [
-              "text-ink-gray-8",
-              "font-bold"
+             "children": [
+              {
+               "classes": [
+                "text-ink-gray-8",
+                "font-bold"
+               ],
+               "componentId": "TextBlock-h8bm1mp3i",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-3xl",
+                "tag": "h1",
+                "text": "{{ categoryName }}"
+               }
+              },
+              {
+               "classes": [
+                "text-ink-gray-6"
+               ],
+               "componentId": "TextBlock-m2czs0278",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-p-base",
+                "tag": "p",
+                "text": "{{ categoryDescription }}"
+               }
+              }
              ],
-             "componentId": "TextBlock-h8bm1mp3i",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-3xl",
-              "tag": "h1",
-              "text": "{{ categoryName }}"
-             }
-            },
-            {
              "classes": [
-              "text-ink-gray-6"
+              "flex",
+              "flex-col",
+              "gap-2"
              ],
-             "componentId": "TextBlock-m2czs0278",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-p-base",
-              "tag": "p",
-              "text": "{{ categoryDescription }}"
-             }
+             "componentId": "category-title-group",
+             "componentName": "container",
+             "originalElement": "div"
             },
             {
              "blockName": "meta-row",
@@ -136,6 +148,32 @@
                 "tag": "span",
                 "text": "{{ articleCount }}"
                }
+              },
+              {
+               "classes": [
+                "text-ink-gray-3"
+               ],
+               "componentId": "category-last-updated-dot",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-sm",
+                "tag": "span",
+                "text": "·"
+               },
+               "visibilityCondition": "{{ lastUpdated }}"
+              },
+              {
+               "classes": [
+                "text-ink-gray-5"
+               ],
+               "componentId": "category-last-updated",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-sm",
+                "tag": "span",
+                "text": "{{ lastUpdated }}"
+               },
+               "visibilityCondition": "{{ lastUpdated }}"
               }
              ],
              "classes": [
@@ -174,125 +212,48 @@
               "count": 8,
               "instant": true
              },
-             "visibilityCondition": "{{ !articles.data }}"
+             "visibilityCondition": "{{ !loaded }}"
             },
             {
-             "children": [
-              {
-               "blockName": "article-row",
-               "children": [
-                {
-                 "blockName": "article-text",
-                 "children": [
-                  {
-                   "classes": [
-                    "text-ink-gray-8",
-                    "font-medium",
-                    "truncate",
-                    "group-hover:text-ink-gray-9",
-                    "max-sm:whitespace-normal",
-                    "max-sm:line-clamp-2"
-                   ],
-                   "componentId": "TextBlock-eigpkjuxp",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-base",
-                    "tag": "p",
-                    "text": "{{ dataItem.title }}"
-                   }
-                  },
-                  {
-                   "classes": [
-                    "text-ink-gray-5",
-                    "truncate",
-                    "max-sm:whitespace-normal",
-                    "max-sm:line-clamp-2"
-                   ],
-                   "componentId": "TextBlock-zhpgz9f0r",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-p-sm",
-                    "tag": "p",
-                    "text": "{{ dataItem.excerpt }}"
-                   }
-                  }
-                 ],
-                 "classes": [
-                  "flex",
-                  "min-w-0",
-                  "flex-1",
-                  "flex-col",
-                  "gap-0.5"
-                 ],
-                 "componentId": "category-row-text",
-                 "componentName": "container",
-                 "originalElement": "div"
-                },
-                {
-                 "classes": [
-                  "size-4",
-                  "shrink-0",
-                  "text-ink-gray-4",
-                  "transition-colors",
-                  "group-hover:text-ink-gray-6"
-                 ],
-                 "componentId": "category-row-icon",
-                 "componentName": "PortalArticleIcon",
-                 "isCustomVueComponent": true
-                }
-               ],
-               "classes": [
-                "group",
-                "flex",
-                "cursor-pointer",
-                "items-center",
-                "gap-4",
-                "py-4",
-                "-mx-2.5",
-                "px-2.5",
-                "rounded-4",
-                "transition-colors",
-                "hover:bg-surface-gray-1",
-                "relative",
-                "after:absolute",
-                "after:inset-x-2.5",
-                "after:bottom-0",
-                "after:h-px",
-                "after:bg-[--outline-gray-1]",
-                "last:after:hidden",
-                "hover:after:opacity-0",
-                "[&:has(+*:hover)]:after:opacity-0",
-                "focus-visible:focus-ring"
-               ],
-               "componentEvents": {
-                "mouseenter": {
-                 "action": "Run Script",
-                 "event": "mouseenter",
-                 "script": "prefetchOnHover(dataItem.name)"
-                }
-               },
-               "componentId": "container-jpuhf5mpa",
-               "componentName": "PortalLink",
-               "componentProps": {
-                "to": "{{ routes.article(dataItem) }}"
-               },
-               "isCustomVueComponent": true
-              }
-             ],
              "classes": [
               "w-full",
-              "!flex-col",
-              "!flex-nowrap",
-              "!gap-0",
               "portal-reveal"
              ],
-             "componentId": "Repeater-m7atz02fl",
+             "componentId": "PortalArticleList-category",
+             "componentName": "PortalArticleList",
+             "componentProps": {
+              "articles": "{{ articles.data || [] }}",
+              "dense": true
+             },
+             "isCustomVueComponent": true,
+             "visibilityCondition": "{{ loaded && articles.data.length }}"
+            },
+            {
+             "classes": [
+              "w-full",
+              "!grid",
+              "items-start",
+              "sm:grid-cols-2",
+              "!gap-4"
+             ],
+             "componentId": "Repeater-category-sections",
              "componentName": "Repeater",
              "componentProps": {
-              "data": "{{ articles.data || [] }}",
+              "data": "{{ sections }}",
               "dataKey": "name"
              },
-             "visibilityCondition": "{{ articles.data && articles.data.length }}"
+             "children": [
+              {
+               "componentId": "PortalSubcategorySection-category",
+               "componentName": "PortalSubcategorySection",
+               "isCustomVueComponent": true,
+               "componentProps": {
+                "category": "{{ dataItem.category }}",
+                "articles": "{{ dataItem.articles }}"
+               }
+              }
+             ],
+             "visibilityCondition": "{{ loaded && sections.length }}"
             },
             {
              "blockName": "empty-state",
@@ -322,13 +283,13 @@
              "componentId": "container-7hq5bv7hx",
              "componentName": "container",
              "originalElement": "div",
-             "visibilityCondition": "{{ articles.data && articles.data.length === 0 }}"
+             "visibilityCondition": "{{ loaded && !articles.data.length && !sections.length }}"
             }
            ],
            "classes": [
             "flex",
             "flex-col",
-            "gap-1",
+            "gap-6",
             "mt-6",
             "w-full"
            ],
@@ -429,7 +390,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-22 15:30:00.000000",
+ "modified": "2026-10-31 22:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
@@ -446,6 +407,16 @@
    "resource_name": "articles",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_articles"
+  },
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{\"category\": \"{{ route.params.category }}\"}",
+   "resource_name": "subcategoryArticles",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_subcategory_articles"
   }
  ],
  "route": "/category/:category",

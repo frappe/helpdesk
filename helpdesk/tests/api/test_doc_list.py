@@ -8,7 +8,10 @@ from helpdesk.test_utils import (
     create_contact,
     delete_default_views,
     make_article,
+    make_article_category,
+    make_contact,
     make_default_view,
+    make_subcategory,
     make_ticket,
     unique_email,
 )
@@ -244,18 +247,11 @@ class TestGroupByView(IntegrationTestCase):
         for category in categories:
             make_article(f"{cls.token} {category}", "Draft", category)
 
-    def test_categories_sorted_by_label_with_general_first(self) -> None:
+    def test_categories_sorted_by_label_with_general_first_and_empty_last(self) -> None:
         options = self.group_options(order_by="modified desc")
 
         self.assertEqual(
-            [o["label"] for o in options], ["General", "", "Alpha", "Zeta"]
-        )
-
-    def test_descending_sort_on_group_field_keeps_general_first(self) -> None:
-        options = self.group_options(order_by="category desc")
-
-        self.assertEqual(
-            [o["label"] for o in options], ["General", "Zeta", "Alpha", ""]
+            [o["label"] for o in options], ["General", "Alpha", "Zeta", ""]
         )
 
     def test_select_field_groups_by_its_options(self) -> None:
@@ -276,3 +272,105 @@ class TestGroupByView(IntegrationTestCase):
 
     def title_filter(self) -> list:
         return [["title", "like", f"{self.token}%"]]
+
+
+class TestSubcategoryGroups(IntegrationTestCase):
+    """Group options read `Parent › Sub` and keep a Subcategory under its parent."""
+
+    VIEW = TestGroupByView.VIEW
+
+    def setUp(self) -> None:
+        self.token = frappe.generate_hash(length=8)
+        self.parent = make_article_category(f"Zzz{self.token}").name
+        sub = make_subcategory(self.parent, "Faq")
+        self.sub, self.sub_name = sub.name, sub.category_name
+
+    def options(self) -> list[dict]:
+        result = get_list_data(
+            "HD Article",
+            filters=[["title", "like", f"{self.token}%"]],
+            view=self.VIEW,
+        )
+        return result["group_by_field"]["options"]
+
+    def test_group_labels_name_the_parent(self) -> None:
+        make_article(f"{self.token} a", "Draft", self.sub)
+        make_article(f"{self.token} b", "Draft", self.parent)
+
+        by_value = {o["value"]: o for o in self.options()}
+
+        sub_option = by_value[self.sub]
+        self.assertEqual(by_value[self.parent]["label"], f"Zzz{self.token}")
+        self.assertEqual(sub_option["label"], f"Zzz{self.token} › {self.sub_name}")
+        self.assertEqual(sub_option["parent_article_category"], self.parent)
+        self.assertFalse(sub_option["has_subcategories"])
+        self.assertTrue(by_value[self.parent]["has_subcategories"])
+
+    def test_a_customer_is_not_told_of_a_private_subcategory(self) -> None:
+        make_article(f"{self.token} a", category=self.parent)
+        make_article(f"{self.token} b", category=self.sub, visibility="Private")
+
+        with self.set_user(make_contact("kb-grouper")["user"]):
+            by_value = {o["value"]: o for o in self.options()}
+
+        self.assertNotIn(self.sub, by_value)
+        self.assertFalse(by_value[self.parent]["has_subcategories"])
+
+    def test_a_parent_with_no_articles_still_gets_a_group(self) -> None:
+        make_article(f"{self.token} a", "Draft", self.sub)
+
+        values = [o["value"] for o in self.options()]
+
+        self.assertIn(self.parent, values)
+
+    def test_a_parent_only_group_keeps_the_parent_icon(self) -> None:
+        frappe.db.set_value("HD Article Category", self.parent, "icon", "🧾")
+        make_article(f"{self.token} a", "Draft", self.sub)
+
+        group = next(o for o in self.options() if o["value"] == self.parent)
+
+        self.assertEqual(group["icon"], "🧾")
+
+    def test_category_group_order_is_fixed_whatever_the_sort(self) -> None:
+        other = make_article_category(f"Zzz{self.token}b").name
+        make_article(f"{self.token} a", "Draft", self.sub)
+        make_article(f"{self.token} b", "Draft", other)
+        make_article(f"{self.token} c", "Draft", None)
+        general = frappe.db.get_value(
+            "HD Article Category", {"category_name": "General"}
+        )
+        make_article(f"{self.token} d", "Draft", general)
+
+        result = get_list_data(
+            "HD Article",
+            filters=[["title", "like", f"{self.token}%"]],
+            order_by="category desc",
+            view=self.VIEW,
+        )
+
+        values = [o["value"] for o in result["group_by_field"]["options"]]
+        self.assertEqual(values, [general, self.parent, self.sub, other, ""])
+
+    def test_subcategory_groups_follow_their_parent(self) -> None:
+        other = make_article_category(f"Zzz{self.token}b").name
+        make_article(f"{self.token} a", "Draft", self.sub)
+        make_article(f"{self.token} b", "Draft", other)
+        make_article(f"{self.token} c", "Draft", None)
+
+        values = [o["value"] for o in self.options()]
+
+        self.assertEqual(values, [self.parent, self.sub, other, ""])
+
+    def test_a_general_subcategory_group_follows_general(self) -> None:
+        general = frappe.db.get_value(
+            "HD Article Category", {"category_name": "General"}
+        )
+        general_sub = make_subcategory(general, "Setup").name
+        make_article(f"{self.token} a", "Draft", general)
+        make_article(f"{self.token} b", "Draft", general_sub)
+        early = make_article_category(f"Aaa{self.token}").name
+        make_article(f"{self.token} c", "Draft", early)
+
+        values = [o["value"] for o in self.options()]
+
+        self.assertEqual(values, [general, general_sub, early])
