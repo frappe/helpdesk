@@ -2,7 +2,8 @@ import { computed } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useBottomSheet } from '@app/composables/useDrawer'
-import { countLabel } from '@helpdesk/shared/utils'
+import { dayjsLocal } from '@helpdesk/shared/timezone'
+import { countLabel, DATE_FORMATS } from '@helpdesk/shared/utils'
 import { prefetchOnHover, useKnowledgeBase } from '@app/stores/knowledgeBase'
 
 export default function setup(context) {
@@ -24,9 +25,11 @@ export default function setup(context) {
   const subcategories = computed(() =>
     (sidebar.data || []).filter((row) => row.parent_article_category === route.params.category),
   )
-  const subcategoryCount = computed(() =>
-    countLabel(subcategories.value.length, __('1 subcategory'), __('{0} subcategories')),
-  )
+  // Newest readable article in the category or its Subcategories.
+  const lastUpdated = computed(() => {
+    const date = category.value?.last_updated
+    return date ? __('Last updated on {0}', [dayjsLocal(date).format(DATE_FORMATS.short)]) : ''
+  })
   const sections = computed(() =>
     subcategories.value
       .filter((row) => context.subcategoryArticles.data?.[row.name]?.length)
@@ -48,7 +51,7 @@ export default function setup(context) {
     categoryDescription,
     articleCount,
     subcategories,
-    subcategoryCount,
+    lastUpdated,
     sections,
     loaded,
   }

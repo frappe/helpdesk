@@ -4,7 +4,8 @@
       v-for="article in articles"
       :key="article.name"
       :to="ROUTES.article(article)"
-      class="group flex cursor-pointer items-center gap-4 py-4 -mx-2.5 px-2.5 rounded-4 transition-colors hover:bg-surface-gray-1 relative after:absolute after:inset-x-2.5 after:bottom-0 after:h-px after:bg-[--outline-gray-1] last:after:hidden hover:after:opacity-0 [&:has(+*:hover)]:after:opacity-0 focus-visible:focus-ring"
+      :class="dense ? 'py-2.5' : 'py-4'"
+      class="group flex cursor-pointer items-center gap-4 -mx-2.5 px-2.5 rounded-4 transition-colors hover:bg-surface-gray-1 relative after:absolute after:inset-x-2.5 after:bottom-0 after:h-px after:bg-[--outline-gray-1] last:after:hidden hover:after:opacity-0 [&:has(+*:hover)]:after:opacity-0 focus-visible:focus-ring"
       @mouseenter="prefetchOnHover(article.name)"
     >
       <div class="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -54,6 +55,7 @@ defineProps<{
     meta?: string;
   }[];
   marked?: boolean;
+  dense?: boolean;
 }>();
 
 // The API escapes everything except <mark>, so v-html is safe here.

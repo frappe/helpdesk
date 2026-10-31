@@ -585,11 +585,25 @@ test.describe("categories and category pages", () => {
 
     await page.goto(`/help/category/${category.name}`);
     const sidebar = page.getByRole("navigation", { name: "Knowledge base" });
-    await expect(sidebar.getByRole("button", { name: category.category_name })).toHaveAttribute("aria-expanded", "true");
-    await sidebar.getByRole("button", { name: other.category_name }).click();
-    await expect(sidebar.getByRole("button", { name: other.category_name })).toHaveAttribute("aria-expanded", "true");
-    await expect(sidebar.getByRole("button", { name: category.category_name })).toHaveAttribute("aria-expanded", "false");
+    const chevron = (row: { name: string }) => sidebar.locator(`[aria-controls="kb-sidebar-${row.name}"]`);
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "true");
+    // The chevron folds without leaving the page.
+    await chevron(category).click();
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "false");
+    await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
+    await chevron(other).click();
+    await expect(chevron(other)).toHaveAttribute("aria-expanded", "true");
     await expect(sidebar.getByRole("link", { name: otherArticle.title })).toBeVisible();
+    // The row opens the category's page, and a second click keeps it open.
+    const otherRow = sidebar.getByRole("link", { name: other.category_name, exact: true });
+    await otherRow.click();
+    await expect(page).toHaveURL(new RegExp(`/help/category/${other.name}$`));
+    await otherRow.click();
+    await expect(chevron(other)).toHaveAttribute("aria-expanded", "true");
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "false");
+    await sidebar.getByRole("link", { name: category.category_name, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "true");
 
     await page.locator("body").press("/");
     const search = sidebar.getByRole("textbox", { name: "Search articles" });
@@ -925,16 +939,16 @@ test.describe("subcategories", () => {
     await expect(head.getByRole("link", { name: visible.category_name })).toHaveAttribute("href", `/help/category/${visible.name}`);
     await expect(page.getByRole("link", { name: article.title })).toBeVisible();
     await expect(page.getByRole("heading", { name: hidden.category_name, level: 2 })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: /^View all/ })).toHaveCount(0);
-    // the header counts the subcategories
-    await expect(page.getByText("1 subcategory", { exact: true })).toBeVisible();
+    // the header dates the newest article, Subcategories' included
+    await expect(page.getByText(/^Last updated on /)).toBeVisible();
 
-    // a subcategory with more than 5 articles offers "View all"
+    // a subcategory card lists 5 articles; its header opens the rest
     const big = await createCategory(api, `Big Sub ${uid()}`, { parent_article_category: parent.name });
     for (let i = 0; i < 6; i++) await createArticle(api, big.name, { visibility: "Customers" });
     await page.reload();
-    await expect(page.getByRole("link", { name: /^View all/ })).toHaveCount(1);
-    await page.getByRole("link", { name: `View all 6 articles in ${big.category_name}` }).click();
+    const bigCard = page.locator("section", { has: page.getByRole("heading", { name: big.category_name, level: 2 }) });
+    await expect(bigCard.getByRole("link")).toHaveCount(6);
+    await bigCard.getByRole("link", { name: big.category_name }).click();
     await expect(page.getByRole("heading", { name: big.category_name, level: 1 })).toBeVisible();
     await page.goBack();
 
@@ -943,15 +957,7 @@ test.describe("subcategories", () => {
     await expect(page.getByRole("link", { name: article.title }).first()).toBeVisible();
     await page.getByRole("link", { name: article.title }).first().click();
     await expect(page.getByRole("heading", { name: article.title, level: 1 })).toBeVisible();
-
-    // The breadcrumb is the navigation that links home and ends on the article.
-    const crumbs = page
-      .getByRole("navigation")
-      .filter({ has: page.locator('a[href="/help/"]') })
-      .filter({ hasText: article.title })
-      .getByRole("listitem");
-    await expect(crumbs.first().getByRole("link")).toHaveAttribute("href", "/help/");
-    await expect(crumbs).toHaveText(["Help", parent.category_name, visible.category_name, article.title]);
+    await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toHaveCount(0);
   });
 });
 
