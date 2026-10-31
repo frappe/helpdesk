@@ -11,7 +11,11 @@
         leave-to="-translate-x-full rtl:translate-x-full"
       >
         <div class="relative z-10 h-full w-fit">
-          <AppSidebar mobile :profile-settings="profileSettings" />
+          <AppSidebar mobile :profile-settings="profileSettings">
+            <template #footer>
+              <div class="px-2"><TrialCard /></div>
+            </template>
+          </AppSidebar>
         </div>
       </TransitionChild>
       <TransitionChild
@@ -50,6 +54,7 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { useApps } from "@/composables/useApps";
 import { __ } from "@/translation";
 import AppSidebar from "./AppSidebar.vue";
+import TrialCard from "./TrialCard.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import AvailabilityDialog from "../AvailabilityDialog.vue";
 

@@ -15,6 +15,10 @@ PORTAL_BANNER = "customer_portal_permission"
 FIELD_BANNER = "ticket_field_permission"
 
 
+def banner_names() -> list[str]:
+    return [banner["name"] for banner in get_banners()]
+
+
 class TestBanners(IntegrationTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
@@ -23,7 +27,7 @@ class TestBanners(IntegrationTestCase):
         manager = make_agent_manager("banner-manager")
         show_only_banners(PORTAL_BANNER)
         with self.set_user(manager):
-            self.assertEqual(get_banners(), [PORTAL_BANNER])
+            self.assertEqual(banner_names(), [PORTAL_BANNER])
 
     def test_flag_never_saved_counts_as_off(self) -> None:
         # the patches set only their own flag, so an upgraded site can lack a row
@@ -31,7 +35,7 @@ class TestBanners(IntegrationTestCase):
         frappe.db.delete(
             "Singles", {"doctype": "HD Settings", "field": BANNERS[PORTAL_BANNER]}
         )
-        self.assertEqual(get_banners(), [FIELD_BANNER])
+        self.assertEqual(banner_names(), [FIELD_BANNER])
 
     def test_agents_and_customers_see_no_banners(self) -> None:
         agent = create_agent(unique_email("banner-agent")).name
@@ -39,13 +43,13 @@ class TestBanners(IntegrationTestCase):
         show_only_banners(PORTAL_BANNER, FIELD_BANNER)
         for user in (agent, customer["user"]):
             with self.subTest(user=user), self.set_user(user):
-                self.assertEqual(get_banners(), [])
+                self.assertEqual(banner_names(), [])
 
     def test_dismissing_hides_the_banner_and_notifies_clients(self) -> None:
         show_only_banners(PORTAL_BANNER, FIELD_BANNER)
         publish_realtime = dismiss_banner_as("Administrator", FIELD_BANNER)
 
-        self.assertEqual(get_banners(), [PORTAL_BANNER])
+        self.assertEqual(banner_names(), [PORTAL_BANNER])
         publish_realtime.assert_called_once()
         self.assertEqual(
             publish_realtime.call_args.args[0], "helpdesk:settings-updated"
@@ -62,4 +66,4 @@ class TestBanners(IntegrationTestCase):
         for user in (agent, customer["user"]):
             with self.subTest(user=user), self.assertRaises(frappe.PermissionError):
                 dismiss_banner_as(user, PORTAL_BANNER)
-        self.assertEqual(get_banners(), [PORTAL_BANNER])
+        self.assertEqual(banner_names(), [PORTAL_BANNER])
