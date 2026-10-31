@@ -39,7 +39,6 @@
     <ArticleWeightModal
       v-model="weightModal"
       :articles="[...listSelections]"
-      :category="selectionCategory"
       :initial-weight="selectionWeight"
       @save="handleSetWeight"
     />
