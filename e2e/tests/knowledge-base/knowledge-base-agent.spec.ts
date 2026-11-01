@@ -143,6 +143,19 @@ test("delete a category with its subcategory and articles; a cited one is archiv
   expect((await api.get("HD Article", cited.name)).status).toBe("Archived");
 });
 
+test("convert a subcategory to a category from its menu", async ({ page, api }) => {
+  const parent = await createCategory(api);
+  const sub = await createCategory(api, undefined, { parent_article_category: parent.name });
+  await createArticle(api, sub.name);
+  // a parent can't be left empty
+  await createArticle(api, parent.name);
+
+  await page.goto("/helpdesk/kb");
+  await openCategoryMenu(page, sub.category_name, "Convert to category");
+  await expect(page.getByText(`${sub.category_name} is now a category`)).toBeVisible();
+  expect((await api.get("HD Article Category", sub.name)).parent_article_category).toBeFalsy();
+});
+
 async function openArticleMenu(page: Page, item: string) {
   await page
     .locator("button[aria-haspopup=menu]:not(nav *)")

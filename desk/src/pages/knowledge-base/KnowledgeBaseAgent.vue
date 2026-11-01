@@ -218,6 +218,33 @@ const groupByActions = [
     },
   },
   {
+    label: __("Convert to category"),
+    icon: "lucide-link-2-off",
+    condition: ({ group }) => !!group.parent_article_category,
+    onClick: async ({ group }) => {
+      try {
+        await call("frappe.client.set_value", {
+          doctype: "HD Article Category",
+          name: group.value,
+          fieldname: "parent_article_category",
+          value: null,
+        });
+      } catch (error: any) {
+        toast.error(
+          error?.messages?.[0] ||
+            error?.message ||
+            __("Failed to update category.")
+        );
+        return;
+      }
+      listViewRef.value.reload();
+      // the group label is "Parent › Sub"
+      toast.success(
+        __("{0} is now a category", [group.label.split(" › ").pop()])
+      );
+    },
+  },
+  {
     label: __("Edit"),
     condition: isNotGeneral,
     icon: "lucide-edit",
