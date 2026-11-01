@@ -1,5 +1,5 @@
 <template>
-  <Dialog title="Merge with another category" v-model:open="showDialog">
+  <Dialog :title="__('Merge with another category')" v-model:open="showDialog">
     <template #default>
       <p class="text-p-base text-ink-gray-8 mb-4">
         This will move all articles of the

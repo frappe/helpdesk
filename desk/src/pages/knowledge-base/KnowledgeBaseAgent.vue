@@ -99,7 +99,7 @@ import {
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
-import { CUSTOMER_PORTAL_ROOT } from "@/utils";
+import { CUSTOMER_PORTAL_ROOT, getErrorMessage } from "@/utils";
 import { copyToClipboard } from "@helpdesk/shared/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
@@ -218,12 +218,8 @@ const groupByActions = [
           doctype: "HD Article Category",
           name: group.value,
         });
-      } catch (error: any) {
-        toast.error(
-          error?.messages?.[0] ||
-            error?.message ||
-            __("Failed to load category.")
-        );
+      } catch (error) {
+        getErrorMessage(error, true, __("Failed to load category."));
         return;
       }
       editTitle.value = true;
@@ -539,21 +535,9 @@ function handleCategoryUpdate() {
       },
     },
     {
-      onSuccess: async () => {
-        // saving with a parent unpins the category; say so (best effort)
-        let unpinned = false;
-        if (category.pinned && category.parent) {
-          try {
-            const { pinned } = await call("frappe.client.get_value", {
-              doctype: "HD Article Category",
-              filters: category.id,
-              fieldname: "pinned",
-            });
-            unpinned = !pinned;
-          } catch {
-            // the save worked; fall back to the generic toast
-          }
-        }
+      onSuccess: () => {
+        // nesting a pinned category unpins it
+        const unpinned = category.pinned && Boolean(category.parent);
         const title = category.title;
         listViewRef.value.reload();
         showCategoryModal.value = false;
@@ -595,8 +579,7 @@ function handleCategoryDelete(alsoDeleteArticles: boolean) {
         listViewRef.value.reload();
         resetState();
       },
-      onError: (error: Error) =>
-        toast.error(error?.messages?.[0] || error.message),
+      onError: (error: Error) => getErrorMessage(error, true),
     }
   );
 }

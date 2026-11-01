@@ -11,6 +11,7 @@ import {
   KNOWLEDGE_BASE_PREVIEW_KEY,
   type KnowledgeBasePreview,
 } from "../knowledgeBasePreview";
+import { categoryIcon } from "../categoryIcons";
 import { __ } from "../translation";
 import { CUSTOMER_PORTAL_ROOT, getErrorMessage, isSafeLink } from "../utils";
 
@@ -148,7 +149,7 @@ function createDraft() {
       .map(({ row, access }) => ({
         label: row.category_name,
         value: row.name,
-        icon: row.icon?.startsWith("lucide-") ? row.icon : "lucide-folder",
+        icon: categoryIcon(row.icon),
         access,
       }))
   );

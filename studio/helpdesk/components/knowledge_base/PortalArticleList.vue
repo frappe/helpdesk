@@ -8,28 +8,16 @@
       @mouseenter="prefetchOnHover(article.name)"
     >
       <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-        <div class="flex items-baseline gap-3">
-          <p
-            class="min-w-0 text-base-medium text-ink-gray-8 group-hover:text-ink-gray-9 truncate max-sm:whitespace-normal max-sm:line-clamp-2"
-            :class="markClass"
-          >
-            <span v-if="marked" v-html="article.title" />
-            <template v-else>{{ article.title }}</template>
-          </p>
-          <span
-            v-if="article.meta"
-            class="text-sm text-ink-gray-5 shrink-0 truncate max-w-[50%]"
-          >
-            {{ article.meta }}
-          </span>
-        </div>
+        <p
+          class="min-w-0 text-base-medium text-ink-gray-8 group-hover:text-ink-gray-9 truncate max-sm:whitespace-normal max-sm:line-clamp-2"
+        >
+          {{ article.title }}
+        </p>
         <p
           v-if="article.excerpt"
           class="text-p-sm text-ink-gray-5 truncate max-sm:whitespace-normal max-sm:line-clamp-2"
-          :class="markClass"
         >
-          <span v-if="marked" v-html="article.excerpt" />
-          <template v-else>{{ article.excerpt }}</template>
+          {{ article.excerpt }}
         </p>
       </div>
       <span
@@ -51,12 +39,6 @@ defineProps<{
     title: string;
     title_slug?: string;
     excerpt?: string;
-    meta?: string;
   }[];
-  marked?: boolean;
 }>();
-
-// The API escapes everything except <mark>, so v-html is safe here.
-const markClass =
-  "[&_mark]:rounded-sm [&_mark]:bg-surface-amber-2 [&_mark]:px-0.5 [&_mark]:text-ink-gray-9";
 </script>

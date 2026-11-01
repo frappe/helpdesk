@@ -178,7 +178,7 @@
 
 <script setup lang="ts">
 import { createReusableTemplate, useMediaQuery, useScroll } from "@vueuse/core";
-import { computed, nextTick, ref, useAttrs, watch } from "vue";
+import { computed, nextTick, reactive, ref, useAttrs, watch } from "vue";
 import {
   BottomSheet,
   Icon,
@@ -294,8 +294,8 @@ watch(
 );
 
 // Search opens all matches; folds hold until the query changes.
-const foldedInSearch = ref(new Set<string>());
-watch(query, () => (foldedInSearch.value = new Set()));
+const foldedInSearch = reactive(new Set<string>());
+watch(query, () => foldedInSearch.clear());
 
 function toggle(name: string, nested: boolean) {
   if (!query.value.trim()) {
@@ -303,9 +303,7 @@ function toggle(name: string, nested: boolean) {
     open.value = open.value === name ? null : name;
     return;
   }
-  const folded = new Set(foldedInSearch.value);
-  folded.has(name) ? folded.delete(name) : folded.add(name);
-  foldedInSearch.value = folded;
+  if (!foldedInSearch.delete(name)) foldedInSearch.add(name);
 }
 
 // A second click on the row leaves it open; only the chevron folds.
@@ -314,9 +312,7 @@ function expand(name: string, nested: boolean) {
     (nested ? openSubName : openName).value = name;
     return;
   }
-  const folded = new Set(foldedInSearch.value);
-  folded.delete(name);
-  foldedInSearch.value = folded;
+  foldedInSearch.delete(name);
 }
 
 // First match only, as `matchesQuery` checks.
@@ -373,7 +369,7 @@ function toGroup(
       category.name === currentCategory.value ||
       category.name === currentParent.value,
     isOpen: searching
-      ? !foldedInSearch.value.has(category.name)
+      ? !foldedInSearch.has(category.name)
       : openRef.value === category.name,
   };
 }
