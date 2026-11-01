@@ -1,5 +1,6 @@
 import frappe
 from frappe.desk.form.assign_to import add as add_assign
+from frappe.utils.html_utils import sanitize_html
 
 AUTHOR_EMAIl = "john@example.com"
 AUTHOR_NAME = "John Doe"
@@ -81,6 +82,11 @@ def create_ticket():
     d.contact = AUTHOR_NAME
     d.via_customer_portal = True
     d.insert()
+    # install skips sanitizing and description is set only once; store what the next
+    # save would, after insert so the first email keeps its autoplaying videos
+    d.db_set(
+        "description", sanitize_html(d.description, linkify=True), update_modified=False
+    )
     add_assign(
         {
             "doctype": "HD Ticket",
