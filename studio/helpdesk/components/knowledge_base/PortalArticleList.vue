@@ -8,7 +8,7 @@
       class="group flex cursor-pointer items-center gap-4 -mx-2.5 px-2.5 rounded-4 transition-colors hover:bg-surface-gray-1 relative after:absolute after:inset-x-2.5 after:bottom-0 after:h-px after:bg-[--outline-gray-1] last:after:hidden hover:after:opacity-0 [&:has(+*:hover)]:after:opacity-0 focus-visible:focus-ring"
       @mouseenter="prefetchOnHover(article.name)"
     >
-      <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+      <div class="flex min-w-0 flex-1 flex-col">
         <div class="flex items-baseline gap-3">
           <p
             class="min-w-0 text-base-medium text-ink-gray-8 group-hover:text-ink-gray-9 truncate max-sm:whitespace-normal max-sm:line-clamp-2"
