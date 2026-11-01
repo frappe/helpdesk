@@ -13,6 +13,8 @@ from helpdesk.utils import is_agent
 
 class HDArticleCategory(NestedSet):
     def validate(self):
+        # a cleared parent comes in as "", which the tree reads as a parent
+        self.parent_article_category = self.parent_article_category or None
         # one level: only a top-level category takes children
         self.is_group = 0 if self.parent_article_category else 1
         self.validate_default_category()

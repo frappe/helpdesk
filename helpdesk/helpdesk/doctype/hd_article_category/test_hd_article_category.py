@@ -2,6 +2,7 @@
 # See license.txt
 
 import frappe
+from frappe.client import set_value
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.knowledge_base import create_category
@@ -175,6 +176,17 @@ class TestCategoryTree(IntegrationTestCase):
         doc.update({"parent_article_category": None}).save()
 
         self.assertEqual(self.is_group(self.sub), 1)
+        self.assertEqual(misplaced_categories(), [])
+
+    def test_clearing_the_parent_stores_null(self):
+        # the desk clears it with an empty value
+        set_value("HD Article Category", self.sub, "parent_article_category", "")
+
+        self.assertIsNone(
+            frappe.db.get_value(
+                "HD Article Category", self.sub, "parent_article_category"
+            )
+        )
         self.assertEqual(misplaced_categories(), [])
 
     def test_deleting_a_category_promotes_its_subcategories_in_the_tree(self):
