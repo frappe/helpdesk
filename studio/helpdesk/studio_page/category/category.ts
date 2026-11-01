@@ -35,6 +35,8 @@ export default function setup(context) {
       .filter((row) => context.subcategoryArticles.data?.[row.name]?.length)
       .map((row) => ({ name: row.name, category: row, articles: context.subcategoryArticles.data[row.name] })),
   )
+  // As many rows as the category's own articles, so the skeleton doesn't fill the page.
+  const skeletonRows = computed(() => Math.min(Math.max(category.value?.articles?.length ?? 3, 1), 8))
   // Both fetches must settle, or a switch shows the new list with old sections; a failed section fetch still counts.
   const loaded = computed(
     () =>
@@ -57,5 +59,6 @@ export default function setup(context) {
     lastUpdated,
     sections,
     loaded,
+    skeletonRows,
   }
 }
