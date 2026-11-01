@@ -28,11 +28,15 @@
         v-for="article in articles"
         :key="article.name"
         :to="ROUTES.article(article)"
-        class="flex items-center gap-2.5 rounded-4 px-2 py-1.5 hover:bg-surface-gray-1 focus-visible:focus-ring"
+        class="group flex items-center gap-2.5 rounded-4 px-2 py-1.5 transition-colors hover:bg-surface-gray-1 focus-visible:focus-ring"
         @mouseenter="prefetchOnHover(article.name)"
       >
-        <ArticleIcon class="size-4 shrink-0 text-ink-gray-5" />
-        <span class="min-w-0 flex-1 truncate text-base text-ink-gray-8">
+        <ArticleIcon
+          class="size-4 shrink-0 text-ink-gray-4 group-hover:text-ink-gray-6"
+        />
+        <span
+          class="min-w-0 flex-1 truncate text-base text-ink-gray-8 group-hover:text-ink-gray-9"
+        >
           {{ article.title }}
         </span>
       </PortalLink>
