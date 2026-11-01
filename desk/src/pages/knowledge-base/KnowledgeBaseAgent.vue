@@ -911,13 +911,17 @@ const options = computed(() => {
       },
       visibility: {
         custom: ({ item }) =>
-          h("div", { class: "flex items-center gap-1.5 text-ink-gray-7" }, [
-            h(Icon, {
-              icon: categoryAccess()[item]?.icon,
-              class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
-            }),
-            categoryAccess()[item]?.label,
-          ]),
+          h(
+            "div",
+            { class: "flex min-w-0 items-center gap-1.5 text-ink-gray-7" },
+            [
+              h(Icon, {
+                icon: categoryAccess()[item]?.icon,
+                class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
+              }),
+              h("span", { class: "truncate" }, categoryAccess()[item]?.label),
+            ]
+          ),
       },
     },
     emptyState: {
