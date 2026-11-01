@@ -12,9 +12,7 @@
           :class="categoryIcon(category.icon)"
           aria-hidden="true"
         />
-        <span
-          class="min-w-0 flex-1 truncate text-base-semibold text-ink-gray-9"
-        >
+        <span class="min-w-0 flex-1 truncate text-base-medium text-ink-gray-9">
           {{ category.category_name }}
         </span>
         <span
