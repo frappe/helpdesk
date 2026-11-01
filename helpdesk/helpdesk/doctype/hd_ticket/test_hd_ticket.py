@@ -984,6 +984,69 @@ class TestHDTicket(IntegrationTestCase):
             ticket2_doc.name,
         )
 
+    def test_split_ticket_starts_its_own_sla_clock(self):
+        """A split ticket counts from the split, not from a clock the source kept."""
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket1 = make_ticket(priority="High", description="Original request")
+            ticket1.reply_via_agent(message="Test reply to split")
+        communication = get_latest_ticket_communication(ticket1.name)
+        source_response_by = ticket1.response_by
+
+        # a detached SLA keeps its clock start, the state the split used to inherit
+        frappe.db.set_value("HD Ticket", ticket1.name, "sla", None)
+        ticket1.reload()
+        self.assertFalse(ticket1.sla)
+
+        split_at = add_to_date(getdate(raised_at), days=7, hours=7, minutes=5)
+        with self.freeze_time(split_at):
+            ticket2 = frappe.get_doc(
+                "HD Ticket",
+                split_ticket(
+                    subject="Split request", communication_id=communication.name
+                ),
+            )
+            self.assertEqual(
+                get_datetime(ticket2.service_level_agreement_creation), split_at
+            )
+            # 07:05 is before the 10:00 opening, so High's hour ends at 11:00
+            self.assertEqual(
+                ticket2.response_by, add_to_date(getdate(split_at), hours=11)
+            )
+            self.assertEqual(ticket2.agreement_status, "First Response Due")
+            self.assertFalse(ticket2.first_responded_on)
+            self.assertFalse(ticket2.first_response_failed_by)
+
+        ticket1.reload()
+        self.assertEqual(ticket1.response_by, source_response_by)
+
+    def test_split_ticket_first_response_counts_from_split(self):
+        """The first agent reply after the split fulfils the new ticket's SLA."""
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket1 = make_ticket(priority="High", description="Original request")
+            ticket1.reply_via_agent(message="Test reply to split")
+        communication = get_latest_ticket_communication(ticket1.name)
+
+        split_at = add_to_date(getdate(raised_at), days=7, hours=7, minutes=5)
+        with self.freeze_time(split_at):
+            ticket2 = frappe.get_doc(
+                "HD Ticket",
+                split_ticket(
+                    subject="Split request", communication_id=communication.name
+                ),
+            )
+
+        reply_at = add_to_date(getdate(split_at), hours=10, minutes=13)
+        with self.freeze_time(reply_at):
+            ticket2.reload()
+            ticket2.reply_via_agent(message="Answer to the new request")
+            ticket2.reload()
+
+            self.assertEqual(ticket2.first_responded_on, reply_at)
+            self.assertIsNone(ticket2.first_response_failed_by)
+            self.assertEqual(ticket2.agreement_status, "Resolution Due")
+
     def test_parse_content_embeds_site_files_only(self):
         """
         Site file images must swap src for embed (so the framework inlines them

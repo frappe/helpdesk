@@ -459,8 +459,6 @@ def duplicate_ticket(ticket_doc, subject):
     new_ticket.status = "Open"
     new_ticket.ticket_split_from = ticket_doc.name
     new_ticket.description = None
-    new_ticket.first_response_time = 0
-    new_ticket.first_responded_on = None
 
     new_ticket.creation = now_datetime()
     new_ticket.opening_date = frappe.utils.nowdate()
@@ -471,18 +469,23 @@ def duplicate_ticket(ticket_doc, subject):
     # an agent made it; where the customer started belongs to the original
     new_ticket.update(dict.fromkeys(TICKET_ORIGIN_FIELDS))
 
-    if new_ticket.sla:
-        new_ticket.sla = None
-        new_ticket.agreement_status = "First Response Due"
-        new_ticket.resolution_by = None
-        new_ticket.service_level_agreement_creation = now_datetime()
-        new_ticket.on_hold_since = None
-        new_ticket.total_hold_time = None
-        new_ticket.response_by = None
-        new_ticket.response_date = None
-        new_ticket.resolution_date = None
-        new_ticket.resolution_time = None
-        new_ticket.user_resolution_time = None
+    # the split ticket answers for itself: no SLA state carries over, including
+    # a clock the source kept after its SLA detached
+    new_ticket.sla = None
+    new_ticket.agreement_status = None
+    new_ticket.service_level_agreement_creation = None
+    new_ticket.response_by = None
+    new_ticket.resolution_by = None
+    new_ticket.first_response_time = 0
+    new_ticket.first_responded_on = None
+    new_ticket.first_response_failed_by = None
+    new_ticket.resolution_failed_by = None
+    new_ticket.on_hold_since = None
+    new_ticket.total_hold_time = None
+    new_ticket.response_date = None
+    new_ticket.resolution_date = None
+    new_ticket.resolution_time = None
+    new_ticket.user_resolution_time = None
 
     new_ticket.insert(ignore_permissions=True)
 
