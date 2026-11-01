@@ -32,7 +32,6 @@
       v-model:icon="category.icon"
       v-model:parent="category.parent"
       :category-id="category.id"
-      :has-subcategories="category.hasSubcategories"
       @update="handleCategoryUpdate"
       @create="handleCategoryCreate"
     />
@@ -132,7 +131,6 @@ const category = reactive({
   id: "",
   icon: "lucide-folder",
   parent: "",
-  hasSubcategories: false,
   pinned: false,
 });
 
@@ -229,12 +227,8 @@ const groupByActions = [
           fieldname: "parent_article_category",
           value: null,
         });
-      } catch (error: any) {
-        toast.error(
-          error?.messages?.[0] ||
-            error?.message ||
-            __("Failed to update category.")
-        );
+      } catch (error) {
+        getErrorMessage(error, true, __("Failed to update category."));
         return;
       }
       listViewRef.value.reload();
@@ -255,7 +249,6 @@ const groupByActions = [
       category.id = group.value;
       category.icon = group.icon || "lucide-folder";
       category.parent = group.parent_article_category || "";
-      category.hasSubcategories = !!group.has_subcategories;
       category.pinned = !!group.pinned;
       showCategoryModal.value = true;
     },
@@ -904,7 +897,6 @@ function resetState() {
   category.id = "";
   category.icon = "lucide-folder";
   category.parent = "";
-  category.hasSubcategories = false;
   category.pinned = false;
 }
 

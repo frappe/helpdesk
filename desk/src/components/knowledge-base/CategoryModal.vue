@@ -11,6 +11,7 @@
         leave-from-class="grid-rows-[1fr]"
         leave-active-class="overflow-hidden transition-[grid-template-rows,opacity] duration-150 delay-200 ease-in motion-reduce:transition-none"
         leave-to-class="grid-rows-[0fr] opacity-0"
+        @after-leave="onUndrawn"
       >
         <div v-if="drawn" class="grid">
           <div class="min-h-0">
@@ -96,7 +97,7 @@
         </Transition>
         <CategoryIconPicker v-model="icon" />
         <TextInput
-          id="kb-category-name"
+          ref="nameInput"
           v-model="newTitle"
           class="flex-1"
           size="md"
@@ -155,10 +156,6 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  hasSubcategories: {
-    type: Boolean,
-    default: false,
-  },
 });
 
 const emit = defineEmits(["update", "create"]);
@@ -171,8 +168,6 @@ const parent = defineModel<string>("parent", { default: "" });
 // `nesting` holds the parent row; `drawn` holds its pieces, so they animate out first.
 const nesting = ref(false);
 const drawn = ref(false);
-// The longest leave: the parent row's delay plus its duration.
-const UNDRAW_MS = 350;
 // Down from the tile's centre, a 6px elbow, then across to 4px short of the icon.
 const ELBOW = "M0 0 V18 Q0 24 6 24 H20";
 
@@ -183,11 +178,16 @@ function nest() {
 
 function unnest() {
   drawn.value = false;
-  setTimeout(() => {
-    nesting.value = false;
-    parent.value = "";
-  }, UNDRAW_MS);
 }
+
+// Also fires when a re-tick cuts the leave short.
+function onUndrawn() {
+  if (drawn.value) return;
+  nesting.value = false;
+  parent.value = "";
+}
+
+const nameInput = ref<InstanceType<typeof TextInput> | null>(null);
 
 watch(showDialog, async (open) => {
   if (!open) return;
@@ -196,7 +196,7 @@ watch(showDialog, async (open) => {
   categoryOptions.submit();
   nesting.value = drawn.value = Boolean(parent.value);
   await nextTick();
-  document.getElementById("kb-category-name")?.focus();
+  nameInput.value?.focus();
 });
 
 // The tile left of the picker shows the icon, so options stay text only.
@@ -207,6 +207,12 @@ const parentOptions = computed(() =>
         !option.parent_article_category && option.value !== props.categoryId
     )
     .map(({ value, label }) => ({ value, label }))
+);
+
+const hasSubcategories = computed(
+  () =>
+    categoryOptions.data?.find((option) => option.value === props.categoryId)
+      ?.has_subcategories
 );
 
 const parentIcon = computed(() =>
