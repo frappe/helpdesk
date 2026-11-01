@@ -26,7 +26,7 @@
         </div>
         <p
           v-if="article.excerpt"
-          class="text-p-sm text-ink-gray-5 truncate max-sm:whitespace-normal max-sm:line-clamp-2"
+          class="mt-1.5 text-p-sm text-ink-gray-5 truncate max-sm:whitespace-normal max-sm:line-clamp-2"
           :class="markClass"
         >
           <span v-if="marked" v-html="article.excerpt" />
