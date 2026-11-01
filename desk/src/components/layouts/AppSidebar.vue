@@ -112,6 +112,8 @@ import { openPalette } from "@/components/command-palette/useCommandPalette";
 import UserMenu from "@/components/UserMenu.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { useDevice } from "@/composables";
+import { mobileSidebarOpened } from "@/composables/mobile";
+import { useActiveView } from "@/composables/useActiveView";
 import { currentView, useView } from "@/composables/useView";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
@@ -130,8 +132,7 @@ import {
 } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
-import type { RouteLocationRaw } from "vue-router";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import LucideBell from "~icons/lucide/bell";
 import LucideSearch from "~icons/lucide/search";
 import { agentPortalSidebarOptions } from "./layoutSettings";
@@ -142,7 +143,7 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
-const router = useRouter();
+const { activeViewName, openView } = useActiveView();
 const device = useDevice();
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
@@ -182,13 +183,15 @@ function toggleSection(label: string) {
 const activeItem = ref<string | null>(currentRouteKey());
 
 function currentRouteKey(): string | null {
-  return (route.query.view as string) || (route.name as string) || null;
+  return activeViewName.value || (route.name as string) || null;
 }
 
-function selectItem(key: string, to: RouteLocationRaw, onSelect?: () => void) {
-  activeItem.value = key;
-  onSelect?.();
-  router.push(to);
+/** A nav item opens its route's default list; a view item opens the view. */
+function selectItem(routeName: string, view?: string) {
+  activeItem.value = view ?? routeName;
+  // The list may not navigate (only the stored view changes), so close here.
+  if (props.mobile) mobileSidebarOpened.value = false;
+  openView(routeName, view);
 }
 
 const navItems = computed(() => {
@@ -198,7 +201,7 @@ const navItems = computed(() => {
       label: option.label,
       icon: option.icon,
       isActive: activeItem.value === option.to,
-      onClick: () => selectItem(option.to, { name: option.to }),
+      onClick: () => selectItem(option.to),
       // Separate the nav group from the search/notification tools above it.
       spacedTop: index === 0,
       key: option.label,
@@ -221,7 +224,7 @@ const notificationItem = computed(() =>
         label: __("Notifications"),
         icon: LucideBell,
         isActive: activeItem.value === "Notifications",
-        onClick: () => selectItem("Notifications", { name: "Notifications" }),
+        onClick: () => selectItem("Notifications"),
         badge: notificationStore.unread,
         key: "notifications",
         id: "notifications-btn",
@@ -267,21 +270,17 @@ function parseViews(views: any[]) {
     label: view.label,
     icon: getIcon(view.icon),
     isActive: activeItem.value === view.name,
-    onClick: () =>
-      selectItem(
-        view.name,
-        { name: view.route_name, query: { view: view.name } },
-        () => {
-          currentView.value = { label: view.label, icon: view.icon };
-        }
-      ),
+    onClick: () => {
+      currentView.value = { label: view.label, icon: view.icon };
+      selectItem(view.route_name, view.name);
+    },
     key: view.name,
     view,
   }));
 }
 
 watch(
-  () => [route.name, route.query.view],
+  () => [route.name, activeViewName.value],
   () => (activeItem.value = currentRouteKey())
 );
 </script>

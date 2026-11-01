@@ -50,16 +50,7 @@ export function getPreviousTicket() {
 }
 
 export function navigateToTicket(ticketId: string) {
-  const view = router.currentRoute.value.query.view as string;
-  const routeToNavigate: any = {
-    name: "TicketAgent",
-    params: { ticketId },
-    hash: "",
-  };
-  if (view) {
-    routeToNavigate["query"] = { view };
-  }
-  router.push(routeToNavigate);
+  router.push({ name: "TicketAgent", params: { ticketId }, hash: "" });
 }
 
 /** True once the view has more than one ticket to move between. */

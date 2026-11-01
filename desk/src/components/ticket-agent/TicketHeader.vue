@@ -90,6 +90,7 @@ import { showMergeModal } from "@/pages/ticket/modalStates";
 import { setupCustomizations } from "@helpdesk/shared/formScripts";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@helpdesk/shared/shortcuts";
+import { useActiveView } from "@/composables/useActiveView";
 import { reloadTicketFeed } from "@/composables/useTicket";
 import { useView } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
@@ -109,7 +110,6 @@ import {
 } from "frappe-ui";
 import {
   computed,
-  ComputedRef,
   h,
   inject,
   onMounted,
@@ -118,7 +118,7 @@ import {
   useTemplateRef,
   watchEffect,
 } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
@@ -132,8 +132,8 @@ defineProps({
   },
 });
 
-const route = useRoute();
 const router = useRouter();
+const { activeViewName, openView } = useActiveView();
 const { findView } = useView("HD Ticket");
 const ticketStatusStore = useTicketStatusStore();
 
@@ -163,16 +163,20 @@ const statusDropdown = computed(() => {
   }));
 });
 const breadcrumbs = computed(() => {
-  let items = [{ label: __("Tickets"), route: { name: "TicketsAgent" } }];
-  if (route.query.view) {
-    const currView: ComputedRef<View> = findView(route.query.view as string);
-    if (currView) {
-      items.push({
-        label: __(currView.value?.label),
-        icon: getIcon(currView.value?.icon),
-        route: { name: "TicketsAgent", query: { view: currView.value?.name } },
-      });
-    }
+  let items = [
+    {
+      label: __("Tickets"),
+      href: router.resolve({ name: "TicketsAgent" }).href,
+      onClick: () => openView("TicketsAgent"),
+    },
+  ];
+  const currView: View = findView(activeViewName.value).value;
+  if (currView) {
+    items.push({
+      label: __(currView.label),
+      icon: getIcon(currView.icon),
+      route: { name: "TicketsAgent" },
+    });
   }
   items.push({
     label: ticket.value.doc?.subject,

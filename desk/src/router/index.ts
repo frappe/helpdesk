@@ -1,4 +1,5 @@
 import { useScreenSize } from "@/composables/screen";
+import { listRouteOf, setActiveView } from "@/composables/useActiveView";
 import { canViewPersona, personaInterrupt } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
@@ -18,6 +19,8 @@ declare module "vue-router" {
     public?: boolean;
     onSuccessRoute?: string;
     parent?: string;
+    /** List route whose active view this page follows. */
+    list?: string;
   }
 }
 
@@ -45,6 +48,7 @@ const portalRoutes = [
     component: () =>
       import(`@/pages/ticket/${handleMobileView("TicketAgent")}.vue`),
     props: true,
+    meta: { list: "TicketsAgent" },
   },
   {
     path: "/tickets/new/:templateId?",
@@ -188,6 +192,15 @@ router.beforeEach(async (to, _, next) => {
   } else {
     next();
   }
+});
+
+// The active view lives in storage. `?view=` (old links, new-tab opens from
+// Home) is adopted into storage and dropped from the URL.
+router.beforeEach((to) => {
+  const { view, ...query } = to.query;
+  if (!view) return;
+  setActiveView(listRouteOf(to), String(view));
+  return { path: to.path, query, hash: to.hash, replace: true };
 });
 
 router.afterEach(async (to) => {
