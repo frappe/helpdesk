@@ -44,9 +44,14 @@
             :options="parentOptions"
             :disabled="hasSubcategories"
           />
-          <p class="mt-1.5 flex items-center gap-1.5 text-p-sm text-ink-gray-5">
+          <p
+            v-if="hasSubcategories"
+            class="mt-1.5 flex items-center gap-1.5 text-p-sm text-ink-gray-5"
+          >
             <LucideInfo class="size-3.5 shrink-0" />
-            {{ parentHint }}
+            {{
+              __("A category with subcategories can't become a subcategory.")
+            }}
           </p>
         </div>
       </div>
@@ -100,17 +105,6 @@ const parentOptions = computed(() => [
     )
     .map(({ value, label }) => ({ value, label })),
 ]);
-
-const parentHint = computed(() => {
-  if (props.hasSubcategories)
-    return __("A category with subcategories can't become a subcategory.");
-  const label = parentOptions.value.find(
-    (option) => option.value && option.value === parent.value
-  )?.label;
-  return label
-    ? __("Appears inside {0} in your help center.", [label])
-    : __("Appears as a main section of your help center.");
-});
 
 watch(showDialog, (open) => {
   if (!open) return;
