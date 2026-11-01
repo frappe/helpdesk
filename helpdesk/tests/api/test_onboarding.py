@@ -1,8 +1,12 @@
+from unittest.mock import patch
+
 import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.onboarding import mark_persona_captured
 from helpdesk.overrides.user_invitation import HelpdeskUserInvitation
+from helpdesk.setup.welcome_ticket import create_welcome_ticket
+from helpdesk.test_utils import make_agent, unique_email
 
 BRAND = "Acme Support"
 
@@ -79,4 +83,29 @@ class TestInvitationTitleOverride(IntegrationTestCase):
         self.assertEqual(
             invitation._get_email_title(),
             frappe.get_hooks("app_title", app_name="frappe")[0],
+        )
+
+
+class TestWelcomeTicket(IntegrationTestCase):
+    def test_agent_can_reply_to_welcome_ticket_created_on_install(self):
+        with (
+            patch.dict(frappe.flags, {"in_install": "helpdesk"}),
+            patch.object(frappe.db, "count", return_value=0),
+        ):
+            create_welcome_ticket()
+        ticket = frappe.get_last_doc("HD Ticket", {"subject": "Welcome to Helpdesk"})
+        agent = make_agent(unique_email("welcome"))
+
+        with self.set_user(agent):
+            ticket.reply_via_agent("Thanks, I'll connect our support email next.")
+
+        self.assertTrue(
+            frappe.db.exists(
+                "Communication",
+                {
+                    "reference_doctype": "HD Ticket",
+                    "reference_name": ticket.name,
+                    "sent_or_received": "Sent",
+                },
+            )
         )
