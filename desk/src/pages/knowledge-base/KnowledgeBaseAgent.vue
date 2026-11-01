@@ -7,7 +7,7 @@
         </div>
       </template>
       <template #right-header>
-        <Dropdown :options="headerOptions">
+        <Dropdown :options="headerOptions" align="end">
           <Button
             :label="__('Create')"
             variant="solid"
