@@ -1,79 +1,151 @@
 <template>
-  <Dialog
-    v-model:open="showDialog"
-    :title="dialogTitle"
-    :actions="getActionButton()"
-  >
+  <Dialog v-model:open="showDialog" :title="dialogTitle" size="md">
     <template #default>
-      <div class="flex flex-col flex-1 gap-4">
-        <div>
-          <div class="mb-1.5 text-base text-ink-gray-5">{{ __("Name") }}</div>
-          <textarea
-            class="text-base rounded-4 py-1.5 px-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full block"
-            ref="titleRef"
-            placeholder="Support Issues"
-            v-model="newTitle"
-            :rows="1"
-            maxlength="50"
-            autofocus
-            @input="(e: Event) => {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = `${target.scrollHeight}px`;
-            }"
-          />
-        </div>
-        <div>
-          <div class="mb-1.5 text-base text-ink-gray-5">{{ __("Icon") }}</div>
-          <Combobox
-            class="w-full"
-            v-model="icon"
-            :options="iconOptions"
-            :placeholder="__('Select an icon')"
-          />
-        </div>
-        <div>
-          <div class="mb-1.5 flex items-center justify-between">
-            <span class="text-base text-ink-gray-5">
-              {{ __("Parent category") }}
-            </span>
-            <span class="text-sm text-ink-gray-4">{{ __("Optional") }}</span>
+      <!-- Tree order: the parent sits above, the category hangs below it.
+           Rows 0fr → 1fr grows the dialog to the row's height instead of jumping. -->
+      <Transition
+        appear
+        enter-from-class="grid-rows-[0fr] opacity-0"
+        enter-active-class="overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-out motion-reduce:transition-none"
+        enter-to-class="grid-rows-[1fr]"
+        leave-from-class="grid-rows-[1fr]"
+        leave-active-class="overflow-hidden transition-[grid-template-rows,opacity] duration-150 delay-200 ease-in motion-reduce:transition-none"
+        leave-to-class="grid-rows-[0fr] opacity-0"
+      >
+        <div v-if="drawn" class="grid">
+          <div class="min-h-0">
+            <div class="flex items-center gap-2 pb-2">
+              <span
+                class="grid size-8 shrink-0 place-items-center rounded-4 bg-surface-gray-2 text-ink-gray-7"
+                aria-hidden="true"
+              >
+                <span :class="parentIcon" class="size-4" />
+              </span>
+              <Combobox
+                v-model="parent"
+                :options="parentOptions"
+                :placeholder="__('Choose a parent category')"
+                :aria-label="__('Parent category')"
+                size="md"
+                class="flex-1"
+              />
+              <Tooltip :text="__('Remove parent')">
+                <!-- Sized like the dialog's close button, which sits right above it. -->
+                <Button
+                  variant="ghost"
+                  :aria-label="__('Remove parent')"
+                  @click="unnest"
+                >
+                  <template #icon>
+                    <span class="lucide-link-2-off size-4 text-ink-gray-9" />
+                  </template>
+                </Button>
+              </Tooltip>
+            </div>
           </div>
-          <Combobox
-            class="w-full"
-            v-model="parent"
-            :options="parentOptions"
-            :disabled="hasSubcategories"
-          />
-          <p
-            v-if="hasSubcategories"
-            class="mt-1.5 flex items-center gap-1.5 text-p-sm text-ink-gray-5"
-          >
-            <LucideInfo class="size-3.5 shrink-0" />
-            {{
-              __("A category with subcategories can't become a subcategory.")
-            }}
-          </p>
         </div>
+      </Transition>
+
+      <div
+        class="relative flex items-center gap-2 transition-[padding] duration-200 ease-out motion-reduce:transition-none"
+        :class="drawn ? 'pl-10' : 'pl-0 delay-150'"
+      >
+        <!-- Icon to icon: one dotted path with a rounded elbow, from the
+             parent's tile down and across. A solid mask stroke draws it in. -->
+        <Transition
+          appear
+          :duration="{ enter: 450, leave: 200 }"
+          enter-from-class="[&_.kb-reveal]:[stroke-dashoffset:1]"
+          enter-active-class="[&_.kb-reveal]:[transition:stroke-dashoffset_300ms_cubic-bezier(0.2,0,0,1)_150ms] motion-reduce:[&_.kb-reveal]:[transition:none]"
+          leave-active-class="[&_.kb-reveal]:[transition:stroke-dashoffset_200ms_ease-in] motion-reduce:[&_.kb-reveal]:[transition:none]"
+          leave-to-class="[&_.kb-reveal]:[stroke-dashoffset:1]"
+        >
+          <svg
+            v-if="drawn"
+            aria-hidden="true"
+            class="absolute -top-2 left-4 h-6 w-5 overflow-visible text-[--outline-gray-5]"
+            viewBox="0 0 20 24"
+            fill="none"
+          >
+            <mask
+              id="kb-category-elbow"
+              maskUnits="userSpaceOnUse"
+              x="-4"
+              y="-4"
+              width="28"
+              height="32"
+            >
+              <path
+                class="kb-reveal"
+                :d="ELBOW"
+                stroke="white"
+                stroke-width="4"
+                pathLength="1"
+                stroke-dasharray="1"
+              />
+            </mask>
+            <path
+              :d="ELBOW"
+              mask="url(#kb-category-elbow)"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-dasharray="0 3"
+            />
+          </svg>
+        </Transition>
+        <CategoryIconPicker v-model="icon" />
+        <TextInput
+          id="kb-category-name"
+          v-model="newTitle"
+          class="flex-1"
+          size="md"
+          maxlength="50"
+          :placeholder="nesting ? __('Subcategory name') : __('Category name')"
+          :aria-label="__('Name')"
+          @keydown.enter="submit"
+        />
+      </div>
+    </template>
+
+    <template #actions>
+      <div class="flex items-center justify-between gap-3">
+        <p v-if="hasSubcategories" class="text-p-sm text-ink-gray-5">
+          {{ __("Has subcategories, so it can't be nested.") }}
+        </p>
+        <Checkbox
+          v-else
+          :model-value="drawn"
+          :label="__('Nest under a category')"
+          @update:model-value="$event ? nest() : unnest()"
+        />
+        <Button
+          variant="solid"
+          :label="actionLabel"
+          :disabled="!canSave"
+          @click="submit"
+        />
       </div>
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { Combobox, Dialog } from "frappe-ui";
-import LucideInfo from "~icons/lucide/info";
+import { computed, nextTick, ref, watch } from "vue";
+import {
+  Button,
+  Checkbox,
+  Combobox,
+  Dialog,
+  TextInput,
+  Tooltip,
+} from "frappe-ui";
 import { categoryOptions } from "@/stores/knowledgeBase";
-import { CATEGORY_ICONS } from "@helpdesk/shared/categoryIcons";
+import { categoryIcon } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
-import { ref } from "vue";
-import { watch } from "vue";
+import CategoryIconPicker from "./CategoryIconPicker.vue";
 
 const props = defineProps({
-  title: {
-    type: String,
-    default: "",
-  },
   edit: {
     type: Boolean,
     default: false,
@@ -96,67 +168,69 @@ const newTitle = defineModel<string>("title");
 const icon = defineModel<string>("icon");
 const parent = defineModel<string>("parent", { default: "" });
 
-const parentOptions = computed(() => [
-  { label: __("None (top level)"), value: "", icon: "lucide-house" },
-  ...(categoryOptions.data || [])
-    .filter(
-      (option) =>
-        !option.parent_article_category && option.value !== props.categoryId
-    )
-    .map(({ value, label }) => ({ value, label })),
-]);
+// `nesting` holds the parent row; `drawn` holds its pieces, so they animate out first.
+const nesting = ref(false);
+const drawn = ref(false);
+// The longest leave: the parent row's delay plus its duration.
+const UNDRAW_MS = 350;
+// Down from the tile's centre, a 6px elbow, then across to 4px short of the icon.
+const ELBOW = "M0 0 V18 Q0 24 6 24 H20";
 
-watch(showDialog, (open) => {
+function nest() {
+  nesting.value = true;
+  drawn.value = true;
+}
+
+function unnest() {
+  drawn.value = false;
+  setTimeout(() => {
+    nesting.value = false;
+    parent.value = "";
+  }, UNDRAW_MS);
+}
+
+watch(showDialog, async (open) => {
   if (!open) return;
   // shared with other dialogs: drop their list before it shows here
   categoryOptions.reset();
   categoryOptions.submit();
+  nesting.value = drawn.value = Boolean(parent.value);
+  await nextTick();
+  document.getElementById("kb-category-name")?.focus();
 });
 
-const iconOptions = CATEGORY_ICONS.map((value) => ({
-  value,
-  icon: value,
-  label: value
-    .replace("lucide-", "")
-    .replace(/-/g, " ")
-    .replace(/^\w/, (c) => c.toUpperCase()),
-}));
-
-const dialogTitle = computed(() =>
-  props.edit ? __("Edit Category") : __("Create Category")
+// The tile left of the picker shows the icon, so options stay text only.
+const parentOptions = computed(() =>
+  (categoryOptions.data || [])
+    .filter(
+      (option) =>
+        !option.parent_article_category && option.value !== props.categoryId
+    )
+    .map(({ value, label }) => ({ value, label }))
 );
 
-const titleRef = ref(null);
-watch(
-  () => titleRef.value,
-  (newVal) => {
-    if (!newVal) return;
-    titleRef.value.style.height =
-      newVal.scrollHeight > newVal.clientHeight
-        ? newVal.scrollHeight + "px"
-        : newVal.scrollHeight + "px";
-  }
+const parentIcon = computed(() =>
+  categoryIcon(
+    categoryOptions.data?.find((option) => option.value === parent.value)?.icon
+  )
 );
 
-function getActionButton() {
-  const action = [];
-  if (props.edit) {
-    action.push({
-      label: "Save",
-      variant: "solid",
-      onClick: () => {
-        emit("update");
-      },
-    });
-  } else {
-    action.push({
-      label: "Create",
-      variant: "solid",
-      onClick: () => {
-        emit("create");
-      },
-    });
-  }
-  return action;
+const dialogTitle = computed(() => {
+  if (props.edit) return __("Edit category");
+  return nesting.value ? __("New subcategory") : __("New category");
+});
+
+const actionLabel = computed(() => {
+  if (props.edit) return __("Save changes");
+  return nesting.value ? __("Create subcategory") : __("Create category");
+});
+
+const canSave = computed(
+  () => Boolean(newTitle.value?.trim()) && (!nesting.value || parent.value)
+);
+
+function submit() {
+  if (!canSave.value) return;
+  emit(props.edit ? "update" : "create");
 }
 </script>

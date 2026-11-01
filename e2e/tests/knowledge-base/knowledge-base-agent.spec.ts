@@ -8,6 +8,26 @@ import {
 
 usePersona("manager");
 
+test("nest a new category under another from the category dialog", async ({ page, api }) => {
+  const parent = await createCategory(api);
+  const name = `E2E Nested ${uid()}`;
+  await page.goto("/helpdesk/kb");
+  await page.getByRole("button", { name: "Create" }).click();
+  await page.getByRole("menuitem", { name: "Category" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("checkbox", { name: "Nest under a category" }).check();
+  await expect(dialog.getByRole("button", { name: "Create subcategory" })).toBeDisabled();
+  await dialog.getByRole("combobox", { name: "Parent category" }).click();
+  await page.getByRole("combobox").last().fill(parent.category_name);
+  await page.getByRole("option", { name: parent.category_name }).first().click();
+  await dialog.getByRole("textbox", { name: "Name" }).fill(name);
+  await dialog.getByRole("button", { name: "Create subcategory" }).click();
+
+  await expect(page).toHaveURL(/\/helpdesk\/kb\/articles\/\w+\?.*isEdit=1/);
+  const created = await api.exists("HD Article Category", { category_name: name });
+  expect((await api.get("HD Article Category", created!)).parent_article_category).toBe(parent.name);
+});
+
 test("create a category and article, publish it, customer can read it", async ({
   page,
   api,
@@ -18,8 +38,8 @@ test("create a category and article, publish it, customer can read it", async ({
   await page.goto("/helpdesk/kb");
   await page.getByRole("button", { name: "Create" }).click();
   await page.getByRole("menuitem", { name: "Category" }).click();
-  await page.getByPlaceholder("Support Issues").fill(categoryName);
-  await page.getByRole("dialog").getByRole("button", { name: "Create" }).click();
+  await page.getByRole("dialog").getByRole("textbox", { name: "Name" }).fill(categoryName);
+  await page.getByRole("dialog").getByRole("button", { name: "Create category" }).click();
 
   await expect(page).toHaveURL(/\/helpdesk\/kb\/articles\/\w+\?.*isEdit=1/);
   await page.getByPlaceholder("Title").fill(title);

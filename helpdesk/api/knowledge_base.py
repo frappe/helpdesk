@@ -230,7 +230,7 @@ def get_category_options(exclude: str | None = None) -> list[dict]:
     has_subcategories; `exclude` leaves one out. Needs write access to HD Article."""
     frappe.has_permission("HD Article", "write", throw=True)
     rows = frappe.get_all(
-        "HD Article Category", fields=["name", "parent_article_category"]
+        "HD Article Category", fields=["name", "parent_article_category", "icon"]
     )
     labels = get_category_labels([row.name for row in rows])
     parents = {row.parent_article_category for row in rows}
@@ -239,6 +239,7 @@ def get_category_options(exclude: str | None = None) -> list[dict]:
             "value": row.name,
             "label": labels[row.name],
             "parent_article_category": row.parent_article_category,
+            "icon": row.icon,
             "has_subcategories": row.name in parents,
         }
         for row in rows

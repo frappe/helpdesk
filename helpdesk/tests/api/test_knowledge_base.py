@@ -1237,6 +1237,13 @@ class TestSubcategoryReads(IntegrationTestCase):
         self.assertFalse(rows[extra]["has_subcategories"])
         self.assertEqual(rows[self.sub]["parent_article_category"], self.parent)
 
+    def test_category_options_carry_the_icon(self) -> None:
+        frappe.db.set_value("HD Article Category", self.parent, "icon", "lucide-rocket")
+
+        rows = {row["value"]: row for row in get_category_options()}
+
+        self.assertEqual(rows[self.parent]["icon"], "lucide-rocket")
+
     def test_category_options_leave_out_the_excluded(self) -> None:
         values = [row["value"] for row in get_category_options(exclude=self.sub)]
 
