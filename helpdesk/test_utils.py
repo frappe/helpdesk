@@ -15,6 +15,7 @@ from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
+from helpdesk.integrations.frappe_cloud import TRIAL_DISMISSED_KEY, forget_trial
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_frappe_version
 
 if is_frappe_version("16", above=True):
@@ -1115,6 +1116,20 @@ def show_only_banners(*banners: str):
     """Turn on exactly `banners` in HD Settings and turn every other banner off."""
     for banner, flag in BANNERS.items():
         frappe.db.set_single_value("HD Settings", flag, int(banner in banners))
+
+
+def fake_cloud_settings(trial: dict | None) -> MagicMock:
+    """Stand-in for Frappe's Cloud Settings on a v2 site whose billing reports `trial`."""
+    cloud_settings = MagicMock()
+    cloud_settings.is_cloud_settings_enabled.return_value = True
+    cloud_settings.get_billing.return_value = {"trial": trial}
+    return cloud_settings
+
+
+def clear_trial_cache(user: str) -> None:
+    """Forget the cached trial and `user`'s dismissal; redis is not rolled back between tests."""
+    forget_trial()
+    frappe.cache.delete_value(TRIAL_DISMISSED_KEY, user=user)
 
 
 def dismiss_banner_as(user: str, banner: str) -> MagicMock:

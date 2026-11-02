@@ -1,6 +1,7 @@
 <template>
   <Dialog
-    v-model:open="show"
+    :open="show"
+    @update:open="(open) => (open || !isCloudOverlayOpen()) && (show = open)"
     size="5xl"
     bare
     :dismissible="!disableSettingModalOutsideClick"
@@ -102,6 +103,8 @@ import {
 } from "./settingsModal";
 
 const show: ModelRef<boolean> = defineModel();
+const isCloudOverlayOpen = () =>
+  !!document.querySelector("fc-cloud-settings[overlay-open]");
 
 const showConfirmDialog = ref(false);
 
