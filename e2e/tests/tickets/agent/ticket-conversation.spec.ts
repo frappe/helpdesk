@@ -76,6 +76,54 @@ test("email reply with cc and an attachment is sent and stored", async ({ page, 
   await expect(emails.getByRole("button", { name: fileName })).toBeVisible();
 });
 
+test("reply attachment is public when HD Ticket makes attachments public", async ({
+  page,
+  api,
+  ticket,
+}) => {
+  const fileName = `public-${uid()}.txt`;
+  const setter = await api.insert("Property Setter", {
+    doctype_or_field: "DocType",
+    doc_type: "HD Ticket",
+    property: "make_attachments_public",
+    property_type: "Check",
+    value: "1",
+  });
+  try {
+    // The meta cache is cleared before the setter commits, so a concurrent read can re-cache it stale.
+    await expect
+      .poll(async () => {
+        const response = await api.raw("frappe.desk.form.load.getdoctype", { doctype: "HD Ticket" });
+        const [meta] = (await response.json()).docs;
+        if (!meta.make_attachments_public) await api.update("Property Setter", setter.name, { value: "1" });
+        return meta.make_attachments_public;
+      })
+      .toBe(1);
+    const metaLoaded = page.waitForResponse(
+      async (response) =>
+        response.url().includes("getdoctype") &&
+        (await response.text()).includes('"make_attachments_public":1')
+    );
+    await openTicket(page, ticket.name);
+    await metaLoaded;
+    await page.getByRole("button", { name: "Reply", exact: true }).click();
+    await page.locator("input[type=file]").setInputFiles({
+      name: fileName,
+      mimeType: "text/plain",
+      buffer: Buffer.from(`attachment ${fileName}`),
+    });
+    await expect(page.getByText(fileName)).toBeVisible();
+
+    const [file] = await api.list("File", {
+      fields: ["is_private"],
+      filters: { attached_to_name: ticket.name, file_name: fileName },
+    });
+    expect(file.is_private).toBe(0);
+  } finally {
+    await api.delete("Property Setter", setter.name);
+  }
+});
+
 test("reply editor inserts a table from the slash menu and uploads a pasted image", async ({
   page,
   api,

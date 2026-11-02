@@ -7,7 +7,7 @@
     :extensions="extensions"
     :upload-function="
       (file: any, options: any) =>
-        track(uploadFunction(file, doctype, ticketId, true, options))
+        track(uploadAttachment(file, options))
     "
   >
     <template #default>
@@ -152,7 +152,7 @@
               <FileUploader
                 :doctype="doctype"
                 :docname="ticketId"
-                private
+                :private="isPrivate"
                 @success="
                   (f) => {
                     attachments.push(f);
@@ -165,7 +165,7 @@
                     <button
                       class="flex rounded-4 p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                       @click="openFileSelector()"
-                      :disabled="uploading"
+                      :disabled="uploading || meta.loading"
                     >
                       <LoadingIndicator v-if="uploading" class="h-4 w-4" />
                       <AttachmentIcon
@@ -236,6 +236,7 @@ import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useUploadTracker } from "@/composables/useUploadTracker";
 import { replyComposer } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
+import { getMeta } from "@/stores/meta";
 import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
 import { RenderedSavedReply } from "@/types";
@@ -319,6 +320,22 @@ const { getUser } = useUserStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const extensions = buildEditorExtensions();
+
+const { meta, doctypeMeta } = getMeta(props.doctype);
+const isPrivate = computed(
+  () => !doctypeMeta[props.doctype]?.make_attachments_public
+);
+
+async function uploadAttachment(file: File, options: any) {
+  if (!doctypeMeta[props.doctype]) await meta.promise?.catch(() => null);
+  return uploadFunction(
+    file,
+    props.doctype,
+    props.ticketId,
+    isPrivate.value,
+    options
+  );
+}
 
 const editorRef = ref(null);
 const editor = computed(() => editorRef.value?.editor);
