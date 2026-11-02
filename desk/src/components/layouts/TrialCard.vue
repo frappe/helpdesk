@@ -1,45 +1,56 @@
 <template>
+  <Button
+    v-if="content && isSidebarCollapsed"
+    variant="ghost"
+    :theme="content.theme === 'red' ? 'red' : 'gray'"
+    icon="lucide-circle-alert"
+    :label="content.title"
+    :tooltip="content.title"
+    @click="openBillingSettings"
+  />
   <SidebarCard
-    v-if="content"
+    v-else-if="content"
     :theme="content.theme"
     :title="content.title"
     :description="content.description"
     :dismissible="content.dismissible"
     :action="{
       label: content.actionLabel,
-      loading: opening,
-      onClick: openBilling,
+      onClick: openBillingSettings,
     }"
     @dismiss="dismiss('trial')"
   />
 </template>
 
 <script setup lang="ts">
-import { useCloudSettings } from "@/composables/cloudSettings";
+import { openBillingSettings } from "@/components/Settings/settingsModal";
 import { useBanners } from "@/composables/useBanners";
 import { __ } from "@/translation";
 import type { BillingTrial } from "@frappe/cloud-sdk";
-import { dayjsLocal, SidebarCard } from "frappe-ui";
+import {
+  Button,
+  dayjsLocal,
+  SidebarCard,
+  type SidebarCardProps,
+} from "frappe-ui";
 import { computed } from "vue";
 
-// From this many days left, the card turns amber
+type TrialCardContent = Required<
+  Pick<SidebarCardProps, "theme" | "title" | "description" | "dismissible">
+> & { actionLabel: string };
+
+defineProps<{ isSidebarCollapsed?: boolean }>();
+
 const URGENT_DAYS = 3;
 
 const { banner, dismiss } = useBanners();
-const { opening, openBilling } = useCloudSettings();
 
 const content = computed(() => {
   const trial = banner("trial")?.trial;
   return trial && trialCardContent(trial);
 });
 
-function trialCardContent(trial: BillingTrial): {
-  theme: "gray" | "amber" | "red";
-  title: string;
-  description: string;
-  actionLabel: string;
-  dismissible: boolean;
-} {
+function trialCardContent(trial: BillingTrial): TrialCardContent {
   if (trial.state === "Ended") {
     return {
       theme: "red",

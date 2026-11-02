@@ -7,7 +7,7 @@
         class="flex flex-col gap-2"
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
-        <TrialCard v-if="!isCollapsed" />
+        <TrialCard :is-sidebar-collapsed="isCollapsed" />
         <TrialBanner
           v-if="isFCSite && !isCloudSettingsAvailable()"
           :isSidebarCollapsed="isCollapsed"
@@ -73,10 +73,9 @@ import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermiss
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import {
+  confirmLoginToFrappeCloud,
   isCloudSettingsAvailable,
-  useCloudSettings,
-} from "@/composables/cloudSettings";
-import { confirmLoginToFrappeCloud } from "@/composables/fc";
+} from "@/composables/fc";
 import { useApps } from "@/composables/useApps";
 import { useBanners } from "@/composables/useBanners";
 import { useScreenSize } from "@/composables/screen";
@@ -110,7 +109,6 @@ import { showShortcutsModal } from "./layoutSettings";
 import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { __ } from "@/translation";
 import Globe from "~icons/lucide/globe";
-import LucideCreditCard from "~icons/lucide/credit-card";
 import LucideKeyboard from "~icons/lucide/keyboard";
 import LucideMoon from "~icons/lucide/moon";
 import LucideSun from "~icons/lucide/sun";
@@ -123,6 +121,7 @@ import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
 
 import {
+  openBillingSettings,
   setActiveSettingsTab,
   showSettingsModal,
 } from "../Settings/settingsModal";
@@ -143,7 +142,6 @@ const themeMenuItem = computed(() => ({
 }));
 
 const isFCSite = ref(window.is_fc_site);
-const { openBilling } = useCloudSettings();
 
 const profileSettings = computed(() => [
   appsMenuOption.value,
@@ -165,8 +163,8 @@ const profileSettings = computed(() => [
   isCloudSettingsAvailable()
     ? {
         label: __("Manage billing"),
-        icon: h(LucideCreditCard),
-        onClick: () => openBilling(),
+        icon: "lucide-credit-card",
+        onClick: openBillingSettings,
       }
     : {
         label: __("Login to Frappe Cloud"),
