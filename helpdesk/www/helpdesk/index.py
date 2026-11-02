@@ -5,7 +5,7 @@ from frappe.utils import cint, get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
-from helpdesk.utils import get_agent_name
+from helpdesk.utils import get_agent_name, is_frappe_version
 
 no_cache = 1
 
@@ -50,6 +50,8 @@ def get_boot():
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
             "telemetry": get_telemetry_boot(),
+            # list group by needs v16 query builder aggregates
+            "supports_group_by": is_frappe_version("16", above=True),
         }
     )
 

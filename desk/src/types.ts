@@ -702,6 +702,7 @@ declare global {
     default_country: string;
     apps: string[];
     telemetry: { enabled: boolean };
+    supports_group_by: boolean;
   }
 }
 

@@ -170,8 +170,8 @@ const selectBannerActions = [
 
 const options = computed(() => ({
   doctype: "HD Ticket",
-  // agents only for now; customers keep the plain list
-  groupBy: !isCustomerPortal.value,
+  // agents only for now, and only on Frappe v16+
+  groupBy: !isCustomerPortal.value && window.supports_group_by,
   // two fields Helpdesk never fills in, and the per-ticket feedback-link token
   groupByExclude: ["avg_response_time", "user_resolution_time", "key"],
   columnConfig: {

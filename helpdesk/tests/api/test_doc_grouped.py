@@ -1,15 +1,20 @@
 import csv
 import io
 import json
+import unittest
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.doc import export_grouped_list, get_grouped_list
 from helpdesk.test_utils import create_agent, make_ticket, make_todo, unique_email
+from helpdesk.utils import is_frappe_version
 
 
-class TestGroupedList(IntegrationTestCase):
+@unittest.skipUnless(
+    is_frappe_version("16", above=True), "group by needs Frappe v16 aggregates"
+)
+class TestGroupedList(FrappeTestCase):
     """Group By counts and exports only the tickets the list itself shows."""
 
     @classmethod
