@@ -15,6 +15,9 @@ const banners = createResource({
 const dismissResource = createResource({
   url: "helpdesk.api.banners.dismiss_banner",
 });
+const refreshTrialResource = createResource({
+  url: "helpdesk.api.banners.refresh_trial",
+});
 let started = false;
 
 export function useBanners() {
@@ -39,5 +42,11 @@ export function useBanners() {
     banners.reload();
   }
 
-  return { banner, isVisible, dismiss, reload: () => banners.reload() };
+  // The server caches the trial, so ask it to read Frappe Cloud again first
+  async function refreshTrial(): Promise<void> {
+    await refreshTrialResource.submit();
+    banners.reload();
+  }
+
+  return { banner, isVisible, dismiss, refreshTrial };
 }

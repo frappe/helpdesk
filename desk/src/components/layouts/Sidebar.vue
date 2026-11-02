@@ -8,10 +8,14 @@
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
 <<<<<<< HEAD
+<<<<<<< HEAD
         <TrialBanner
           v-if="isFCSite && !isCustomerPortal"
 =======
         <TrialCard v-if="!isCollapsed" />
+=======
+        <TrialCard :is-sidebar-collapsed="isCollapsed" />
+>>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
         <TrialBanner
           v-if="isFCSite && !isCloudSettingsAvailable()"
 >>>>>>> 34738e9 (feat(sidebar): trial card on Frappe Cloud v2)
@@ -74,10 +78,9 @@ import TicketFieldPermissionBanner from "@/components/layouts/TicketFieldPermiss
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import {
+  confirmLoginToFrappeCloud,
   isCloudSettingsAvailable,
-  useCloudSettings,
-} from "@/composables/cloudSettings";
-import { confirmLoginToFrappeCloud } from "@/composables/fc";
+} from "@/composables/fc";
 import { useApps } from "@/composables/useApps";
 import { useScreenSize } from "@/composables/screen";
 import { showNewContactModal } from "@/pages/contact/dialogState";
@@ -112,7 +115,6 @@ import { useShortcut } from "@/composables/shortcuts";
 import { __ } from "@/translation";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
-import LucideCreditCard from "~icons/lucide/credit-card";
 import LucideKeyboard from "~icons/lucide/keyboard";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
@@ -123,6 +125,7 @@ import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
+  openBillingSettings,
   setActiveSettingsTab,
   showSettingsModal,
 } from "../Settings/settingsModal";
@@ -143,7 +146,6 @@ const themeMenuItem = computed(() => ({
 }));
 
 const isFCSite = ref(window.is_fc_site);
-const { openBilling } = useCloudSettings();
 
 const customerPortalDropdown = computed(() => [
   {
@@ -182,8 +184,8 @@ const agentPortalDropdown = computed(() => [
   isCloudSettingsAvailable()
     ? {
         label: __("Manage billing"),
-        icon: h(LucideCreditCard),
-        onClick: () => openBilling(),
+        icon: "lucide-credit-card",
+        onClick: openBillingSettings,
       }
     : {
         label: __("Login to Frappe Cloud"),

@@ -21,7 +21,12 @@ from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
+<<<<<<< HEAD
 from helpdesk.utils import get_customers, is_frappe_version
+=======
+from helpdesk.integrations.frappe_cloud import TRIAL_DISMISSED_KEY, forget_trial
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_frappe_version
+>>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
 
 if is_frappe_version("16", above=True):
     from frappe.tests.utils import make_test_objects
@@ -1023,6 +1028,62 @@ def get_user_roles(user: str) -> list[str]:
     )
 
 
+<<<<<<< HEAD
+=======
+def get_granted_rights(role: str) -> set[tuple]:
+    """(doctype, permlevel, right, if_owner) for every right the role's DocPerms grant."""
+    perms = frappe.get_all(
+        "DocPerm", {"role": role}, ["parent", "permlevel", "if_owner", *rights]
+    )
+    return {
+        (p.parent, p.permlevel, r, p.if_owner) for p in perms for r in rights if p[r]
+    }
+
+
+def show_only_banners(*banners: str):
+    """Turn on exactly `banners` in HD Settings and turn every other banner off."""
+    for banner, flag in BANNERS.items():
+        frappe.db.set_single_value("HD Settings", flag, int(banner in banners))
+
+
+def fake_cloud_settings(trial: dict | None) -> MagicMock:
+    """Stand-in for Frappe's Cloud Settings on a v2 site whose billing reports `trial`."""
+    cloud_settings = MagicMock()
+    cloud_settings.is_cloud_settings_enabled.return_value = True
+    cloud_settings.get_billing.return_value = {"trial": trial}
+    return cloud_settings
+
+
+def clear_trial_cache(user: str) -> None:
+    """Forget the cached trial and `user`'s dismissal; redis is not rolled back between tests."""
+    forget_trial()
+    frappe.cache.delete_value(TRIAL_DISMISSED_KEY, user=user)
+
+
+def dismiss_banner_as(user: str, banner: str) -> MagicMock:
+    """Dismiss `banner` as `user`, returning the realtime publisher mock."""
+    previous_user = frappe.session.user
+    frappe.set_user(user)
+    try:
+        with patch("frappe.publish_realtime") as publish_realtime:
+            dismiss_banner(banner)
+    finally:
+        frappe.set_user(previous_user)
+    return publish_realtime
+
+
+def ticket_pings(publish_realtime: MagicMock) -> set[str]:
+    return {
+        call.kwargs["user"]
+        for call in publish_realtime.call_args_list
+        if call.args
+        and call.args[0] == "helpdesk:ticket-update"
+        and call.kwargs.get("user")
+        and not call.kwargs.get("room")
+    }
+
+
+>>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
 def make_assigned_ticket(agent: str, subject: str, status: str | None = None):
     """A ticket that has been responded to and is assigned to `agent`, so dashboard
     queries filtered by that agent only see the tickets a test creates."""

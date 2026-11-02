@@ -5,7 +5,13 @@ from frappe.utils import cint, get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
+<<<<<<< HEAD
 from helpdesk.utils import get_agent_name
+=======
+from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
+from helpdesk.integrations import frappe_cloud
+from helpdesk.utils import get_agent_name, is_agent
+>>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
 
 no_cache = 1
 
@@ -52,8 +58,12 @@ def get_boot():
 <<<<<<< HEAD
 =======
             "telemetry": get_telemetry_boot(),
+<<<<<<< HEAD
             "cloud_settings": get_cloud_settings_boot(),
 >>>>>>> 34738e9 (feat(sidebar): trial card on Frappe Cloud v2)
+=======
+            "cloud_settings": frappe_cloud.get_boot_context(),
+>>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
         }
     )
 
@@ -77,6 +87,7 @@ def get_telemetry_boot():
         return boot_config()
     except Exception:
         return {"enabled": False}
+<<<<<<< HEAD
 
 
 def get_cloud_settings_boot():
@@ -87,3 +98,5 @@ def get_cloud_settings_boot():
         return {"enabled": False}
     return get_boot_context()
 >>>>>>> 34738e9 (feat(sidebar): trial card on Frappe Cloud v2)
+=======
+>>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
