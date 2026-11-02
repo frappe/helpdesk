@@ -355,6 +355,9 @@ def get_filterable_fields(
 
     from_doc_fields = from_doc_fields.run(as_dict=True)
     # from hd ticket template get children with fieldname and hidden_from_customer
+    for field in [*from_doc_fields, *from_custom_fields]:
+        if field.get("label"):
+            field["label"] = _(field["label"])
 
     res = []
     res.extend(from_doc_fields)
@@ -366,7 +369,7 @@ def get_filterable_fields(
             {
                 "fieldname": "_assign",
                 "fieldtype": "Link",
-                "label": "Assigned to",
+                "label": _("Assigned to"),
                 "options": "HD Agent",
             }
         )
@@ -374,7 +377,7 @@ def get_filterable_fields(
             {
                 "fieldname": "_user_tags",
                 "fieldtype": "Link",
-                "label": "Tags",
+                "label": _("Tags"),
                 "options": "Tag",
             }
         )
@@ -387,25 +390,34 @@ def get_filterable_fields(
             res = [r for r in res if r.get("fieldname") != "agent_group"]
 
     standard_fields = [
-        {"fieldname": "name", "fieldtype": "Link", "label": "ID", "options": doctype},
+        {
+            "fieldname": "name",
+            "fieldtype": "Link",
+            "label": _("ID"),
+            "options": doctype,
+        },
         {
             "fieldname": "owner",
             "fieldtype": "Link",
-            "label": "Created By",
+            "label": _("Created By"),
             "options": "User",
         },
         {
             "fieldname": "modified_by",
             "fieldtype": "Link",
-            "label": "Last Updated By",
+            "label": _("Last Updated By"),
             "options": "User",
         },
-        {"fieldname": "creation", "fieldtype": "Datetime", "label": "Created On"},
-        {"fieldname": "modified", "fieldtype": "Datetime", "label": "Last Updated On"},
+        {"fieldname": "creation", "fieldtype": "Datetime", "label": _("Created On")},
+        {
+            "fieldname": "modified",
+            "fieldtype": "Datetime",
+            "label": _("Last Updated On"),
+        },
         {
             "fieldname": "__assigned_on",
             "fieldtype": "Date",
-            "label": "Assigned on",
+            "label": _("Assigned on"),
         },
     ]
     for field in standard_fields:
@@ -420,7 +432,7 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
     fields = [
         {
-            "label": field.label,
+            "label": _(field.label),
             "value": field.fieldname,
         }
         for field in fields
@@ -431,11 +443,11 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
         fields = get_customer_portal_fields(doctype, fields)
 
     standard_fields = [
-        {"label": "Name", "value": "name"},
-        {"label": "Created On", "value": "creation"},
-        {"label": "Last Modified", "value": "modified"},
-        {"label": "Modified By", "value": "modified_by"},
-        {"label": "Owner", "value": "owner"},
+        {"label": _("Name"), "value": "name"},
+        {"label": _("Created On"), "value": "creation"},
+        {"label": _("Last Modified"), "value": "modified"},
+        {"label": _("Modified By"), "value": "modified_by"},
+        {"label": _("Owner"), "value": "owner"},
     ]
 
     fields.extend(standard_fields)
@@ -448,7 +460,7 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
     meta = frappe.get_meta(doctype)
     fields = [field for field in meta.fields if field.in_standard_filter]
     quick_filters = []
-    name_filter = {"label": "ID", "name": "name", "type": "Data"}
+    name_filter = {"label": _("ID"), "name": "name", "type": "Data"}
     if doctype == "Contact":
         quick_filters.append(name_filter)
         return quick_filters

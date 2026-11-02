@@ -163,17 +163,19 @@ export function twoUnitDuration(milliseconds: number): string {
   const seconds = duration.seconds();
 
   if (years > 0) {
-    return `${years}y ${months}mo`;
+    return __("{0}y {1}mo", [years, months]);
   } else if (months > 0) {
-    return `${months}mo ${days}d`;
+    return __("{0}mo {1}d", [months, days]);
   } else if (days > 0) {
-    return `${days}d ${hours}h`;
+    return __("{0}d {1}h", [days, hours]);
   } else if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+    return __("{0}h {1}m", [hours, minutes]);
   } else if (minutes > 0) {
-    return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+    return seconds > 0
+      ? __("{0}m {1}s", [minutes, seconds])
+      : __("{0}m", [minutes]);
   }
-  return `${seconds}s`;
+  return __("{0}s", [seconds]);
 }
 
 export function isContentEmpty(content: string) {
@@ -255,14 +257,14 @@ export function shortDuration(target: string): string {
     const days = Math.floor(seconds / DAY);
     const hours = Math.floor((seconds % DAY) / HOUR);
     const dayLabel = countLabel(days, __("1 day"), __("{0} days"));
-    return hours ? `${dayLabel} ${hours}h` : dayLabel;
+    return hours ? `${dayLabel} ${__("{0}h", [hours])}` : dayLabel;
   }
   if (seconds >= HOUR) {
     const hours = Math.floor(seconds / HOUR);
     const minutes = Math.floor((seconds % HOUR) / MINUTE);
-    return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+    return minutes ? __("{0}h {1}m", [hours, minutes]) : __("{0}h", [hours]);
   }
-  return `${Math.floor(seconds / MINUTE)}m`;
+  return __("{0}m", [Math.floor(seconds / MINUTE)]);
 }
 
 /**

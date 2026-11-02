@@ -1,3 +1,4 @@
+import { __ } from "@/translation";
 import { isSlaMissed, twoUnitDuration } from "@helpdesk/shared/utils";
 import { dayjsLocal } from "frappe-ui";
 import { computed, type ComputedRef, type Ref } from "vue";
@@ -73,7 +74,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
         ? twoUnitDuration(d.first_response_failed_by * 1000)
         : shortDuration(d.first_responded_on, d.response_by);
       return {
-        ...metric("failed", `Failed by ${failed}`, "red", {
+        ...metric("failed", __("Failed by {0}", [failed]), "red", {
           dueBy: d.response_by,
           actual: d.first_responded_on,
           delay: `+${failed}`,
@@ -90,7 +91,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
     if (dayjsLocal().isBefore(dayjsLocal(d.response_by))) {
       return metric(
         "due",
-        `Due in ${coarseDuration(d.response_by)}`,
+        __("Due in {0}", [coarseDuration(d.response_by)]),
         "orange",
         {
           dueBy: d.response_by,
@@ -98,7 +99,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
       );
     }
     const overdue = coarseDuration(d.response_by);
-    return metric("overdue", `Overdue by ${overdue}`, "red", {
+    return metric("overdue", __("Overdue by {0}", [overdue]), "red", {
       dueBy: d.response_by,
       delay: `+${overdue}`,
     });
@@ -138,7 +139,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
         ? twoUnitDuration(d.resolution_failed_by * 1000)
         : shortDuration(d.resolution_date, d.resolution_by);
       return {
-        ...metric("failed", `Failed by ${failed}`, "red", {
+        ...metric("failed", __("Failed by {0}", [failed]), "red", {
           dueBy: d.resolution_by,
           actual: d.resolution_date,
           delay: `+${failed}`,
@@ -155,13 +156,13 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
     if (dayjsLocal().isBefore(dayjsLocal(d.resolution_by))) {
       return metric(
         "due",
-        `Due in ${coarseDuration(d.resolution_by)}`,
+        __("Due in {0}", [coarseDuration(d.resolution_by)]),
         "violet",
         { dueBy: d.resolution_by }
       );
     }
     const overdue = coarseDuration(d.resolution_by);
-    return metric("overdue", `Overdue by ${overdue}`, "red", {
+    return metric("overdue", __("Overdue by {0}", [overdue]), "red", {
       dueBy: d.resolution_by,
       delay: `+${overdue}`,
     });

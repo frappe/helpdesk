@@ -25,6 +25,7 @@
 import FieldLabel from "@/components/FieldLabel.vue";
 import TicketPriority from "@/components/TicketPriority.vue";
 import { APIOptions, Field, FieldValue } from "@/types";
+import { __ } from "@/translation";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui";
 import {
@@ -97,7 +98,7 @@ const isSearchableSelect = computed(
 // the Combobox feeds one placeholder to both trigger and search box, so it
 // gets none and its prefix slot carries the empty state instead
 const emptyLabel = computed(
-  () => props.field.placeholder || `Add ${props.field.label}`
+  () => props.field.placeholder || __("Add {0}", [__(props.field.label)])
 );
 
 const usesCombobox = computed(
