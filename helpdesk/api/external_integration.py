@@ -26,7 +26,8 @@ def create_ticket_from_hmis(
     custom_phone: Optional[str] = None,
     custom_section: Optional[str] = None,
     api_key: Optional[str] = None,
-    api_secret: Optional[str] = None
+    api_secret: Optional[str] = None,
+    source: Optional[str] = None
 ):
     """
     Create a helpdesk ticket from HMIS system
@@ -122,7 +123,7 @@ def create_ticket_from_hmis(
 
     # Add custom fields if provided
     if custom_fields and isinstance(custom_fields, dict):
-        ticket_data.update(custom_fields)
+        ticket_data.update({k: v for k, v in custom_fields.items() if str(k).startswith("custom_")})
 
     # Store HMIS reference in custom field if it exists
     if external_reference_id:
@@ -158,6 +159,10 @@ def create_ticket_from_hmis(
 
     if custom_section:
         ticket_data["custom_section"] = custom_section
+
+    if source in ("F360", "P360", "Admin Central"):
+        ticket_data["brand"] = source
+        ticket_data["source"] = source
 
     # Step 6: Create the ticket
     try:
