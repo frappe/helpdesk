@@ -496,15 +496,12 @@ function getChartType({ type, key, ...props }: any) {
   return h(type === "donut" ? DonutChart : BarChart, props);
 }
 
-// include today, so last 7 days is today and the 6 days before
+// include today, so last 7 days is today and the 6 days before. The site's
+// today, not the browser's: tickets are dated in the site's timezone.
 function getLastXDays(range: number = 30): string {
-  const today = new Date();
-  const lastXDate = new Date(today);
-
-  lastXDate.setDate(today.getDate() - (range - 1));
-  return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format(
-    "YYYY-MM-DD"
-  )}`;
+  const today = dayjs().tz(window.timezone?.system);
+  const from = today.subtract(range - 1, "day");
+  return `${from.format("YYYY-MM-DD")},${today.format("YYYY-MM-DD")}`;
 }
 
 const showDatePicker = ref(false);

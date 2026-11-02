@@ -112,10 +112,6 @@
    "select": 1,
    "share": 1,
    "write": 1
-  },
-  {
-   "read": 1,
-   "role": "HD Customer"
   }
  ],
  "row_format": "Dynamic",

@@ -64,7 +64,7 @@
       >
         <LoadingIndicator class="w-4" />
       </div>
-      <div
+      <EmptyState
         v-if="
           !savedRepliesListResource?.list?.loading &&
           !savedRepliesListResource?.data?.length

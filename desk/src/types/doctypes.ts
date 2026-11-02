@@ -91,10 +91,6 @@ export interface HDTicket extends DocType {
   email_account?: string;
   /** Via Customer Portal: Check */
   via_customer_portal: 0 | 1;
-  /** Attachment: Attach */
-  attachment?: any;
-  /** Content Type: Data */
-  content_type?: string;
   /** Feedback (Extra): Long Text */
   feedback_extra?: any;
   /** Feedback (Option): Link (HD Ticket Feedback Option) */

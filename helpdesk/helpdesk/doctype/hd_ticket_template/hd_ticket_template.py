@@ -4,38 +4,40 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import comma_and
 
-from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
+from helpdesk.consts import (
+    DEFAULT_TICKET_TEMPLATE,
+    NEVER_CUSTOMER_VISIBLE_FIELDS,
+    SERVER_COMPUTED_FIELDS,
+    TICKET_INTERNAL_FIELD_PERMLEVEL,
+)
 from helpdesk.utils import capture_event
+
+# linked from the hide warning below
+PERMISSION_LEVEL_DOCS = (
+    "https://docs.frappe.io/helpdesk/customization/perm-levels-in-helpdesk"
+)
 
 
 class HDTicketTemplate(Document):
     def validate(self):
         self.verify_field_exists()
         self.validate_unallowed_fields()
+        self.validate_customer_visible_fields()
+        self.warn_customer_hidden_fields()
 
     def verify_field_exists(self):
+        # meta, not a DB lookup: the DB matches case-insensitively and would
+        # let `status_Category` past every check below
+        meta = frappe.get_meta("HD Ticket")
         for f in self.fields:
-            if not f.fieldname:
-                continue
-            exists = self.docfield_exists(f.fieldname) or self.custom_field_exists(
-                f.fieldname
-            )
-            if not exists:
+            if f.fieldname and not meta.has_field(f.fieldname):
                 text = _("Field `{0}` does not exist in Ticket").format(f.fieldname)
                 frappe.throw(text)
 
-    def docfield_exists(self, fieldname: str):
-        return frappe.db.exists(
-            {
-                "doctype": "DocField",
-                "fieldname": fieldname,
-                "parent": "HD Ticket",
-            }
-        )
-
     def validate_unallowed_fields(self):
-        unallowed_fields = ["status", "agreement_status"]
+        unallowed_fields = ["status", "agreement_status", "subject"]
         for f in self.fields:
             if f.fieldname in unallowed_fields:
                 text = _("Field `{0}` is not allowed in Ticket Template").format(
@@ -43,14 +45,84 @@ class HDTicketTemplate(Document):
                 )
                 frappe.throw(text)
 
-    def custom_field_exists(self, fieldname: str):
-        return frappe.db.exists(
-            {
-                "doctype": "Custom Field",
-                "fieldname": fieldname,
-                "dt": "HD Ticket",
-            }
+    def validate_customer_visible_fields(self):
+        """Templates only narrow what permission levels allow, never widen."""
+        for f in self.fields:
+            if not f.fieldname or f.visible_to == "Agents":
+                continue
+            if f.fieldname in NEVER_CUSTOMER_VISIBLE_FIELDS:
+                text = _(
+                    "Field `{0}` is a secret and can never be shown to customers."
+                ).format(f.fieldname)
+                frappe.throw(text)
+            if f.fieldname in SERVER_COMPUTED_FIELDS:
+                text = _(
+                    "Field `{0}` is set by the system and cannot be shown to customers."
+                ).format(f.fieldname)
+                frappe.throw(text)
+            if self.current_permlevel(f.fieldname) >= TICKET_INTERNAL_FIELD_PERMLEVEL:
+                text = _(
+                    "Field `{0}` is internal and cannot be shown to customers."
+                    " Lower its permission level in Customize Form to show it"
+                    " in the ticket form."
+                ).format(f.fieldname)
+                frappe.throw(text)
+
+    def warn_customer_hidden_fields(self):
+        """Hiding covers helpdesk pages only; say so when the API still serves it."""
+        if frappe.flags.in_migrate or frappe.flags.in_patch:
+            return
+        meta = frappe.get_meta("HD Ticket")
+        exposed = [
+            meta.get_translated_label(f.fieldname)
+            for f in self.newly_hidden_rows()
+            if self.current_permlevel(f.fieldname) < TICKET_INTERNAL_FIELD_PERMLEVEL
+        ]
+        if not exposed:
+            return
+        link = '<a href="/desk/customize-form?doc_type=HD%20Ticket">{0}</a>'.format(
+            _("Customize Form")
         )
+        # opens in a new tab so an unsaved template is not lost
+        docs = '<a href="{0}" target="_blank">{1}</a>'.format(
+            PERMISSION_LEVEL_DOCS, _("here")
+        )
+        if len(exposed) == 1:
+            text = _(
+                "{0} is successfully hidden from customers in the ticket form."
+                " Raise its permission level in {1} to hide it from the API layer."
+                " Read more about permission levels {2}."
+            ).format(exposed[0], link, docs)
+        else:
+            text = _(
+                "{0} are successfully hidden from customers in the ticket form."
+                " Raise their permission levels in {1} to hide them from the API layer."
+                " Read more about permission levels {2}."
+            ).format(comma_and(exposed, add_quotes=False), link, docs)
+        frappe.msgprint(
+            text, title=_("Ticket form successfully updated"), indicator="blue"
+        )
+
+    def newly_hidden_rows(self) -> list:
+        """Rows this save marks Agents that were not Agents before."""
+        previous = self.get_doc_before_save()
+        hidden_before = (
+            {f.fieldname for f in previous.fields if f.visible_to == "Agents"}
+            if previous
+            else set()
+        )
+        return [
+            f
+            for f in self.fields
+            if f.fieldname
+            and f.visible_to == "Agents"
+            and f.fieldname not in hidden_before
+        ]
+
+    def current_permlevel(self, fieldname: str) -> int:
+        """Live meta check, so a level changed in Customize Form counts."""
+        field = frappe.get_meta("HD Ticket").get_field(fieldname)
+        return field.permlevel if field else 0
 
     def on_update(self):
         capture_event("ticket_template_updated")
