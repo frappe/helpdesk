@@ -34,7 +34,7 @@ jobs:
       commit: ${{ github.sha }}
       channel: stable
     secrets:
-      registry_token: ${{ secrets.MARKETPLACE_PR_TOKEN }}
+      registry_token: ${{ secrets.RELEASE_TOKEN }}
 
   marketplace-merge:
     name: Merge the marketplace release PR
@@ -43,7 +43,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - env:
-          GH_TOKEN: ${{ secrets.MARKETPLACE_PR_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           GH_REPO: frappe/marketplace
           COMMIT: ${{ github.sha }}
         run: |
