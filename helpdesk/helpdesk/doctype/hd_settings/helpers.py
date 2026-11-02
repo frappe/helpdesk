@@ -137,7 +137,8 @@ def get_rendered_banner_msg(ticket_id):
         "expected_response": expected_response,
     }
 
-    rendered = frappe.render_template(banner_msg, context)
+    # Admin-only template from HD Settings, ticket data passed as context
+    rendered = frappe.render_template(banner_msg, context)  # nosemgrep
 
     return {
         "banner_msg": rendered,

@@ -12,7 +12,8 @@ no_cache = 1
 
 
 def get_context(context):
-    frappe.db.commit()
+    # GET requests don't commit; keeps session writes, as frappe/www/billing.py
+    frappe.db.commit()  # nosemgrep
     redirect_customer_home()
     context.boot = get_boot()
 
