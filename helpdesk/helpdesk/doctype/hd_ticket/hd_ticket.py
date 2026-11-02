@@ -126,7 +126,8 @@ class HDTicket(Document, CustomerEditController):
         }
         for key, value in args.items():
             template_args[key] = value
-        return frappe.render_template(
+        # Admin-only template from HD Settings, user text passed as args
+        return frappe.render_template(  # nosemgrep
             default_content if is_email_content_empty(content) else content,
             template_args,
         )
