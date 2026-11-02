@@ -26,7 +26,7 @@ Set `ADMIN_PASSWORD` if the site's Administrator password is not `admin`.
   - `tickets/new/`: `TicketNew.vue` (`/tickets/new`) and the Studio portal's `new_ticket` page (`/help/my-tickets/new`)
   - `knowledge-base/`, `customer-management/` and `settings/`: one spec per page or settings tab
   - A feature spanning several pages, like `tickets/form-script.spec.ts`, keeps one file.
-  - App wide specs (`auth`, `onboarding`, `permissions`, `navigation`) sit at the top of `tests/`.
+  - App wide specs (`auth`, `permissions`, `navigation`) sit at the top of `tests/`.
 
   Every role that touches a page is tested in its spec. Each spec creates its own data with unique names.
 - `fixtures/` holds files the specs upload.
