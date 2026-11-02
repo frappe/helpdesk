@@ -215,7 +215,7 @@ class CustomEmailAccount(EmailAccount):
                     frappe.log_error(
                         title=_(
                             "Error processing email at index {0}, message: {1}"
-                        ).format(index, e),
+                        ).format(index, str(e)),
                         message=frappe.get_traceback(),
                     )
                     self.handle_bad_emails(index, message, frappe.get_traceback())
