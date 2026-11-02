@@ -1,6 +1,6 @@
 name: Pre-build assets
 
-# develop pushes go to marketplace as nightly; main release commits as stable.
+# Only main release commits (on_release.yml) go to marketplace, as stable.
 
 on:
   push:
@@ -25,14 +25,14 @@ jobs:
     name: Open the marketplace release PR
     needs: assets
     if: >-
-      github.ref_name == 'develop' ||
+      github.ref_name == 'main' &&
       startsWith(github.event.head_commit.message, 'chore(release):')
     uses: frappe/marketplace/.github/workflows/publish-release.yml@main
     with:
       app: helpdesk
       branch: ${{ github.ref_name }}
       commit: ${{ github.sha }}
-      channel: ${{ github.ref_name == 'main' && 'stable' || 'nightly' }}
+      channel: stable
     secrets:
       registry_token: ${{ secrets.MARKETPLACE_PR_TOKEN }}
 
