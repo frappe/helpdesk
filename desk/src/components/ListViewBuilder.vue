@@ -2,15 +2,10 @@
   <!-- View Controls -->
   <div
     :class="[
-<<<<<<< HEAD
-      'flex items-center justify-between gap-2 px-5 pb-4 pt-3 ',
-      list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
-=======
       'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
       groupBy || list.loading || list?.data?.data?.length > 0
         ? 'relative'
         : 'absolute inset-x-0',
->>>>>>> 5a476af (fix: show placeholder rows while a ticket list loads, below its toolbar)
     ]"
     v-if="showViewControls"
   >
