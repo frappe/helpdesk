@@ -197,7 +197,6 @@ fixtures = [
     {"dt": "HD Incident Model"},
     {"dt": "HD Support Level"},
     {"dt": "Workflow", "filters": [["document_type", "=", "HD Article"]]},
-    {"dt": "HD Team"},  # includes HD Team Member child rows (regional/county assignments)
 ]
 
 # CLI Commands
