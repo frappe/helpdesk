@@ -1,12 +1,12 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from helpdesk.api.onboarding import mark_persona_captured
 from helpdesk.overrides.user_invitation import HelpdeskUserInvitation
 
 BRAND = "Acme Support"
 
 
+<<<<<<< HEAD:helpdesk/tests/api/test_onboarding.py
 class TestMarkPersonaCaptured(FrappeTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
@@ -41,6 +41,9 @@ class TestMarkPersonaCaptured(FrappeTestCase):
 
 
 class TestInvitationTitleOverride(FrappeTestCase):
+=======
+class TestInvitationTitleOverride(IntegrationTestCase):
+>>>>>>> a3f586a (chore: remove onboarding persona questionnaire):helpdesk/tests/test_user_invitation.py
     def setUp(self) -> None:
         frappe.set_user("Administrator")
         frappe.db.set_single_value("HD Settings", "brand_name", "")

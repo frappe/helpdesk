@@ -57,9 +57,13 @@ export const useAuthStore = defineStore("auth", () => {
   const userTeams: ComputedRef<string[]> = computed(
     () => user__.value.user_teams
   );
+<<<<<<< HEAD
   const personaCaptured: ComputedRef<boolean> = computed(
     () => !!user__.value.persona_captured
   );
+=======
+  const language: ComputedRef<string> = computed(() => user__.value.language);
+>>>>>>> a3f586a (chore: remove onboarding persona questionnaire)
 
   function sessionUser() {
     const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
@@ -100,8 +104,11 @@ export const useAuthStore = defineStore("auth", () => {
     availabilityChangedBy,
     timezone,
     language,
+<<<<<<< HEAD
     userTeams,
     personaCaptured,
+=======
+>>>>>>> a3f586a (chore: remove onboarding persona questionnaire)
     user,
     logout,
   };

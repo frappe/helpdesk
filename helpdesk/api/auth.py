@@ -50,12 +50,15 @@ def get_user():
     language = user.language or frappe.db.get_single_value(
         "System Settings", "language"
     )
+<<<<<<< HEAD
     user_team = get_agents_team()
     user_team_names = [team["team_name"] for team in user_team]
     # Ride the boot so the onboarding guard decides without an extra round-trip.
     persona_captured = bool(
         frappe.db.get_single_value("HD Settings", "persona_captured")
     )
+=======
+>>>>>>> a3f586a (chore: remove onboarding persona questionnaire)
 
     return {
         "has_desk_access": has_desk_access,
@@ -74,7 +77,17 @@ def get_user():
         "availability": availability.get("availability"),
         "availability_changed_on": availability.get("availability_changed_on"),
         "availability_changed_by": availability.get("availability_changed_by"),
+<<<<<<< HEAD
         "persona_captured": persona_captured,
+=======
+        "availability_expires_on": availability.get("availability_expires_on"),
+        # what "Clear now" in the availability menu moves the agent to
+        "default_agent_status": (
+            frappe.db.get_single_value("HD Settings", "default_agent_status")
+            if agent_name
+            else None
+        ),
+>>>>>>> a3f586a (chore: remove onboarding persona questionnaire)
     }
 
 

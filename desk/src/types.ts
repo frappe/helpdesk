@@ -700,7 +700,12 @@ declare global {
     agent: string | null;
     default_country: string;
     apps: string[];
+<<<<<<< HEAD
     telemetry: { enabled: boolean };
+=======
+    cloud_settings?: { enabled: boolean };
+    customer_home_page: string;
+>>>>>>> a3f586a (chore: remove onboarding persona questionnaire)
   }
 }
 

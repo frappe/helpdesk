@@ -1,5 +1,6 @@
 import frappe
 
+<<<<<<< HEAD
 from helpdesk.utils import agent_manager_only
 
 
@@ -27,6 +28,8 @@ def get_welcome_ticket() -> str | None:
     """Name of the seeded welcome ticket, if it still exists."""
     return frappe.db.get_value("HD Ticket", {"subject": "Welcome to Helpdesk"}, "name")
 
+=======
+>>>>>>> a3f586a (chore: remove onboarding persona questionnaire)
 
 @frappe.whitelist()
 def get_first_ticket(ticket: str | None = None):
