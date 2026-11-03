@@ -58,6 +58,7 @@
         theme="gray"
         variant="solid"
         :label="__('Create ticket')"
+        icon-left="lucide-plus"
         :loading="isCreating || uploading > 0"
         @click="createTicket"
       />

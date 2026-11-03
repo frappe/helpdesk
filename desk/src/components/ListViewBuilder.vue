@@ -3,60 +3,68 @@
   <div
     :class="[
       'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
-      groupBy || list.loading || list?.data?.data?.length > 0
+      groupBy || isLoadingRows || list?.data?.data?.length > 0
         ? 'relative'
         : 'absolute inset-x-0',
     ]"
-    v-if="showViewControls"
+    v-if="!options.hideViewControls"
   >
-    <QuickFilters v-if="!isMobileView" />
-    <div v-if="!isMobileView" class="-ms-2 h-5 border-s"></div>
-    <div
-      class="flex items-start gap-2 justify-end h-full py-1 ps-0.5"
-      v-if="!isMobileView"
-    >
-      <Button
-        :label="__('Save Changes')"
-        v-if="isViewUpdated && canSaveView"
-        @click="handleViewUpdate"
-      />
-      <Reload @click="handleReload" :loading="list.loading" />
-      <Filter />
-      <!-- a grouped list sorts and sizes from its own column headers -->
-      <SortBy v-if="!groupBy" :hide-label="isMobileView" />
-      <GroupBy
-        v-if="options.groupBy"
-        :modelValue="groupBy"
-        :doctype="options.doctype"
-        :exclude="options.groupByExclude"
-        @update:modelValue="updateGroupBy"
-      />
-      <Dropdown v-if="groupBy" :options="exportGroupOptions">
-        <Button :label="__('Export')" icon-left="lucide-download" />
-      </Dropdown>
-      <ColumnSettings
-        :hide-label="isMobileView"
-        v-if="!options.hideColumnSetting && !groupBy"
-      />
-    </div>
-    <div v-else class="flex justify-between items-center w-full">
-      <Filter />
-      <div class="flex items-center gap-2">
+    <ViewControlsSkeleton
+      v-if="!viewControlsReady"
+      :is-mobile-view="isMobileView"
+      :group-by="Boolean(options.groupBy)"
+      :column-setting="!options.hideColumnSetting"
+    />
+    <template v-else>
+      <QuickFilters v-if="!isMobileView" />
+      <div v-if="!isMobileView" class="-ms-2 h-5 border-s"></div>
+      <div
+        class="flex items-start gap-2 justify-end h-full py-1 ps-0.5"
+        v-if="!isMobileView"
+      >
+        <Button
+          :label="__('Save Changes')"
+          v-if="isViewUpdated && canSaveView"
+          @click="handleViewUpdate"
+        />
         <Reload @click="handleReload" :loading="list.loading" />
+        <Filter />
+        <!-- a grouped list sorts and sizes from its own column headers -->
         <SortBy v-if="!groupBy" :hide-label="isMobileView" />
         <GroupBy
           v-if="options.groupBy"
           :modelValue="groupBy"
           :doctype="options.doctype"
           :exclude="options.groupByExclude"
-          hideLabel
           @update:modelValue="updateGroupBy"
         />
         <Dropdown v-if="groupBy" :options="exportGroupOptions">
-          <Button :tooltip="__('Export')" icon="lucide-download" />
+          <Button :label="__('Export')" icon-left="lucide-download" />
         </Dropdown>
+        <ColumnSettings
+          :hide-label="isMobileView"
+          v-if="!options.hideColumnSetting && !groupBy"
+        />
       </div>
-    </div>
+      <div v-else class="flex justify-between items-center w-full">
+        <Filter />
+        <div class="flex items-center gap-2">
+          <Reload @click="handleReload" :loading="list.loading" />
+          <SortBy v-if="!groupBy" :hide-label="isMobileView" />
+          <GroupBy
+            v-if="options.groupBy"
+            :modelValue="groupBy"
+            :doctype="options.doctype"
+            :exclude="options.groupByExclude"
+            hideLabel
+            @update:modelValue="updateGroupBy"
+          />
+          <Dropdown v-if="groupBy" :options="exportGroupOptions">
+            <Button :tooltip="__('Export')" icon="lucide-download" />
+          </Dropdown>
+        </div>
+      </div>
+    </template>
   </div>
 
   <!-- Group By summary: one row per group instead of the records -->
@@ -136,20 +144,15 @@
       </ListFooter>
     </div>
   </template>
-  <!-- Loading State: header and placeholder rows, like the grouped table -->
-  <div
-    v-else-if="list.loading && !list.data?.data?.length"
-    class="flex-1 overflow-hidden"
-  >
-    <div class="mb-2 h-[34px] rounded-4 bg-surface-gray-2 sm:mx-5 mx-3" />
-    <div
-      v-for="i in 8"
-      :key="i"
-      class="flex h-10 items-center gap-4 border-b px-2 sm:mx-5 mx-3"
-    >
-      <Skeleton v-for="j in 4" :key="j" class="h-3 flex-1 rounded-1" />
-    </div>
-  </div>
+  <!-- Loading State -->
+  <ListViewSkeleton
+    v-else-if="isLoadingRows"
+    :columns="columns"
+    :row-count="Math.min(defaultParams.page_length_count, 20)"
+    :selectable="options.selectable"
+    :footer="false"
+    aria-busy="true"
+  />
   <!-- List View -->
   <ListView
     v-else-if="list.data?.data.length > 0"
@@ -243,7 +246,7 @@
   </div>
   <!-- Empty State -->
   <EmptyState
-    v-else-if="!groupBy && !list.loading"
+    v-else-if="!groupBy && !isLoadingRows"
     :title="emptyState.title"
     :icon="emptyState.icon"
     :description="emptyState.description"
@@ -268,8 +271,10 @@ import {
   QuickFilters,
   Reload,
   SortBy,
+  ViewControlsSkeleton,
 } from "@/components/view-controls";
 import { Filter, normalizeFilters } from "@helpdesk/shared/filter";
+import ListViewSkeleton from "@helpdesk/shared/ListViewSkeleton.vue";
 import { useScreenSize } from "@/composables/screen";
 import {
   currentView as headerView,
@@ -291,7 +296,6 @@ import {
   Dropdown,
   frappeRequest,
   Rating,
-  Skeleton,
   TabButtons,
   toast,
   Tooltip,
@@ -530,6 +534,12 @@ const list = createResource({
   },
 });
 
+// Until the first response lands there is nothing to call empty, so keep the skeleton up.
+const isLoadingRows = computed(
+  () =>
+    !list.data?.data?.length && (list.loading || (!list.fetched && !list.error))
+);
+
 const exposeFunctions = {
   list,
   reload,
@@ -735,14 +745,9 @@ function applyColumnFilter(key: string, operator: string, value: any) {
   applyFilters(conditions);
 }
 
-const showViewControls = computed(() => {
-  return (
-    !options.value.hideViewControls &&
-    filterableFields.data &&
-    sortableFields.data &&
-    quickFilters.data
-  );
-});
+const viewControlsReady = computed(() =>
+  Boolean(filterableFields.data && sortableFields.data && quickFilters.data)
+);
 
 const listViewData = reactive({
   list,

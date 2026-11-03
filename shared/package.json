@@ -26,6 +26,7 @@
 		"./ChangePasswordModal.vue": "./src/ChangePasswordModal.vue",
 		"./AvatarRow.vue": "./src/AvatarRow.vue",
 		"./ExportModal.vue": "./src/ExportModal.vue",
+		"./ListViewSkeleton.vue": "./src/ListViewSkeleton.vue",
 		"./ArticleIcon.vue": "./src/ArticleIcon.vue",
 		"./OrganizationsIcon.vue": "./src/OrganizationsIcon.vue",
 		"./settings/*": "./src/settings/*"

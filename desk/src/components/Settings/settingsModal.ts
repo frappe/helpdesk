@@ -37,8 +37,22 @@ import SettingsGear from "~icons/lucide/settings";
 import ZapIcon from "~icons/lucide/zap";
 import ProfilePage from "./Profile/ProfilePage.vue";
 import Preferences from "./Preferences/Preferences.vue";
+import CloudPanel from "./CloudSettings/CloudPanel.vue";
+import { isCloudSettingsAvailable } from "@/composables/fc";
+import type { CloudSettingsPanel } from "@frappe/cloud-sdk";
+import LucideCreditCard from "~icons/lucide/credit-card";
+import LucideStore from "~icons/lucide/store";
+import LucideGlobe from "~icons/lucide/globe";
+import LucideBolt from "~icons/lucide/bolt";
 
 export const showSettingsModal = ref(false);
+
+const cloudPanel = (panel: CloudSettingsPanel) =>
+  markRaw(() => h(CloudPanel, { panel }));
+const CloudBilling = cloudPanel("billing");
+const CloudMarketplace = cloudPanel("marketplace");
+const CloudDomains = cloudPanel("domains");
+const CloudAdvanced = cloudPanel("advanced");
 
 const auth = useAuthStore();
 
@@ -171,6 +185,32 @@ export const tabs = computed(() => {
         },
       ],
     },
+    {
+      label: __("Frappe Cloud"),
+      condition: () => isCloudSettingsAvailable(),
+      items: [
+        {
+          label: __("Billing"),
+          icon: markRaw(LucideCreditCard),
+          component: CloudBilling,
+        },
+        {
+          label: __("Marketplace"),
+          icon: markRaw(LucideStore),
+          component: CloudMarketplace,
+        },
+        {
+          label: __("Domains"),
+          icon: markRaw(LucideGlobe),
+          component: CloudDomains,
+        },
+        {
+          label: __("Advanced"),
+          icon: markRaw(LucideBolt),
+          component: CloudAdvanced,
+        },
+      ],
+    },
   ];
 
   return _tabs.filter((tab) => {
@@ -208,7 +248,8 @@ type TabName =
   | "Field Dependencies"
   | "Telephony"
   | "ERPNext"
-  | "Saved Replies";
+  | "Saved Replies"
+  | "Billing";
 
 export const setActiveSettingsTab = (tabName: TabName) => {
   activeTab.value =
@@ -219,3 +260,8 @@ export const setActiveSettingsTab = (tabName: TabName) => {
         .find((tab) => tab.label == __(tabName))) ||
     tabs.value[0].items[0];
 };
+
+export function openBillingSettings() {
+  setActiveSettingsTab("Billing");
+  showSettingsModal.value = true;
+}

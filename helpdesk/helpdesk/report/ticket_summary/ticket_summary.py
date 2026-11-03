@@ -7,6 +7,7 @@ import json
 
 import frappe
 from frappe import _, scrub
+from frappe.query_builder.functions import Avg
 from frappe.utils import flt
 from six import iteritems
 
@@ -338,23 +339,22 @@ class TicketSummary:
                         )
 
             else:
-                data = frappe.db.sql(
-                    """
-					SELECT
-						{0}, AVG(first_response_time) as avg_frt,
-						AVG(avg_response_time) as avg_resp_time,
-						AVG(total_hold_time) as avg_hold_time,
-						AVG(resolution_time) as avg_resolution_time,
-						AVG(user_resolution_time) as avg_user_resolution_time
-					FROM `tabHD Ticket`
-					WHERE
-						name IN %(ticket)s
-					GROUP BY {0}
-				""".format(
-                        field
-                    ),
-                    {"ticket": ticket},
-                    as_dict=1,
+                hd_ticket = frappe.qb.DocType("HD Ticket")
+                data = (
+                    frappe.qb.from_(hd_ticket)
+                    .select(
+                        hd_ticket[field],
+                        Avg(hd_ticket.first_response_time).as_("avg_frt"),
+                        Avg(hd_ticket.avg_response_time).as_("avg_resp_time"),
+                        Avg(hd_ticket.total_hold_time).as_("avg_hold_time"),
+                        Avg(hd_ticket.resolution_time).as_("avg_resolution_time"),
+                        Avg(hd_ticket.user_resolution_time).as_(
+                            "avg_user_resolution_time"
+                        ),
+                    )
+                    .where(hd_ticket.name.isin(ticket))
+                    .groupby(hd_ticket[field])
+                    .run(as_dict=True)
                 )
 
                 for entry in data:

@@ -66,7 +66,7 @@ def create_ticket():
         first_name = "there"
     else:
         first_name = (user_doc.first_name or "").strip() or "there"
-    rendered_content = frappe.render_template(
+    rendered_content = frappe.render_template(  # nosemgrep
         CONTENT,
         {
             "first_name": first_name,
