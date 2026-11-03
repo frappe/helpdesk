@@ -106,6 +106,7 @@ def get_list_data(
 
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
+    handle_category_filter(filters, doctype)
 
     if rows is None:
         rows = []
@@ -589,6 +590,7 @@ def get_grouped_list(
     filters = frappe.parse_json(filters) or []
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
+    handle_category_filter(filters, doctype)
     return frappe.get_list(
         doctype,
         fields=frappe.parse_json(fields),
@@ -609,6 +611,7 @@ def export_grouped_list(doctype: str, filters: str | list | dict | None = None):
     filters = frappe.parse_json(filters) or []
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
+    handle_category_filter(filters, doctype)
     frappe.form_dict.update(doctype=doctype, filters=filters)
     return export_query()
 
@@ -634,6 +637,44 @@ def _replace_at_me(container, key):
         container[key] = frappe.session.user
     elif value == "%@me%":
         container[key] = "%" + frappe.session.user + "%"
+
+
+def handle_category_filter(filters, doctype):
+    """An article category filter also matches its Subcategories: "=" and "in" widen
+    to them, "!=" and "not in" leave them out too."""
+    if doctype != "HD Article":
+        return
+    if isinstance(filters, dict):
+        value = filters.get("category")
+        if isinstance(value, str) and value:
+            filters["category"] = _category_branch_condition("=", value)
+        elif isinstance(value, list) and len(value) == 2:
+            filters["category"] = _category_branch_condition(*value)
+        return
+    for condition in filters:
+        if (
+            isinstance(condition, list)
+            and len(condition) >= 3
+            and condition[-3] == "category"
+        ):
+            condition[-2:] = _category_branch_condition(*condition[-2:])
+
+
+def _category_branch_condition(operator, value) -> list:
+    # local import: circular via the article controller
+    from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+        get_branch,
+    )
+
+    operator = str(operator).lower()
+    if operator in ("=", "!=") and value:
+        names = [value]
+    elif operator in ("in", "not in") and value:
+        names = value.split(",") if isinstance(value, str) else value
+    else:
+        return [operator, value]
+    branch = [name for category in names for name in get_branch(category.strip())]
+    return ["not in" if operator in ("!=", "not in") else "in", branch]
 
 
 def handle_assigned_on_filter(filters, doctype):

@@ -8,12 +8,12 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
+  "category",
   "status",
   "visibility",
   "published_on",
   "views",
   "column_break_7",
-  "category",
   "weight",
   "pinned",
   "pinned_order",
@@ -37,6 +37,7 @@
    "fieldname": "category",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Category",
    "options": "HD Article Category"
   },

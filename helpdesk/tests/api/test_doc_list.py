@@ -326,6 +326,40 @@ class TestSubcategoryGroups(IntegrationTestCase):
 
         self.assertIn(self.parent, values)
 
+    def test_a_category_filter_also_matches_its_subcategories_only(self) -> None:
+        own = make_article(f"{self.token} a", "Draft", self.parent)
+        sub = make_article(f"{self.token} b", "Draft", self.sub)
+
+        other = make_article(
+            f"{self.token} c", "Draft", make_article_category(f"Zzz{self.token}o").name
+        )
+
+        def names(operator: str, value) -> set[str]:
+            filters = [
+                ["title", "like", f"{self.token}%"],
+                ["category", operator, value],
+            ]
+            data = get_list_data("HD Article", filters=filters, rows=["name"])["data"]
+            return {row["name"] for row in data}
+
+        self.assertEqual(names("=", self.parent), {own, sub})
+        self.assertEqual(names("=", self.sub), {sub})
+        self.assertEqual(names("!=", self.parent), {other})
+        self.assertEqual(names("in", [self.parent]), {own, sub})
+        self.assertEqual(names("not in", f"{self.parent},{self.sub}"), {other})
+
+    def test_a_category_filter_given_as_a_dict_matches_subcategories(self) -> None:
+        own = make_article(f"{self.token} a", "Draft", self.parent)
+        sub = make_article(f"{self.token} b", "Draft", self.sub)
+
+        def names(category) -> set[str]:
+            filters = {"title": ["like", f"{self.token}%"], "category": category}
+            data = get_list_data("HD Article", filters=filters, rows=["name"])["data"]
+            return {row["name"] for row in data}
+
+        self.assertEqual(names(self.parent), {own, sub})
+        self.assertEqual(names(["!=", self.parent]), set())
+
     def test_a_parent_only_group_keeps_the_parent_icon(self) -> None:
         frappe.db.set_value("HD Article Category", self.parent, "icon", "🧾")
         make_article(f"{self.token} a", "Draft", self.sub)
