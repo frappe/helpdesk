@@ -6,6 +6,10 @@ from helpdesk.utils import agent_only
 @frappe.whitelist()
 @agent_only
 def get_users():
+    """List every enabled user with their helpdesk role, by full name.
+    Each has name, email, user_image, full_name, user_type, `role` (Manager, Agent or
+    Guest, the highest held, if any) and `session_user` True on the caller. Agents
+    only."""
     session_user = frappe.session.user
 
     # Fetch agent-related roles in a single query

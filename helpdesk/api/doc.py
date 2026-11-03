@@ -33,6 +33,10 @@ def get_list_data(
     view: dict | None = None,
     is_default: bool = False,
 ) -> dict:
+    """One page of a list view of any doctype, with columns, rows and total count.
+    Also filterable fields for HD Ticket. `is_default` uses the user's default HD View;
+    `view` sets grouping. Filters accept "@me" and `__assigned_on`. Respects
+    permissions."""
     is_custom = False
 
     rows = frappe.parse_json(rows or "[]")
@@ -277,6 +281,9 @@ def get_filterable_fields(
     show_customer_portal_fields: bool = False,
     ignore_team_restrictions: bool = False,
 ):
+    """Fields a list of `doctype` can be filtered on, with type, label and options.
+    Visible fields, custom fields and standard ones. Portal mode keeps only
+    customer-visible ones; agent_group drops out under team restrictions. Needs read."""
     check_permissions(doctype, None)
     QBDocField = frappe.qb.DocType("DocField")
     QBCustomField = frappe.qb.DocType("Custom Field")
@@ -416,6 +423,9 @@ def get_filterable_fields(
 
 @frappe.whitelist()
 def sort_options(doctype: str, show_customer_portal_fields: bool = False):
+    """Fields a list of `doctype` can be sorted by, as {label, value}.
+    Includes standard fields; only customer-visible ones with
+    `show_customer_portal_fields`."""
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
     fields = [
@@ -445,6 +455,9 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
 
 @frappe.whitelist()
 def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
+    """The quick filters above a list of `doctype`, as {label, name, type, options}.
+    ID and fields marked as standard filters; options are Select choices or a Link's
+    doctype. Contact and TP Call Log get ID only."""
     meta = frappe.get_meta(doctype)
     fields = [field for field in meta.fields if field.in_standard_filter]
     quick_filters = []
@@ -734,6 +747,8 @@ def apply_datetime_filter(query, field, filter_value):
 @frappe.whitelist()
 @agent_only
 def remove_assignments(doctype: str, name: str, assignees: list[str]):
+    """Unassign `assignees` (user ids) from a document by cancelling their ToDos.
+    Agents only."""
     assignees = frappe.parse_json(assignees)
 
     if not assignees:

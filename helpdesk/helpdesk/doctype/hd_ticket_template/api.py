@@ -11,6 +11,9 @@ DOCTYPE_TEMPLATE = "HD Ticket Template"
 
 @frappe.whitelist()
 def get_one(name: str):
+    """A ticket template's about text, description template, fields and form script.
+    For the new-ticket form. Portal customers get the customer field scoped to
+    their own customers when that is auto-set. Needs read on HD Ticket Template."""
     check_permissions(DOCTYPE_TEMPLATE, None)
     template = frappe.db.get_value(
         DOCTYPE_TEMPLATE, name, ["about", "description_template"], as_dict=True
