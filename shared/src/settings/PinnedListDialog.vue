@@ -201,7 +201,7 @@ import { Badge, Button, Dialog, ScrollArea, TextInput, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import Draggable from "vuedraggable";
 import CategoryAccessBadge from "./CategoryAccessBadge.vue";
-import { PIN_LIMITS, type PinKind } from "./knowledgeBaseDraft";
+import { MAX_PINNED_ARTICLES, type PinKind } from "./knowledgeBaseDraft";
 import { pinnedListText } from "./pinnedListText";
 
 type Section = "pinned" | "unpinned";
@@ -298,12 +298,11 @@ const hiddenCount = computed(
 
 watch(search, (value) => props.search?.(value));
 
-// Refuses a pin past the limit; true when it fits.
+// Refuses an article pin past the limit; categories have none. True when it fits.
 function hasRoomToPin() {
-  const limit = PIN_LIMITS[props.kind];
-  if (!limit || selected.value.length < limit) return true;
-  // only articles have a limit
-  toast.error(__("You can pin up to {0} articles", [limit]));
+  if (props.kind !== "articles" || selected.value.length < MAX_PINNED_ARTICLES)
+    return true;
+  toast.error(__("You can pin up to {0} articles", [MAX_PINNED_ARTICLES]));
   return false;
 }
 

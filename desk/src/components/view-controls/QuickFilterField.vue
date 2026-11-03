@@ -21,13 +21,15 @@
     :model-value="props.value"
     :doctype="filter.options"
     :placeholder="filter.label"
-    :title="props.value ? String(props.value) : undefined"
-    class="!min-w-36 max-w-36"
+    :title="
+      props.value ? linkTitle?.(props.value) || String(props.value) : undefined
+    "
+    class="!min-w-36 max-w-36 [&_input]:truncate"
     @update:model-value="(value) => updateFilter(filter, value ?? '')"
   />
   <component
     v-else-if="['Date', 'Datetime'].includes(filter.type)"
-    class="border-none !min-w-36 max-w-36"
+    class="border-none !min-w-36 max-w-36 [&_input]:truncate"
     :is="filter.type === 'Date' ? DatePicker : DateTimePicker"
     :model-value="props.value"
     @change="(v) => updateFilter(filter, v)"
@@ -39,7 +41,7 @@
     type="text"
     :placeholder="filter.label"
     @input.stop="debouncedFn(filter, $event.target.value)"
-    class="border-none !min-w-36 max-w-36"
+    class="border-none !min-w-36 max-w-36 [&_input]:truncate"
   />
 </template>
 <script setup>
@@ -56,6 +58,8 @@ const props = defineProps({
     type: [String, Boolean],
     required: true,
   },
+  // what the Link shows for its value until its search loads; the ID if not given
+  linkTitle: Function,
 });
 
 const emit = defineEmits(["applyQuickFilter"]);

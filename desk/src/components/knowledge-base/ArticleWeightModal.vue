@@ -27,7 +27,7 @@ import { Dialog, FormControl } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 
 const props = defineProps<{
-  articles: string[];
+  count: number;
   // The current weight, for one article.
   initialWeight?: number;
 }>();
@@ -39,8 +39,8 @@ const weight = ref<number | string>(0);
 const cleanWeight = computed(() => Math.max(0, Number(weight.value) || 0));
 
 const title = computed(() =>
-  props.articles.length > 1
-    ? __("Set weight for {0} articles", [props.articles.length])
+  props.count > 1
+    ? __("Set weight for {0} articles", [props.count])
     : __("Set weight")
 );
 

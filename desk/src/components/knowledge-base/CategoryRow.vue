@@ -22,7 +22,7 @@
         <Checkbox
           :modelValue="all"
           :class="{ 'opacity-60': some }"
-          :aria-label="__('Select every article in {0}', [label])"
+          :aria-label="__('Select {0}', [label])"
           class="cursor-pointer"
           @update:modelValue="toggleBranch"
         />
@@ -124,7 +124,7 @@ import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import { __ } from "@/translation";
 import { Button, Checkbox, Dropdown, dayjsLocal } from "frappe-ui";
 import { Icon as SpriteIcon } from "frappe-ui/experimental";
-import { computed, inject } from "vue";
+import { computed, inject, watch } from "vue";
 
 // A category or subcategory as a list row; its cells sum up its articles.
 const props = defineProps<{
@@ -137,6 +137,7 @@ const props = defineProps<{
 defineEmits<{ toggle: [] }>();
 
 const list = inject<any>("list");
+const tickedCategories = inject<Set<string>>("tickedCategories");
 
 const label = computed(
   () => props.group.group.category_name || props.group.group.label
@@ -148,20 +149,40 @@ const iconTone = computed(() =>
   props.depth ? "text-ink-gray-6" : "text-ink-gray-7"
 );
 const ids = computed(() => props.rows.map((row) => row.name));
-const all = computed(
+const value = computed(() => props.group.group.value);
+const filled = computed(
   () =>
     ids.value.length > 0 &&
     ids.value.every((id) => list.value.selections.has(id))
 );
+// the header's select all ticks every category
+watch(
+  () => list.value.allRowsSelected,
+  (selected) => selected && tickedCategories.add(value.value),
+  { immediate: true }
+);
+// checked only when this category, or its parent, was ticked; articles picked one
+// by one leave it partly checked
+const all = computed(
+  () =>
+    filled.value &&
+    (tickedCategories.has(value.value) ||
+      tickedCategories.has(props.group.group.parent_article_category))
+);
 const some = computed(
   () => !all.value && ids.value.some((id) => list.value.selections.has(id))
 );
+watch(filled, (isFilled) => {
+  if (!isFilled) tickedCategories.delete(value.value);
+});
 function toggleBranch() {
   const select = !all.value;
   for (const id of ids.value) {
     if (select) list.value.selections.add(id);
     else list.value.selections.delete(id);
   }
+  if (select) tickedCategories.add(value.value);
+  else tickedCategories.delete(value.value);
 }
 
 const access = computed(() => {

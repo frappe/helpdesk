@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import frappe
+from frappe.desk.search import search_link, search_widget
 from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import change_settings
 from redis.exceptions import ResponseError
@@ -9,7 +10,8 @@ from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
-    count_cited_articles,
+    archive_articles,
+    bulk_delete,
     create_category,
     delete_articles,
     delete_category,
@@ -21,6 +23,7 @@ from helpdesk.api.knowledge_base import (
     get_category_delete_summary,
     get_category_options,
     get_category_visibility,
+    get_cited_articles,
     get_featured_articles,
     get_general_category,
     get_kb_sidebar,
@@ -29,6 +32,7 @@ from helpdesk.api.knowledge_base import (
     merge_category,
     move_to_category,
     search_articles,
+    search_categories,
     set_category_visibility,
     set_pinned_articles,
     vote_on_article,
@@ -908,7 +912,7 @@ class TestCategoryAccess(IntegrationTestCase):
         other = make_article_category("Fixture Access Other")
         last = make_article("Fixture access last", category=other.name)
 
-        with self.assertRaisesRegex(frappe.ValidationError, "at least one article"):
+        with self.assertRaisesRegex(frappe.ValidationError, "only article in"):
             move_to_category(self.category.name, [last])
 
     def test_merging_in_takes_the_access_the_category_shares(self) -> None:
@@ -1217,6 +1221,16 @@ class TestSubcategoryReads(IntegrationTestCase):
             {self.parent: self.parent_name, self.sub: self.sub_label},
         )
 
+    def test_articles_of_a_category_can_include_its_subcategories(self) -> None:
+        own = make_article(category=self.parent)
+        sub = make_article(category=self.sub)
+
+        def names(**kwargs) -> set[str]:
+            return {row.name for row in get_articles(self.parent, **kwargs)}
+
+        self.assertEqual(names(), {own})
+        self.assertEqual(names(include_subcategories=1), {own, sub})
+
     def test_subcategory_articles_are_newest_first_and_capped(self) -> None:
         names = [
             make_article(category=self.sub, published_on=f"2026-01-0{day} 10:00:00")
@@ -1362,12 +1376,6 @@ class TestSubcategoryReads(IntegrationTestCase):
         rows = {row["value"]: row for row in get_category_options()}
 
         self.assertEqual(rows[self.parent]["icon"], "lucide-rocket")
-
-    def test_category_options_leave_out_the_excluded(self) -> None:
-        values = [row["value"] for row in get_category_options(exclude=self.sub)]
-
-        self.assertNotIn(self.sub, values)
-        self.assertIn(self.parent, values)
 
     def test_a_customer_cannot_list_category_options(self) -> None:
         with self.set_user(make_contact("kb-options")["user"]):
@@ -1546,9 +1554,7 @@ class TestCategoryDelete(IntegrationTestCase):
             make_article(category=self.sub, status="Draft"),
         ]
 
-        self.assertEqual(
-            delete_category(self.parent, with_articles=True), {"archived": 0}
-        )
+        delete_category(self.parent, with_articles=True)
 
         self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
         self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
@@ -1557,15 +1563,13 @@ class TestCategoryDelete(IntegrationTestCase):
         )
         self.assertFalse(frappe.flags.deleting_category)
 
-    def test_branch_delete_archives_cited_articles(self) -> None:
+    def test_branch_delete_archives_the_linked_articles(self) -> None:
         make_article(category=self.parent)
         # the only article of its subcategory: the length guard must not fire
         cited = make_article(category=self.sub)
         self.cite(cited)
 
-        self.assertEqual(
-            delete_category(self.parent, with_articles=True), {"archived": 1}
-        )
+        delete_category(self.parent, with_articles=True, archive_linked=True)
 
         self.assertEqual(
             frappe.db.get_value("HD Article", cited, ["status", "category"]),
@@ -1593,42 +1597,145 @@ class TestCategoryDelete(IntegrationTestCase):
 
         self.assertTrue(frappe.db.exists("HD Article Feedback", {"article": article}))
 
-    def test_deleting_a_cited_article_archives_it(self) -> None:
+    def test_archiving_a_cited_article_keeps_its_tickets(self) -> None:
         make_article(category=self.parent)
         cited = make_article(category=self.parent)
         self.cite(cited)
 
-        self.assertEqual(delete_articles([cited]), {"archived": 1})
+        archive_articles([cited])
 
         self.assertEqual(frappe.db.get_value("HD Article", cited, "status"), "Archived")
+        self.assertTrue(frappe.db.exists("HD Ticket", {"source_article": cited}))
 
-    def test_deleting_a_cited_article_without_archiving_clears_its_tickets(
+    def test_moving_an_archived_article_restores_it_as_a_draft(self) -> None:
+        make_article(category=self.parent)
+        article = make_article(category=self.parent)
+        archive_articles([article])
+
+        move_to_category(self.sub, [article])
+
+        row = frappe.db.get_value(
+            "HD Article", article, ["status", "category"], as_dict=True
+        )
+        self.assertEqual((row.status, row.category), ("Draft", self.sub))
+
+    def test_category_search_labels_a_subcategory_with_its_parent(self) -> None:
+        parent_name = frappe.db.get_value(
+            "HD Article Category", self.parent, "category_name"
+        )
+        sub_name = frappe.db.get_value("HD Article Category", self.sub, "category_name")
+
+        rows = dict(
+            search_categories("HD Article Category", parent_name, "name", 0, 20, {})
+        )
+        by_name = dict(
+            search_categories("HD Article Category", self.sub, "name", 0, 20, {})
+        )
+
+        self.assertEqual(rows[self.parent], parent_name)
+        self.assertEqual(rows[self.sub], f"{parent_name} › {sub_name}")
+        self.assertEqual(list(by_name), [self.sub])
+
+    def test_link_search_pages_and_filters_categories(self) -> None:
+        parent_name = frappe.db.get_value(
+            "HD Article Category", self.parent, "category_name"
+        )
+
+        def values(**kwargs) -> list[str]:
+            rows = search_widget("HD Article Category", parent_name, **kwargs)
+            return [row[0] for row in rows]
+
+        first, second = values(page_length=1), values(page_length=1, start=1)
+        top_level = values(filters={"parent_article_category": ["is", "not set"]})
+
+        self.assertEqual(first + second, [self.parent, self.sub])
+        self.assertEqual(top_level, [self.parent])
+        labels = {
+            row["value"]: row["label"]
+            for row in search_link("HD Article Category", parent_name)
+        }
+        self.assertTrue(labels[self.sub].startswith(f"{parent_name} › "))
+
+    def test_bulk_delete_leaves_nothing_changed_when_an_archive_is_refused(
         self,
     ) -> None:
+        make_article(category=self.parent)
+        lone = make_article_category(unique_name("Fixture Lone")).name
+        last = make_article(category=lone)
+        self.cite(last)
+        frappe.db.savepoint("bulk_delete")
+
+        # the last article can't be archived, after the branch is already deleted
+        with self.assertRaisesRegex(frappe.ValidationError, "only article in"):
+            bulk_delete(categories=[self.parent], articles=[last], archive_linked=True)
+        # what the failed request's rollback does
+        frappe.db.rollback(save_point="bulk_delete")
+
+        self.assertTrue(frappe.db.exists("HD Article Category", self.parent))
+        self.assertTrue(frappe.db.exists("HD Article Category", self.sub))
+
+    def test_a_customer_cannot_archive_articles(self) -> None:
+        make_article(category=self.parent)
+        article = make_article(category=self.parent)
+        customer = make_contact("kb-archiver")["user"]
+
+        with self.set_user(customer), self.assertRaises(frappe.PermissionError):
+            archive_articles([article])
+
+    def test_deleting_a_cited_article_clears_its_tickets(self) -> None:
         make_article(category=self.parent)
         cited = make_article(category=self.parent)
         self.cite(cited)
         ticket = frappe.db.get_value("HD Ticket", {"source_article": cited})
 
-        self.assertEqual(delete_articles([cited], archive_cited=False), {"archived": 0})
+        delete_articles([cited])
 
         self.assertFalse(frappe.db.exists("HD Article", cited))
         self.assertIsNone(frappe.db.get_value("HD Ticket", ticket, "source_article"))
 
-    def test_branch_delete_without_archiving_deletes_cited_articles(self) -> None:
+    def test_branch_delete_deletes_cited_articles_not_named_to_archive(self) -> None:
         make_article(category=self.parent)
         cited = make_article(category=self.sub)
         self.cite(cited)
 
-        self.assertEqual(
-            delete_category(self.parent, with_articles=True, archive_cited=False),
-            {"archived": 0},
-        )
+        delete_category(self.parent, with_articles=True)
 
         self.assertFalse(frappe.db.exists("HD Article", cited))
         self.assertFalse(frappe.db.exists("HD Ticket", {"source_article": cited}))
 
-    def test_cited_count_covers_articles_and_category_branches(self) -> None:
+    def test_bulk_delete_archives_the_linked_and_deletes_the_rest(self) -> None:
+        other = make_article_category(unique_name("Fixture other")).name
+        make_article(category=other)
+        cited, plain = make_article(category=other), make_article(category=other)
+        in_branch = make_article(category=self.sub)
+        self.cite(cited)
+
+        result = bulk_delete(
+            articles=[cited, plain], categories=[self.parent], archive_linked=True
+        )
+
+        self.assertEqual(result, {"archived": 1})
+        self.assertEqual(frappe.db.get_value("HD Article", cited, "status"), "Archived")
+        self.assertFalse(frappe.db.exists("HD Article", plain))
+        self.assertFalse(frappe.db.exists("HD Article", in_branch))
+        self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
+
+    def test_a_customer_cannot_bulk_delete(self) -> None:
+        article = make_article(category=self.parent)
+        customer = make_contact("kb-bulk")["user"]
+
+        # articles alone skip delete_category's check
+        for kwargs in (
+            {"articles": [article], "categories": [self.sub]},
+            {"articles": [article], "archive_linked": True},
+        ):
+            with self.subTest(**kwargs), self.set_user(customer):
+                self.assertRaises(frappe.PermissionError, bulk_delete, **kwargs)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", self.sub))
+        self.assertTrue(frappe.db.exists("HD Article", article))
+
+    def test_cited_articles_cover_articles_and_category_branches(self) -> None:
         in_branch = make_article(category=self.sub)
         loose = make_article(
             category=make_article_category(unique_name("Fixture loose")).name
@@ -1638,12 +1745,13 @@ class TestCategoryDelete(IntegrationTestCase):
             self.cite(article)
         self.cite(loose)
 
-        self.assertEqual(count_cited_articles(articles=[loose, uncited]), 1)
-        self.assertEqual(count_cited_articles(categories=[self.parent]), 1)
-        self.assertEqual(
-            count_cited_articles(articles=[loose], categories=[self.parent]), 2
+        self.assertEqual(get_cited_articles(articles=[loose, uncited]), [loose])
+        self.assertEqual(get_cited_articles(categories=[self.parent]), [in_branch])
+        self.assertCountEqual(
+            get_cited_articles(articles=[loose], categories=[self.parent]),
+            [loose, in_branch],
         )
-        self.assertEqual(count_cited_articles(), 0)
+        self.assertEqual(get_cited_articles(), [])
 
     def test_archiving_the_last_article_outside_a_branch_delete_is_refused(
         self,
@@ -1651,8 +1759,8 @@ class TestCategoryDelete(IntegrationTestCase):
         cited = make_article(category=self.sub)
         self.cite(cited)
 
-        with self.assertRaisesRegex(frappe.ValidationError, "at least one article"):
-            delete_articles([cited])
+        with self.assertRaisesRegex(frappe.ValidationError, "only article in"):
+            archive_articles([cited])
 
         self.assertEqual(self.category(cited), self.sub)
 

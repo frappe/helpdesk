@@ -162,6 +162,10 @@ doc_events = {
     },
 }
 
+standard_queries = {
+    "HD Article Category": "helpdesk.api.knowledge_base.search_categories",
+}
+
 # For List View
 permission_query_conditions = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",

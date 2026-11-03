@@ -11,7 +11,6 @@ from frappe.utils import (
     escape_html,
     expand_relative_urls,
     get_user_info_for_avatar,
-    sbool,
 )
 from frappe.website.utils import cleanup_page_name, find_first_image
 
@@ -28,12 +27,13 @@ from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     SEPARATOR,
     batched_article_index,
+    format_category_label,
     get_category_labels,
     get_parent,
     get_stricter_visibility,
     get_subcategories,
     move_category_articles,
-    validate_parent_keeps_content,
+    validate_keeps_content,
 )
 from helpdesk.search import NUM_RESULTS
 from helpdesk.utils import is_agent
@@ -81,26 +81,49 @@ def validate_public_access():
 
 
 @frappe.whitelist(methods=["POST"])
-def delete_articles(articles: list[str], archive_cited: bool = True) -> dict:
-    """Delete the given HD Articles. One a ticket cites is archived instead, unless
-    `archive_cited` is off: then it's deleted and cleared from those tickets.
-    Returns {"archived": count}. Needs delete permission. Refuses to delete the last
-    article left in a category."""
+def delete_articles(articles: list[str]) -> None:
+    """Delete the given HD Articles, clearing them from the tickets that cite them.
+    Needs delete permission. Refuses to delete the last article left in a category."""
     # before any raw delete below
     frappe.has_permission("HD Article", "delete", throw=True)
-    archive_cited = sbool(archive_cited)
-    return {
-        "archived": sum(
-            delete_or_archive_article(name, archive_cited) for name in articles
-        )
-    }
+    for name in articles:
+        _delete_article(name)
+
+
+@frappe.whitelist(methods=["POST"])
+def archive_articles(articles: list[str]) -> None:
+    """Archive the given HD Articles: they leave their category, and tickets keep their
+    link. Needs write permission. Refuses to empty a category."""
+    frappe.has_permission("HD Article", "write", throw=True)
+    for name in articles:
+        _archive_article(name)
+
+
+@frappe.whitelist(methods=["POST"])
+def bulk_delete(
+    articles: list[str] | None = None,
+    categories: list[str] | None = None,
+    archive_linked: bool = False,
+) -> dict:
+    """The KB list's Delete: delete `categories` with their whole branch, and
+    `articles`. `archive_linked` archives the ones a ticket cites instead. One request,
+    so a failure anywhere leaves everything as it was. Returns {"archived": count}."""
+    # before any read or raw delete below
+    frappe.has_permission("HD Article", "delete", throw=True)
+    archived = sum(
+        delete_category(category, with_articles=True, archive_linked=archive_linked)[
+            "archived"
+        ]
+        for category in categories or []
+    )
+    return {"archived": archived + _delete_or_archive(articles or [], archive_linked)}
 
 
 @frappe.whitelist()
-def count_cited_articles(
+def get_cited_articles(
     articles: list[str] | None = None, categories: list[str] | None = None
-) -> int:
-    """How many of `articles`, and of the articles in `categories` and their
+) -> list[str]:
+    """Which of `articles`, and of the articles in `categories` and their
     Subcategories, a ticket cites. Needs delete permission on HD Article."""
     frappe.has_permission("HD Article", "delete", throw=True)
     names = set(articles or [])
@@ -115,10 +138,37 @@ def count_cited_articles(
                 "HD Article", filters={"category": ["in", branches]}, pluck="name"
             )
         )
-    return len(get_cited_articles(list(names)))
+    return _get_cited_articles(list(names))
 
 
-def get_cited_articles(articles: list[str]) -> list[str]:
+def _delete_or_archive(articles: list[str], archive_linked: bool) -> int:
+    """Delete `articles`; with `archive_linked`, archive the ones a ticket cites
+    instead. Returns how many were archived."""
+    archive = _get_archivable(articles) if cint(archive_linked) else set()
+    with batched_article_index():
+        for name in articles:
+            if name in archive:
+                _archive_article(name)
+            else:
+                _delete_article(name)
+    return len(archive)
+
+
+def _get_archivable(articles: list[str]) -> set[str]:
+    """Which of `articles` a ticket cites and that aren't archived yet."""
+    cited = _get_cited_articles(articles)
+    return set(
+        frappe.get_all(
+            "HD Article",
+            filters={"name": ["in", cited], "status": ["!=", "Archived"]},
+            pluck="name",
+        )
+        if cited
+        else []
+    )
+
+
+def _get_cited_articles(articles: list[str]) -> list[str]:
     if not articles:
         return []
     return frappe.get_all(
@@ -129,16 +179,16 @@ def get_cited_articles(articles: list[str]) -> list[str]:
     )
 
 
-def delete_or_archive_article(name: str, archive_cited: bool = True) -> bool:
-    """A ticket cites it: archive instead, keeping the link, or with `archive_cited`
-    off, clear it from those tickets and delete. True when archived."""
+def _archive_article(name: str) -> None:
+    # a save, for version history and the search index
+    article = frappe.get_doc("HD Article", name)
+    article.status = "Archived"
+    article.save()
+
+
+def _delete_article(name: str) -> None:
+    """Delete it, clearing it from the tickets that cite it."""
     if frappe.db.exists("HD Ticket", {"source_article": name}):
-        if archive_cited:
-            # a save, for version history and the search index
-            article = frappe.get_doc("HD Article", name)
-            article.status = "Archived"
-            article.save()
-            return True
         frappe.has_permission("HD Ticket", "write", throw=True)
         # the field is empty once the article no longer exists
         frappe.db.set_value(
@@ -151,7 +201,6 @@ def delete_or_archive_article(name: str, archive_cited: bool = True) -> bool:
     # feedback would fail the link check
     frappe.db.delete("HD Article Feedback", {"article": name})
     frappe.delete_doc("HD Article", name)
-    return False
 
 
 @frappe.whitelist(methods=["POST"])
@@ -228,10 +277,10 @@ def category_label_sort_key(label: str) -> tuple:
 
 
 @frappe.whitelist()
-def get_category_options(exclude: str | None = None) -> list[dict]:
+def get_category_options() -> list[dict]:
     """Every article category as a picker option, General first, Subcategories after
     their parent. Each has value, label, parent_article_category, icon and
-    has_subcategories; `exclude` leaves one out. Needs write access to HD Article."""
+    has_subcategories. Needs write access to HD Article."""
     frappe.has_permission("HD Article", "write", throw=True)
     rows = frappe.get_all(
         "HD Article Category", fields=["name", "parent_article_category", "icon"]
@@ -247,9 +296,36 @@ def get_category_options(exclude: str | None = None) -> list[dict]:
             "has_subcategories": row.name in parents,
         }
         for row in rows
-        if row.name != exclude
     ]
     return sorted(options, key=lambda option: category_label_sort_key(option["label"]))
+
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def search_categories(
+    doctype: str,
+    txt: str,
+    searchfield: str,
+    start: int,
+    page_len: int,
+    filters: dict | list | None,
+) -> list[tuple[str, str]]:
+    """Link search for article categories, a Subcategory labelled `Parent › Sub`.
+    Matches the label or the name."""
+    # ponytail: filters in Python; categories number in the dozens
+    names = frappe.get_list("HD Article Category", filters=filters or {}, pluck="name")
+    labels = get_category_labels(names)
+    txt = (txt or "").casefold()
+    rows = sorted(
+        (
+            (name, label)
+            for name, label in labels.items()
+            if txt in label.casefold() or txt == name.casefold()
+        ),
+        key=lambda row: category_label_sort_key(row[1]),
+    )
+    start, page_len = int(start), int(page_len)
+    return rows[start : start + page_len]
 
 
 @frappe.whitelist(methods=["POST"])
@@ -279,7 +355,7 @@ def set_category_visibility(category: str, visibility: str):
 
 @frappe.whitelist(methods=["POST"])
 def move_to_category(category: str, articles: list[str]):
-    """Move the given articles to a category.
+    """Move the given articles to a category; an archived one comes back as a Draft.
     An article wider than the visibility the category's articles share is narrowed to
     it. Needs write access to HD Article."""
     frappe.has_permission("HD Article", "write", throw=True)
@@ -289,6 +365,8 @@ def move_to_category(category: str, articles: list[str]):
     category_visibility = hd_article_category.get_joining_visibility(category)
     for name in articles:
         article = frappe.get_doc("HD Article", name)
+        if article.status == "Archived":
+            article.status = "Draft"
         article.category = category
         article.visibility = get_stricter_visibility(
             article.visibility, category_visibility
@@ -299,16 +377,24 @@ def move_to_category(category: str, articles: list[str]):
 # Guest endpoints: make_article_filters limits guests to Public articles.
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_articles(
-    category: str | None = None, limit: int | None = None, sort: str = "latest"
+    category: str | None = None,
+    limit: int | None = None,
+    sort: str = "latest",
+    include_subcategories: bool = False,
 ) -> list[dict]:
     """List published articles the caller can read: name, title and excerpt.
-    Optionally of one category, heaviest first, at most 100. `sort` "popular" orders by
-    views, else newest first. Guests only when the knowledge base is public."""
+    Optionally of one category, and its Subcategories with `include_subcategories`,
+    heaviest first, at most 100. `sort` "popular" orders by views, else newest first.
+    Guests only when the knowledge base is public."""
     validate_public_access()
     filters = make_article_filters()
     order_by = "views desc" if sort == "popular" else "published_on desc"
     if category:
-        filters["category"] = category
+        filters["category"] = (
+            ["in", hd_article_category.get_branch(category)]
+            if cint(include_subcategories)
+            else category
+        )
         order_by = f"{WEIGHT_ORDER}, {order_by}"
     return frappe.get_all(
         "HD Article",
@@ -320,18 +406,15 @@ def get_articles(
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
-def get_featured_articles(
-    names: str | list | None = None, limit: int | None = None
-) -> list[dict]:
+def get_featured_articles(names: str | list | None = None) -> list[dict]:
     """The home page's Featured articles: name, title and excerpt, in pin order.
     `names` reads Settings Preview's unsaved pins instead, in their order. Never
-    Private articles, at most `limit` (100). Guests only when the knowledge base is
-    public."""
+    Private articles, at most MAX_PINNED_ARTICLES. Guests only when the knowledge base
+    is public."""
     validate_public_access()
     filters = make_article_filters()
     # Featured is for customers, so agents skip Private too; others keep their narrower filter.
     filters.setdefault("visibility", ["!=", PRIVATE])
-    limit = min(cint(limit) or LIST_LIMIT, LIST_LIMIT)
     fields = ["name", "title", "excerpt"]
     if names is None:
         filters["pinned"] = 1
@@ -340,17 +423,17 @@ def get_featured_articles(
             filters=filters,
             fields=fields,
             order_by="pinned_order asc",
-            limit_page_length=limit,
+            limit_page_length=MAX_PINNED_ARTICLES,
         )
     names = _parse_guest_names(names, LIST_LIMIT)
     if not names:
         return []
     filters["name"] = ["in", names]
-    # the limit cuts after their order
+    # the cap cuts after their order
     rows = frappe.get_all("HD Article", filters=filters, fields=fields)
     position = {name: index for index, name in enumerate(names)}
     rows.sort(key=lambda row: position[row.name])
-    return rows[:limit]
+    return rows[:MAX_PINNED_ARTICLES]
 
 
 @frappe.whitelist(methods=["POST"])
@@ -491,10 +574,8 @@ def get_article(name: str) -> dict:
     article.category_name = category.category_name
     article.parent_article_category = category.parent_article_category
     article.parent_category_name = category.parent_category_name
-    article.category_label = (
-        f"{category.parent_category_name}{SEPARATOR}{category.category_name}"
-        if category.parent_category_name
-        else category.category_name
+    article.category_label = category.category_name and format_category_label(
+        category.category_name, category.parent_category_name
     )
     article.feedback = _get_own_feedback(name)
     article.minutes = _get_reading_minutes(
@@ -715,7 +796,7 @@ def merge_category(source: str, target: str):
     if source == get_general_category():
         frappe.throw(_("Cannot merge General category"))
     if (parent := get_parent(source)) != target:
-        validate_parent_keeps_content(parent, leaving=source)
+        validate_keeps_content(parent, leaving_subcategory=source)
 
     # `source` may lose its last subcategory on the way out
     frappe.flags.deleting_category = [source]
@@ -772,16 +853,18 @@ def get_category_delete_summary(category: str) -> dict:
     return {
         "articles": len(articles),
         "subcategories": len(branch) - 1,
-        "cited": len(get_cited_articles(articles)),
+        "cited": len(_get_cited_articles(articles)),
     }
 
 
 @frappe.whitelist(methods=["POST"])
 def delete_category(
-    category: str, with_articles: bool = False, archive_cited: bool = True
+    category: str, with_articles: bool = False, archive_linked: bool = False
 ) -> dict:
-    """`with_articles` deletes the whole branch. Cited articles are archived, unless
-    `archive_cited` is off: then they're deleted and cleared from their tickets."""
+    """Delete an article category. Its articles move to the parent, or General, and
+    its Subcategories move up. `with_articles` deletes the whole branch instead;
+    `archive_linked` archives the articles a ticket cites. Needs delete permission.
+    Returns {"archived": count}."""
     frappe.has_permission("HD Article Category", "delete", throw=True)
     _validate_category(category)
     if category == get_general_category():
@@ -791,23 +874,18 @@ def delete_category(
         return {"archived": 0}
 
     # on_trash checks it too, but only after every article is deleted
-    validate_parent_keeps_content(
+    validate_keeps_content(
         get_parent(category),
-        leaving=category,
+        leaving_subcategory=category,
         message=_("Delete the parent category instead"),
     )
     branch = hd_article_category.get_branch(category)
     frappe.flags.deleting_category = branch
     try:
-        with batched_article_index():
-            archived = sum(
-                delete_or_archive_article(name, sbool(archive_cited))
-                for name in frappe.get_all(
-                    "HD Article",
-                    filters={"category": ["in", branch]},
-                    pluck="name",
-                )
-            )
+        articles = frappe.get_all(
+            "HD Article", filters={"category": ["in", branch]}, pluck="name"
+        )
+        archived = _delete_or_archive(articles, archive_linked)
         # subcategories first: the category's on_trash would promote them
         for name in reversed(branch):
             frappe.delete_doc("HD Article Category", name)

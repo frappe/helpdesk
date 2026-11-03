@@ -1,5 +1,9 @@
 <template>
-  <Dialog v-model:open="showDialog" :title="__('Move To')" :actions="actions">
+  <Dialog
+    v-model:open="showDialog"
+    :title="title || __('Move To')"
+    :actions="actions"
+  >
     <template #default>
       <div class="flex flex-col flex-1">
         <Combobox
@@ -40,25 +44,30 @@ const joiningNote = computed(
 
 const props = defineProps<{
   excludeCategory?: string;
+  title?: string;
+  actionLabel?: string;
+  defaultCategory?: string;
 }>();
 
 const options = computed(() =>
-  (categoryOptions.data || []).map(({ value, label }) => ({ value, label }))
+  (categoryOptions.data || [])
+    .filter(({ value }) => value !== props.excludeCategory)
+    .map(({ value, label }) => ({ value, label }))
 );
 watch(showDialog, (open) => {
   if (!open) return;
   // a pick made before a cancel must not survive
-  category.value = "";
+  category.value = props.defaultCategory || "";
   // shared with other dialogs: drop their list before it shows here
   categoryOptions.reset();
-  categoryOptions.submit({ exclude: props.excludeCategory });
+  categoryOptions.submit();
 });
 
-const actions = [
+const actions = computed(() => [
   {
-    label: __("Move"),
+    label: props.actionLabel || __("Move"),
     variant: "solid",
     onClick: () => emit("move", category.value),
   },
-];
+]);
 </script>

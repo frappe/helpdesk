@@ -11,8 +11,9 @@ from frappe.utils import cint, evaluate_filters
 from frappe.website.utils import cleanup_page_name
 
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
-    check_category_length,
     get_joining_visibility,
+    index_articles,
+    validate_keeps_content,
 )
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
 from helpdesk.utils import capture_event, is_agent
@@ -60,7 +61,9 @@ class HDArticle(Document):
 
     def validate_article_category(self):
         if self.has_value_changed("category") and not self.is_new():
-            check_category_length(self.get_doc_before_save().get("category"))
+            validate_keeps_content(
+                self.get_doc_before_save().get("category"), leaving_article=self.name
+            )
 
     def validate_published_content(self):
         if self.status == "Published" and not self.content:
@@ -108,20 +111,11 @@ class HDArticle(Document):
         self.update_search_index()
 
     def on_trash(self):
-        check_category_length(self.category)
+        validate_keeps_content(self.category, leaving_article=self.name)
         self.update_search_index()
 
     def update_search_index(self):
-        # a bulk change sends one job for all its articles
-        if (batch := frappe.flags.batch_article_index) is not None:
-            batch.append(self.name)
-            return
-        frappe.enqueue(
-            "helpdesk.search.update_article_index",
-            article=self.name,
-            queue="short",
-            enqueue_after_commit=True,
-        )
+        index_articles([self.name], queue="short")
 
     @staticmethod
     def default_list_data():

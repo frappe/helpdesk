@@ -37,7 +37,7 @@
     />
     <ArticleWeightModal
       v-model="weightModal"
-      :articles="[...listSelections]"
+      :count="listSelections.size"
       :initial-weight="selectionWeight"
       @save="handleSetWeight"
     />
@@ -55,6 +55,7 @@
     <DeleteCategoryModal
       v-model="deleteModal"
       :category="category.id"
+      :title="category.title"
       :is-subcategory="!!category.parent"
       @confirm="handleCategoryDelete"
     />
@@ -96,7 +97,6 @@ import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.v
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { globalStore } from "@/stores/globalStore";
 import {
-  deleteArticles,
   deleteCategory,
   mergeCategory,
   moveToCategory,
@@ -105,7 +105,7 @@ import {
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
-import { CUSTOMER_PORTAL_ROOT, getErrorMessage } from "@/utils";
+import { citedMessage, CUSTOMER_PORTAL_ROOT, getErrorMessage } from "@/utils";
 import { copyToClipboard, countLabel } from "@helpdesk/shared/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
@@ -118,7 +118,7 @@ import {
   toast,
   usePageMeta,
 } from "frappe-ui";
-import { computed, h, markRaw, onMounted, reactive, ref } from "vue";
+import { computed, h, markRaw, onMounted, provide, reactive, ref } from "vue";
 import { __ } from "@/translation";
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
@@ -141,6 +141,10 @@ const category = reactive({
 });
 
 const listViewRef = ref(null);
+// Categories whose checkbox was ticked, so Delete can tell a ticked category from
+// articles that happen to fill one. Lives as long as the page.
+const tickedCategories = reactive(new Set<string>());
+provide("tickedCategories", tickedCategories);
 const editTitle = ref(false);
 
 // modals state
@@ -223,7 +227,7 @@ const groupByActions = [
   },
   {
     label: __("Convert to category"),
-    icon: "lucide-link-2-off",
+    icon: "lucide-folder-up",
     condition: ({ group }) => !!group.parent_article_category,
     onClick: async ({ group }) => {
       try {
@@ -240,6 +244,18 @@ const groupByActions = [
       listViewRef.value.reload();
       toast.success(__("{0} is now a category", [group.category_name]));
     },
+  },
+  {
+    label: __("Copy link"),
+    condition: isNotGeneral,
+    icon: "lucide-link",
+    onClick: ({ group }) =>
+      copyToClipboard(
+        window.location.origin +
+          CUSTOMER_PORTAL_ROOT +
+          ROUTES.category(group.value),
+        __("Category link copied to clipboard.")
+      ),
   },
   {
     label: __("Edit"),
@@ -285,18 +301,6 @@ const groupByActions = [
     },
   },
   {
-    label: __("Copy link"),
-    condition: isNotGeneral,
-    icon: "lucide-link",
-    onClick: ({ group }) =>
-      copyToClipboard(
-        window.location.origin +
-          CUSTOMER_PORTAL_ROOT +
-          ROUTES.category(group.value),
-        __("Category link copied to clipboard.")
-      ),
-  },
-  {
     label: __("Delete"),
     condition: isNotGeneral,
     icon: "lucide-trash-2",
@@ -304,6 +308,7 @@ const groupByActions = [
     onClick: ({ group }) => {
       resetState();
       category.id = group.value;
+      category.title = group.category_name;
       category.parent = group.parent_article_category || "";
       deleteModal.value = true;
     },
@@ -510,13 +515,14 @@ function loadedBranch(value: string) {
     .map((row) => row.name);
 }
 
-// Categories whose checkbox is ticked: every loaded article of the branch is
-// selected. General can't be deleted, so it stays a set of articles.
+// Categories ticked in the list whose articles are all still selected. General
+// can't be deleted, so it stays a set of articles.
 function selectedCategories(selections: Set<string>) {
   const groups = (
     listViewRef.value?.list?.data?.group_by_field?.options || []
   ).filter((group) => {
-    if (!group.value || group.value === generalCategory.data) return false;
+    if (!tickedCategories.has(group.value)) return false;
+    if (group.value === generalCategory.data) return false;
     const branch = loadedBranch(group.value);
     return branch.length && branch.every((name) => selections.has(name));
   });
@@ -536,13 +542,14 @@ async function deleteSelection(selections: Set<string>) {
     // the row menu's dialog: keep or delete the articles, with server counts
     resetState();
     category.id = categories[0].value;
+    category.title = categories[0].category_name;
     category.parent = categories[0].parent_article_category || "";
     deleteModal.value = true;
     return;
   }
-  let cited = 0;
+  let cited: string[] = [];
   try {
-    cited = await call("helpdesk.api.knowledge_base.count_cited_articles", {
+    cited = await call("helpdesk.api.knowledge_base.get_cited_articles", {
       articles,
       categories: categories.map((group) => group.value),
     });
@@ -550,20 +557,34 @@ async function deleteSelection(selections: Set<string>) {
     getErrorMessage(error, true);
     return;
   }
-  const run = (archiveCited: boolean) =>
-    categories.length
-      ? deleteCategoriesAndArticles(categories, articles, archiveCited)
-      : handleDeleteArticles(archiveCited);
+  // archived ones have no category, and delete is their only way out
+  const archived = new Set(
+    (listViewRef.value?.list?.data?.data || [])
+      .filter((row) => !row.category)
+      .map((row) => row.name)
+  );
+  const archivable = cited.filter((name) => !archived.has(name));
+  const citedArchived = cited.length - archivable.length;
+  const run = (archiveLinked: boolean) =>
+    deleteCategoriesAndArticles(categories, articles, archiveLinked);
   $dialog({
-    title: deleteTitle(categories.length, articles.length),
+    title:
+      !categories.length && articles.every((name) => archived.has(name))
+        ? countLabel(
+            articles.length,
+            __("Delete archived article"),
+            __("Delete archived articles")
+          )
+        : deleteTitle(categories.length, articles.length),
     message: [
       deleteMessage(categories.length, articles.length),
-      cited ? citedMessage(cited) : "",
+      archivable.length ? citedMessage(archivable.length) : "",
+      citedArchived ? citedArchivedMessage(citedArchived) : "",
     ]
       .filter(Boolean)
       .join(" "),
     actions: [
-      ...(cited
+      ...(archivable.length
         ? [
             {
               label: __("Archive linked"),
@@ -608,77 +629,52 @@ function deleteMessage(categories: number, articles: number) {
   );
 }
 
-// Only said when a ticket links one of them.
-function citedMessage(cited: number) {
+// Archived articles a ticket links: deleting removes them from the ticket.
+function citedArchivedMessage(cited: number) {
   return countLabel(
     cited,
     __(
-      "1 article is linked to a ticket. Archive it to keep the link, or delete it and remove it from the ticket."
+      "1 archived article is linked to a ticket. Deleting it removes it from the ticket."
     ),
     __(
-      "{0} articles are linked to tickets. Archive them to keep the links, or delete them and remove them from those tickets."
+      "{0} archived articles are linked to tickets. Deleting them removes them from those tickets."
     )
   );
 }
 
 function deleteTitle(categories: number, articles: number) {
   if (!categories) {
-    return countLabel(
-      articles,
-      __("Delete article"),
-      __("Delete {0} articles")
-    );
+    return articles === 1 ? __("Delete article") : __("Delete articles");
   }
-  if (!articles) return __("Delete {0} categories", [categories]);
-  if (categories === 1) {
-    return countLabel(
-      articles,
-      __("Delete 1 category and 1 article"),
-      __("Delete 1 category and {0} articles")
-    );
-  }
-  return articles === 1
-    ? __("Delete {0} categories and 1 article", [categories])
-    : __("Delete {0} categories and {1} articles", [categories, articles]);
+  // one category alone opens DeleteCategoryModal
+  return articles
+    ? __("Delete categories and articles")
+    : __("Delete categories");
 }
 
+// Deletes the articles and categories; `archiveLinked` archives the ones tickets link.
 async function deleteCategoriesAndArticles(
   categories: { value: string }[],
   articles: string[],
-  archiveCited: boolean
+  archiveLinked: boolean
 ) {
-  let archived = 0;
   try {
-    for (const group of categories) {
-      const result = await call("helpdesk.api.knowledge_base.delete_category", {
-        category: group.value,
-        with_articles: true,
-        archive_cited: archiveCited,
-      });
-      archived += result.archived;
-    }
-    if (articles.length) {
-      const result = await call("helpdesk.api.knowledge_base.delete_articles", {
-        articles,
-        archive_cited: archiveCited,
-      });
-      archived += result.archived;
-    }
+    // one request, so it all happens or none of it does
+    const { archived } = await call("helpdesk.api.knowledge_base.bulk_delete", {
+      articles,
+      categories: categories.map((group) => group.value),
+      archive_linked: archiveLinked,
+    });
     toast.success(
       archived
         ? countLabel(
             archived,
-            __(
-              "Deleted successfully. 1 article linked to a ticket was archived."
-            ),
-            __(
-              "Deleted successfully. {0} articles linked to tickets were archived."
-            )
+            __("Deleted successfully. 1 linked article was archived."),
+            __("Deleted successfully. {0} linked articles were archived.")
           )
         : __("Deleted successfully.")
     );
   } catch (error) {
-    // the ones deleted before the failure stay deleted
     getErrorMessage(error, true);
   } finally {
     listViewRef.value?.reload();
@@ -813,18 +809,18 @@ function handleCategoryUpdate() {
   );
 }
 
-function handleCategoryDelete(
+async function handleCategoryDelete(
   alsoDeleteArticles: boolean,
-  archiveCited = true
+  archiveLinked: boolean
 ) {
   deleteCategory.submit(
     {
       category: category.id,
       with_articles: alsoDeleteArticles,
-      archive_cited: archiveCited,
+      archive_linked: archiveLinked,
     },
     {
-      onSuccess: ({ archived }: { archived: number }) => {
+      onSuccess: ({ archived }) => {
         deleteModal.value = false;
         toast.success(
           archived
@@ -841,35 +837,6 @@ function handleCategoryDelete(
         resetState();
       },
       onError: (error: Error) => getErrorMessage(error, true),
-    }
-  );
-}
-
-function handleDeleteArticles(archiveCited = true) {
-  deleteArticles.submit(
-    {
-      articles: Array.from(listSelections.value),
-      archive_cited: archiveCited,
-    },
-    {
-      onSuccess: ({ archived }: { archived: number }) => {
-        listViewRef.value?.reload();
-        listViewRef.value?.unselectAll();
-        listSelections.value?.clear();
-        toast.success(
-          archived
-            ? countLabel(
-                archived,
-                __(
-                  "Articles deleted successfully. 1 linked to a ticket was archived."
-                ),
-                __(
-                  "Articles deleted successfully. {0} linked to tickets were archived."
-                )
-              )
-            : __("Articles deleted successfully.")
-        );
-      },
     }
   );
 }
@@ -913,6 +880,13 @@ const options = computed(() => {
       label_doc: "HD Article Category",
       label_field: "category_name",
       icon_field: "icon",
+    },
+    // the Category filter reads "Parent › Sub" from the loaded groups, not the ID
+    quickFilterTitles: {
+      category: (value: string) =>
+        listViewRef.value?.list?.data?.group_by_field?.options?.find(
+          (group) => group.value === value
+        )?.label,
     },
     columnConfig: {
       title: {

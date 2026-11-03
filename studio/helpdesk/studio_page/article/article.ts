@@ -117,7 +117,7 @@ export default function setup(context) {
         name,
         title: article.data.title,
         title_slug: article.data.title_slug,
-        categoryName: article.data.category_label || article.data.category_name,
+        categoryName: article.data.category_label,
         minutes: minutes.value,
       })
     },

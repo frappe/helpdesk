@@ -30,7 +30,7 @@ _Avoid_: Priority, rank, position
 The reserved Category that receives the Articles of a deleted Category. It cannot be renamed or deleted, but it can hold Subcategories like any Category.
 
 **Archived article**:
-An Article taken out of the knowledge base but kept because a ticket cites it. It belongs to no Category.
+An Article taken out of the knowledge base without deleting it, so the tickets that cite it keep their link. It belongs to no Category, and readers never see it. Restoring it puts it back in a Category as a draft.
 
 **Access**:
 Who can read an Article: Public (anyone), Customers (signed-in customers), or Private (agents only).

@@ -7,7 +7,7 @@ import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import { Icon } from "frappe-ui/experimental";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
-import { copyToClipboard, isEmoji } from "@helpdesk/shared/utils";
+import { copyToClipboard, countLabel, isEmoji } from "@helpdesk/shared/utils";
 
 // TODO: drop after #3846/#3847 merge; import from shared directly.
 export {
@@ -535,4 +535,17 @@ export function hasPermission() {
 export function splitPlacement(placement?: string) {
   const [side = "bottom", align = "center"] = (placement || "").split("-");
   return { side, align } as { side: any; align: any };
+}
+
+// Delete dialogs say it when a ticket links any of the articles.
+export function citedMessage(cited: number) {
+  return countLabel(
+    cited,
+    __(
+      "1 article is linked to a ticket. Archive it to keep the link, or delete it and remove it from the ticket."
+    ),
+    __(
+      "{0} articles are linked to tickets. Archive them to keep the links, or delete them and remove them from those tickets."
+    )
+  );
 }

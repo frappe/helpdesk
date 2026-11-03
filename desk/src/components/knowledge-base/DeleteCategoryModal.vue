@@ -1,40 +1,51 @@
 <template>
-  <Dialog
-    v-model:open="showDialog"
-    :title="__('Delete category?')"
-    @after-leave="deleteArticles = false"
-  >
+  <Dialog v-model:open="showDialog" :title="__('Delete category?')">
     <template #default>
       <div class="flex flex-col gap-3">
-        <Checkbox
-          v-model="deleteArticles"
-          :label="__('Also delete articles')"
-          :disabled="!summary"
-        />
         <p class="text-p-base text-ink-gray-7">{{ message }}</p>
-        <p v-if="hasLinked" class="text-p-base text-ink-gray-7">
-          {{ citedMessage }}
+        <p v-if="summary?.subcategories" class="text-p-base text-ink-gray-7">
+          {{
+            __("Moving them also makes its subcategories top-level categories.")
+          }}
+        </p>
+        <p v-if="summary?.cited" class="text-p-base text-ink-gray-7">
+          {{ citedMessage(summary.cited) }}
         </p>
       </div>
     </template>
     <template #actions>
-      <div class="flex gap-2">
+      <div class="flex w-full flex-col gap-2">
+        <template v-if="hasContent">
+          <Button
+            variant="subtle"
+            icon-left="lucide-folder-input"
+            :label="
+              isSubcategory
+                ? __('Move articles to parent category')
+                : __('Move articles to General')
+            "
+            :disabled="!ready || deleteCategory.loading"
+            :loading="deleteCategory.loading && choice === 'move'"
+            @click="confirm('move')"
+          />
+          <Button
+            v-if="summary?.cited"
+            variant="subtle"
+            icon-left="lucide-archive"
+            :label="__('Delete articles, archive linked')"
+            :disabled="deleteCategory.loading"
+            :loading="deleteCategory.loading && choice === 'archive'"
+            @click="confirm('archive')"
+          />
+        </template>
         <Button
-          v-if="hasLinked"
-          class="w-full"
-          variant="subtle"
-          :label="__('Archive linked')"
-          :loading="deleteCategory.loading"
-          @click="emit('confirm', true, true)"
-        />
-        <Button
-          class="w-full"
           variant="solid"
           theme="red"
-          :label="hasLinked ? __('Delete') : __('Confirm')"
-          :disabled="!summary && !categoryDeleteSummary.error"
-          :loading="deleteCategory.loading"
-          @click="emit('confirm', deleteArticles, false)"
+          icon-left="lucide-trash-2"
+          :label="deleteLabel"
+          :disabled="!ready || deleteCategory.loading"
+          :loading="deleteCategory.loading && choice === 'delete'"
+          @click="confirm('delete')"
         />
       </div>
     </template>
@@ -43,26 +54,31 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { Button, Checkbox, Dialog } from "frappe-ui";
-import { countLabel } from "@helpdesk/shared/utils";
+import { Button, Dialog } from "frappe-ui";
+import { citedMessage } from "@/utils";
 import { categoryDeleteSummary, deleteCategory } from "@/stores/knowledgeBase";
 import { __ } from "@/translation";
 
 const props = defineProps<{
   category: string;
+  title: string;
   // A Subcategory's articles move to its parent, not General.
   isSubcategory?: boolean;
 }>();
 const emit = defineEmits<{
-  confirm: [deleteArticles: boolean, archiveCited: boolean];
+  confirm: [deleteArticles: boolean, archiveLinked: boolean];
 }>();
 const showDialog = defineModel<boolean>();
-const deleteArticles = ref(false);
+const choice = ref<"move" | "archive" | "delete">();
 
 const summary = computed(() => categoryDeleteSummary.data);
-// articles that tickets link to: archive them or delete them too
-const hasLinked = computed(
-  () => deleteArticles.value && Boolean(summary.value?.cited)
+// a failed summary still lets the user choose
+const ready = computed(
+  () => Boolean(summary.value) || Boolean(categoryDeleteSummary.error)
+);
+// an empty category has nothing to move or keep
+const hasContent = computed(
+  () => !summary.value || summary.value.articles || summary.value.subcategories
 );
 
 watch(showDialog, (open) => {
@@ -71,44 +87,21 @@ watch(showDialog, (open) => {
   categoryDeleteSummary.submit({ category: props.category });
 });
 
-const message = computed(() => {
-  if (deleteArticles.value) {
-    const subcategories = summary.value?.subcategories ?? 0;
-    const articles = countLabel(
-      summary.value?.articles ?? 0,
-      __("1 article"),
-      __("{0} articles")
-    );
-    return subcategories
-      ? __("Deletes {0} and {1}", [
-          countLabel(
-            subcategories,
-            __("1 subcategory"),
-            __("{0} subcategories")
-          ),
-          articles,
-        ])
-      : __("Deletes {0}", [articles]);
-  }
-  if (props.isSubcategory) {
-    return __("Articles in this subcategory will move to the parent category.");
-  }
-  return summary.value?.subcategories
-    ? __(
-        "Subcategories will become top-level categories and articles will move to the General category."
-      )
-    : __("Articles will move to the General category.");
+const message = computed(() =>
+  hasContent.value
+    ? __("What should happen to the articles in {0}?", [props.title])
+    : __("{0} has no articles.", [props.title])
+);
+
+const deleteLabel = computed(() => {
+  if (!hasContent.value) return __("Delete category");
+  return summary.value?.cited || summary.value?.subcategories
+    ? __("Delete everything")
+    : __("Delete articles");
 });
 
-const citedMessage = computed(() =>
-  countLabel(
-    summary.value?.cited ?? 0,
-    __(
-      "1 article is linked to a ticket. Archive it to keep the link, or delete it and remove it from the ticket."
-    ),
-    __(
-      "{0} articles are linked to tickets. Archive them to keep the links, or delete them and remove them from those tickets."
-    )
-  )
-);
+function confirm(value: "move" | "archive" | "delete") {
+  choice.value = value;
+  emit("confirm", value !== "move", value === "archive");
+}
 </script>

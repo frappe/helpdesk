@@ -358,8 +358,6 @@ def article_index_jobs(enqueue: MagicMock) -> list[set[str]]:
     for call in enqueue.call_args_list:
         if call.args[0] == "helpdesk.search.update_article_indexes":
             jobs.append(set(call.kwargs["articles"]))
-        elif call.args[0] == "helpdesk.search.update_article_index":
-            jobs.append({call.kwargs["article"]})
     return jobs
 
 

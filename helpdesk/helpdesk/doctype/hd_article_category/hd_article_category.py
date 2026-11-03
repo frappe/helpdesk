@@ -58,8 +58,8 @@ class HDArticleCategory(NestedSet):
     def validate_old_parent(self):
         old_doc = self.get_doc_before_save()
         if old_doc and self.has_value_changed("parent_article_category"):
-            validate_parent_keeps_content(
-                old_doc.parent_article_category, leaving=self.name
+            validate_keeps_content(
+                old_doc.parent_article_category, leaving_subcategory=self.name
             )
 
     def validate_pinned_order(self):
@@ -120,9 +120,9 @@ class HDArticleCategory(NestedSet):
         if self.parent_article_category:
             move_category_articles(self.name, self.parent_article_category)
             # its moved articles, if any, fill the parent
-            validate_parent_keeps_content(
+            validate_keeps_content(
                 self.parent_article_category,
-                leaving=self.name,
+                leaving_subcategory=self.name,
                 message=_("Delete the parent category instead"),
             )
         else:
@@ -265,14 +265,15 @@ def get_parent(category: str) -> str | None:
 SEPARATOR = " \u203a "
 
 
+def format_category_label(name: str, parent_name: str | None = None) -> str:
+    """`<parent> › <name>` for a Subcategory, the plain name otherwise."""
+    return f"{parent_name}{SEPARATOR}{name}" if parent_name else name
+
+
 def get_category_labels(names: list[str]) -> dict[str, str]:
     """A top-level name maps to its category name, a Subcategory to `<parent> › <name>`."""
     return {
-        row.name: (
-            f"{row.parent_name}{SEPARATOR}{row.category_name}"
-            if row.parent_name
-            else row.category_name
-        )
+        row.name: format_category_label(row.category_name, row.parent_name)
         for row in frappe.get_all(
             "HD Article Category",
             filters={"name": ["in", names]},
@@ -295,24 +296,33 @@ def get_stricter_visibility(visibility: str, category_visibility: str | None) ->
     return min(visibility, category_visibility, key=VISIBILITY_ORDER.index)
 
 
-def validate_parent_keeps_content(
-    parent: str | None, leaving: str, message: str | None = None
+def validate_keeps_content(
+    category: str | None,
+    leaving_article: str | None = None,
+    leaving_subcategory: str | None = None,
+    message: str | None = None,
 ) -> None:
-    """A parent needs an article of its own or a Subcategory other than `leaving`."""
+    """A category keeps an article or a Subcategory besides the one leaving it."""
     if (
-        not parent
+        not category
         # a branch being deleted may empty its categories
-        or parent in (frappe.flags.deleting_category or ())
-        or frappe.db.exists("HD Article", {"category": parent})
-        or set(get_subcategories(parent)) - {leaving}
+        or category in (frappe.flags.deleting_category or ())
+        or frappe.db.exists(
+            "HD Article", {"category": category, "name": ["!=", leaving_article or ""]}
+        )
+        or set(get_subcategories(category)) - {leaving_subcategory}
     ):
         return
-    frappe.throw(
-        message
-        or _("{0} would be left empty. Move or add an article to it first").format(
-            frappe.db.get_value("HD Article Category", parent, "category_name")
-        )
-    )
+    if not message:
+        name = frappe.db.get_value("HD Article Category", category, "category_name")
+        message = (
+            _(
+                "This is the only article in {0}. Move another article in first, or delete the category."
+            )
+            if leaving_article
+            else _("{0} would be left empty. Move or add an article to it first")
+        ).format(name)
+    frappe.throw(message)
 
 
 def move_category_articles(source: str, target: str) -> None:
@@ -363,8 +373,9 @@ def batched_article_index():
     index_articles(articles)
 
 
-def index_articles(articles: list[str]) -> None:
-    """One job: a job per article overloads the queue on a big category."""
+def index_articles(articles: list[str], queue: str = "long") -> None:
+    """One job: a job per article overloads the queue on a big category. Inside
+    `batched_article_index`, the batch sends it."""
     if (batch := frappe.flags.batch_article_index) is not None:
         batch.extend(articles)
         return
@@ -373,19 +384,6 @@ def index_articles(articles: list[str]) -> None:
             "helpdesk.search.update_article_indexes",
             # a save in the batch and the bulk move may name the same article
             articles=list(dict.fromkeys(articles)),
-            queue="long",
+            queue=queue,
             enqueue_after_commit=True,
         )
-
-
-def check_category_length(category: str | None) -> None:
-    """Only a category without subcategories must keep an article."""
-    # a branch being deleted may empty its categories
-    if (
-        not category
-        or category in (frappe.flags.deleting_category or ())
-        or get_subcategories(category)
-    ):
-        return
-    if frappe.db.count("HD Article", {"category": category}) == 1:
-        frappe.throw(_("Category must have at least one article"))

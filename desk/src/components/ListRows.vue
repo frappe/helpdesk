@@ -47,6 +47,7 @@
 
 <script setup>
 import CategoryRow from "@/components/knowledge-base/CategoryRow.vue";
+import { __ } from "@/translation";
 import { ListRow, ListRows } from "frappe-ui/experimental";
 import { computed, nextTick, reactive, watch } from "vue";
 
@@ -126,15 +127,23 @@ const items = computed(() => {
 });
 
 // the Archived group is no category, so it has no actions
-const actions = (group) =>
-  !group.group.value
-    ? []
-    : props.groupByActions
-        .filter((action) => action.condition?.(group) ?? true)
-        .map(({ condition, ...action }) => ({
-          ...action,
-          onClick: () => action.onClick(group),
-        }));
+const actions = (group) => {
+  if (!group.group.value) return [];
+  const items = props.groupByActions
+    .filter((action) => action.condition?.(group) ?? true)
+    .map(({ condition, ...action }) => ({
+      ...action,
+      onClick: () => action.onClick(group),
+    }));
+  const danger = items.filter((action) => action.theme === "red");
+  // red actions sit below a divider, as ConfirmDelete's do
+  return [
+    ...items.filter((action) => action.theme !== "red"),
+    ...(danger.length
+      ? [{ group: __("Danger"), hideLabel: true, options: danger }]
+      : []),
+  ];
+};
 
 const showGroupedRows = computed(() => {
   return props.rows.every(

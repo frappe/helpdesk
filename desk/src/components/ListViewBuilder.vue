@@ -332,6 +332,8 @@ interface P {
     doctype: string;
     defaultFilters?: Record<string, any>;
     columnConfig?: Record<string, any>;
+    // what a Link quick filter shows for its value, by fieldname
+    quickFilterTitles?: Record<string, (value: string) => string | undefined>;
     emptyState?: {
       // type of a h componnt
       icon?: string | VNode;
@@ -756,6 +758,7 @@ const listViewData = reactive({
   filterableFields,
   quickFilters,
   sortableFields,
+  quickFilterTitles: computed(() => options.value?.quickFilterTitles || {}),
 });
 
 provide("listViewData", listViewData);

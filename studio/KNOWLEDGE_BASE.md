@@ -45,9 +45,12 @@ The `General` category is reserved. It cannot be renamed or deleted.
 
 `helpdesk/api/knowledge_base.py` has the KB endpoints.
 
-- **Reads** (guests allowed, `GET`): `get_categories`, `get_articles`, `get_featured_articles`, `get_kb_sidebar`, `get_article`, `get_article_markdown`, `search_articles`.
+- **Reads** (guests allowed, `GET`): `get_categories`, `get_articles`, `get_featured_articles`, `get_subcategory_articles`, `get_kb_sidebar`, `get_article`, `get_article_markdown`, `search_articles`.
 - **Guest writes** (`POST`, rate limited): `vote_on_article`, `increment_views`. A guest voter is known by the `hd_visitor` cookie.
-- **Agent only**: `create_category`, `delete_articles`, `move_to_category`, `merge_category`, `get_category_visibility`, `set_category_visibility`, `get_general_category`.
+- **Agent only**:
+  - Categories: `create_category`, `merge_category`, `delete_category`, `get_category_delete_summary`, `get_category_options`, `get_category_visibility`, `set_category_visibility`, `get_category_access`, `get_general_category`.
+  - Articles: `move_to_category` (also restores an archived article as a draft), `archive_articles`, `delete_articles`, `bulk_delete` (the list's Delete, in one request), `get_cited_articles`, `set_pinned_articles`.
+  - `search_categories` is the link search for HD Article Category, registered in `standard_queries`. It labels a subcategory `Parent › Sub`.
 
 Every guest endpoint calls `validate_public_access()` first. Keep that call in any new guest endpoint.
 

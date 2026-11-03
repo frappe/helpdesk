@@ -41,7 +41,7 @@ function parseLinks(script: string): Link[] {
 export type PinKind = "categories" | "articles";
 
 // The home page features this many; the backend's MAX_PINNED_ARTICLES.
-export const PIN_LIMITS: Partial<Record<PinKind, number>> = { articles: 5 };
+export const MAX_PINNED_ARTICLES = 5;
 // Pickable articles shown before a search narrows them.
 const ARTICLE_SEARCH_LIMIT = 100;
 
@@ -86,7 +86,7 @@ function createDraft() {
     doctype: "HD Article",
     fields: ["name", "title", "visibility", "pinned", "pinned_order"],
     filters: { pinned: 1 },
-    pageLength: PIN_LIMITS.articles,
+    pageLength: MAX_PINNED_ARTICLES,
     auto: true,
   });
   // The rest load by search, once the pin dialog opens: a big knowledge base has too many to list.

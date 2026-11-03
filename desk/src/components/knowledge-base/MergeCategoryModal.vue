@@ -42,7 +42,9 @@ const showDialog = defineModel<boolean>();
 
 const toCategory = ref("");
 const options = computed(() =>
-  (categoryOptions.data || []).map(({ value, label }) => ({ value, label }))
+  (categoryOptions.data || [])
+    .filter(({ value }) => value !== props.categoryId)
+    .map(({ value, label }) => ({ value, label }))
 );
 watch(showDialog, (open) => {
   if (!open) return;
@@ -50,7 +52,7 @@ watch(showDialog, (open) => {
   toCategory.value = "";
   // shared with other dialogs: drop their list before it shows here
   categoryOptions.reset();
-  categoryOptions.submit({ exclude: props.categoryId });
+  categoryOptions.submit();
 });
 const joining = useCategoryVisibility(toCategory);
 // A merge only narrows access; Public needs no note.

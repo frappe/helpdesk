@@ -30,10 +30,9 @@ export const deleteRes = createResource({
 
 export const deleteArticles = createResource({
   url: "helpdesk.api.knowledge_base.delete_articles",
-  makeParams({ articles, archive_cited = true }) {
+  makeParams({ articles }) {
     return {
       articles,
-      archive_cited,
     };
   },
   validate({ articles }) {
