@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from typing import Any
+from unittest.mock import MagicMock, patch
 
 import frappe
 from frappe.cache_manager import clear_doctype_map
@@ -17,6 +18,7 @@ except ImportError:  # frappe v15
 
 from frappe.utils import add_to_date, getdate, now_datetime
 
+from helpdesk.api.banners import BANNERS, dismiss_banner
 from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
@@ -992,13 +994,6 @@ def make_email_account_data(service: str | None, **overrides: Any) -> dict[str, 
     }
 
 
-def is_portal_notice_shown() -> bool:
-    """Whether HD Settings still flags the customer portal notice as shown."""
-    from helpdesk.api.customer_portal_notice import NOTICE_FLAG
-
-    return bool(frappe.db.get_single_value("HD Settings", NOTICE_FLAG))
-
-
 def make_email_account(service: str, **overrides: Any) -> str:
     """An Email Account saved through the helpdesk settings API.
 
@@ -1041,3 +1036,21 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
     cards = HelpdeskDashboard(filters).get_number_card_data()
     return {card["title"]: card for card in cards}
+
+
+def show_only_banners(*banners: str):
+    """Turn on exactly `banners` in HD Settings and turn every other banner off."""
+    for banner, flag in BANNERS.items():
+        frappe.db.set_single_value("HD Settings", flag, int(banner in banners))
+
+
+def dismiss_banner_as(user: str, banner: str) -> MagicMock:
+    """Dismiss `banner` as `user`, returning the realtime publisher mock."""
+    previous_user = frappe.session.user
+    frappe.set_user(user)
+    try:
+        with patch("frappe.publish_realtime") as publish_realtime:
+            dismiss_banner(banner)
+    finally:
+        frappe.set_user(previous_user)
+    return publish_realtime

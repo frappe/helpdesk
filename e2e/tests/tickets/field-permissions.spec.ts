@@ -25,7 +25,7 @@ test.describe("field permission notice", () => {
   });
 
   test("a manager sees it until they dismiss it in any tab", async ({ api, pageAs }) => {
-    const text = "Some ticket fields are now visible to agents only";
+    const text = "Some fields are now hidden from customers";
     const otherTab = await pageAs("manager");
     await otherTab.goto("/helpdesk/tickets");
     await expect(otherTab.getByText(text)).toBeVisible();
@@ -35,8 +35,8 @@ test.describe("field permission notice", () => {
     await expect(banner).toBeVisible();
 
     await page.getByRole("button", { name: "Learn more" }).click();
-    const dialog = page.getByRole("dialog", { name: "Ticket field permissions have changed" });
-    await expect(dialog.getByRole("link", { name: "documentation" })).toHaveAttribute(
+    const dialog = page.getByRole("dialog", { name: "Ticket fields have changed" });
+    await expect(dialog.getByRole("link", { name: "See how" })).toHaveAttribute(
       "href",
       /perm-levels-in-helpdesk/
     );
@@ -59,7 +59,7 @@ test.describe("field permission notice", () => {
       const page = await pageAs(persona);
       await page.goto(url);
       await page.waitForLoadState("networkidle");
-      await expect(page.getByText("Ticket field permissions")).toHaveCount(0);
+      await expect(page.getByText("Ticket fields update")).toHaveCount(0);
     }
   });
 });
