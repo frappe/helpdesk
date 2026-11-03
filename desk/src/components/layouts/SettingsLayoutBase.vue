@@ -1,17 +1,19 @@
 <template>
   <div class="flex flex-col h-full w-full pb-8">
     <div class="px-10 py-8 pb-6 relative z-10">
-      <div class="flex items-start justify-between">
-        <div class="flex flex-col gap-1 text-start">
+      <div
+        class="flex flex-wrap lg:flex-nowrap items-start justify-between gap-x-4 gap-y-2"
+      >
+        <div class="flex min-w-0 flex-col gap-1 text-start">
           <slot name="title">
-            <div v-if="backLabel" class="flex items-center gap-2">
+            <div v-if="backLabel" class="flex min-w-0 items-center gap-2">
               <Button
                 variant="ghost"
                 icon-left="lucide-chevron-left"
                 :label="backLabel"
                 size="md"
                 @click="onBack"
-                class="cursor-pointer -ms-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 text-ink-gray-7 text-md-semibold hover:opacity-70 !pe-0 !max-w-96 !justify-start rtl:flex-row-reverse rtl:ps-4"
+                class="cursor-pointer -ms-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 text-ink-gray-7 text-md-semibold hover:opacity-70 !pe-0 !max-w-96 !shrink min-w-0 !justify-start rtl:flex-row-reverse rtl:ps-4"
               />
               <UnsavedBadge :show="Boolean(dirty)" />
             </div>

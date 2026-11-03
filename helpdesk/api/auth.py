@@ -62,10 +62,6 @@ def get_user():
     language = user.language or frappe.db.get_single_value(
         "System Settings", "language"
     )
-    # Ride the boot so the onboarding guard decides without an extra round-trip.
-    persona_captured = bool(
-        frappe.db.get_single_value("HD Settings", "persona_captured")
-    )
 
     return {
         "has_desk_access": has_desk_access,
@@ -91,7 +87,6 @@ def get_user():
             if agent_name
             else None
         ),
-        "persona_captured": persona_captured,
     }
 
 
