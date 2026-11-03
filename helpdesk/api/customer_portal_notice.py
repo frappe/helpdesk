@@ -1,24 +1,6 @@
 import frappe
-from frappe.realtime import get_website_room
 
 from helpdesk.utils import agent_manager_only
-
-NOTICE_FLAG = "show_customer_portal_permission_notice"
-FIELD_PERMISSION_NOTICE_FLAG = "show_ticket_field_permission_notice"
-
-
-@frappe.whitelist(methods=["POST"])
-@agent_manager_only
-def dismiss_notice() -> None:
-    """Permanently dismiss the customer portal permission change notice."""
-    disable_notice()
-
-
-@frappe.whitelist(methods=["POST"])
-@agent_manager_only
-def dismiss_field_permission_notice() -> None:
-    """Permanently dismiss the ticket field permission change notice."""
-    disable_notice(FIELD_PERMISSION_NOTICE_FLAG)
 
 
 @frappe.whitelist(methods=["POST"])
@@ -28,23 +10,12 @@ def restore_ticket_access() -> None:
 
     Promotes every customer contact to a customer manager in a background
     job, so each contact can again see all tickets of their customer.
-    Dismisses the notice once the job is queued.
     """
     frappe.enqueue(
         promote_all_contacts_to_managers,
         queue="long",
         job_id="promote_all_contacts_to_managers",
         deduplicate=True,
-    )
-    disable_notice()
-
-
-def disable_notice(flag: str = NOTICE_FLAG) -> None:
-    """Turn the flag off and notify connected clients, publishing the same
-    realtime event HD Settings emits from its on_update."""
-    frappe.db.set_single_value("HD Settings", flag, 0)
-    frappe.publish_realtime(
-        "helpdesk:settings-updated", room=get_website_room(), after_commit=True
     )
 
 

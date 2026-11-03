@@ -700,7 +700,7 @@ declare global {
     agent: string | null;
     default_country: string;
     apps: string[];
-    telemetry: { enabled: boolean };
+    cloud_settings?: { enabled: boolean };
   }
 }
 

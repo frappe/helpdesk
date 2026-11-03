@@ -7,8 +7,9 @@
         class="flex flex-col gap-2"
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
+        <TrialCard :is-sidebar-collapsed="isCollapsed" />
         <TrialBanner
-          v-if="isFCSite && !isCustomerPortal"
+          v-if="isFCSite && !isCustomerPortal && !isCloudSettingsAvailable()"
           :isSidebarCollapsed="isCollapsed"
         />
         <GettingStartedBanner
@@ -16,14 +17,16 @@
           :isSidebarCollapsed="isCollapsed"
           appName="helpdesk"
         />
-        <CustomerPortalPermissionBanner
-          v-if="showPermissionNoticeBanner"
-          :isSidebarCollapsed="isCollapsed"
-        />
-        <TicketFieldPermissionBanner
-          v-if="showFieldPermissionNoticeBanner"
-          :isSidebarCollapsed="isCollapsed"
-        />
+        <template v-if="!isCustomerPortal">
+          <CustomerPortalPermissionBanner
+            v-if="isBannerVisible('customer_portal_permission')"
+            :isSidebarCollapsed="isCollapsed"
+          />
+          <TicketFieldPermissionBanner
+            v-if="isBannerVisible('ticket_field_permission')"
+            :isSidebarCollapsed="isCollapsed"
+          />
+        </template>
       </div>
       <SidebarItem
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
@@ -63,12 +66,16 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
-import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
-import TicketFieldPermissionBanner from "@/components/layouts/TicketFieldPermissionBanner.vue";
+import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalPermissionBanner.vue";
+import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
-import { confirmLoginToFrappeCloud } from "@/composables/fc";
+import {
+  confirmLoginToFrappeCloud,
+  isCloudSettingsAvailable,
+} from "@/composables/fc";
 import { useApps } from "@/composables/useApps";
+import { useBanners } from "@/composables/useBanners";
 import { useScreenSize } from "@/composables/screen";
 import { showNewContactModal } from "@/pages/contact/dialogState";
 import {
@@ -77,7 +84,6 @@ import {
   showEmailBox,
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
-import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
 import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
@@ -95,6 +101,7 @@ import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppSidebar from "./AppSidebar.vue";
+import TrialCard from "./TrialCard.vue";
 import { showShortcutsModal } from "./layoutSettings";
 
 import { useShortcut } from "@/composables/shortcuts";
@@ -111,6 +118,7 @@ import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
+  openBillingSettings,
   setActiveSettingsTab,
   showSettingsModal,
 } from "../Settings/settingsModal";
@@ -119,7 +127,7 @@ const { isMobileView } = useScreenSize();
 
 const router = useRouter();
 const authStore = useAuthStore();
-const configStore = useConfigStore();
+const { isVisible: isBannerVisible } = useBanners();
 
 const { appsMenuOption } = useApps();
 const { colorScheme, toggleColorScheme } = useColorScheme();
@@ -166,12 +174,18 @@ const agentPortalDropdown = computed(() => [
     label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
-  {
-    label: __("Login to Frappe Cloud"),
-    icon: FrappeCloudIcon,
-    onClick: () => confirmLoginToFrappeCloud(),
-    condition: () => !isMobileView.value && window.is_fc_site,
-  },
+  isCloudSettingsAvailable()
+    ? {
+        label: __("Manage billing"),
+        icon: "lucide-credit-card",
+        onClick: openBillingSettings,
+      }
+    : {
+        label: __("Login to Frappe Cloud"),
+        icon: FrappeCloudIcon,
+        onClick: () => confirmLoginToFrappeCloud(),
+        condition: () => !isMobileView.value && window.is_fc_site,
+      },
   {
     label: __("Shortcuts"),
     icon: h(LucideKeyboard),
@@ -208,18 +222,6 @@ const logo = h(
   },
   null
 );
-
-const showPermissionNoticeBanner = computed(() => {
-  return (
-    !isCustomerPortal.value &&
-    (authStore.isManager || authStore.isAdmin) &&
-    configStore.showCustomerPortalPermissionNotice
-  );
-});
-
-const showFieldPermissionNoticeBanner = computed(() => {
-  return !isCustomerPortal.value && (authStore.isManager || authStore.isAdmin);
-});
 
 const showOnboardingBanner = computed(() => {
   return (

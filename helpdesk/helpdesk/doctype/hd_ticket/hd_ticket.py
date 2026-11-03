@@ -81,7 +81,7 @@ class HDTicket(Document, CustomerEditController):
 
     def before_insert(self):
         self.generate_key()
-        self.apply_portal_insert_rules()
+        self.apply_ticket_insert_rules()
 
     def validate_higher_perm_levels(self):
         # ahead of the framework's silent reset of fields the user cannot write,
@@ -126,7 +126,7 @@ class HDTicket(Document, CustomerEditController):
         }
         for key, value in args.items():
             template_args[key] = value
-        return frappe.render_template(
+        return frappe.render_template(  # nosemgrep
             default_content if is_email_content_empty(content) else content,
             template_args,
         )
@@ -180,7 +180,7 @@ class HDTicket(Document, CustomerEditController):
             )
             frappe.msgprint(_("Feedback email has been sent to the customer"))
         except Exception as e:
-            frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
+            frappe.throw(_("Could not send feedback email,due to: {0}").format(str(e)))
 
     def after_insert(self):
         # Telemetry Event
@@ -764,7 +764,7 @@ class HDTicket(Document, CustomerEditController):
                     {"message": message, "ticket_url": self.portal_uri},
                 )
             except Exception as e:
-                frappe.throw(_("Could not an email due to: {0}").format(e))
+                frappe.throw(_("Could not an email due to: {0}").format(str(e)))
 
         send_delayed = True
         send_now = False
@@ -933,7 +933,7 @@ class HDTicket(Document, CustomerEditController):
             )
         except Exception as e:
             frappe.throw(
-                _("Could not send an acknowledgement email due to: {0}").format(e)
+                _("Could not send an acknowledgement email due to: {0}").format(str(e))
             )
 
     @frappe.whitelist()

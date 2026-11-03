@@ -1,5 +1,4 @@
 import { useScreenSize } from "@/composables/screen";
-import { canViewPersona, personaInterrupt } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { isCustomerPortal } from "@/utils";
@@ -203,13 +202,6 @@ const portalRoutes = [
 ];
 
 const routes = [
-  // Renders bare — no portal chrome.
-  {
-    path: "/onboarding",
-    name: "Persona",
-    component: () => import("@/pages/PersonaForm.vue"),
-    beforeEnter: () => canViewPersona(useAuthStore()) || { name: "Home" },
-  },
   {
     path: "/",
     component: () => import("@/roots/PortalRoot.vue"),
@@ -232,9 +224,6 @@ router.beforeEach(async (to, _, next) => {
   if (authStore.isLoggedIn) {
     await authStore.init();
   }
-
-  const interrupt = personaInterrupt(to, authStore);
-  if (interrupt) return next(interrupt);
 
   if (!authStore.isLoggedIn) {
     const redirectURL = to.fullPath !== "/" ? to.fullPath : "";

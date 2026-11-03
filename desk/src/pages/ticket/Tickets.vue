@@ -378,7 +378,7 @@ const dropdownOptions = computed(() => {
       options: [
         {
           label: __("List View"),
-          icon: "lucide-align-justify",
+          icon: "lucide-text-align-justify",
           onClick: () =>
             router.push({
               name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",

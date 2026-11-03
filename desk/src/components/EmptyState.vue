@@ -19,6 +19,19 @@
         {{ __(descriptionText) }}
       </div>
     </div>
+    <div
+      v-if="actions?.length || documentationLink"
+      class="flex flex-wrap items-center justify-center gap-2 pointer-events-auto"
+    >
+      <Button v-for="action in actions" :key="action.label" v-bind="action" />
+      <Button
+        v-if="documentationLink"
+        variant="outline"
+        icon-left="lucide-external-link"
+        :label="__('Documentation')"
+        :href="documentationLink"
+      />
+    </div>
   </div>
   <div
     v-else
@@ -61,16 +74,32 @@
           {{ __(descriptionText) }}
         </span>
       </div>
+      <div
+        v-if="actions?.length || documentationLink"
+        class="mt-2 flex flex-wrap items-center justify-center gap-2 pointer-events-auto"
+      >
+        <Button v-for="action in actions" :key="action.label" v-bind="action" />
+        <Button
+          v-if="documentationLink"
+          variant="outline"
+          icon-left="lucide-external-link"
+          :label="__('Documentation')"
+          :href="documentationLink"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Button, type ButtonProps } from "frappe-ui";
 import { VNode, computed } from "vue";
 interface Props {
   title: string;
   icon?: VNode | string;
   description?: string;
+  actions?: (ButtonProps & { onClick?: () => void })[];
+  documentationLink?: string;
   variant?: "default" | "overlay" | "badge";
   text?: "sm" | "md" | "lg";
 }
