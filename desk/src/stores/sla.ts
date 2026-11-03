@@ -321,8 +321,8 @@ export function getBreakError(
   return "";
 }
 
-/** Minutes since midnight for an "H:MM" or "H:MM:SS" time. */
+/** Minutes since midnight for an "H:MM" or "H:MM:SS" time, seconds as a fraction. */
 export function toMinutes(time?: string | null): number {
-  const [hours, minutes] = (time || "").split(":").map(Number);
-  return (hours || 0) * 60 + (minutes || 0);
+  const [hours, minutes, seconds] = (time || "").split(":").map(Number);
+  return (hours || 0) * 60 + (minutes || 0) + (seconds || 0) / 60;
 }
