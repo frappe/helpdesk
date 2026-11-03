@@ -77,7 +77,7 @@
         </div>
 
         <div>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-[1fr_1fr_auto] items-end gap-2">
             <FormControl
               type="time"
               size="sm"
@@ -95,27 +95,25 @@
               :disabled="!workDayData.break_start"
               @blur="validateBreak"
             />
+            <Button
+              :disabled="!workDayData.break_start && !workDayData.break_end"
+              variant="subtle"
+              size="sm"
+              icon="lucide-x"
+              :tooltip="__('Remove break')"
+              :aria-label="__('Remove break')"
+              @click="removeBreak"
+            />
           </div>
           <ErrorMessage :message="errors.break" class="mt-2" />
         </div>
 
         <!-- invisible, not v-if: a layout shift on blur would swallow the Save click -->
-        <div
-          class="flex items-center justify-between"
+        <Checkbox
           :class="{ invisible: !hasBreak }"
-        >
-          <Checkbox
-            v-model="applyBreakToAll"
-            :label="__('Apply break to all workdays')"
-          />
-          <Button
-            variant="ghost"
-            size="sm"
-            icon-left="lucide-x"
-            :label="__('Remove break')"
-            @click="removeBreak"
-          />
-        </div>
+          v-model="applyBreakToAll"
+          :label="__('Apply break to all workdays')"
+        />
       </div>
     </template>
     <template #actions>
