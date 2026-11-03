@@ -470,7 +470,7 @@ function selectedCategories(selections: Set<string>) {
   return groups.filter((group) => !values.has(group.parent_article_category));
 }
 
-function deleteSelection(selections: Set<string>) {
+async function deleteSelection(selections: Set<string>) {
   listSelections.value = new Set(selections);
   const categories = selectedCategories(selections);
   const covered = new Set(
@@ -485,28 +485,41 @@ function deleteSelection(selections: Set<string>) {
     deleteModal.value = true;
     return;
   }
+  let cited = 0;
+  try {
+    cited = await call("helpdesk.api.knowledge_base.count_cited_articles", {
+      articles,
+      categories: categories.map((group) => group.value),
+    });
+  } catch (error) {
+    getErrorMessage(error, true);
+    return;
+  }
+  const run = (archiveCited: boolean) =>
+    categories.length
+      ? deleteCategoriesAndArticles(categories, articles, archiveCited)
+      : handleDeleteArticles(archiveCited);
   $dialog({
     title: deleteTitle(categories.length, articles.length),
-    message: categories.length
-      ? countLabel(
-          categories.length,
-          __(
-            "This also deletes the category's subcategories and all its articles. Articles cited by tickets are archived instead."
-          ),
-          __(
-            "This also deletes the categories' subcategories and all their articles. Articles cited by tickets are archived instead."
-          )
-        )
-      : countLabel(
-          articles.length,
-          __(
-            "Are you sure you want to delete this article? If a ticket cites it, it is archived instead."
-          ),
-          __(
-            "Are you sure you want to delete these {0} articles? Articles cited by tickets are archived instead."
-          )
-        ),
+    message: [
+      deleteMessage(categories.length, articles.length),
+      cited ? citedMessage(cited) : "",
+    ]
+      .filter(Boolean)
+      .join(" "),
     actions: [
+      ...(cited
+        ? [
+            {
+              label: __("Archive linked"),
+              variant: "subtle",
+              onClick({ close }) {
+                close();
+                run(true);
+              },
+            },
+          ]
+        : []),
       {
         label: __("Delete"),
         theme: "red",
@@ -514,15 +527,43 @@ function deleteSelection(selections: Set<string>) {
         variant: "solid",
         onClick({ close }) {
           close();
-          if (categories.length) {
-            deleteCategoriesAndArticles(categories, articles);
-          } else {
-            handleDeleteArticles();
-          }
+          run(false);
         },
       },
     ],
   });
+}
+
+function deleteMessage(categories: number, articles: number) {
+  if (categories) {
+    return countLabel(
+      categories,
+      __(
+        "This also deletes the category's subcategories and all its articles."
+      ),
+      __(
+        "This also deletes the categories' subcategories and all their articles."
+      )
+    );
+  }
+  return countLabel(
+    articles,
+    __("Are you sure you want to delete this article?"),
+    __("Are you sure you want to delete these {0} articles?")
+  );
+}
+
+// Only said when a ticket links one of them.
+function citedMessage(cited: number) {
+  return countLabel(
+    cited,
+    __(
+      "1 article is linked to a ticket. Archive it to keep the link, or delete it and remove it from the ticket."
+    ),
+    __(
+      "{0} articles are linked to tickets. Archive them to keep the links, or delete them and remove them from those tickets."
+    )
+  );
 }
 
 function deleteTitle(categories: number, articles: number) {
@@ -548,7 +589,8 @@ function deleteTitle(categories: number, articles: number) {
 
 async function deleteCategoriesAndArticles(
   categories: { value: string }[],
-  articles: string[]
+  articles: string[],
+  archiveCited: boolean
 ) {
   let archived = 0;
   try {
@@ -556,12 +598,14 @@ async function deleteCategoriesAndArticles(
       const result = await call("helpdesk.api.knowledge_base.delete_category", {
         category: group.value,
         with_articles: true,
+        archive_cited: archiveCited,
       });
       archived += result.archived;
     }
     if (articles.length) {
       const result = await call("helpdesk.api.knowledge_base.delete_articles", {
         articles,
+        archive_cited: archiveCited,
       });
       archived += result.archived;
     }
@@ -570,10 +614,10 @@ async function deleteCategoriesAndArticles(
         ? countLabel(
             archived,
             __(
-              "Deleted successfully. 1 article cited by tickets was archived."
+              "Deleted successfully. 1 article linked to a ticket was archived."
             ),
             __(
-              "Deleted successfully. {0} articles cited by tickets were archived."
+              "Deleted successfully. {0} articles linked to tickets were archived."
             )
           )
         : __("Deleted successfully.")
@@ -692,9 +736,16 @@ function handleCategoryUpdate() {
   );
 }
 
-function handleCategoryDelete(alsoDeleteArticles: boolean) {
+function handleCategoryDelete(
+  alsoDeleteArticles: boolean,
+  archiveCited = true
+) {
   deleteCategory.submit(
-    { category: category.id, with_articles: alsoDeleteArticles },
+    {
+      category: category.id,
+      with_articles: alsoDeleteArticles,
+      archive_cited: archiveCited,
+    },
     {
       onSuccess: ({ archived }: { archived: number }) => {
         deleteModal.value = false;
@@ -717,10 +768,11 @@ function handleCategoryDelete(alsoDeleteArticles: boolean) {
   );
 }
 
-function handleDeleteArticles() {
+function handleDeleteArticles(archiveCited = true) {
   deleteArticles.submit(
     {
       articles: Array.from(listSelections.value),
+      archive_cited: archiveCited,
     },
     {
       onSuccess: ({ archived }: { archived: number }) => {
@@ -732,10 +784,10 @@ function handleDeleteArticles() {
             ? countLabel(
                 archived,
                 __(
-                  "Articles deleted successfully. 1 cited by tickets was archived."
+                  "Articles deleted successfully. 1 linked to a ticket was archived."
                 ),
                 __(
-                  "Articles deleted successfully. {0} cited by tickets were archived."
+                  "Articles deleted successfully. {0} linked to tickets were archived."
                 )
               )
             : __("Articles deleted successfully.")

@@ -244,6 +244,7 @@ import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.v
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
+import { globalStore } from "@/stores/globalStore";
 import {
   categoryOptions,
   deleteArticles,
@@ -254,7 +255,12 @@ import {
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Article, Breadcrumb, Error, Resource } from "@/types";
-import { ConfirmDelete, CUSTOMER_PORTAL_ROOT, uploadFunction } from "@/utils";
+import {
+  ConfirmDelete,
+  CUSTOMER_PORTAL_ROOT,
+  getErrorMessage,
+  uploadFunction,
+} from "@/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import Icon from "@helpdesk/shared/Icon.vue";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
@@ -268,6 +274,7 @@ import {
   Badge,
   Breadcrumbs,
   Button,
+  call,
   createResource,
   dayjsLocal,
   debounce,
@@ -288,6 +295,7 @@ import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 
 const extensions = buildEditorExtensions();
+const { $dialog } = globalStore();
 const { isMobileView } = useScreenSize();
 
 const props = defineProps({
@@ -555,18 +563,59 @@ function handleArticleUpdate() {
   );
 }
 
-function handleDelete() {
+// A ticket links it: ask whether to archive it or delete it from the ticket too.
+async function handleDelete() {
+  let cited = 0;
+  try {
+    cited = await call("helpdesk.api.knowledge_base.count_cited_articles", {
+      articles: [article.data.name],
+    });
+  } catch (error) {
+    getErrorMessage(error, true);
+    return;
+  }
+  if (!cited) return deleteArticle(false);
+  $dialog({
+    title: __("This article is linked to tickets"),
+    message: __(
+      "Archive it to keep the link, or delete it and remove it from those tickets."
+    ),
+    actions: [
+      {
+        label: __("Archive"),
+        variant: "subtle",
+        onClick({ close }) {
+          close();
+          deleteArticle(true);
+        },
+      },
+      {
+        label: __("Delete"),
+        theme: "red",
+        iconLeft: "lucide-trash-2",
+        variant: "solid",
+        onClick({ close }) {
+          close();
+          deleteArticle(false);
+        },
+      },
+    ],
+  });
+}
+
+function deleteArticle(archiveCited: boolean) {
   deleteArticles.submit(
-    { articles: [article.data.name] },
+    { articles: [article.data.name], archive_cited: archiveCited },
     {
       onSuccess: ({ archived }: { archived: number }) => {
         toast.success(
           archived
-            ? __("Article is cited by tickets, so it was archived.")
+            ? __("Article archived.")
             : __("Article deleted successfully.")
         );
         router.push({ name: "AgentKnowledgeBase" });
       },
+      onError: (error: Error) => getErrorMessage(error, true),
     }
   );
 }

@@ -9,6 +9,7 @@ from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
+    count_cited_articles,
     create_category,
     delete_articles,
     delete_category,
@@ -1407,6 +1408,49 @@ class TestCategoryDelete(IntegrationTestCase):
         self.assertEqual(delete_articles([cited]), {"archived": 1})
 
         self.assertEqual(frappe.db.get_value("HD Article", cited, "status"), "Archived")
+
+    def test_deleting_a_cited_article_without_archiving_clears_its_tickets(
+        self,
+    ) -> None:
+        make_article(category=self.parent)
+        cited = make_article(category=self.parent)
+        self.cite(cited)
+        ticket = frappe.db.get_value("HD Ticket", {"source_article": cited})
+
+        self.assertEqual(delete_articles([cited], archive_cited=False), {"archived": 0})
+
+        self.assertFalse(frappe.db.exists("HD Article", cited))
+        self.assertIsNone(frappe.db.get_value("HD Ticket", ticket, "source_article"))
+
+    def test_branch_delete_without_archiving_deletes_cited_articles(self) -> None:
+        make_article(category=self.parent)
+        cited = make_article(category=self.sub)
+        self.cite(cited)
+
+        self.assertEqual(
+            delete_category(self.parent, with_articles=True, archive_cited=False),
+            {"archived": 0},
+        )
+
+        self.assertFalse(frappe.db.exists("HD Article", cited))
+        self.assertFalse(frappe.db.exists("HD Ticket", {"source_article": cited}))
+
+    def test_cited_count_covers_articles_and_category_branches(self) -> None:
+        in_branch = make_article(category=self.sub)
+        loose = make_article(
+            category=make_article_category(unique_name("Fixture loose")).name
+        )
+        uncited = make_article(category=self.parent)
+        for article in (in_branch, loose):
+            self.cite(article)
+        self.cite(loose)
+
+        self.assertEqual(count_cited_articles(articles=[loose, uncited]), 1)
+        self.assertEqual(count_cited_articles(categories=[self.parent]), 1)
+        self.assertEqual(
+            count_cited_articles(articles=[loose], categories=[self.parent]), 2
+        )
+        self.assertEqual(count_cited_articles(), 0)
 
     def test_archiving_the_last_article_outside_a_branch_delete_is_refused(
         self,

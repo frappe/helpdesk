@@ -12,24 +12,31 @@
           :disabled="!summary"
         />
         <p class="text-p-base text-ink-gray-7">{{ message }}</p>
-        <p
-          v-if="deleteArticles && summary?.cited"
-          class="text-p-base text-ink-gray-7"
-        >
+        <p v-if="hasLinked" class="text-p-base text-ink-gray-7">
           {{ citedMessage }}
         </p>
       </div>
     </template>
     <template #actions>
-      <Button
-        class="w-full"
-        variant="solid"
-        theme="red"
-        :label="__('Confirm')"
-        :disabled="!summary && !categoryDeleteSummary.error"
-        :loading="deleteCategory.loading"
-        @click="emit('confirm', deleteArticles)"
-      />
+      <div class="flex gap-2">
+        <Button
+          v-if="hasLinked"
+          class="w-full"
+          variant="subtle"
+          :label="__('Archive linked')"
+          :loading="deleteCategory.loading"
+          @click="emit('confirm', true, true)"
+        />
+        <Button
+          class="w-full"
+          variant="solid"
+          theme="red"
+          :label="hasLinked ? __('Delete') : __('Confirm')"
+          :disabled="!summary && !categoryDeleteSummary.error"
+          :loading="deleteCategory.loading"
+          @click="emit('confirm', deleteArticles, false)"
+        />
+      </div>
     </template>
   </Dialog>
 </template>
@@ -46,11 +53,17 @@ const props = defineProps<{
   // A Subcategory's articles move to its parent, not General.
   isSubcategory?: boolean;
 }>();
-const emit = defineEmits<{ confirm: [deleteArticles: boolean] }>();
+const emit = defineEmits<{
+  confirm: [deleteArticles: boolean, archiveCited: boolean];
+}>();
 const showDialog = defineModel<boolean>();
 const deleteArticles = ref(false);
 
 const summary = computed(() => categoryDeleteSummary.data);
+// articles that tickets link to: archive them or delete them too
+const hasLinked = computed(
+  () => deleteArticles.value && Boolean(summary.value?.cited)
+);
 
 watch(showDialog, (open) => {
   if (!open) return;
@@ -61,10 +74,11 @@ watch(showDialog, (open) => {
 const message = computed(() => {
   if (deleteArticles.value) {
     const subcategories = summary.value?.subcategories ?? 0;
-    // cited ones are archived, not deleted
-    const deleted =
-      (summary.value?.articles ?? 0) - (summary.value?.cited ?? 0);
-    const articles = countLabel(deleted, __("1 article"), __("{0} articles"));
+    const articles = countLabel(
+      summary.value?.articles ?? 0,
+      __("1 article"),
+      __("{0} articles")
+    );
     return subcategories
       ? __("Deletes {0} and {1}", [
           countLabel(
@@ -87,10 +101,14 @@ const message = computed(() => {
 });
 
 const citedMessage = computed(() =>
-  summary.value?.cited === 1
-    ? __("1 article cited by tickets will be archived")
-    : __("{0} articles cited by tickets will be archived", [
-        summary.value?.cited,
-      ])
+  countLabel(
+    summary.value?.cited ?? 0,
+    __(
+      "1 article is linked to a ticket. Archive it to keep the link, or delete it and remove it from the ticket."
+    ),
+    __(
+      "{0} articles are linked to tickets. Archive them to keep the links, or delete them and remove them from those tickets."
+    )
+  )
 );
 </script>

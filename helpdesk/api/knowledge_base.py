@@ -9,6 +9,7 @@ from frappe.utils import (
     escape_html,
     expand_relative_urls,
     get_user_info_for_avatar,
+    sbool,
 )
 from frappe.website.utils import cleanup_page_name, find_first_image
 
@@ -73,21 +74,71 @@ def validate_public_access():
 
 
 @frappe.whitelist(methods=["POST"])
-def delete_articles(articles: list[str]) -> dict:
-    """Delete the given HD Articles; one a ticket cites is archived instead.
+def delete_articles(articles: list[str], archive_cited: bool = True) -> dict:
+    """Delete the given HD Articles. One a ticket cites is archived instead, unless
+    `archive_cited` is off: then it's deleted and cleared from those tickets.
     Returns {"archived": count}. Needs delete permission. Refuses to delete the last
     article left in a category."""
-    return {"archived": sum(delete_or_archive_article(name) for name in articles)}
+    archive_cited = sbool(archive_cited)
+    return {
+        "archived": sum(
+            delete_or_archive_article(name, archive_cited) for name in articles
+        )
+    }
 
 
-def delete_or_archive_article(name: str) -> bool:
-    """A ticket cites it: archive instead, keeping the link. True when archived."""
+@frappe.whitelist()
+def count_cited_articles(
+    articles: list[str] | None = None, categories: list[str] | None = None
+) -> int:
+    """How many of `articles`, and of the articles in `categories` and their
+    Subcategories, a ticket cites. Needs delete permission on HD Article."""
+    frappe.has_permission("HD Article", "delete", throw=True)
+    names = set(articles or [])
+    if categories:
+        branches = [
+            name
+            for category in categories
+            for name in hd_article_category.get_branch(category)
+        ]
+        names.update(
+            frappe.get_all(
+                "HD Article", filters={"category": ["in", branches]}, pluck="name"
+            )
+        )
+    return len(get_cited_articles(list(names)))
+
+
+def get_cited_articles(articles: list[str]) -> list[str]:
+    if not articles:
+        return []
+    return frappe.get_all(
+        "HD Ticket",
+        filters={"source_article": ["in", articles]},
+        pluck="source_article",
+        distinct=True,
+    )
+
+
+def delete_or_archive_article(name: str, archive_cited: bool = True) -> bool:
+    """A ticket cites it: archive instead, keeping the link, or with `archive_cited`
+    off, clear it from those tickets and delete. True when archived."""
     if frappe.db.exists("HD Ticket", {"source_article": name}):
-        # a save, for version history and the search index
-        article = frappe.get_doc("HD Article", name)
-        article.status = "Archived"
-        article.save()
-        return True
+        if archive_cited:
+            # a save, for version history and the search index
+            article = frappe.get_doc("HD Article", name)
+            article.status = "Archived"
+            article.save()
+            return True
+        frappe.has_permission("HD Ticket", "write", throw=True)
+        # the field is empty once the article no longer exists
+        frappe.db.set_value(
+            "HD Ticket",
+            {"source_article": name},
+            "source_article",
+            None,
+            update_modified=False,
+        )
     # feedback would fail the link check
     frappe.db.delete("HD Article Feedback", {"article": name})
     frappe.delete_doc("HD Article", name)
@@ -616,26 +667,19 @@ def get_category_delete_summary(category: str) -> dict:
     articles = frappe.get_all(
         "HD Article", filters={"category": ["in", branch]}, pluck="name"
     )
-    cited = (
-        frappe.get_all(
-            "HD Ticket",
-            filters={"source_article": ["in", articles]},
-            pluck="source_article",
-            distinct=True,
-        )
-        if articles
-        else []
-    )
     return {
         "articles": len(articles),
         "subcategories": len(branch) - 1,
-        "cited": len(cited),
+        "cited": len(get_cited_articles(articles)),
     }
 
 
 @frappe.whitelist(methods=["POST"])
-def delete_category(category: str, with_articles: bool = False) -> dict:
-    """`with_articles` deletes the whole branch; cited articles are archived."""
+def delete_category(
+    category: str, with_articles: bool = False, archive_cited: bool = True
+) -> dict:
+    """`with_articles` deletes the whole branch. Cited articles are archived, unless
+    `archive_cited` is off: then they're deleted and cleared from their tickets."""
     frappe.has_permission("HD Article Category", "delete", throw=True)
     _validate_category(category)
     if category == get_general_category():
@@ -655,7 +699,7 @@ def delete_category(category: str, with_articles: bool = False) -> dict:
     try:
         with batched_article_index():
             archived = sum(
-                delete_or_archive_article(name)
+                delete_or_archive_article(name, sbool(archive_cited))
                 for name in frappe.get_all(
                     "HD Article",
                     filters={"category": ["in", branch]},
