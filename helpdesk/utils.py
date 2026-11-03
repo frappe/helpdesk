@@ -20,15 +20,11 @@ CUSTOMER_PORTAL_ROOT = "/help"
 
 
 def check_permissions(doctype, parent, doc=None):
-    user = frappe.session.user
-
-    permissions = ("select", "read")
-    has_select_permission, has_read_permission = [
-        frappe.has_permission(doctype, perm, user=user, doc=doc, parent_doctype=parent)
-        for perm in permissions
-    ]
-
-    if not has_select_permission and not has_read_permission:
+    kwargs = {"user": frappe.session.user, "doc": doc, "parent_doctype": parent}
+    if not (
+        frappe.has_permission(doctype, "select", **kwargs)
+        or frappe.has_permission(doctype, "read", **kwargs)
+    ):
         frappe.throw(
             _("Insufficient Permission for {0}").format(doctype), frappe.PermissionError
         )

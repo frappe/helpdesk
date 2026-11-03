@@ -371,7 +371,7 @@ const customizationCtx = computed(() => ({
 }));
 
 watchEffect(async () => {
-  if (customizations.data) {
+  if (customizations.data && ticket.value.doc) {
     await setupCustomizations(customizations.data, customizationCtx.value);
     customActions.value = [...(customizations.data?._customActions || [])];
   }

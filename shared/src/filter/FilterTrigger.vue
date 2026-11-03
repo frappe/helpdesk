@@ -9,10 +9,13 @@
       <template #suffix>
         <!-- -ms-2 cancels the Button's gap while the badge is closed -->
         <span
-          :class="[REVEAL, count ? 'grid-cols-[1fr]' : '-ms-2 grid-cols-[0fr]']"
+          :class="[
+            REVEAL,
+            count ? 'grid-cols-[1fr]' : 'invisible -ms-2 grid-cols-[0fr]',
+          ]"
           :aria-hidden="!count"
         >
-          <span class="min-w-0 overflow-hidden">
+          <span class="-m-1 min-w-0 overflow-hidden p-1">
             <span
               class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
             >
@@ -29,7 +32,8 @@
     >
       <div class="min-w-0 overflow-hidden">
         <Tooltip :text="__('Clear all Filter')">
-          <div>
+          <!-- flex: a block wrapper puts the button on a text line, half a pixel taller -->
+          <div class="flex">
             <Button
               class="rounded-s-none border-s"
               icon="lucide-x"

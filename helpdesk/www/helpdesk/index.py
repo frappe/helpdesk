@@ -6,13 +6,14 @@ from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
+from helpdesk.integrations import frappe_cloud
 from helpdesk.utils import get_agent_name, is_agent
 
 no_cache = 1
 
 
 def get_context(context):
-    frappe.db.commit()
+    frappe.db.commit()  # nosemgrep
     redirect_customer_home()
     context.boot = get_boot()
 
@@ -74,6 +75,7 @@ def get_boot():
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
             "telemetry": get_telemetry_boot(),
+            "cloud_settings": frappe_cloud.get_boot_context(),
         }
     )
 

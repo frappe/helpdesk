@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 from frappe.desk.form import activity, load
+from frappe.utils.user import is_website_user
 
 from helpdesk.utils import is_agent
 
@@ -44,6 +45,15 @@ def getdoc(doctype: str, name: str | int):
     """Desk's getdoc (document plus docinfo), refused on HD Ticket to non-agents."""
     deny_ticket_form_to_customers(doctype)
     return load.getdoc(doctype, name)
+
+
+@frappe.whitelist()
+def getdoctype(doctype: str, with_parent: int | bool = False):
+    """Desk's getdoctype: a doctype's meta, with its linked doctypes and scripts.
+    Portal users asking for HD Ticket get only its own meta."""
+    if doctype != "HD Ticket" or not is_website_user():
+        return load.getdoctype(doctype, with_parent)
+    frappe.response.docs.append(frappe.get_meta(doctype).as_dict(no_nulls=True))
 
 
 @frappe.whitelist()

@@ -50,63 +50,11 @@
       </ListSelectBanner>
     </ListView>
 
-    <!-- Header bar and 40px rows share one column grid. -->
     <PortalSkeleton v-else-if="loading" class="flex min-h-0 flex-1 flex-col">
-      <!-- w-max: narrow screens clip the columns, not squeeze them. -->
-      <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div
-          class="mx-3 flex w-max min-w-[calc(100%-1.5rem)] flex-col sm:mx-5 sm:min-w-[calc(100%-2.5rem)]"
-        >
-          <div
-            class="mb-2 grid h-[34px] shrink-0 items-center gap-4 rounded-4 bg-surface-gray-2 px-2"
-            :style="{ gridTemplateColumns }"
-          >
-            <Skeleton
-              class="size-3.5 rounded-[4px] motion-reduce:animate-none"
-            />
-            <Skeleton
-              v-for="(column, i) in columns"
-              :key="column.key"
-              class="h-[0.6em] min-w-6 max-w-16 rounded-full text-sm motion-reduce:animate-none"
-              :style="{ width: `${50 + ((i * 17) % 30)}%` }"
-            />
-          </div>
-          <div
-            v-for="row in Math.min(pageLength, 20)"
-            :key="row"
-            class="shrink-0"
-          >
-            <div
-              class="grid h-10 items-center gap-4 px-2"
-              :style="{ gridTemplateColumns }"
-            >
-              <Skeleton
-                class="size-3.5 rounded-[4px] motion-reduce:animate-none"
-              />
-              <Skeleton
-                v-for="(column, i) in columns"
-                :key="column.key"
-                class="h-[0.6em] min-w-8 rounded-full text-base motion-reduce:animate-none"
-                :style="{ width: `${40 + ((row * 7 + i * 13) % 45)}%` }"
-              />
-            </div>
-            <div
-              v-if="row < Math.min(pageLength, 20)"
-              class="mx-2 h-px border-t border-outline-gray-1"
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        class="flex h-[49px] shrink-0 items-center justify-between border-t px-3 sm:px-5"
-      >
-        <Skeleton
-          class="h-7 w-[104px] rounded-[8px] motion-reduce:animate-none"
-        />
-        <Skeleton
-          class="h-[0.6em] w-16 rounded-full text-base motion-reduce:animate-none"
-        />
-      </div>
+      <ListViewSkeleton
+        :columns="columns"
+        :row-count="Math.min(pageLength, 20)"
+      />
     </PortalSkeleton>
 
     <PortalEmptyState
@@ -134,9 +82,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { Button, Skeleton } from "frappe-ui";
+import { ref } from "vue";
+import { Button } from "frappe-ui";
 import ExportModal from "@helpdesk/shared/ExportModal.vue";
+import ListViewSkeleton from "@helpdesk/shared/ListViewSkeleton.vue";
 import { __ } from "@helpdesk/shared/translation";
 import {
   ListFooter,
@@ -178,18 +127,6 @@ const props = withDefaults(
 );
 
 const pageLength = defineModel<number>("pageLength", { default: 20 });
-
-// Checkbox, then each column's width; plain numbers become `fr`.
-const gridTemplateColumns = computed(() =>
-  [
-    "14px",
-    ...props.columns.map((column) =>
-      typeof (column.width || 1) === "number"
-        ? `${column.width || 1}fr`
-        : column.width
-    ),
-  ].join(" ")
-);
 
 const emit = defineEmits<{
   columnResize: [payload: { key: string; width: string; save: boolean }];

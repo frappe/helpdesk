@@ -309,6 +309,8 @@ export interface HDAgent extends DocType {
   availability_changed_on?: string;
   /** Availability Changed By: Link (User) */
   availability_changed_by?: string;
+  /** Availability Expires On: Datetime */
+  availability_expires_on?: string;
 }
 
 // Last updated: 2026-06-02 01:18:56.023594
