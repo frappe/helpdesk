@@ -825,6 +825,8 @@ test.describe("knowledge base settings", () => {
       // Pins save from their own dialog, apart from the draft.
       await dialog.getByRole("button", { name: "Customize pinned categories" }).click();
       const pins = page.getByRole("dialog", { name: "Pinned categories" });
+      // the dialog lists 100 at most; a busy test site has more
+      await pins.getByRole("textbox", { name: "Search categories to pin" }).fill(category.category_name);
       await pins.getByRole("button", { name: `Pin ${category.category_name}`, exact: true }).click();
       await pins.getByRole("button", { name: "Save" }).click();
       await expect(pins).toBeHidden();
@@ -873,6 +875,8 @@ test.describe("knowledge base settings: pins on the home page", () => {
       await page.getByRole("dialog").getByRole("button", { name: "Customize pinned categories" }).click();
       const pins = page.getByRole("dialog", { name: "Pinned categories" });
       for (const category of pinned) {
+        // the dialog lists 100 at most; a busy test site has more
+        await pins.getByRole("textbox", { name: "Search categories to pin" }).fill(category.category_name);
         await pins.getByRole("button", { name: `Pin ${category.category_name}`, exact: true }).click();
       }
       await pins.getByRole("button", { name: "Save" }).click();
