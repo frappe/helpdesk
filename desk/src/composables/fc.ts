@@ -2,6 +2,10 @@ import { globalStore } from "@/stores/globalStore";
 import { createResource } from "frappe-ui";
 import { ref } from "vue";
 
+/** Frappe enables it only for System Managers on a Frappe Cloud v2 site. */
+export const isCloudSettingsAvailable = () =>
+  window.cloud_settings?.enabled === true;
+
 const baseEndpoint = ref("https://frappecloud.com");
 const siteName = ref("");
 

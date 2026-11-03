@@ -74,6 +74,9 @@ def validate_public_access():
 
 @frappe.whitelist(methods=["POST"])
 def delete_articles(articles: list[str]) -> dict:
+    """Delete the given HD Articles; one a ticket cites is archived instead.
+    Returns {"archived": count}. Needs delete permission. Refuses to delete the last
+    article left in a category."""
     return {"archived": sum(delete_or_archive_article(name) for name in articles)}
 
 
@@ -93,6 +96,9 @@ def delete_or_archive_article(name: str) -> bool:
 
 @frappe.whitelist(methods=["POST"])
 def create_category(title: str, icon: str | None = None, parent: str | None = None):
+    """Create an article category holding one "New Article"; returns both names.
+    Under `parent` when given, as a Subcategory. Returns {"article": name,
+    "category": name}. "General" is a reserved name."""
     if title.strip().lower() == "general":
         frappe.throw(
             _(
@@ -121,6 +127,8 @@ def _validate_category(category: str) -> None:
 
 @frappe.whitelist()
 def get_category_visibility(category: str) -> str | None:
+    """The visibility all of a category's articles share, or None when they differ.
+    One of Public, Customers or Private. Needs write access to HD Article."""
     frappe.has_permission("HD Article", "write", throw=True)
     _validate_category(category)
     return hd_article_category.get_category_visibility(category)
@@ -161,6 +169,9 @@ def category_label_sort_key(label: str) -> tuple:
 
 @frappe.whitelist()
 def get_category_options(exclude: str | None = None) -> list[dict]:
+    """Every article category as a picker option, General first, Subcategories after
+    their parent. Each has value, label, parent_article_category and
+    has_subcategories; `exclude` leaves one out. Needs write access to HD Article."""
     frappe.has_permission("HD Article", "write", throw=True)
     rows = frappe.get_all(
         "HD Article Category", fields=["name", "parent_article_category"]
@@ -182,6 +193,9 @@ def get_category_options(exclude: str | None = None) -> list[dict]:
 
 @frappe.whitelist(methods=["POST"])
 def set_category_visibility(category: str, visibility: str):
+    """Set the visibility of every article in a category.
+    `visibility` is Public, Customers or Private. Saves each article, so each gets a
+    version. Needs write access to HD Article."""
     frappe.has_permission("HD Article", "write", throw=True)
     _validate_category(category)
     options = frappe.get_meta("HD Article").get_options("visibility").split("\n")
@@ -204,6 +218,9 @@ def set_category_visibility(category: str, visibility: str):
 
 @frappe.whitelist(methods=["POST"])
 def move_to_category(category: str, articles: list[str]):
+    """Move the given articles to a category.
+    An article wider than the visibility the category's articles share is narrowed to
+    it. Needs write access to HD Article."""
     frappe.has_permission("HD Article", "write", throw=True)
     _validate_category(category)
 
@@ -223,6 +240,9 @@ def move_to_category(category: str, articles: list[str]):
 def get_articles(
     category: str | None = None, limit: int | None = None, sort: str = "latest"
 ) -> list[dict]:
+    """List published articles the caller can read: name, title and excerpt.
+    Optionally of one category, at most 100. `sort` "popular" orders by views, else
+    newest first. Guests only when the knowledge base is public."""
     validate_public_access()
     filters = make_article_filters()
     if category:
@@ -271,6 +291,9 @@ def _get_byline(user: str) -> dict:
 # guests count per IP, so leave room for a shared office address
 @rate_limit(limit=120, seconds=60, user_based=True)
 def get_kb_sidebar() -> list[dict]:
+    """Knowledge base sidebar: readable categories, each with its articles' titles.
+    get_categories' rows plus `creators` (author name and image) and `articles` (name
+    and title, newest first). Guests only when the knowledge base is public."""
     validate_public_access()
     articles = {}
     for row in frappe.get_all(
@@ -289,6 +312,10 @@ def get_kb_sidebar() -> list[dict]:
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_article(name: str) -> dict:
+    """Get a readable article: content, author, category, reading time, caller's vote.
+    `name` may be the URL path `<name>-<title slug>`. `feedback` is 0 none, 1 helpful,
+    2 not helpful. Doesn't count a view (see increment_views). Guests only when the
+    knowledge base is public."""
     name = _get_article_name(name)
     article = _get_viewable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
     article.author = _get_byline(article.author)
@@ -325,6 +352,9 @@ def get_article(name: str) -> dict:
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_article_markdown(name: str) -> None:
+    """Download a readable article as a Markdown file, `<name>.md`.
+    Served inline, title as the heading. Takes the bare name, not the URL slug. Guests
+    only when the knowledge base is public."""
     article = _get_viewable_article(name, ["title", "content"])
     body = html2text(expand_relative_urls(article.content or ""), wrap=False)
     frappe.response.update(
@@ -353,6 +383,11 @@ def _get_viewable_article(name: str, fields: list[str] | None = None) -> frappe.
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_categories() -> list[dict]:
+    """List categories that have a published article the caller can read, directly or
+    in a Subcategory. Each has name, category_name, description, icon, pinned,
+    pinned_order, parent_article_category, label, article_count (Subcategories
+    included) and last_updated; sorted by category_name. Guests only when the
+    knowledge base is public."""
     validate_public_access()
     return _get_categories()
 
@@ -414,6 +449,10 @@ def _get_categories(with_creators: bool = False) -> list[dict]:
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 @rate_limit(limit=120, seconds=60, user_based=True)
 def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
+    """Search published articles the caller can read; returns at most 5 hits.
+    Each hit: name, title and excerpt with matches in <mark> tags, title_slug, first
+    image, minutes to read, category_name. Empty without RediSearch. Guests only when
+    the knowledge base is public."""
     validate_public_access()
     query = query.strip()[:SEARCH_QUERY_LENGTH]
     if not query:
@@ -510,6 +549,10 @@ def _get_own_feedback(article: str) -> int:
 
 @frappe.whitelist(methods=["POST"])
 def merge_category(source: str, target: str):
+    """Merge one article category into another, deleting the source category.
+    Moves every article of `source` to `target`, narrowed to the visibility the
+    target's articles share. General can't be the source. Needs delete permission on
+    HD Article Category."""
     frappe.has_permission("HD Article Category", "delete", throw=True)
 
     if source == target:
@@ -564,6 +607,9 @@ def _set_parent(category: str, parent: str | None) -> None:
 
 @frappe.whitelist()
 def get_category_delete_summary(category: str) -> dict:
+    """What deleting `category` and its Subcategories would touch.
+    Returns {"articles": count, "subcategories": count, "cited": count of articles a
+    ticket cites}. Needs delete permission on HD Article Category."""
     frappe.has_permission("HD Article Category", "delete", throw=True)
     _validate_category(category)
     branch = hd_article_category.get_branch(category)
@@ -675,6 +721,7 @@ def get_category_group_options(options: list[dict]) -> list[dict]:
 
 @frappe.whitelist()
 def get_general_category():
+    """Name of the reserved "General" article category, or None."""
     return frappe.db.get_value(
         "HD Article Category", {"category_name": "General"}, "name"
     )
@@ -682,6 +729,9 @@ def get_general_category():
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])  # nosemgrep
 def increment_views(article: str):
+    """Count one view of a published article, at most once an hour per reader.
+    A reader is a signed-in user or a Guest IP. Drafts aren't counted; an article the
+    caller can't read throws."""
     # an agent previewing a draft
     if _get_viewable_article(article).status != "Published":
         return

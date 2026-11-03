@@ -117,6 +117,9 @@ def delete_customer(name: str, delete_tickets: bool = False) -> None:
 
 @frappe.whitelist()
 def get_portal_account() -> dict:
+    """The session user's portal account and the organizations they belong to.
+    Account: name, email, image, language, time zone. Each organization has the user's
+    role and member and ticket counts."""
     user = frappe.db.get_value(
         "User",
         frappe.session.user,
@@ -137,6 +140,9 @@ def get_portal_account() -> dict:
 
 @frappe.whitelist()
 def get_organization(customer: str) -> dict:
+    """An organization's email, country and members, for anyone who may read it.
+    Its managers and agent managers also get members' last active time and, if customer
+    managers may invite, the pending invitations."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     customer_doc.check_permission("read")
     can_manage = _has_manager_permission(customer_doc)
@@ -153,6 +159,10 @@ def get_organization(customer: str) -> dict:
 
 @frappe.whitelist()
 def get_invitable_contacts(customer: str, query: str = "") -> list[dict]:
+    """Up to 50 portal users on the organization's email domain who can be invited.
+    Matches `query` on name or email; skips agents, members and the already invited.
+    Empty for a public or missing domain. Needs `allow_customer_managers_to_invite` and
+    an organization manager or agent manager."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
@@ -278,6 +288,10 @@ def _get_invited_emails(emails: list[str], status: str) -> list[str]:
 
 @frappe.whitelist(methods=["POST"])
 def update_member_role(customer: str, contact: str, is_manager: bool) -> None:
+    """Make an organization member a manager or a plain member.
+    Not the primary contact or yourself. Needs
+    `allow_customer_managers_to_manage_organization` and an organization manager or
+    agent manager."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
@@ -291,6 +305,10 @@ def update_member_role(customer: str, contact: str, is_manager: bool) -> None:
 
 @frappe.whitelist(methods=["POST"])
 def remove_member(customer: str, contact: str) -> None:
+    """Remove a member from an organization.
+    Not the primary contact or yourself. Needs
+    `allow_customer_managers_to_manage_organization` and an organization manager or
+    agent manager."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
@@ -304,6 +322,9 @@ def remove_member(customer: str, contact: str) -> None:
 
 @frappe.whitelist(methods=["POST"])
 def cancel_invitation(customer: str, invitation: str) -> None:
+    """Cancel an invitation to join an organization.
+    Needs `allow_customer_managers_to_invite` and an organization manager or agent
+    manager."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
@@ -322,6 +343,10 @@ def cancel_invitation(customer: str, invitation: str) -> None:
 
 @frappe.whitelist(methods=["POST"])
 def update_organization_image(customer: str, image: str) -> None:
+    """Set or clear an organization's logo.
+    `image` must be an uploaded /files/ path, or "" to clear. Needs
+    `allow_customer_managers_to_manage_organization` and an organization manager or
+    agent manager."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,

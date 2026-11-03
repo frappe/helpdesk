@@ -8,6 +8,7 @@ from frappe.utils import add_days, nowdate
 
 from helpdesk.api.agent_home.utils import calculate_percentage_change
 from helpdesk.api.analytics_utils import _apply_scope, get_avg_time_metric
+from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.utils import agent_only
 
 Scope = str  # Literal["agent", "customer", "contact"]
@@ -56,6 +57,10 @@ def get_feedback_received(
     scope: Scope,
     value: str,
 ) -> dict:
+    """All-time feedback star counts and average for an agent, customer or contact.
+    `scope` is "agent" (assigned tickets), "customer" or "contact", `value` its name.
+    Returns {"data": {1-5: count}, "average", "total"}. Agents may read only their
+    own; Agent Managers anyone's."""
     validate_agent_access(scope, value)
     Ticket = DocType("HD Ticket")
 
@@ -97,6 +102,11 @@ def get_sla_violations(
     dn: str,
     period: str = "last month",
 ) -> dict:
+    """Count a customer's or contact's tickets that failed their SLA, over a period.
+    `dt` is HD Customer or Contact, `dn` its name; `period` is last week, last month,
+    last 3 months or last 6 months. Returns data ({date, count} daily, weekly or
+    monthly), total and percentage_change (None when the last period had 0). Agents
+    only."""
     return _get_sla_violations(_resolve_scope(dt), dn, period)
 
 
@@ -212,6 +222,9 @@ def get_avg_first_response_time(
     dn: str,
     period: str = "last month",
 ) -> dict:
+    """Average first response time of a customer's or contact's tickets, over a period.
+    In seconds, SLA tickets only. `dt`, `dn` and `period` as in get_sla_violations.
+    Returns daily {date, avg_time}, average and percentage_change. Agents only."""
     return get_avg_time_metric(period, "first_response_time", _resolve_scope(dt), dn)
 
 
@@ -222,6 +235,10 @@ def get_avg_resolution_time(
     dn: str,
     period: str = "last month",
 ) -> dict:
+    """Average resolution time of a customer's or contact's tickets, over a period.
+    In seconds, resolved SLA tickets only. `dt`, `dn` and `period` as in
+    get_sla_violations. Returns daily {date, avg_time}, average and percentage_change.
+    Agents only."""
     return get_avg_time_metric(period, "resolution_time", _resolve_scope(dt), dn)
 
 
@@ -232,6 +249,9 @@ def get_ticket_stats(
     dn: str,
     period: str = "last month",
 ) -> dict:
+    """A customer's or contact's feedback, SLA violations and average times in one call.
+    Keys feedback_received (all time), sla_violations, avg_first_response_time and
+    avg_resolution_time, as those methods return them. Agents only."""
     scope = _resolve_scope(dt)
 
     stats: dict = {}
@@ -246,3 +266,60 @@ def get_ticket_stats(
     )
 
     return stats
+
+
+@frappe.whitelist()
+@agent_only
+def get_agent_performance(
+    team: str | None = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
+) -> list[dict]:
+    """The dashboard's numbers for each agent, so an Agent Manager can compare them.
+    For the members of `team`, counting only its tickets, or every active agent.
+    Agents are credited by `_assign`, as the dashboard does. Defaults to the last
+    30 days."""
+    if "Agent Manager" not in frappe.get_roles():
+        frappe.throw(
+            _("Only an Agent Manager can compare agents."), frappe.PermissionError
+        )
+
+    to_date = to_date or nowdate()
+    from_date = from_date or add_days(to_date, -29)
+    if team:
+        agents = frappe.get_all(
+            "HD Team Member",
+            filters={"parent": team, "parenttype": "HD Team"},
+            pluck="user",
+        )
+    else:
+        agents = frappe.get_all("HD Agent", filters={"is_active": 1}, pluck="user")
+    names = dict(
+        frappe.get_all(
+            "HD Agent",
+            filters={"user": ["in", agents]},
+            fields=["user", "agent_name"],
+            as_list=True,
+        )
+    )
+
+    # ponytail: one dashboard pass per agent; group by agent in SQL if teams pass ~50
+    rows = []
+    for agent in agents:
+        dashboard = HelpdeskDashboard(
+            frappe._dict(from_date=from_date, to_date=to_date, team=team, agent=agent)
+        )
+        rows.append(
+            {
+                "agent": agent,
+                "agent_name": names.get(agent),
+                "tickets": dashboard.get_ticket_count()["value"],
+                "sla_fulfilled_percent": dashboard.get_sla_fulfilled_count()["value"],
+                "avg_first_response_hours": dashboard.get_avg_first_response_time()[
+                    "value"
+                ],
+                "avg_resolution_days": dashboard.get_avg_resolution_time()["value"],
+                "avg_feedback_stars": dashboard.get_avg_feedback_score()["value"],
+            }
+        )
+    return rows

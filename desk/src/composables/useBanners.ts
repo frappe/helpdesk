@@ -1,7 +1,12 @@
 import { globalStore } from "@/stores/globalStore";
+import type { BillingTrial } from "@frappe/cloud-sdk";
 import { createResource } from "frappe-ui";
 
-export type BannerName = "customer_portal_permission" | "ticket_field_permission";
+export type BannerName =
+  | "customer_portal_permission"
+  | "ticket_field_permission"
+  | "trial";
+export type Banner = { name: BannerName; trial?: BillingTrial };
 
 const banners = createResource({
   url: "helpdesk.api.banners.get_banners",
@@ -9,6 +14,9 @@ const banners = createResource({
 });
 const dismissResource = createResource({
   url: "helpdesk.api.banners.dismiss_banner",
+});
+const refreshTrialResource = createResource({
+  url: "helpdesk.api.banners.refresh_trial",
 });
 let started = false;
 
@@ -21,14 +29,24 @@ export function useBanners() {
     );
   }
 
-  function isVisible(banner: BannerName): boolean {
-    return banners.data.includes(banner);
+  function banner(name: BannerName): Banner | undefined {
+    return banners.data.find((b: Banner) => b.name === name);
   }
 
-  async function dismiss(banner: BannerName): Promise<void> {
-    await dismissResource.submit({ banner });
+  function isVisible(name: BannerName): boolean {
+    return !!banner(name);
+  }
+
+  async function dismiss(name: BannerName): Promise<void> {
+    await dismissResource.submit({ banner: name });
     banners.reload();
   }
 
-  return { isVisible, dismiss };
+  // The server caches the trial, so ask it to read Frappe Cloud again first
+  async function refreshTrial(): Promise<void> {
+    await refreshTrialResource.submit();
+    banners.reload();
+  }
+
+  return { banner, isVisible, dismiss, refreshTrial };
 }

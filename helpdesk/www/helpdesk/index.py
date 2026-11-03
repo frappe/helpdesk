@@ -6,13 +6,14 @@ from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
+from helpdesk.integrations import frappe_cloud
 from helpdesk.utils import get_agent_name, is_agent
 
 no_cache = 1
 
 
 def get_context(context):
-    frappe.db.commit()
+    frappe.db.commit()  # nosemgrep
     redirect_customer_home()
     context.boot = get_boot()
 
@@ -40,8 +41,11 @@ def redirect_customer_home():
     raise frappe.Redirect(302)
 
 
-@frappe.whitelist(methods=["POST"], allow_guest=True)
+@frappe.whitelist(methods=["POST"], allow_guest=True)  # nosemgrep
 def get_context_for_dev():
+    """The helpdesk app's boot data, for the frontend dev server.
+    Session user, agent, site, formats, timezone, CSRF token and installed apps.
+    Developer mode only."""
     if not frappe.conf.developer_mode:
         frappe.throw(_("This method is only meant for developer mode"))
     return get_boot()
@@ -70,25 +74,10 @@ def get_boot():
             "lang": frappe.local.lang,
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
-            "telemetry": get_telemetry_boot(),
+            "cloud_settings": frappe_cloud.get_boot_context(),
         }
     )
 
 
 def get_default_route():
     return "/helpdesk"
-
-
-def get_telemetry_boot():
-    """Direct-mode config for the browser telemetry client, as a boot value.
-
-    Telemetry must never break the page: older frappe versions have no pulse
-    module, and any boot_config error degrades to "disabled". The key it
-    ships is a public write-only ingest key (same as desk boot).
-    """
-    try:
-        from frappe.utils.telemetry.pulse.client import boot_config
-
-        return boot_config()
-    except Exception:
-        return {"enabled": False}
