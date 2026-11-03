@@ -98,13 +98,16 @@ const items = computed(() => {
     });
 });
 
+// the Archived group is no category, so it has no actions
 const actions = (group) =>
-  props.groupByActions
-    .filter((action) => action.condition?.(group) ?? true)
-    .map(({ condition, ...action }) => ({
-      ...action,
-      onClick: () => action.onClick(group),
-    }));
+  !group.group.value
+    ? []
+    : props.groupByActions
+        .filter((action) => action.condition?.(group) ?? true)
+        .map(({ condition, ...action }) => ({
+          ...action,
+          onClick: () => action.onClick(group),
+        }));
 
 const showGroupedRows = computed(() => {
   return props.rows.every(

@@ -716,6 +716,9 @@ def get_category_group_options(options: list[dict]) -> list[dict]:
         group["pinned"] = row.pinned
         group["has_subcategories"] = group["value"] in with_subcategories
     groups.sort(key=lambda group: category_label_sort_key(group["label"]))
+    for group in empty:
+        # archiving clears an article's category, so this group holds them
+        group.update(label=_("Archived"), icon="lucide-archive")
     return groups + empty
 
 

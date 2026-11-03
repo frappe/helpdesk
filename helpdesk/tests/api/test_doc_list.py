@@ -247,11 +247,13 @@ class TestGroupByView(IntegrationTestCase):
         for category in categories:
             make_article(f"{cls.token} {category}", "Draft", category)
 
-    def test_categories_sorted_by_label_with_general_first_and_empty_last(self) -> None:
+    def test_categories_sorted_by_label_with_general_first_and_archived_last(
+        self,
+    ) -> None:
         options = self.group_options(order_by="modified desc")
 
         self.assertEqual(
-            [o["label"] for o in options], ["General", "Alpha", "Zeta", ""]
+            [o["label"] for o in options], ["General", "Alpha", "Zeta", "Archived"]
         )
 
     def test_select_field_groups_by_its_options(self) -> None:
@@ -350,6 +352,19 @@ class TestSubcategoryGroups(IntegrationTestCase):
 
         values = [o["value"] for o in result["group_by_field"]["options"]]
         self.assertEqual(values, [general, self.parent, self.sub, other, ""])
+
+    def test_archived_articles_group_as_archived(self) -> None:
+        name = make_article(f"{self.token} a", "Draft", self.sub)
+        # a category keeps at least one article
+        make_article(f"{self.token} b", "Draft", self.sub)
+        article = frappe.get_doc("HD Article", name)
+        article.status = "Archived"
+        article.save()
+
+        group = next(o for o in self.options() if not o["value"])
+
+        self.assertEqual(group["label"], "Archived")
+        self.assertEqual(group["icon"], "lucide-archive")
 
     def test_subcategory_groups_follow_their_parent(self) -> None:
         other = make_article_category(f"Zzz{self.token}b").name
