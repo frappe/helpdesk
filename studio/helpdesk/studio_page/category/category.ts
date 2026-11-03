@@ -44,6 +44,8 @@ export default function setup(context) {
       !context.subcategoryArticles.loading &&
       Boolean(context.articles.data && sidebar.data && (context.subcategoryArticles.data || context.subcategoryArticles.error)),
   )
+  // Without these the page has nothing to show; a section fetch failing only drops its cards.
+  const loadFailed = computed(() => Boolean(sidebar.error || context.articles.error))
 
   return {
     ...useKnowledgeBaseHeader(context),
@@ -59,6 +61,7 @@ export default function setup(context) {
     lastUpdated,
     sections,
     loaded,
+    loadFailed,
     skeletonRows,
   }
 }

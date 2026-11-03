@@ -68,7 +68,7 @@
           "variant": "category",
           "count": "{{ skeletonRows }}"
          },
-         "visibilityCondition": "{{ !category && !notFound }}",
+         "visibilityCondition": "{{ !category && !notFound && !loadFailed }}",
          "classes": [
           "flex",
           "flex-col",
@@ -93,13 +93,12 @@
              "children": [
               {
                "classes": [
-                "text-ink-gray-8",
-                "font-bold"
+                "text-ink-gray-8"
                ],
                "componentId": "TextBlock-h8bm1mp3i",
                "componentName": "TextBlock",
                "componentProps": {
-                "fontSize": "text-3xl",
+                "fontSize": "text-3xl-bold",
                 "tag": "h1",
                 "text": "{{ categoryName }}"
                }
@@ -314,7 +313,23 @@
          "componentId": "container-pdx9evglv",
          "componentName": "container",
          "originalElement": "div",
-         "visibilityCondition": "{{ category }}"
+         "visibilityCondition": "{{ category && !loadFailed }}"
+        },
+        {
+         "blockName": "load-failed",
+         "classes": [
+          "self-stretch",
+          "xl:col-span-4"
+         ],
+         "componentId": "PortalEmptyState-category-load-failed",
+         "componentName": "PortalEmptyState",
+         "componentProps": {
+          "description": "{{ t('Check your connection and reload the page.') }}",
+          "icon": "article",
+          "title": "{{ t('Could not load this category') }}"
+         },
+         "isCustomVueComponent": true,
+         "visibilityCondition": "{{ loadFailed }}"
         },
         {
          "blockName": "not-found",
@@ -389,7 +404,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-11-02 12:00:00.000000",
+ "modified": "2026-11-03 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
