@@ -1561,6 +1561,16 @@ class TestCategoryDelete(IntegrationTestCase):
         self.assertFalse(frappe.db.exists("HD Article", article))
         self.assertFalse(frappe.db.exists("HD Article Feedback", {"article": article}))
 
+    def test_a_customer_cannot_delete_articles(self) -> None:
+        article = make_article(category=self.parent)
+        make_article_feedback(article, 1)
+        customer = make_contact("kb-deleter")["user"]
+
+        with self.set_user(customer), self.assertRaises(frappe.PermissionError):
+            delete_articles([article])
+
+        self.assertTrue(frappe.db.exists("HD Article Feedback", {"article": article}))
+
     def test_deleting_a_cited_article_archives_it(self) -> None:
         make_article(category=self.parent)
         cited = make_article(category=self.parent)

@@ -87,6 +87,8 @@ def delete_articles(articles: list[str], archive_cited: bool = True) -> dict:
     `archive_cited` is off: then it's deleted and cleared from those tickets.
     Returns {"archived": count}. Needs delete permission. Refuses to delete the last
     article left in a category."""
+    # before any raw delete below
+    frappe.has_permission("HD Article", "delete", throw=True)
     archive_cited = sbool(archive_cited)
     return {
         "archived": sum(
