@@ -216,16 +216,23 @@ def get_category_visibility(category: str, exclude: str | None = None) -> str | 
 
     None when the articles' visibilities differ.
     """
-    # published articles decide; categories of only drafts read their drafts.
-    # Not just the ones the caller can read
+    # not just the ones the caller can read
     branch = [name for name in get_branch(category) if name != exclude]
-    filters = {"category": ["in", branch]}
-    if frappe.db.exists("HD Article", {**filters, "status": "Published"}):
-        filters["status"] = "Published"
-    values = frappe.get_all(
-        "HD Article", filters=filters, pluck="visibility", distinct=True
+    values = read_visibilities(
+        frappe.get_all(
+            "HD Article",
+            filters={"category": ["in", branch]},
+            fields=["visibility", "status"],
+            distinct=True,
+        )
     )
-    return values[0] if len(values) == 1 else None
+    return values.pop() if len(values) == 1 else None
+
+
+def read_visibilities(rows: list[dict]) -> set[str]:
+    """Of a branch's article rows: published ones decide, a branch of only drafts reads its drafts."""
+    published = [row for row in rows if row.status == "Published"]
+    return {row.visibility for row in published or rows}
 
 
 def get_joining_visibility(category: str) -> str | None:

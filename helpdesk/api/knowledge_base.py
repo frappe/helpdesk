@@ -126,6 +126,33 @@ def get_category_visibility(category: str) -> str | None:
     return hd_article_category.get_category_visibility(category)
 
 
+@frappe.whitelist()
+def get_category_access() -> dict[str, str]:
+    """Each top-level category's access across its branch, `Mixed` when its articles differ; empty ones are left out."""
+    frappe.has_permission("HD Article", "write", throw=True)
+    # one level deep, so a branch is a category and its children
+    top = {
+        row.name: row.parent_article_category or row.name
+        for row in frappe.get_all(
+            "HD Article Category", fields=["name", "parent_article_category"]
+        )
+    }
+    branches = {}
+    for row in frappe.get_all(
+        "HD Article",
+        filters={"category": ["is", "set"]},
+        fields=["category", "visibility", "status"],
+        distinct=True,
+    ):
+        if name := top.get(row.category):
+            branches.setdefault(name, []).append(row)
+    access = {}
+    for name, rows in branches.items():
+        values = hd_article_category.read_visibilities(rows)
+        access[name] = values.pop() if len(values) == 1 else "Mixed"
+    return access
+
+
 def category_label_sort_key(label: str) -> tuple:
     """General first, then by label parts so a Subcategory follows its parent."""
     parts = label.split(SEPARATOR)
@@ -213,17 +240,21 @@ def get_articles(
 def get_subcategory_articles(category: str) -> dict[str, list[dict]]:
     """The newest articles of each Subcategory of `category`, skipping empty ones."""
     validate_public_access()
+    subcategories = get_subcategories(category)
+    if not subcategories:
+        return {}
+    # one query for all; like the sidebar, newer ones win past TITLES_LIMIT
     result = {}
-    for subcategory in get_subcategories(category):
-        rows = frappe.get_all(
-            "HD Article",
-            filters=make_article_filters(category=subcategory),
-            fields=["name", "title"],
-            order_by="published_on desc",
-            limit_page_length=SUBCATEGORY_ARTICLES_LIMIT,
-        )
-        if rows:
-            result[subcategory] = rows
+    for row in frappe.get_all(
+        "HD Article",
+        filters=make_article_filters(category=["in", subcategories]),
+        fields=["name", "title", "category"],
+        order_by="published_on desc",
+        limit_page_length=TITLES_LIMIT,
+    ):
+        rows = result.setdefault(row.pop("category"), [])
+        if len(rows) < SUBCATEGORY_ARTICLES_LIMIT:
+            rows.append(row)
     return result
 
 
@@ -267,25 +298,23 @@ def get_article(name: str) -> dict:
         frappe.db.get_value(
             "HD Article Category",
             article.category,
-            ["category_name", "parent_article_category"],
+            [
+                "category_name",
+                "parent_article_category",
+                "parent_article_category.category_name as parent_category_name",
+            ],
             as_dict=True,
         )
         if article.category
-        else frappe._dict()
-    )
-    article.category_name = category.get("category_name")
+        else None
+    ) or frappe._dict()
+    article.category_name = category.category_name
+    article.parent_article_category = category.parent_article_category
+    article.parent_category_name = category.parent_category_name
     article.category_label = (
-        get_category_labels([article.category])[article.category]
-        if article.category
-        else None
-    )
-    article.parent_article_category = category.get("parent_article_category")
-    article.parent_category_name = (
-        frappe.db.get_value(
-            "HD Article Category", category.parent_article_category, "category_name"
-        )
-        if category.get("parent_article_category")
-        else None
+        f"{category.parent_category_name}{SEPARATOR}{category.category_name}"
+        if category.parent_category_name
+        else category.category_name
     )
     article.feedback = _get_own_feedback(name)
     article.minutes = _get_reading_minutes(
@@ -588,25 +617,24 @@ def get_category_group_options(options: list[dict]) -> list[dict]:
     groups = [option for option in options if option["value"]]
     empty = [option for option in options if not option["value"]]
     values = [option["value"] for option in groups]
-    parents = dict(
-        frappe.get_all(
-            "HD Article Category",
-            filters={"name": ["in", values]},
-            fields=["name", "parent_article_category"],
-            as_list=True,
+    # the desk's Edit reads the plain name and the pin from here
+    fields = ["name", "parent_article_category", "category_name", "pinned"]
+    rows = {
+        row.name: row
+        for row in frappe.get_all(
+            "HD Article Category", filters={"name": ["in", values]}, fields=fields
         )
-    )
+    }
     # a parent's own group is there even when it has no rows
-    missing = {parent for parent in parents.values() if parent} - set(values)
-    groups += [
-        {"value": name, "icon": icon}
-        for name, icon in frappe.get_all(
-            "HD Article Category",
-            filters={"name": ["in", list(missing)]},
-            fields=["name", "icon"],
-            as_list=True,
-        )
-    ]
+    missing = {row.parent_article_category for row in rows.values()} - set(values)
+    missing.discard(None)
+    for row in frappe.get_all(
+        "HD Article Category",
+        filters={"name": ["in", list(missing)]},
+        fields=[*fields, "icon"],
+    ):
+        rows[row.name] = row
+        groups.append({"value": row.name, "icon": row.icon})
     names = [group["value"] for group in groups]
     labels = get_category_labels(names)
     # read past permissions: would tell a customer a Private subcategory exists
@@ -624,7 +652,10 @@ def get_category_group_options(options: list[dict]) -> list[dict]:
     for group in groups:
         # a dangling link has no category to label it
         group["label"] = labels.get(group["value"], group["value"])
-        group["parent_article_category"] = parents.get(group["value"])
+        row = rows.get(group["value"], frappe._dict())
+        group["parent_article_category"] = row.parent_article_category
+        group["category_name"] = row.category_name
+        group["pinned"] = row.pinned
         group["has_subcategories"] = group["value"] in with_subcategories
     groups.sort(key=lambda group: category_label_sort_key(group["label"]))
     return groups + empty

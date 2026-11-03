@@ -16,6 +16,7 @@ from helpdesk.api.knowledge_base import (
     get_article_markdown,
     get_articles,
     get_categories,
+    get_category_access,
     get_category_delete_summary,
     get_category_options,
     get_category_visibility,
@@ -812,6 +813,22 @@ class TestSubcategoryAccess(IntegrationTestCase):
         return category in frappe.get_list(
             "HD Article Category", pluck="name"
         ) and frappe.has_permission("HD Article Category", "read", category)
+
+    def test_category_access_reads_each_top_level_branch(self) -> None:
+        make_article(category=self.parent)
+        make_article(category=self.sub, visibility=CUSTOMERS)
+        published = make_article_category(unique_name("Fixture Published")).name
+        make_article(category=published)
+        make_article("Fixture hidden draft", "Draft", published, visibility=PRIVATE)
+        drafts = make_article_category(unique_name("Fixture Drafts")).name
+        make_article("Fixture draft", "Draft", drafts, visibility=PRIVATE)
+
+        access = get_category_access()
+
+        self.assertEqual(access[self.parent], "Mixed")
+        self.assertNotIn(self.sub, access)
+        self.assertEqual(access[published], PUBLIC)
+        self.assertEqual(access[drafts], PRIVATE)
 
     def test_a_parent_with_only_a_readable_subcategory_is_shown(self) -> None:
         make_article(category=self.sub)

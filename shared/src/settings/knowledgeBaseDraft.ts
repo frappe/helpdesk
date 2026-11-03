@@ -66,15 +66,9 @@ function createDraft() {
     pageLength: 99999,
     auto: true,
   });
-  const accessRows = createResource({
-    url: "frappe.client.get_list",
-    params: {
-      doctype: "HD Article",
-      fields: ["category", "visibility", "status"],
-      group_by: "category, visibility, status",
-      order_by: "category asc",
-      limit_page_length: 0,
-    },
+  // Each top-level category's access across its branch, or "Mixed".
+  const categoryAccess = createResource({
+    url: "helpdesk.api.knowledge_base.get_category_access",
     auto: true,
   });
   const linksScript = createResource({
@@ -122,29 +116,12 @@ function createDraft() {
     { immediate: true }
   );
 
-  // The backend's get_category_visibility rule: read across the branch,
-  // Published articles decide, a branch of only drafts reads its drafts.
-  function getBranchAccess(category: string): string | undefined {
-    const branch = new Set([category]);
-    for (const row of categories.data || []) {
-      if (row.parent_article_category === category) branch.add(row.name);
-    }
-    const rows = (accessRows.data || []).filter((row) =>
-      branch.has(row.category)
-    );
-    const published = rows.filter((row) => row.status === "Published");
-    const access = new Set(
-      (published.length ? published : rows).map((row) => row.visibility)
-    );
-    return access.size > 1 ? "Mixed" : [...access][0];
-  }
-
   const categoryOptions = computed(() =>
     // Customers never see Private categories; already pinned ones stay to unpin.
     // Subcategories are never pinned.
     (categories.data || [])
       .filter((row) => !row.parent_article_category)
-      .map((row) => ({ row, access: getBranchAccess(row.name) }))
+      .map((row) => ({ row, access: categoryAccess.data?.[row.name] }))
       .filter(({ row, access }) => access !== "Private" || row.pinned)
       .map(({ row, access }) => ({
         label: row.category_name,
