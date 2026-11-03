@@ -57,9 +57,6 @@ export const useAuthStore = defineStore("auth", () => {
   const userTeams: ComputedRef<string[]> = computed(
     () => user__.value.user_teams
   );
-  const personaCaptured: ComputedRef<boolean> = computed(
-    () => !!user__.value.persona_captured
-  );
 
   function sessionUser() {
     const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
@@ -101,7 +98,6 @@ export const useAuthStore = defineStore("auth", () => {
     timezone,
     language,
     userTeams,
-    personaCaptured,
     user,
     logout,
   };

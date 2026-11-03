@@ -9,7 +9,6 @@ export async function seedSite(api: Api) {
   await ensureOutgoingEmailAccount(api);
   await resetDefaultTicketViews(api);
   await api.update("HD Settings", "HD Settings", {
-    persona_captured: 1,
     setup_complete: 1,
   });
 }

@@ -52,10 +52,6 @@ def get_user():
     )
     user_team = get_agents_team()
     user_team_names = [team["team_name"] for team in user_team]
-    # Ride the boot so the onboarding guard decides without an extra round-trip.
-    persona_captured = bool(
-        frappe.db.get_single_value("HD Settings", "persona_captured")
-    )
 
     return {
         "has_desk_access": has_desk_access,
@@ -74,7 +70,6 @@ def get_user():
         "availability": availability.get("availability"),
         "availability_changed_on": availability.get("availability_changed_on"),
         "availability_changed_by": availability.get("availability_changed_by"),
-        "persona_captured": persona_captured,
     }
 
 
