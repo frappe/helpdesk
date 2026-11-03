@@ -230,7 +230,7 @@ def category_label_sort_key(label: str) -> tuple:
 @frappe.whitelist()
 def get_category_options(exclude: str | None = None) -> list[dict]:
     """Every article category as a picker option, General first, Subcategories after
-    their parent. Each has value, label, parent_article_category and
+    their parent. Each has value, label, parent_article_category, icon and
     has_subcategories; `exclude` leaves one out. Needs write access to HD Article."""
     frappe.has_permission("HD Article", "write", throw=True)
     rows = frappe.get_all(
@@ -323,7 +323,10 @@ def get_articles(
 def get_featured_articles(
     names: str | list | None = None, limit: int | None = None
 ) -> list[dict]:
-    """The home page's pins in order; `names`, Settings Preview's unsaved ones."""
+    """The home page's Featured articles: name, title and excerpt, in pin order.
+    `names` reads Settings Preview's unsaved pins instead, in their order. Never
+    Private articles, at most `limit` (100). Guests only when the knowledge base is
+    public."""
     validate_public_access()
     filters = make_article_filters()
     # Featured is for customers, so agents skip Private too; others keep their narrower filter.
@@ -352,7 +355,9 @@ def get_featured_articles(
 
 @frappe.whitelist(methods=["POST"])
 def set_pinned_articles(names: list[str]) -> None:
-    """Pins `names` in order and unpins the rest, without saving each article."""
+    """Pin `names` to the home page in that order and unpin every other article.
+    At most 5, all Published and not Private. Leaves weights and `modified` alone, and
+    doesn't save each article. Needs write access to HD Article."""
     frappe.has_permission("HD Article", "write", throw=True)
     names = list(dict.fromkeys(names))
     if len(names) > MAX_PINNED_ARTICLES:
@@ -400,7 +405,8 @@ def _parse_guest_names(value, limit: int) -> list[str]:
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_subcategory_articles(category: str) -> dict[str, list[dict]]:
-    """The newest articles of each Subcategory of `category`, skipping empty ones."""
+    """The articles of each Subcategory of `category`, heaviest then newest first,
+    skipping empty ones."""
     validate_public_access()
     subcategories = get_subcategories(category)
     if not subcategories:
@@ -435,7 +441,8 @@ def _get_byline(user: str) -> dict:
 def get_kb_sidebar() -> list[dict]:
     """Knowledge base sidebar: readable categories, each with its articles' titles.
     get_categories' rows plus `creators` (author name and image) and `articles` (name
-    and title, newest first). Guests only when the knowledge base is public."""
+    and title, heaviest then newest first). Guests only when the knowledge base is
+    public."""
     validate_public_access()
     articles = {}
     for row in frappe.get_all(
@@ -456,8 +463,8 @@ def get_kb_sidebar() -> list[dict]:
 def get_article(name: str) -> dict:
     """Get a readable article: content, author, category, reading time, caller's vote.
     `name` may be the URL path `<name>-<title slug>`. `feedback` is 0 none, 1 helpful,
-    2 not helpful. Doesn't count a view (see increment_views). Guests only when the
-    knowledge base is public."""
+    2 not helpful. Agents also get `pinned` and `weight`. Doesn't count a view (see
+    increment_views). Guests only when the knowledge base is public."""
     name = _get_article_name(name)
     # the desk article page shows the pin and edits the weight
     desk_fields = ["pinned", "weight"] if is_agent() else []
