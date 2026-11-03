@@ -67,13 +67,14 @@ frappectl -s <p> doc create "HD Service Level Agreement" --input sla.json
     {"priority": "Low", "response_time": 14400, "resolution_time": 86400}
   ],
   "support_and_resolution": [
-    {"workday": "Monday", "start_time": "09:00:00", "end_time": "18:00:00"},
+    {"workday": "Monday", "start_time": "09:00:00", "end_time": "18:00:00", "break_start": "13:00:00", "break_end": "14:00:00"},
     {"workday": "Tuesday", "start_time": "09:00:00", "end_time": "18:00:00"}
   ]
 }
 ```
 
 - Times are in seconds of working time.
+- A workday's `break_start` and `break_end` are optional: the SLA clock stops between them. Set both or neither, inside that day's hours, or the save is refused. Each day has its own break; copy it to every row that needs it.
 - `condition` is what the ticket is matched on. `condition_json` is the same condition as the app's filter editor shows it; set both so the app can display and edit it.
 - Set `default_sla` 1 instead of a condition for the SLA that catches every other ticket. Set `rank` to choose between SLAs whose conditions overlap. `sla.md` explains the order.
 - A ticket whose priority has no row in the SLA does not get it.

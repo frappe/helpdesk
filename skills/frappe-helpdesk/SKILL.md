@@ -59,7 +59,7 @@ For numbers across many tickets (counts, average response and resolution time, S
 
 `method call helpdesk.helpdesk.doctype.hd_ticket.api.get_one -f name=<ticket>` returns `overdue_by`, with `response` and `resolution` in working seconds past due. It is empty while the ticket is paused. `get_one` also marks the ticket as seen by the caller. The ticket itself has `sla`, `agreement_status` (First Response Due, Resolution Due, Paused, Failed or Fulfilled), `response_by`, `resolution_by`, `first_responded_on`, `on_hold_since`, `total_hold_time`, `first_response_failed_by` and `resolution_failed_by`.
 
-To explain a date, read the SLA named in `sla` with `doc get "HD Service Level Agreement" <sla>` (Agent Manager only): its priorities, working hours and holiday list. Without that role, `get_ticket_analytics` (`reference/tickets.md`) still gives each target and how far it was missed. `reference/sla.md` explains how the SLA is picked and the dates are worked out.
+To explain a date, read the SLA named in `sla` with `doc get "HD Service Level Agreement" <sla>` (Agent Manager only): its priorities, working hours, breaks and holiday list. Without that role, `get_ticket_analytics` (`reference/tickets.md`) still gives each target and how far it was missed. `reference/sla.md` explains how the SLA is picked and the dates are worked out.
 
 ## 4. Common tasks
 
