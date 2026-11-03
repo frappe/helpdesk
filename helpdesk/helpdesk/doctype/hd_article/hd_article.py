@@ -153,12 +153,6 @@ class HDArticle(Document):
                 "width": "10rem",
             },
             {
-                "label": "Weight",
-                "type": "Int",
-                "key": "weight",
-                "width": "6rem",
-            },
-            {
                 "label": "Author",
                 "type": "Link",
                 "key": "author",
