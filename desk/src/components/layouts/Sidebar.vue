@@ -7,8 +7,9 @@
         class="flex flex-col gap-2"
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
+        <TrialCard :is-sidebar-collapsed="isCollapsed" />
         <TrialBanner
-          v-if="isFCSite && !isCustomerPortal"
+          v-if="isFCSite && !isCustomerPortal && !isCloudSettingsAvailable()"
           :isSidebarCollapsed="isCollapsed"
         />
         <GettingStartedBanner
@@ -69,7 +70,10 @@ import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalP
 import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
-import { confirmLoginToFrappeCloud } from "@/composables/fc";
+import {
+  confirmLoginToFrappeCloud,
+  isCloudSettingsAvailable,
+} from "@/composables/fc";
 import { useApps } from "@/composables/useApps";
 import { useBanners } from "@/composables/useBanners";
 import { useScreenSize } from "@/composables/screen";
@@ -97,6 +101,7 @@ import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppSidebar from "./AppSidebar.vue";
+import TrialCard from "./TrialCard.vue";
 import { showShortcutsModal } from "./layoutSettings";
 
 import { useShortcut } from "@/composables/shortcuts";
@@ -113,6 +118,7 @@ import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
+  openBillingSettings,
   setActiveSettingsTab,
   showSettingsModal,
 } from "../Settings/settingsModal";
@@ -168,12 +174,18 @@ const agentPortalDropdown = computed(() => [
     label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
-  {
-    label: __("Login to Frappe Cloud"),
-    icon: FrappeCloudIcon,
-    onClick: () => confirmLoginToFrappeCloud(),
-    condition: () => !isMobileView.value && window.is_fc_site,
-  },
+  isCloudSettingsAvailable()
+    ? {
+        label: __("Manage billing"),
+        icon: "lucide-credit-card",
+        onClick: openBillingSettings,
+      }
+    : {
+        label: __("Login to Frappe Cloud"),
+        icon: FrappeCloudIcon,
+        onClick: () => confirmLoginToFrappeCloud(),
+        condition: () => !isMobileView.value && window.is_fc_site,
+      },
   {
     label: __("Shortcuts"),
     icon: h(LucideKeyboard),

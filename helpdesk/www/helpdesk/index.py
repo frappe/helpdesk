@@ -5,6 +5,7 @@ from frappe.utils import cint, get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
+from helpdesk.integrations import frappe_cloud
 from helpdesk.utils import get_agent_name
 
 no_cache = 1
@@ -49,6 +50,7 @@ def get_boot():
             "lang": frappe.local.lang,
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
+            "cloud_settings": frappe_cloud.get_boot_context(),
         }
     )
 

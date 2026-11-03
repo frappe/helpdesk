@@ -700,6 +700,7 @@ declare global {
     agent: string | null;
     default_country: string;
     apps: string[];
+    cloud_settings?: { enabled: boolean };
   }
 }
 
