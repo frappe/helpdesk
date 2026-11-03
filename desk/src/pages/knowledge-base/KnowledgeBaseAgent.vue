@@ -435,27 +435,158 @@ const selectBannerActions = [
   {
     label: __("Delete"),
     icon: "lucide-trash-2",
-    onClick: (selections: Set<string>) => {
-      listSelections.value = selections;
-      $dialog({
-        title: __("Delete articles"),
-        message: __("Are you sure you want to delete these articles?"),
-        actions: [
-          {
-            label: __("Delete"),
-            theme: "red",
-            iconLeft: "lucide-trash-2",
-            variant: "solid",
-            onClick({ close }) {
-              handleDeleteArticles();
-              close();
-            },
-          },
-        ],
-      });
-    },
+    onClick: deleteSelection,
   },
 ];
+
+// The articles of a category and its Subcategories that the list has loaded.
+function loadedBranch(value: string) {
+  const data = listViewRef.value?.list?.data;
+  const parentOf = new Map(
+    (data?.group_by_field?.options || []).map((group) => [
+      group.value,
+      group.parent_article_category,
+    ])
+  );
+  return (data?.data || [])
+    .filter(
+      (row) => row.category === value || parentOf.get(row.category) === value
+    )
+    .map((row) => row.name);
+}
+
+// Categories whose checkbox is ticked: every loaded article of the branch is
+// selected. General can't be deleted, so it stays a set of articles.
+function selectedCategories(selections: Set<string>) {
+  const groups = (
+    listViewRef.value?.list?.data?.group_by_field?.options || []
+  ).filter((group) => {
+    if (!group.value || group.value === generalCategory.data) return false;
+    const branch = loadedBranch(group.value);
+    return branch.length && branch.every((name) => selections.has(name));
+  });
+  // a ticked parent already covers its Subcategories
+  const values = new Set(groups.map((group) => group.value));
+  return groups.filter((group) => !values.has(group.parent_article_category));
+}
+
+function deleteSelection(selections: Set<string>) {
+  listSelections.value = new Set(selections);
+  const categories = selectedCategories(selections);
+  const covered = new Set(
+    categories.flatMap((group) => loadedBranch(group.value))
+  );
+  const articles = [...selections].filter((name) => !covered.has(name));
+  if (categories.length === 1 && !articles.length) {
+    // the row menu's dialog: keep or delete the articles, with server counts
+    resetState();
+    category.id = categories[0].value;
+    category.parent = categories[0].parent_article_category || "";
+    deleteModal.value = true;
+    return;
+  }
+  $dialog({
+    title: deleteTitle(categories.length, articles.length),
+    message: categories.length
+      ? countLabel(
+          categories.length,
+          __(
+            "This also deletes the category's subcategories and all its articles. Articles cited by tickets are archived instead."
+          ),
+          __(
+            "This also deletes the categories' subcategories and all their articles. Articles cited by tickets are archived instead."
+          )
+        )
+      : countLabel(
+          articles.length,
+          __(
+            "Are you sure you want to delete this article? If a ticket cites it, it is archived instead."
+          ),
+          __(
+            "Are you sure you want to delete these {0} articles? Articles cited by tickets are archived instead."
+          )
+        ),
+    actions: [
+      {
+        label: __("Delete"),
+        theme: "red",
+        iconLeft: "lucide-trash-2",
+        variant: "solid",
+        onClick({ close }) {
+          close();
+          if (categories.length) {
+            deleteCategoriesAndArticles(categories, articles);
+          } else {
+            handleDeleteArticles();
+          }
+        },
+      },
+    ],
+  });
+}
+
+function deleteTitle(categories: number, articles: number) {
+  if (!categories) {
+    return countLabel(
+      articles,
+      __("Delete article"),
+      __("Delete {0} articles")
+    );
+  }
+  if (!articles) return __("Delete {0} categories", [categories]);
+  if (categories === 1) {
+    return countLabel(
+      articles,
+      __("Delete 1 category and 1 article"),
+      __("Delete 1 category and {0} articles")
+    );
+  }
+  return articles === 1
+    ? __("Delete {0} categories and 1 article", [categories])
+    : __("Delete {0} categories and {1} articles", [categories, articles]);
+}
+
+async function deleteCategoriesAndArticles(
+  categories: { value: string }[],
+  articles: string[]
+) {
+  let archived = 0;
+  try {
+    for (const group of categories) {
+      const result = await call("helpdesk.api.knowledge_base.delete_category", {
+        category: group.value,
+        with_articles: true,
+      });
+      archived += result.archived;
+    }
+    if (articles.length) {
+      const result = await call("helpdesk.api.knowledge_base.delete_articles", {
+        articles,
+      });
+      archived += result.archived;
+    }
+    toast.success(
+      archived
+        ? countLabel(
+            archived,
+            __(
+              "Deleted successfully. 1 article cited by tickets was archived."
+            ),
+            __(
+              "Deleted successfully. {0} articles cited by tickets were archived."
+            )
+          )
+        : __("Deleted successfully.")
+    );
+  } catch (error) {
+    // the ones deleted before the failure stay deleted
+    getErrorMessage(error, true);
+  } finally {
+    listViewRef.value?.reload();
+    listViewRef.value?.unselectAll();
+    listSelections.value.clear();
+  }
+}
 
 function handleMoveToCategory(category: string) {
   moveToCategory.submit(
@@ -577,6 +708,8 @@ function handleCategoryDelete(alsoDeleteArticles: boolean) {
             : __("Category deleted successfully.")
         );
         listViewRef.value.reload();
+        listViewRef.value.unselectAll();
+        listSelections.value.clear();
         resetState();
       },
       onError: (error: Error) => getErrorMessage(error, true),
