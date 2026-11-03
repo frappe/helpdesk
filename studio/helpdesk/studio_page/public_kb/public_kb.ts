@@ -6,7 +6,7 @@ import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useRememberedCount } from '@app/composables/useRememberedCount'
 import { prefetchOnHover } from '@app/stores/knowledgeBase'
 
-// home lists show this many; Featured is also capped by MAX_PINNED_ARTICLES (hd_article.py)
+// home lists show this many; the server caps Featured at MAX_PINNED_ARTICLES (hd_article.py)
 const ARTICLE_LIMIT = 5
 export default function setup(context) {
   const { articles, categories, pinnedArticles } = context
@@ -33,7 +33,7 @@ export default function setup(context) {
     (value) => {
       if (!value) return
       const names = preview.value?.pinned_articles
-      pinnedArticles.fetch({ ...(names && { names: JSON.stringify(names) }), limit: ARTICLE_LIMIT })
+      pinnedArticles.fetch(names ? { names: JSON.stringify(names) } : {})
     },
     { immediate: true },
   )
@@ -41,7 +41,7 @@ export default function setup(context) {
   // Subcategories open from their parent's page.
   const topCategories = computed(() => (categories.data || []).filter((row) => !row.parent_article_category))
 
-  const homeCategories = computed(() => {
+  const pickedCategories = computed(() => {
     const rows = topCategories.value
     const order = preview.value?.pinned
     const pinned = order
@@ -50,7 +50,15 @@ export default function setup(context) {
     return pinned.length ? pinned : rows
   })
 
-  const hasHiddenCategories = computed(() => homeCategories.value.length < topCategories.value.length)
+  // A lone category with two or more subcategories shows them as its cards; with one, it stays lone.
+  const homeCategories = computed(() => {
+    const rows = pickedCategories.value
+    if (rows.length !== 1) return rows
+    const subcategories = (categories.data || []).filter((row) => row.parent_article_category === rows[0].name)
+    return subcategories.length > 1 ? subcategories : rows
+  })
+
+  const hasHiddenCategories = computed(() => pickedCategories.value.length < topCategories.value.length)
 
   // The skeleton takes the layout of last time's count.
   const skeletonCount = useRememberedCount(
@@ -95,14 +103,16 @@ export default function setup(context) {
 
   // Waits for categories and pins: an earlier fetch could land after the right one.
   const pinsSettled = computed(() => Boolean(pinnedArticles.data || pinnedArticles.error))
+  // One picked category lists its own and its subcategories' articles, whether or not they show as cards.
+  const branchCategory = computed(() => (pickedCategories.value.length === 1 ? pickedCategories.value[0] : null))
   watch(
-    [sort, focusCategory, () => categories.data, pinsSettled],
-    ([value, category, loaded, settled]) => {
+    [sort, branchCategory, focusCategory, () => categories.data, pinsSettled],
+    ([value, category, focus, loaded, settled]) => {
       if (!loaded || !settled || value === 'featured') return
       if (!category) return articles.fetch({ limit: ARTICLE_LIMIT, sort: value })
       // A pinned lone category previews like the rest; a site's only category lists everything.
-      const limit = hasHiddenCategories.value ? ARTICLE_LIMIT : 0
-      articles.fetch({ category: category.name, limit, sort: value })
+      const limit = focus && !hasHiddenCategories.value ? 0 : ARTICLE_LIMIT
+      articles.fetch({ category: category.name, include_subcategories: 1, limit, sort: value })
     },
     { immediate: true },
   )
