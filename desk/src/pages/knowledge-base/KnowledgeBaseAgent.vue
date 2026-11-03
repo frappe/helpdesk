@@ -655,11 +655,13 @@ const options = computed(() => {
     },
     columnConfig: {
       title: {
-        prefix: () => {
-          return h(ArticleIcon, {
-            class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
-          });
-        },
+        prefix: () =>
+          h("span", {
+            class: "lucide-file-text size-4 shrink-0 text-ink-gray-4",
+            "aria-hidden": "true",
+          }),
+        custom: ({ item }) =>
+          h("span", { class: "truncate text-base text-ink-gray-8" }, item),
       },
       status: {
         custom: ({ item }) => {

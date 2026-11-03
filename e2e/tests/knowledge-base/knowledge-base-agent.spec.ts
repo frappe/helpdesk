@@ -132,12 +132,6 @@ async function openArticleMenu(page: Page, item: string) {
 }
 
 async function openCategoryMenu(page: Page, category: string, item: string) {
-  await page
-    .locator("div")
-    .filter({ has: page.getByText(category, { exact: true }) })
-    .filter({ has: page.locator("button") })
-    .last()
-    .getByRole("button")
-    .click();
+  await page.getByRole("button", { name: `Options for ${category}`, exact: true }).click();
   await page.getByRole("menuitem", { name: item }).click();
 }
