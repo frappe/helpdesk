@@ -255,30 +255,56 @@ class TestPublicReads(IntegrationTestCase):
         article.save()
 
         self.assertEqual(
-            frappe.db.get_value("HD Article", name, ["pinned", "weight"]), (0, 0)
+            frappe.db.get_value("HD Article", name, ["pinned", "pinned_order"]),
+            (0, 0),
         )
 
-    def test_pins_weigh_in_their_order(self) -> None:
+    def test_set_pinned_saves_the_order(self) -> None:
         names = [self.make_article(f"Fixture {index}") for index in range(3)]
         modified = frappe.db.get_value("HD Article", names[0], "modified")
 
         set_pinned_articles(names)
 
-        self.assertEqual(
-            self.pins(), [(name, 3 - index) for index, name in enumerate(names)]
-        )
+        self.assertEqual(self.pins(), names)
         self.assertEqual(
             frappe.db.get_value("HD Article", names[0], "modified"), modified
         )
 
-    def test_unpinning_resets_the_weight(self) -> None:
+    def test_set_pinned_unpins_the_rest(self) -> None:
         first, second = (self.make_article(f"Fixture {index}") for index in range(2))
         set_pinned_articles([first, second])
 
         set_pinned_articles([second])
 
-        self.assertEqual(self.pins(), [(second, 1)])
-        self.assertEqual(frappe.db.get_value("HD Article", first, "weight"), 0)
+        self.assertEqual(self.pins(), [second])
+
+    def test_pinning_leaves_the_weight_alone(self) -> None:
+        first = self.make_article("Fixture first", weight=7)
+        second = self.make_article("Fixture second", pinned=1, weight=3)
+
+        set_pinned_articles([first, second])
+        set_pinned_articles([])
+        article = frappe.get_doc("HD Article", second)
+        article.pinned = 1
+        article.save()
+
+        weights = frappe.get_all(
+            "HD Article",
+            filters={"name": ["in", [first, second]]},
+            fields=["name", "weight"],
+            as_list=True,
+        )
+        self.assertEqual(dict(weights), {first: 7, second: 3})
+
+    def test_only_agents_set_pinned_articles(self) -> None:
+        name = self.make_article("Fixture pinnable")
+        customer = make_contact("kb-pinner")["user"]
+
+        for user in (customer, "Guest"):
+            with self.subTest(user=user), self.set_user(user):
+                self.assertRaises(frappe.PermissionError, set_pinned_articles, [name])
+
+        self.assertEqual(self.pins(), [])
 
     def test_set_pinned_refuses_what_customers_cannot_read(self) -> None:
         private = self.make_article("Fixture private", visibility=PRIVATE)
@@ -288,13 +314,13 @@ class TestPublicReads(IntegrationTestCase):
             with self.subTest(names=len(names)):
                 self.assertRaises(frappe.ValidationError, set_pinned_articles, names)
 
-    def test_deleting_a_pin_reweighs_the_rest(self) -> None:
+    def test_deleting_a_pin_keeps_the_rest(self) -> None:
         first, second = (self.make_article(f"Fixture {index}") for index in range(2))
         set_pinned_articles([first, second])
 
         frappe.delete_doc("HD Article", first)
 
-        self.assertEqual(self.pins(), [(second, 1)])
+        self.assertEqual(self.pins(), [second])
 
     def test_featured_leaves_out_what_the_reader_cannot_see(self) -> None:
         private = self.make_article("Fixture private")
@@ -314,18 +340,6 @@ class TestPublicReads(IntegrationTestCase):
         self.assertNotIn("pinned", article)
         self.assertNotIn("weight", article)
 
-    def pins(self) -> list[tuple[str, int]]:
-        return [
-            tuple(row)
-            for row in frappe.get_all(
-                "HD Article",
-                filters={"pinned": 1},
-                fields=["name", "weight"],
-                order_by="pinned_order asc",
-                as_list=True,
-            )
-        ]
-
     def test_names_read_in_the_given_order(self) -> None:
         second = self.make_article("Fixture second")
 
@@ -338,6 +352,14 @@ class TestPublicReads(IntegrationTestCase):
     def test_junk_names_read_none(self) -> None:
         for names in ("not json", "{}", "[]", '[1, {"a": 1}]'):
             self.assertEqual(get_featured_articles(names=names), [])
+
+    def pins(self) -> list[str]:
+        return frappe.get_all(
+            "HD Article",
+            filters={"pinned": 1},
+            order_by="pinned_order asc",
+            pluck="name",
+        )
 
     def test_reads_one_published_article(self) -> None:
         article = get_article(self.published)

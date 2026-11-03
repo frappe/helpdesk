@@ -475,9 +475,8 @@ function save(values: Record<string, string | number>, message: string) {
     {
       onSuccess: (doc: Article) => {
         article.data.modified = doc.modified;
-        // unpublishing unpins; pins set the weight
+        // unpublishing unpins
         article.data.pinned = doc.pinned;
-        article.data.weight = doc.weight;
         toast.success(message);
       },
       onError: (error: Error) => {
@@ -783,14 +782,21 @@ const breadcrumbs = computed(() => {
       route: { name: "AgentKnowledgeBase" },
     },
   ];
-  // no route: the list has no page per category
+  // the list opens the category it's sent to
+  const inList = (category: string) => ({
+    name: "AgentKnowledgeBase",
+    query: { category },
+  });
   if (article.data?.parent_category_name) {
-    items.push({ label: article.data.parent_category_name });
+    items.push({
+      label: article.data.parent_category_name,
+      route: inList(article.data.parent_article_category),
+    });
   }
   if (article.data?.category_name) {
     items.push({
       label: article.data?.category_name,
-      route: { name: "AgentKnowledgeBase" },
+      route: inList(article.data.category),
     });
   }
   if (article.data?.title) {

@@ -22,7 +22,6 @@ from helpdesk.helpdesk.doctype.hd_article.hd_article import (
     can_view_article,
     get_voter,
     make_article_filters,
-    sync_pinned_weights,
     throw_pin_limit,
 )
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
@@ -346,7 +345,8 @@ def get_featured_articles(
     filters["name"] = ["in", names]
     # the limit cuts after their order
     rows = frappe.get_all("HD Article", filters=filters, fields=fields)
-    rows.sort(key=lambda row: names.index(row.name))
+    position = {name: index for index, name in enumerate(names)}
+    rows.sort(key=lambda row: position[row.name])
     return rows[:limit]
 
 
@@ -369,11 +369,12 @@ def set_pinned_articles(names: list[str]) -> None:
     if len(pinnable) != len(names):
         frappe.throw(_("Only published articles customers can read can be pinned"))
     article = frappe.qb.DocType("HD Article")
-    # unpinned ones lose the weight their pin gave them
     unpin = (
-        frappe.qb.update(article).set(article.pinned, 0).set(article.pinned_order, 0)
+        frappe.qb.update(article)
+        .set(article.pinned, 0)
+        .set(article.pinned_order, 0)
+        .where(article.pinned == 1)
     )
-    unpin = unpin.set(article.weight, 0).where(article.pinned == 1)
     if names:
         unpin = unpin.where(article.name.notin(names))
     unpin.run()
@@ -384,7 +385,6 @@ def set_pinned_articles(names: list[str]) -> None:
             {"pinned": 1, "pinned_order": order},
             update_modified=False,
         )
-    sync_pinned_weights()
 
 
 def _parse_guest_names(value, limit: int) -> list[str]:

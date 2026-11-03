@@ -89,21 +89,21 @@ function createDraft() {
     pageLength: PIN_LIMITS.articles,
     auto: true,
   });
-  // The rest load by search: a big knowledge base has too many to list.
+  // The rest load by search, once the pin dialog opens: a big knowledge base has too many to list.
   const articleSearch = createListResource({
     doctype: "HD Article",
     fields: ["name", "title", "visibility"],
-    filters: { status: "Published", visibility: ["!=", "Private"] },
     orderBy: "title asc",
     pageLength: ARTICLE_SEARCH_LIMIT,
-    auto: true,
   });
   const searchArticles = useDebounceFn((query: string) => {
+    // a typed % or _ matches itself
+    const like = query.replace(/[\\%_]/g, "\\$&");
     articleSearch.update({
       filters: {
         status: "Published",
         visibility: ["!=", "Private"],
-        ...(query && { title: ["like", `%${query}%`] }),
+        ...(query && { title: ["like", `%${like}%`] }),
       },
     });
     articleSearch.reload();
@@ -222,10 +222,10 @@ function createDraft() {
       }
       if (changed.value.includes("links")) await saveLinks(value.links);
       if (changed.value.includes("pinned")) {
-        await savePinned("categories", value.pinned);
+        await savePinnedCategories(value.pinned);
       }
       if (changed.value.includes("pinned_articles")) {
-        await savePinned("articles", value.pinned_articles);
+        await savePinnedArticles(value.pinned_articles);
       }
       clearPreview();
       await Promise.all([
@@ -243,44 +243,31 @@ function createDraft() {
     }
   }
 
-  const pinLists = {
-    categories: {
-      rows: categories,
-      doctype: "HD Article Category",
-      draftKey: "pinned",
-      saved: () => __("Pinned categories updated"),
-      failed: () => __("Could not update the pinned categories"),
-    },
-    articles: {
-      rows: articles,
-      draftKey: "pinned_articles",
-      saved: () => __("Pinned articles updated"),
-    },
-  } as const;
-
   // Order is 1-based; 0 means unpinned.
-  async function savePinned(kind: PinKind, pinned: string[]) {
-    if (kind === "articles") {
-      return call("helpdesk.api.knowledge_base.set_pinned_articles", {
-        names: pinned,
-      });
-    }
-    const { rows, doctype, failed } = pinLists[kind];
+  async function savePinnedCategories(pinned: string[]) {
     const { failed_docs } = await call("frappe.client.bulk_update", {
-      docs: rows.data
+      docs: categories.data
         .map((row) => ({ row, order: pinned.indexOf(row.name) + 1 }))
         .filter(
           ({ row, order }) =>
             Boolean(row.pinned) !== order > 0 || row.pinned_order !== order
         )
         .map(({ row, order }) => ({
-          doctype,
+          doctype: "HD Article Category",
           docname: row.name,
           pinned: order > 0 ? 1 : 0,
           pinned_order: order,
         })),
     });
-    if (failed_docs.length) throw new Error(failed());
+    if (failed_docs.length) {
+      throw new Error(__("Could not update the pinned categories"));
+    }
+  }
+
+  function savePinnedArticles(pinned: string[]) {
+    return call("helpdesk.api.knowledge_base.set_pinned_articles", {
+      names: pinned,
+    });
   }
 
   function saveLinks(links: Link[]) {
@@ -306,10 +293,25 @@ function createDraft() {
     });
   }
 
+  const pinLists = {
+    categories: {
+      save: savePinnedCategories,
+      rows: categories,
+      draftKey: "pinned",
+      saved: () => __("Pinned categories updated"),
+    },
+    articles: {
+      save: savePinnedArticles,
+      rows: articles,
+      draftKey: "pinned_articles",
+      saved: () => __("Pinned articles updated"),
+    },
+  } as const;
+
   async function savePins(kind: PinKind, pinned: string[]) {
-    const { rows, draftKey, saved } = pinLists[kind];
+    const { save, rows, draftKey, saved } = pinLists[kind];
     try {
-      await savePinned(kind, pinned);
+      await save(pinned);
       // The merge watch keeps a draft that differs from the old saved order.
       draft.value![draftKey] = [...pinned];
       await rows.reload();

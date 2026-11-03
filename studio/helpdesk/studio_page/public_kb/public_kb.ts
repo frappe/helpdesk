@@ -6,6 +6,7 @@ import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useRememberedCount } from '@app/composables/useRememberedCount'
 import { prefetchOnHover } from '@app/stores/knowledgeBase'
 
+// home lists show this many; Featured is also capped by MAX_PINNED_ARTICLES (hd_article.py)
 const ARTICLE_LIMIT = 5
 export default function setup(context) {
   const { articles, categories, pinnedArticles } = context

@@ -1,6 +1,7 @@
 <template>
   <div
-    class="group/folder cursor-pointer rounded-4"
+    :id="`kb-category-${group.group.value}`"
+    class="group/folder relative cursor-pointer rounded-4"
     :class="
       all
         ? 'bg-surface-gray-2 hover:bg-surface-gray-3'
@@ -29,7 +30,7 @@
       <div
         v-for="(column, i) in list.columns"
         :key="column.key"
-        class="overflow-x-hidden"
+        class="min-w-0"
       >
         <div
           v-if="i === 0"
@@ -37,7 +38,7 @@
           :style="{ paddingInlineStart: `${depth * 24}px` }"
         >
           <button
-            class="flex shrink-0 items-center gap-2"
+            class="flex shrink-0 items-center gap-2 rounded focus:outline-none focus-visible:ring focus-visible:ring-outline-gray-3"
             :aria-expanded="open"
             :aria-label="
               open ? __('Collapse {0}', [label]) : __('Expand {0}', [label])
@@ -49,17 +50,14 @@
               :class="open ? 'rotate-90' : 'rtl:rotate-180'"
               aria-hidden="true"
             />
-            <SpriteIcon
-              v-if="!depth"
-              :name="group.group.icon?.replace(/^lucide-/, '') || 'folder'"
-              class="size-4 text-ink-gray-7"
-            />
+            <!-- a plain folder opens with the row; a custom icon stays put -->
             <span
-              v-else
-              :class="open ? 'lucide-folder-open' : 'lucide-folder'"
-              class="size-4 text-ink-gray-6"
+              v-if="icon === 'folder'"
+              :class="[open ? 'lucide-folder-open' : 'lucide-folder', iconTone]"
+              class="size-4"
               aria-hidden="true"
             />
+            <SpriteIcon v-else :name="icon" class="size-4" :class="iconTone" />
           </button>
           <span
             class="min-w-0 truncate"
@@ -71,23 +69,7 @@
           >
             {{ label }}
           </span>
-          <Dropdown v-if="actions.length" :options="actions" align="start">
-            <Button
-              variant="ghost"
-              size="sm"
-              icon="lucide-ellipsis"
-              :aria-label="__('Options for {0}', [label])"
-              class="opacity-0 focus:opacity-100 group-hover/folder:opacity-100"
-              @click.stop
-            />
-          </Dropdown>
         </div>
-
-        <LiveRing
-          v-else-if="column.key === 'status'"
-          :published="published"
-          :total="total"
-        />
 
         <span
           v-else-if="column.key === 'visibility' && access"
@@ -119,12 +101,25 @@
         </span>
       </div>
     </div>
+    <!-- at the row's end, as the old group headers had it -->
+    <div
+      v-if="actions.length"
+      class="absolute inset-y-0 end-1 flex items-center"
+      @click.stop
+    >
+      <Dropdown :options="actions" align="end">
+        <Button
+          variant="ghost"
+          icon="lucide-more-horizontal"
+          :aria-label="__('Options for {0}', [label])"
+        />
+      </Dropdown>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import Icon from "@helpdesk/shared/Icon.vue";
-import LiveRing from "./LiveRing.vue";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import { __ } from "@/translation";
 import { Button, Checkbox, Dropdown, dayjsLocal } from "frappe-ui";
@@ -146,6 +141,12 @@ const list = inject<any>("list");
 const label = computed(
   () => props.group.group.category_name || props.group.group.label
 );
+const icon = computed(
+  () => props.group.group.icon?.replace(/^lucide-/, "") || "folder"
+);
+const iconTone = computed(() =>
+  props.depth ? "text-ink-gray-6" : "text-ink-gray-7"
+);
 const ids = computed(() => props.rows.map((row) => row.name));
 const all = computed(
   () =>
@@ -163,10 +164,6 @@ function toggleBranch() {
   }
 }
 
-const total = computed(() => props.rows.length);
-const published = computed(
-  () => props.rows.filter((row) => row.status === "Published").length
-);
 const access = computed(() => {
   const values = new Set(props.rows.map((row) => row.visibility));
   return values.size > 1 ? "Mixed" : [...values][0];

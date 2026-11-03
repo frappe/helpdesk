@@ -17,7 +17,7 @@ Agents write articles in the desk at `/helpdesk/kb`. Customers and guests read t
 - `allow_anonymous_article_voting`: guests can vote.
 - `banner_image`, `banner_preset`: the banner on the KB home.
 
-Within a category, every article list (`get_articles` with a `category`, `get_subcategory_articles`, `get_kb_sidebar`) sorts by `weight` first, heaviest on top. Pins write the weight: the first of N pinned articles weighs N, the last 1, and an unpinned article goes back to 0 (`HDArticle.sync_pinned_weights`).
+Within a category, every article list (`get_articles` with a `category`, `get_subcategory_articles`, `get_kb_sidebar`) sorts by `weight` first, heaviest on top. Pins never touch the weight; Featured reads them by `pinned_order`.
 
 ## Who can read what
 

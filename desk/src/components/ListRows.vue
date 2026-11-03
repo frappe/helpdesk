@@ -48,7 +48,7 @@
 <script setup>
 import CategoryRow from "@/components/knowledge-base/CategoryRow.vue";
 import { ListRow, ListRows } from "frappe-ui/experimental";
-import { computed, reactive } from "vue";
+import { computed, nextTick, reactive, watch } from "vue";
 
 const props = defineProps({
   rows: {
@@ -59,6 +59,11 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  // a category to open alone and scroll to
+  revealGroup: {
+    type: String,
+    default: null,
+  },
 });
 
 // categories start open, subcategories closed; a choice survives reloads
@@ -66,6 +71,28 @@ const open = reactive({});
 const isOpen = (group, depth) => open[group.group.value] ?? depth === 0;
 const toggle = (group, depth) =>
   (open[group.group.value] = !isOpen(group, depth));
+
+// opens only that category and its parent
+let revealed = null;
+watch(
+  () => [props.revealGroup, props.rows],
+  ([name]) => {
+    if (!name || name === revealed) return;
+    const group = props.rows.find((g) => g.group?.value === name);
+    if (!group) return;
+    revealed = name;
+    const parent = group.group.parent_article_category;
+    for (const g of props.rows) {
+      open[g.group.value] = g.group.value === name || g.group.value === parent;
+    }
+    nextTick(() =>
+      document
+        .getElementById(`kb-category-${name}`)
+        ?.scrollIntoView({ block: "center" })
+    );
+  },
+  { immediate: true }
+);
 
 // flattened in display order: a category, its subcategories, then its own articles
 const items = computed(() => {

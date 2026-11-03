@@ -120,10 +120,16 @@ import {
 } from "frappe-ui";
 import { computed, h, markRaw, onMounted, reactive, ref } from "vue";
 import { __ } from "@/translation";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 
 const router = useRouter();
+// ?category= (from an article's breadcrumb) is read once, then dropped from the URL
+const route = useRoute();
+const revealCategory = route.query.category as string | undefined;
+if (revealCategory) {
+  router.replace({ query: { ...route.query, category: undefined } });
+}
 const { $dialog } = globalStore();
 
 const category = reactive({
@@ -911,10 +917,7 @@ const options = computed(() => {
     columnConfig: {
       title: {
         prefix: () =>
-          h("span", {
-            class: "lucide-file-text size-4 shrink-0 text-ink-gray-4",
-            "aria-hidden": "true",
-          }),
+          h(ArticleIcon, { class: "size-4 shrink-0 text-ink-gray-6" }),
         custom: ({ item }) =>
           h("span", { class: "truncate text-base text-ink-gray-8" }, item),
       },
@@ -956,6 +959,7 @@ const options = computed(() => {
       prop: "articleId",
     },
     groupByActions,
+    revealGroup: revealCategory,
     showSelectBanner: true,
     selectBannerActions,
     default_page_length: 100,

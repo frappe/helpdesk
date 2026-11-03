@@ -23,7 +23,7 @@ A Published Article listed under the Featured tab on the knowledge base home, in
 _Avoid_: Promoted article, featured article (that is only the portal's tab)
 
 **Article weight**:
-A whole number on an Article. Inside its Category, a heavier Article lists first; equal weights keep the usual order (newest, or most viewed). Pinning sets it from the pin order: the first of N Pinned articles weighs N, the last 1, and unpinning resets it to 0. It has no effect on search or the home page's Popular and Latest lists.
+A whole number on an Article. Inside its Category, a heavier Article lists first; equal weights keep the usual order (newest, or most viewed). Pinning never changes it. It has no effect on search or the home page's Popular and Latest lists.
 _Avoid_: Priority, rank, position
 
 **General**:

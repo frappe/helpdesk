@@ -184,6 +184,7 @@
       :rows="rows"
       v-slot="{ idx, column, item, row }"
       :group-by-actions="options.groupByActions"
+      :reveal-group="options.revealGroup"
       @scrollend="handleListScroll"
       class="list-rows"
     >
@@ -342,6 +343,7 @@ interface P {
     selectable?: boolean;
     view?: ViewType;
     groupByActions?: Array<any>;
+    revealGroup?: string;
     showSelectBanner?: boolean;
     selectBannerActions?: Record<string, any>;
     default_page_length?: number;

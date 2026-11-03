@@ -256,6 +256,8 @@ const isSaving = ref(false);
 watch(show, (open) => {
   if (!open) return;
   query.value = "";
+  // lazy lists load on first open
+  props.search?.("");
   picked.clear();
   selected.value = [...props.pinned];
   initial.value = [...props.pinned];

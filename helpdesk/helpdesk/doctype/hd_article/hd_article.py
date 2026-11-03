@@ -21,7 +21,7 @@ PUBLIC = "Public"
 CUSTOMERS = "Customers"
 PRIVATE = "Private"
 EXCERPT_LENGTH = 140
-# the home page features this many
+# the home page features this many; PIN_LIMITS in knowledgeBaseDraft.ts mirrors it
 MAX_PINNED_ARTICLES = 5
 
 
@@ -35,17 +35,15 @@ class HDArticle(Document):
         self.validate_pin()
 
     def validate_pin(self):
-        """Order is 1-based; 0 means unpinned. Only Published articles customers can read stay pinned, and unpinning resets the weight."""
+        """Order is 1-based; 0 means unpinned. Only Published articles customers can read stay pinned."""
         if self.status != "Published" or self.visibility == PRIVATE:
             self.pinned = 0
-        before = self.get_doc_before_save()
         if not self.pinned:
             self.pinned_order = 0
-            # its weight came from the pin
-            if before and before.pinned:
-                self.weight = 0
             return
+        before = self.get_doc_before_save()
         if not (before and before.pinned):
+            # ponytail: count-then-pin races, a row lock if concurrent pins matter
             pins = frappe.db.count(
                 "HD Article", {"pinned": 1, "name": ["!=", self.name]}
             )
@@ -108,16 +106,10 @@ class HDArticle(Document):
 
     def on_update(self):
         self.update_search_index()
-        before = self.get_doc_before_save()
-        was = (before.pinned, before.pinned_order) if before else (0, 0)
-        if (self.pinned, self.pinned_order) != was:
-            self.weight = sync_pinned_weights().get(self.name, self.weight)
 
     def on_trash(self):
         check_category_length(self.category)
         self.update_search_index()
-        if self.pinned:
-            sync_pinned_weights(leaving=self.name)
 
     def update_search_index(self):
         # a bulk change sends one job for all its articles
@@ -266,25 +258,3 @@ def throw_pin_limit():
         _("You can pin up to {0} articles").format(MAX_PINNED_ARTICLES),
         title=_("Too many pinned articles"),
     )
-
-
-def sync_pinned_weights(leaving: str | None = None) -> dict[str, int]:
-    """Weights follow the pin order, so each pin lists in its category as on the home page: the first of N pins weighs N, the last 1."""
-    pins = frappe.get_all(
-        "HD Article",
-        filters={"pinned": 1, "name": ["!=", leaving or ""]},
-        fields=["name", "weight"],
-        order_by="pinned_order asc",
-    )
-    weights = {}
-    for rank, pin in enumerate(pins):
-        weights[pin.name] = len(pins) - rank
-        if pin.weight != weights[pin.name]:
-            frappe.db.set_value(
-                "HD Article",
-                pin.name,
-                "weight",
-                weights[pin.name],
-                update_modified=False,
-            )
-    return weights
