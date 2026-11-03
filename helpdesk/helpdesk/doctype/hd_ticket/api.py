@@ -314,6 +314,7 @@ def merge_ticket(source: str, target: str):
     controller.reply_via_agent(
         doc,
         message=message,
+        to=doc.raised_by,
     )
 
     # comment in target ticket that
@@ -445,6 +446,7 @@ def split_ticket(subject: str, communication_id: str):
         message=_(
             "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
         ).format(new_ticket_link, new_ticket),
+        to=ticket_doc.raised_by,
     )
 
     # Email on the old ticket that it has been split to new_ticket
