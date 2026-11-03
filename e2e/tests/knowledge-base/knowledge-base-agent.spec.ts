@@ -15,7 +15,7 @@ test("nest a new category under another from the category dialog", async ({ page
   await page.getByRole("button", { name: "Create" }).click();
   await page.getByRole("menuitem", { name: "Category" }).click();
   const dialog = page.getByRole("dialog");
-  await dialog.getByRole("checkbox", { name: "Nest under a category" }).check();
+  await dialog.getByRole("checkbox", { name: "Add as a subcategory" }).check();
   await expect(dialog.getByRole("button", { name: "Create subcategory" })).toBeDisabled();
   await dialog.getByRole("combobox", { name: "Parent category" }).click();
   await page.getByRole("combobox").last().fill(parent.category_name);

@@ -114,10 +114,12 @@
         <p v-if="hasSubcategories" class="text-p-sm text-ink-gray-5">
           {{ __("Has subcategories, so it can't be nested.") }}
         </p>
+        <!-- Waits for the options: they say whether it has subcategories. -->
         <Checkbox
           v-else
           :model-value="drawn"
-          :label="__('Nest under a category')"
+          :disabled="categoryOptions.loading"
+          :label="__('Add as a subcategory')"
           @update:model-value="$event ? nest() : unnest()"
         />
         <Button
@@ -231,12 +233,15 @@ const actionLabel = computed(() => {
   return nesting.value ? __("Create subcategory") : __("Create category");
 });
 
+// `drawn` is the intent; `nesting` lags it while the parent row animates out.
 const canSave = computed(
-  () => Boolean(newTitle.value?.trim()) && (!nesting.value || parent.value)
+  () => Boolean(newTitle.value?.trim()) && (!drawn.value || parent.value)
 );
 
 function submit() {
   if (!canSave.value) return;
+  // a parent removed mid-animation is already gone
+  if (!drawn.value) onUndrawn();
   emit(props.edit ? "update" : "create");
 }
 </script>

@@ -305,6 +305,7 @@ class TestSubcategoryGroups(IntegrationTestCase):
         self.assertEqual(by_value[self.parent]["label"], f"Zzz{self.token}")
         self.assertEqual(sub_option["label"], f"Zzz{self.token} › {self.sub_name}")
         self.assertEqual(sub_option["parent_article_category"], self.parent)
+        self.assertEqual(sub_option["category_name"], self.sub_name)
         self.assertFalse(sub_option["has_subcategories"])
         self.assertTrue(by_value[self.parent]["has_subcategories"])
 

@@ -232,10 +232,7 @@ const groupByActions = [
         return;
       }
       listViewRef.value.reload();
-      // the group label is "Parent › Sub"
-      toast.success(
-        __("{0} is now a category", [group.label.split(" › ").pop()])
-      );
+      toast.success(__("{0} is now a category", [group.category_name]));
     },
   },
   {
