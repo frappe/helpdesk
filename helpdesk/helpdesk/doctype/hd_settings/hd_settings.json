@@ -556,11 +556,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
-<<<<<<< HEAD
- "modified": "2026-09-30 18:00:00.000000",
-=======
  "modified": "2026-11-02 15:54:13.209685",
->>>>>>> a3f586a (chore: remove onboarding persona questionnaire)
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

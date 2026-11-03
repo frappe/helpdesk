@@ -49,11 +49,6 @@ def get_boot():
             "lang": frappe.local.lang,
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
-<<<<<<< HEAD
-            "telemetry": get_telemetry_boot(),
-=======
-            "cloud_settings": frappe_cloud.get_boot_context(),
->>>>>>> a3f586a (chore: remove onboarding persona questionnaire)
         }
     )
 
