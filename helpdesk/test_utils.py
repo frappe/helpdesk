@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from typing import Any
+from unittest.mock import MagicMock, patch
 
 import frappe
 from frappe.cache_manager import clear_doctype_map
@@ -17,16 +18,13 @@ except ImportError:  # frappe v15
 
 from frappe.utils import add_to_date, getdate, now_datetime
 
+from helpdesk.api.banners import BANNERS, dismiss_banner
 from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
-<<<<<<< HEAD
-from helpdesk.utils import get_customers, is_frappe_version
-=======
 from helpdesk.integrations.frappe_cloud import TRIAL_DISMISSED_KEY, forget_trial
-from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_frappe_version
->>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
+from helpdesk.utils import get_customers, is_frappe_version
 
 if is_frappe_version("16", above=True):
     from frappe.tests.utils import make_test_objects
@@ -997,13 +995,6 @@ def make_email_account_data(service: str | None, **overrides: Any) -> dict[str, 
     }
 
 
-def is_portal_notice_shown() -> bool:
-    """Whether HD Settings still flags the customer portal notice as shown."""
-    from helpdesk.api.customer_portal_notice import NOTICE_FLAG
-
-    return bool(frappe.db.get_single_value("HD Settings", NOTICE_FLAG))
-
-
 def make_email_account(service: str, **overrides: Any) -> str:
     """An Email Account saved through the helpdesk settings API.
 
@@ -1028,16 +1019,24 @@ def get_user_roles(user: str) -> list[str]:
     )
 
 
-<<<<<<< HEAD
-=======
-def get_granted_rights(role: str) -> set[tuple]:
-    """(doctype, permlevel, right, if_owner) for every right the role's DocPerms grant."""
-    perms = frappe.get_all(
-        "DocPerm", {"role": role}, ["parent", "permlevel", "if_owner", *rights]
-    )
-    return {
-        (p.parent, p.permlevel, r, p.if_owner) for p in perms for r in rights if p[r]
-    }
+def make_assigned_ticket(agent: str, subject: str, status: str | None = None):
+    """A ticket that has been responded to and is assigned to `agent`, so dashboard
+    queries filtered by that agent only see the tickets a test creates."""
+    ticket = make_ticket(subject=subject)
+    ticket.reload()
+    ticket.first_responded_on = now_datetime()
+    if status:
+        ticket.status = status
+    ticket.save()
+    frappe.db.set_value("HD Ticket", ticket.name, "_assign", json.dumps([agent]))
+    return ticket
+
+
+def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict]:
+    """dashboard number cards for tickets assigned to `agent`, keyed by title"""
+    filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
+    cards = HelpdeskDashboard(filters).get_number_card_data()
+    return {card["title"]: card for card in cards}
 
 
 def show_only_banners(*banners: str):
@@ -1070,35 +1069,3 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
-
-
-def ticket_pings(publish_realtime: MagicMock) -> set[str]:
-    return {
-        call.kwargs["user"]
-        for call in publish_realtime.call_args_list
-        if call.args
-        and call.args[0] == "helpdesk:ticket-update"
-        and call.kwargs.get("user")
-        and not call.kwargs.get("room")
-    }
-
-
->>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
-def make_assigned_ticket(agent: str, subject: str, status: str | None = None):
-    """A ticket that has been responded to and is assigned to `agent`, so dashboard
-    queries filtered by that agent only see the tickets a test creates."""
-    ticket = make_ticket(subject=subject)
-    ticket.reload()
-    ticket.first_responded_on = now_datetime()
-    if status:
-        ticket.status = status
-    ticket.save()
-    frappe.db.set_value("HD Ticket", ticket.name, "_assign", json.dumps([agent]))
-    return ticket
-
-
-def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict]:
-    """dashboard number cards for tickets assigned to `agent`, keyed by title"""
-    filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
-    cards = HelpdeskDashboard(filters).get_number_card_data()
-    return {card["title"]: card for card in cards}

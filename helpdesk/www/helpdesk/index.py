@@ -5,13 +5,8 @@ from frappe.utils import cint, get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
-<<<<<<< HEAD
-from helpdesk.utils import get_agent_name
-=======
-from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
 from helpdesk.integrations import frappe_cloud
-from helpdesk.utils import get_agent_name, is_agent
->>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
+from helpdesk.utils import get_agent_name
 
 no_cache = 1
 
@@ -55,48 +50,10 @@ def get_boot():
             "lang": frappe.local.lang,
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
-<<<<<<< HEAD
-=======
-            "telemetry": get_telemetry_boot(),
-<<<<<<< HEAD
-            "cloud_settings": get_cloud_settings_boot(),
->>>>>>> 34738e9 (feat(sidebar): trial card on Frappe Cloud v2)
-=======
             "cloud_settings": frappe_cloud.get_boot_context(),
->>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)
         }
     )
 
 
 def get_default_route():
     return "/helpdesk"
-<<<<<<< HEAD
-=======
-
-
-def get_telemetry_boot():
-    """Direct-mode config for the browser telemetry client, as a boot value.
-
-    Telemetry must never break the page: older frappe versions have no pulse
-    module, and any boot_config error degrades to "disabled". The key it
-    ships is a public write-only ingest key (same as desk boot).
-    """
-    try:
-        from frappe.utils.telemetry.pulse.client import boot_config
-
-        return boot_config()
-    except Exception:
-        return {"enabled": False}
-<<<<<<< HEAD
-
-
-def get_cloud_settings_boot():
-    """Frappe Cloud v2 settings context; enabled only for System Managers on a Pilot-managed site."""
-    try:
-        from frappe.integrations.frappe_providers.cloud_settings import get_boot_context
-    except ImportError:
-        return {"enabled": False}
-    return get_boot_context()
->>>>>>> 34738e9 (feat(sidebar): trial card on Frappe Cloud v2)
-=======
->>>>>>> 003546c (feat(settings): show Frappe Cloud panels inline in settings)

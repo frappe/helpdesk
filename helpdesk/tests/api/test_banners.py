@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.banners import BANNERS, get_banners, refresh_trial
 from helpdesk.test_utils import (
@@ -26,7 +26,7 @@ def banner_names() -> list[str]:
 CLOUD_SETTINGS = "helpdesk.integrations.frappe_cloud.cloud_settings"
 
 
-class TestBanners(IntegrationTestCase):
+class TestBanners(FrappeTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
         # Not a Frappe Cloud site, whatever the test site's config says
@@ -82,7 +82,7 @@ ACTIVE_TRIAL = {"state": "Active", "days_left": 10}
 ENDED_TRIAL = {"state": "Ended", "days_left": 0}
 
 
-class TestTrialBanner(IntegrationTestCase):
+class TestTrialBanner(FrappeTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
         show_only_banners()

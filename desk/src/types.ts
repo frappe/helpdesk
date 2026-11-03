@@ -700,12 +700,7 @@ declare global {
     agent: string | null;
     default_country: string;
     apps: string[];
-<<<<<<< HEAD
-=======
-    telemetry: { enabled: boolean };
     cloud_settings?: { enabled: boolean };
-    customer_home_page: string;
->>>>>>> 34738e9 (feat(sidebar): trial card on Frappe Cloud v2)
   }
 }
 
