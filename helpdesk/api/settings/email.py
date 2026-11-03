@@ -13,6 +13,10 @@ FRAPPE_SERVICE_NAMES = {
 
 @frappe.whitelist()
 def create_email_account(data: dict[str, Any]):
+    """Create an email account whose incoming mail becomes tickets; returns its name.
+    `data["service"]` is a key of email_service_config (GMail, Outlook, Frappe Mail,
+    Custom, ...). Logs in to the IMAP server, if any, before saving. Needs create
+    permission on Email Account."""
     frappe.has_permission("Email Account", "create", throw=True)
 
     service: str = data.get("service", "")

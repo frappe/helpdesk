@@ -20,6 +20,9 @@ from helpdesk.utils import agent_only, format_time_difference
 @frappe.whitelist()
 @agent_only
 def get_dashboard(reset_layout: bool = False):
+    """The current agent's home dashboard layout, each chart filled with its data.
+    Returns {layout, default_layout (JSON), dashboard_id}. Uses their saved layout, or
+    the default one; `reset_layout` returns the default but keeps the saved one."""
     dashboard = frappe.db.exists("HD Field Layout", {"user": frappe.session.user})
     dashboard_id = None
 
@@ -80,6 +83,10 @@ def _resolve_window(period: str):
 @frappe.whitelist()
 @agent_only
 def get_agent_tickets(period: str = "last month"):
+    """Daily counts of tickets assigned to the current agent, with total and % change.
+    Counted by creation day, 0 for empty days, against the previous window of the same
+    length. `period`: "last 7 days", "last week", "last month" or "last 3 months"; else
+    30 days."""
     current_from, current_to, previous_from, previous_to = _resolve_window(period)
 
     def get_ticket_data(from_date, to_date):
@@ -141,12 +148,20 @@ def get_agent_tickets(period: str = "last month"):
 @frappe.whitelist()
 @agent_only
 def get_avg_first_response_time(period: str = "last month"):
+    """The current agent's average first response time per day, overall and % change.
+    In seconds, over SLA tickets assigned to them, compared with the previous period.
+    `period`: "last week", "last month", "last 3 months" or "last 6 months"; else
+    7 days."""
     return get_avg_time_metric(period, "first_response_time", scope="agent")
 
 
 @frappe.whitelist()
 @agent_only
 def get_avg_resolution_time(period: str = "last month"):
+    """The current agent's average resolution time per day, overall and % change.
+    In seconds, over resolved SLA tickets assigned to them, compared with the previous
+    period. `period`: "last week", "last month", "last 3 months" or "last 6 months";
+    else 7 days."""
     return get_avg_time_metric(period, "resolution_time", scope="agent")
 
 
@@ -158,6 +173,10 @@ def get_recent_feedback(
     from_date: str = None,
     to_date: str = None,
 ):
+    """Ratings on the current agent's tickets: average, 1-5 star counts, 20 feedbacks.
+    Average is out of 5. Best rated first, or worst with `sort_order` "negative_first".
+    `period`: "last_week", "last_month", "last_3_months", "last_6_months",
+    "custom_range" with from_date and to_date, or anything else for all time."""
     agent = frappe.session.user
     Ticket = DocType("HD Ticket")
     Contact = DocType("Contact")
@@ -279,6 +298,10 @@ def get_recent_feedback(
 def get_avg_time_metrics(
     period: str = "6m", from_date: str = None, to_date: str = None
 ):
+    """The current agent's monthly average first response and resolution times.
+    Returns {data: [[month, first, resolution]], averages} in seconds. Counts SLA tickets
+    assigned to them, resolution only resolved ones. `period`: "3m", "6m" (default),
+    "1y", or "custom_range" with from_date and to_date."""
     periods = {
         "3m": 90,
         "6m": 180,
@@ -573,6 +596,10 @@ def _get_pending_response_tickets(limit=10):
 @frappe.whitelist()
 @agent_only
 def get_pending_tickets(ticket_type: str = "upcoming_sla"):
+    """Up to 6 open tickets the current agent should act on, with reasons, and the total.
+    Only tickets created in the last 6 months. `ticket_type`: "upcoming_sla" (response
+    or resolution due), "new_tickets" (assigned in the last 7 days) or "pending"
+    (customer replied, longest waiting first)."""
     if ticket_type == "upcoming_sla":
         tickets, total_count = _get_upcoming_sla_tickets(limit=6)
     elif ticket_type == "new_tickets":
@@ -626,8 +653,9 @@ ACTIVITY_SOURCES = [
 @frappe.whitelist()
 @agent_only
 def get_recent_activity() -> list[dict]:
-    """The current agent's latest action per ticket (replied, commented, updated,
-    viewed, assigned), one row per ticket, newest first, over the last few days."""
+    """The current agent's latest action on each ticket, newest first.
+    One row per ticket over the last few days: replied, commented, updated, viewed
+    or assigned."""
     user = frappe.session.user
     cutoff = frappe.utils.add_days(frappe.utils.nowdate(), -RECENT_ACTIVITY_DAYS)
 

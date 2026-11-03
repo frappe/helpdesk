@@ -366,6 +366,9 @@ def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[di
 @frappe.whitelist()
 @filelock("helpdesk_search_indexing", timeout=1)
 def build_index():
+    """Rebuild the help article search index from published articles.
+    One entry per section. Needs write on HD Settings; fails if a rebuild is
+    already running."""
     # whitelisted only for the HD Settings button
     frappe.has_permission("HD Settings", "write", throw=True)
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
