@@ -471,21 +471,20 @@ def add_fts_index():
 
 
 def add_index_if_not_exists(table, column, index_name):
-    index_exists = frappe.db.sql(
-        """
-        SHOW INDEX FROM `{table}`
-            WHERE Column_name = '{column}'
-            AND Index_type = 'FULLTEXT'
-        """.format(
-            table=table, column=column
-        ),
-        as_dict=True,
+    statistics = frappe.qb.Schema("information_schema").statistics
+    index_names = (
+        frappe.qb.from_(statistics)
+        .select(statistics.index_name)
+        .where(statistics.table_schema == frappe.db.cur_db_name)
+        .where(statistics.table_name == table)
+        .where(statistics.column_name == column)
+        .where(statistics.index_type == "FULLTEXT")
+        .run(pluck=True)
     )
-    print("\n\n", index_exists, "\n\n")
-    if index_exists:
+    if index_names:
         frappe.db.sql_ddl(
             "DROP INDEX `{index_name}` ON `{table}`".format(
-                index_name=index_exists[0].Key_name, table=table
+                index_name=index_names[0], table=table
             )
         )
 
