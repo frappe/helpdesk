@@ -12,19 +12,24 @@
         :style="{ height: 'calc(100vh - 8rem)' }"
       >
         <div
+<<<<<<< HEAD
           class="flex-col rounded-s-6 w-56 shrink-0 ps-1 py-1 bg-surface-sidebar overflow-y-auto hide-scrollbar"
+=======
+          :ref="revealActiveGroup"
+          class="flex-col rounded-l-6 w-56 shrink-0 ps-1 py-1 bg-surface-sidebar overflow-y-auto hide-scrollbar"
+>>>>>>> 5a9a4e6 (fix(settings): open on the active tab's group, close sticky heading gap)
         >
           <h1
-            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-sidebar ml-1"
+            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky -top-1 z-10 bg-surface-sidebar ml-1"
           >
             {{ __("Account") }}
           </h1>
-          <div v-for="tab in tabs" class="last:mb-2">
+          <div v-for="tab in tabs" data-settings-group class="last:mb-2">
             <div v-if="!tab.noborder" class="mx-2 my-2.5"></div>
 
             <div
               v-if="!tab.hideLabel"
-              class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-sidebar ml-1"
+              class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky -top-1 z-10 bg-surface-sidebar ml-1"
             >
               <Tooltip :text="__(tab.label)" side="right">
                 <span class="truncate">{{ __(tab.label) }}</span>
@@ -35,6 +40,9 @@
               <button
                 v-for="item in tab.items"
                 :key="item.label"
+                :aria-current="
+                  activeTab?.label == item.label ? 'page' : undefined
+                "
                 class="flex h-7 w-full items-center gap-2 rounded-4 px-2 py-[7px]"
                 :class="[
                   activeTab?.label == item.label
@@ -107,6 +115,14 @@ const isCloudOverlayOpen = () =>
   !!document.querySelector("fc-cloud-settings[overlay-open]");
 
 const showConfirmDialog = ref(false);
+
+// runs once per open: opened on a low tab (e.g. Billing), show its whole group
+function revealActiveGroup(nav) {
+  nav
+    ?.querySelector("[aria-current=page]")
+    ?.closest("[data-settings-group]")
+    ?.scrollIntoView({ block: "nearest" });
+}
 
 function onTabChange(tab) {
   if (!disableSettingModalOutsideClick.value) {
