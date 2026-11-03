@@ -162,6 +162,6 @@ const editWorkDay = () => {
   };
 };
 
-const formatTime = (time) =>
+const formatTime = (time?: string | null) =>
   dayjs(`2000-01-01 ${time || "00:00"}`).format(getTimeFormat());
 </script>
