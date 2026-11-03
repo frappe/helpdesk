@@ -101,13 +101,6 @@
         </span>
 
         <span
-          v-else-if="column.key === 'weight'"
-          class="text-base tabular-nums text-ink-gray-7"
-        >
-          0
-        </span>
-
-        <span
           v-else-if="column.key === 'author'"
           class="block truncate text-base text-ink-gray-7"
         >
