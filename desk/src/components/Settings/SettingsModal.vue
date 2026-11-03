@@ -12,12 +12,8 @@
         :style="{ height: 'calc(100vh - 8rem)' }"
       >
         <div
-<<<<<<< HEAD
-          class="flex-col rounded-s-6 w-56 shrink-0 ps-1 py-1 bg-surface-sidebar overflow-y-auto hide-scrollbar"
-=======
           :ref="revealActiveGroup"
-          class="flex-col rounded-l-6 w-56 shrink-0 ps-1 py-1 bg-surface-sidebar overflow-y-auto hide-scrollbar"
->>>>>>> 5a9a4e6 (fix(settings): open on the active tab's group, close sticky heading gap)
+          class="flex-col rounded-s-6 w-56 shrink-0 ps-1 py-1 bg-surface-sidebar overflow-y-auto hide-scrollbar"
         >
           <h1
             class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky -top-1 z-10 bg-surface-sidebar ml-1"
