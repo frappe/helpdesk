@@ -71,6 +71,7 @@ test("an SLA's targets, work days and holiday list are edited and saved", async 
   await expect(workday.getByText("End time must be after start time")).toBeVisible();
   await workday.getByLabel("End time").fill("18:30");
   await workday.getByLabel("Break start").fill("17:30");
+  await workday.getByLabel("Break start").press("Tab");
   await workday.getByLabel("Break end").fill("18:00");
   await workday.getByLabel("Break end").press("Tab");
   await workday.getByRole("checkbox", { name: "Apply break to all workdays" }).check();
@@ -133,9 +134,10 @@ for (const [label, viewport] of [
     await expect(savePolicy).toBeDisabled();
 
     await rowMenu(page, tableRow(dialog, "Monday"), "Edit");
+    await expect(workday.getByLabel("Break end")).toBeDisabled();
     await workday.getByLabel("Break start").fill("13:00");
-    await workday.getByRole("button", { name: "Save" }).click();
-    await expect(workday.getByText("Set both break start and break end, or neither.")).toBeVisible();
+    await workday.getByLabel("Break start").press("Tab");
+    await expect(workday.getByLabel("Break end")).toHaveValue("14:00");
     await workday.getByLabel("Break end").fill("12:30");
     await workday.getByRole("button", { name: "Save" }).click();
     await expect(workday.getByText("Break end must be after break start.")).toBeVisible();
@@ -161,8 +163,8 @@ for (const [label, viewport] of [
 
     await rowMenu(page, tableRow(dialog, "Tuesday"), "Edit");
     await expect(workday.getByLabel("Break start")).toHaveValue("13:00");
-    await workday.getByLabel("Break start").fill("");
-    await workday.getByLabel("Break end").fill("");
+    await workday.getByRole("button", { name: "Remove break" }).click();
+    await expect(workday.getByLabel("Break end")).toBeDisabled();
     await workday.getByRole("button", { name: "Save" }).click();
     await expect(workday).toBeHidden();
     await dialog.getByRole("button", { name: "Save", exact: true }).click();
@@ -178,6 +180,7 @@ for (const [label, viewport] of [
     await dialog.getByRole("button", { name: "New", exact: true }).click();
     await rowMenu(page, tableRow(dialog, "Monday"), "Edit");
     await workday.getByLabel("Break start").fill("13:00");
+    await workday.getByLabel("Break start").press("Tab");
     await workday.getByLabel("Break end").fill("14:00");
     await workday.getByLabel("Break end").press("Tab");
     await workday.getByRole("checkbox", { name: "Apply break to all workdays" }).check();
