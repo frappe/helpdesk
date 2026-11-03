@@ -28,7 +28,7 @@
     @mark-all-as-read="controller.markAllAsRead"
     @load-more="controller.loadMore"
   >
-    <template #header><span /></template>
+    <template #header><NotificationFilters /></template>
     <template #empty>
       <div class="flex flex-1 flex-col items-center gap-2 py-12">
         <LucideBell class="h-20 w-20 text-ink-gray-2" />
@@ -41,10 +41,12 @@
 </template>
 <script setup lang="ts">
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import NotificationFilters from "@/components/notifications/NotificationFilters.vue";
 import { useNotificationStore } from "@/stores/notification";
 import { __ } from "@/translation";
 import { NotificationLog, NotificationPanel } from "@framework/ui";
 import { Breadcrumbs, Tooltip } from "frappe-ui";
+import { onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import LucideBell from "~icons/lucide/bell";
 
@@ -57,4 +59,6 @@ function handleNotificationClick(n: NotificationLog) {
   const route = notificationStore.routeFor(n);
   if (route) router.push(route);
 }
+
+onUnmounted(notificationStore.resetFilters);
 </script>
