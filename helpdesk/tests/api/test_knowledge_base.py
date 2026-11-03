@@ -30,9 +30,15 @@ from helpdesk.api.knowledge_base import (
     move_to_category,
     search_articles,
     set_category_visibility,
+    set_pinned_articles,
     vote_on_article,
 )
-from helpdesk.helpdesk.doctype.hd_article.hd_article import CUSTOMERS, PRIVATE, PUBLIC
+from helpdesk.helpdesk.doctype.hd_article.hd_article import (
+    CUSTOMERS,
+    MAX_PINNED_ARTICLES,
+    PRIVATE,
+    PUBLIC,
+)
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     get_category_labels,
@@ -65,6 +71,11 @@ BYLINE_FIELDS = {"name", "image"}
 class TestPublicReads(IntegrationTestCase):
     def setUp(self) -> None:
         self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
+        # the site's own pins would count against the limit
+        article = frappe.qb.DocType("HD Article")
+        frappe.qb.update(article).set(article.pinned, 0).set(
+            article.pinned_order, 0
+        ).where(article.pinned == 1).run()
         self.category = make_article_category(
             "Fixture Public", description="Fixture description"
         )
@@ -228,6 +239,92 @@ class TestPublicReads(IntegrationTestCase):
             frappe.db.get_value("HD Article", name, ["pinned", "pinned_order"]),
             (0, 0),
         )
+
+    def test_pinning_past_the_limit_is_refused(self) -> None:
+        for index in range(MAX_PINNED_ARTICLES):
+            self.make_article(f"Fixture pin {index}", pinned=1)
+
+        self.assertRaises(
+            frappe.ValidationError, self.make_article, "Fixture one too many", pinned=1
+        )
+
+    def test_making_a_pin_private_unpins_it(self) -> None:
+        name = self.make_article("Fixture pinned", pinned=1)
+        article = frappe.get_doc("HD Article", name)
+        article.visibility = PRIVATE
+        article.save()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Article", name, ["pinned", "weight"]), (0, 0)
+        )
+
+    def test_pins_weigh_in_their_order(self) -> None:
+        names = [self.make_article(f"Fixture {index}") for index in range(3)]
+        modified = frappe.db.get_value("HD Article", names[0], "modified")
+
+        set_pinned_articles(names)
+
+        self.assertEqual(
+            self.pins(), [(name, 3 - index) for index, name in enumerate(names)]
+        )
+        self.assertEqual(
+            frappe.db.get_value("HD Article", names[0], "modified"), modified
+        )
+
+    def test_unpinning_resets_the_weight(self) -> None:
+        first, second = (self.make_article(f"Fixture {index}") for index in range(2))
+        set_pinned_articles([first, second])
+
+        set_pinned_articles([second])
+
+        self.assertEqual(self.pins(), [(second, 1)])
+        self.assertEqual(frappe.db.get_value("HD Article", first, "weight"), 0)
+
+    def test_set_pinned_refuses_what_customers_cannot_read(self) -> None:
+        private = self.make_article("Fixture private", visibility=PRIVATE)
+        too_many = [self.make_article(f"Fixture {index}") for index in range(6)]
+
+        for names in ([self.draft], [private], too_many):
+            with self.subTest(names=len(names)):
+                self.assertRaises(frappe.ValidationError, set_pinned_articles, names)
+
+    def test_deleting_a_pin_reweighs_the_rest(self) -> None:
+        first, second = (self.make_article(f"Fixture {index}") for index in range(2))
+        set_pinned_articles([first, second])
+
+        frappe.delete_doc("HD Article", first)
+
+        self.assertEqual(self.pins(), [(second, 1)])
+
+    def test_featured_leaves_out_what_the_reader_cannot_see(self) -> None:
+        private = self.make_article("Fixture private")
+        customers = self.make_article("Fixture customers", visibility=CUSTOMERS)
+        set_pinned_articles([private, customers])
+        # an older site may hold a Private pin
+        frappe.db.set_value("HD Article", private, "visibility", PRIVATE)
+
+        self.assertEqual([row.name for row in get_featured_articles()], [customers])
+        with self.set_user("Guest"):
+            self.assertEqual(get_featured_articles(), [])
+
+    def test_a_guest_reads_no_pin_or_weight(self) -> None:
+        with self.set_user("Guest"):
+            article = get_article(self.published)
+
+        self.assertNotIn("pinned", article)
+        self.assertNotIn("weight", article)
+
+    def pins(self) -> list[tuple[str, int]]:
+        return [
+            tuple(row)
+            for row in frappe.get_all(
+                "HD Article",
+                filters={"pinned": 1},
+                fields=["name", "weight"],
+                order_by="pinned_order asc",
+                as_list=True,
+            )
+        ]
 
     def test_names_read_in_the_given_order(self) -> None:
         second = self.make_article("Fixture second")

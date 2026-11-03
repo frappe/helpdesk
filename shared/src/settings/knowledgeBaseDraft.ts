@@ -6,6 +6,7 @@ import {
   getCachedDocumentResource,
   toast,
 } from "frappe-ui";
+import { useDebounceFn } from "@vueuse/core";
 import { computed, effectScope, ref, shallowRef, watch } from "vue";
 import {
   KNOWLEDGE_BASE_PREVIEW_KEY,
@@ -38,6 +39,11 @@ function parseLinks(script: string): Link[] {
 }
 
 export type PinKind = "categories" | "articles";
+
+// The home page features this many; the backend's MAX_PINNED_ARTICLES.
+export const PIN_LIMITS: Partial<Record<PinKind, number>> = { articles: 5 };
+// Pickable articles shown before a search narrows them.
+const ARTICLE_SEARCH_LIMIT = 100;
 
 function getPinned(rows: { name: string; pinned: number; pinned_order: number }[]) {
   return rows
@@ -75,16 +81,33 @@ function createDraft() {
     pageLength: 99999,
     auto: true,
   });
-  // Only Published articles stay pinned.
-  // ponytail: loads every published title; page it if a KB outgrows that
+  // Only Published articles customers can read stay pinned.
   const articles = createListResource({
     doctype: "HD Article",
     fields: ["name", "title", "visibility", "pinned", "pinned_order"],
-    filters: { status: "Published" },
-    orderBy: "title asc",
-    pageLength: 99999,
+    filters: { pinned: 1 },
+    pageLength: PIN_LIMITS.articles,
     auto: true,
   });
+  // The rest load by search: a big knowledge base has too many to list.
+  const articleSearch = createListResource({
+    doctype: "HD Article",
+    fields: ["name", "title", "visibility"],
+    filters: { status: "Published", visibility: ["!=", "Private"] },
+    orderBy: "title asc",
+    pageLength: ARTICLE_SEARCH_LIMIT,
+    auto: true,
+  });
+  const searchArticles = useDebounceFn((query: string) => {
+    articleSearch.update({
+      filters: {
+        status: "Published",
+        visibility: ["!=", "Private"],
+        ...(query && { title: ["like", `%${query}%`] }),
+      },
+    });
+    articleSearch.reload();
+  }, 300);
   // Each top-level category's access across its branch, or "Mixed".
   const categoryAccess = createResource({
     url: "helpdesk.api.knowledge_base.get_category_access",
@@ -149,16 +172,16 @@ function createDraft() {
       }))
   );
 
-  // Customers never see Private articles; already pinned ones stay to unpin.
-  const articleOptions = computed(() =>
-    (articles.data || [])
-      .filter((row) => row.visibility !== "Private" || row.pinned)
-      .map((row) => ({
-        label: row.title,
-        value: row.name,
-        access: row.visibility,
-      }))
-  );
+  // Pins stay listed whatever the search; A–Z, so an unpinned one snaps into place.
+  const articleOptions = computed(() => {
+    const rows = new Map(
+      [...(articles.data || []), ...(articleSearch.data || [])].map((row) => [
+        row.name,
+        { label: row.title, value: row.name, access: row.visibility },
+      ])
+    );
+    return [...rows.values()].sort((a, b) => a.label.localeCompare(b.label));
+  });
 
   const changed = computed(() => {
     if (!draft.value || !saved.value) return [];
@@ -230,15 +253,18 @@ function createDraft() {
     },
     articles: {
       rows: articles,
-      doctype: "HD Article",
       draftKey: "pinned_articles",
       saved: () => __("Pinned articles updated"),
-      failed: () => __("Could not update the pinned articles"),
     },
   } as const;
 
   // Order is 1-based; 0 means unpinned.
   async function savePinned(kind: PinKind, pinned: string[]) {
+    if (kind === "articles") {
+      return call("helpdesk.api.knowledge_base.set_pinned_articles", {
+        names: pinned,
+      });
+    }
     const { rows, doctype, failed } = pinLists[kind];
     const { failed_docs } = await call("frappe.client.bulk_update", {
       docs: rows.data
@@ -334,6 +360,7 @@ function createDraft() {
     savePins,
     categoryOptions,
     articleOptions,
+    searchArticles,
     isDirty,
     saving,
     save,

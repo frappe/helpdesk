@@ -17,10 +17,13 @@ from frappe.website.utils import cleanup_page_name, find_first_image
 
 from helpdesk.api.article import search_accessible_articles
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
+    MAX_PINNED_ARTICLES,
     PRIVATE,
     can_view_article,
     get_voter,
     make_article_filters,
+    sync_pinned_weights,
+    throw_pin_limit,
 )
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
@@ -345,6 +348,43 @@ def get_featured_articles(
     return rows[:limit]
 
 
+@frappe.whitelist(methods=["POST"])
+def set_pinned_articles(names: list[str]) -> None:
+    """Pins `names` in order and unpins the rest, without saving each article."""
+    frappe.has_permission("HD Article", "write", throw=True)
+    names = list(dict.fromkeys(names))
+    if len(names) > MAX_PINNED_ARTICLES:
+        throw_pin_limit()
+    pinnable = frappe.get_all(
+        "HD Article",
+        filters={
+            "name": ["in", names or [""]],
+            "status": "Published",
+            "visibility": ["!=", PRIVATE],
+        },
+        pluck="name",
+    )
+    if len(pinnable) != len(names):
+        frappe.throw(_("Only published articles customers can read can be pinned"))
+    article = frappe.qb.DocType("HD Article")
+    # unpinned ones lose the weight their pin gave them
+    unpin = (
+        frappe.qb.update(article).set(article.pinned, 0).set(article.pinned_order, 0)
+    )
+    unpin = unpin.set(article.weight, 0).where(article.pinned == 1)
+    if names:
+        unpin = unpin.where(article.name.notin(names))
+    unpin.run()
+    for order, name in enumerate(names, 1):
+        frappe.db.set_value(
+            "HD Article",
+            name,
+            {"pinned": 1, "pinned_order": order},
+            update_modified=False,
+        )
+    sync_pinned_weights()
+
+
 def _parse_guest_names(value, limit: int) -> list[str]:
     """Guest input: a name or a JSON list of names. Bad JSON is a plain name, junk is dropped."""
     if isinstance(value, str) and value.lstrip().startswith("["):
@@ -418,8 +458,9 @@ def get_article(name: str) -> dict:
     knowledge base is public."""
     name = _get_article_name(name)
     # the desk article page shows the pin and edits the weight
+    desk_fields = ["pinned", "weight"] if is_agent() else []
     article = _get_viewable_article(
-        name, [*PUBLIC_ARTICLE_FIELDS, "content", "pinned", "weight"]
+        name, [*PUBLIC_ARTICLE_FIELDS, "content", *desk_fields]
     )
     article.author = _get_byline(article.author)
     article.title_slug = cleanup_page_name(article.title)

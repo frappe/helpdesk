@@ -197,11 +197,11 @@
 import ArticleIcon from "../ArticleIcon.vue";
 import { __ } from "../translation";
 import { askConfirm } from "../utils";
-import { Badge, Button, Dialog, ScrollArea, TextInput } from "frappe-ui";
+import { Badge, Button, Dialog, ScrollArea, TextInput, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import Draggable from "vuedraggable";
 import CategoryAccessBadge from "./CategoryAccessBadge.vue";
-import type { PinKind } from "./knowledgeBaseDraft";
+import { PIN_LIMITS, type PinKind } from "./knowledgeBaseDraft";
 import { pinnedListText } from "./pinnedListText";
 
 type Section = "pinned" | "unpinned";
@@ -239,6 +239,8 @@ const props = defineProps<{
   pinned: string[];
   // Resolves true on success.
   save: (pinned: string[]) => Promise<boolean>;
+  // Loads matching items, for lists too big to load whole.
+  search?: (query: string) => void;
 }>();
 
 const show = defineModel<boolean>("open", { required: true });
@@ -254,6 +256,7 @@ const isSaving = ref(false);
 watch(show, (open) => {
   if (!open) return;
   query.value = "";
+  picked.clear();
   selected.value = [...props.pinned];
   initial.value = [...props.pinned];
 });
@@ -261,11 +264,15 @@ watch(show, (open) => {
 const byName = computed(
   () => new Map(props.items.map((item) => [item.value, item]))
 );
+// A pick outlives the search that found it; set before `selected` changes.
+const picked = new Map<string, Item>();
+
+function itemOf(name: string) {
+  return byName.value.get(name) || picked.get(name);
+}
 
 const pinnedItems = computed(() =>
-  selected.value
-    .map((name) => byName.value.get(name))
-    .filter((item): item is Item => item !== undefined)
+  selected.value.map(itemOf).filter((item): item is Item => item !== undefined)
 );
 
 // In the order the items come: A–Z.
@@ -287,6 +294,17 @@ const hiddenCount = computed(
   () => matchingUnpinned.value.length - shownUnpinned.value.length
 );
 
+watch(search, (value) => props.search?.(value));
+
+// Refuses a pin past the limit; true when it fits.
+function hasRoomToPin() {
+  const limit = PIN_LIMITS[props.kind];
+  if (!limit || selected.value.length < limit) return true;
+  // only articles have a limit
+  toast.error(__("You can pin up to {0} articles", [limit]));
+  return false;
+}
+
 const hasUnsavedChanges = computed(
   () => selected.value.join() !== initial.value.join()
 );
@@ -294,12 +312,18 @@ const hasUnsavedChanges = computed(
 function onPinnedChange({ added, moved }: Change) {
   const change = added || moved;
   if (!change) return;
+  // a new array, so the drag's own row edit is redrawn away
+  if (added && !hasRoomToPin()) {
+    selected.value = [...selected.value];
+    return;
+  }
   // newIndex counts shown rows; pins to missing items aren't shown
   const names = pinnedItems.value
     .map((item) => item.value)
     .filter((name) => name !== change.element.value);
   names.splice(change.newIndex, 0, change.element.value);
-  const missing = selected.value.filter((name) => !byName.value.has(name));
+  picked.set(change.element.value, change.element);
+  const missing = selected.value.filter((name) => !itemOf(name));
   selected.value = [...names, ...missing];
 }
 
@@ -308,6 +332,11 @@ function onUnpinnedChange({ added }: Change) {
 }
 
 function moveTo(name: string, section: Section) {
+  if (section === "pinned") {
+    if (!hasRoomToPin()) return;
+    const item = byName.value.get(name);
+    if (item) picked.set(name, item);
+  }
   const rest = selected.value.filter((row) => row !== name);
   selected.value = section === "pinned" ? [...rest, name] : rest;
 }

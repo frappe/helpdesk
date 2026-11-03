@@ -21,6 +21,8 @@ PUBLIC = "Public"
 CUSTOMERS = "Customers"
 PRIVATE = "Private"
 EXCERPT_LENGTH = 140
+# the home page features this many
+MAX_PINNED_ARTICLES = 5
 
 
 class HDArticle(Document):
@@ -33,16 +35,23 @@ class HDArticle(Document):
         self.validate_pin()
 
     def validate_pin(self):
-        """Order is 1-based; 0 means unpinned. Only Published articles stay pinned, and unpinning resets the weight."""
-        if self.status != "Published":
+        """Order is 1-based; 0 means unpinned. Only Published articles customers can read stay pinned, and unpinning resets the weight."""
+        if self.status != "Published" or self.visibility == PRIVATE:
             self.pinned = 0
+        before = self.get_doc_before_save()
         if not self.pinned:
             self.pinned_order = 0
             # its weight came from the pin
-            before = self.get_doc_before_save()
             if before and before.pinned:
                 self.weight = 0
-        elif cint(self.pinned_order) < 1:
+            return
+        if not (before and before.pinned):
+            pins = frappe.db.count(
+                "HD Article", {"pinned": 1, "name": ["!=", self.name]}
+            )
+            if pins >= MAX_PINNED_ARTICLES:
+                throw_pin_limit()
+        if cint(self.pinned_order) < 1:
             # pinned from the article itself: it goes last
             last = frappe.get_all(
                 "HD Article",
@@ -99,31 +108,16 @@ class HDArticle(Document):
 
     def on_update(self):
         self.update_search_index()
-        if self.has_value_changed("pinned") or self.has_value_changed("pinned_order"):
-            self.sync_pinned_weights()
+        before = self.get_doc_before_save()
+        was = (before.pinned, before.pinned_order) if before else (0, 0)
+        if (self.pinned, self.pinned_order) != was:
+            self.weight = sync_pinned_weights().get(self.name, self.weight)
 
     def on_trash(self):
         check_category_length(self.category)
         self.update_search_index()
         if self.pinned:
-            self.sync_pinned_weights(leaving=self.name)
-
-    def sync_pinned_weights(self, leaving: str | None = None):
-        """Weights follow the pin order, so each pin lists in its category as on the home page: the first of N pins weighs N, the last 1."""
-        pins = frappe.get_all(
-            "HD Article",
-            filters={"pinned": 1, "name": ["!=", leaving or ""]},
-            fields=["name", "weight"],
-            order_by="pinned_order asc",
-        )
-        for rank, pin in enumerate(pins):
-            weight = len(pins) - rank
-            if pin.name == self.name:
-                self.weight = weight
-            if pin.weight != weight:
-                frappe.db.set_value(
-                    "HD Article", pin.name, "weight", weight, update_modified=False
-                )
+            sync_pinned_weights(leaving=self.name)
 
     def update_search_index(self):
         # a bulk change sends one job for all its articles
@@ -271,3 +265,32 @@ def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bo
     if ptype in ("write", "create", "delete"):
         return True
     return can_view_article(user or frappe.session.user, doc)
+
+
+def throw_pin_limit():
+    frappe.throw(
+        _("You can pin up to {0} articles").format(MAX_PINNED_ARTICLES),
+        title=_("Too many pinned articles"),
+    )
+
+
+def sync_pinned_weights(leaving: str | None = None) -> dict[str, int]:
+    """Weights follow the pin order, so each pin lists in its category as on the home page: the first of N pins weighs N, the last 1."""
+    pins = frappe.get_all(
+        "HD Article",
+        filters={"pinned": 1, "name": ["!=", leaving or ""]},
+        fields=["name", "weight"],
+        order_by="pinned_order asc",
+    )
+    weights = {}
+    for rank, pin in enumerate(pins):
+        weights[pin.name] = len(pins) - rank
+        if pin.weight != weights[pin.name]:
+            frappe.db.set_value(
+                "HD Article",
+                pin.name,
+                "weight",
+                weights[pin.name],
+                update_modified=False,
+            )
+    return weights

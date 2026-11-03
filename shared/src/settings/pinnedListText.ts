@@ -1,5 +1,5 @@
 import { __ } from "../translation";
-import type { PinKind } from "./knowledgeBaseDraft";
+import { PIN_LIMITS, type PinKind } from "./knowledgeBaseDraft";
 
 // A function so labels translate once loaded.
 export function pinnedListText(kind: PinKind) {
@@ -22,7 +22,8 @@ export function pinnedListText(kind: PinKind) {
       title: __("Pinned articles"),
       customize: __("Customize pinned articles"),
       description: __(
-        "Pinned articles will appear as featured articles on your knowledge base home page, in this order."
+        "Up to {0} pinned articles will appear as featured articles on your knowledge base home page, in this order.",
+        [PIN_LIMITS.articles]
       ),
       empty: __("Nothing pinned yet. The home page will show no featured articles."),
       search: __("Search articles to pin"),

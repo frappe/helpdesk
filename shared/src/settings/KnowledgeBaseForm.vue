@@ -45,6 +45,7 @@
             v-model:pinned="draft.pinned_articles"
             kind="articles"
             :items="articleOptions"
+            :search="searchArticles"
             :save="(pinned) => savePinsAndNotify('articles', pinned)"
           />
           <BannerPicker
@@ -108,6 +109,7 @@ const {
   savePins,
   categoryOptions,
   articleOptions,
+  searchArticles,
 } = useKnowledgeBaseDraft();
 
 const emit = defineEmits<{ pinsSaved: [] }>();

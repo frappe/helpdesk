@@ -112,6 +112,7 @@
    "fieldname": "weight",
    "fieldtype": "Int",
    "label": "Weight",
+   "no_copy": 1,
    "non_negative": 1
   },
   {

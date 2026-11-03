@@ -63,6 +63,7 @@
       :items="items"
       :pinned="pinned"
       :save="save"
+      :search="search"
     />
   </div>
 </template>
@@ -91,6 +92,7 @@ const props = defineProps<{
   pinned: string[];
   // The Customize dialog saves at once; resolves true on success.
   save: (pinned: string[]) => Promise<boolean>;
+  search?: (query: string) => void;
 }>();
 
 // Row menu edits wait for the form's Save.

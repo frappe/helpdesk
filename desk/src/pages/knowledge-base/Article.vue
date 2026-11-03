@@ -728,8 +728,8 @@ const articleActions = computed(() => [
           icon: "lucide-lock",
           onClick: () => (showAccessModal.value = true),
         },
-        // Customers never see Private articles; a pinned one can still be unpinned.
-        ...(article.data?.pinned || article.data?.visibility !== "Private"
+        // Customers never see Private articles, so they are never pinned.
+        ...(article.data?.visibility !== "Private"
           ? [
               {
                 label: article.data?.pinned
