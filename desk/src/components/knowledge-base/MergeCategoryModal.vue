@@ -2,9 +2,12 @@
   <Dialog :title="__('Merge with another category')" v-model:open="showDialog">
     <template #default>
       <p class="text-p-base text-ink-gray-8 mb-4">
-        This will move all articles of the
-        <span class="whitespace-nowrap font-semibold">{{ categoryTitle }}</span>
-        category to the selected category. This change is irreversible!
+        {{
+          __(
+            "Moves the articles and subcategories of {0} to the category you pick. You can't undo this.",
+            [categoryTitle]
+          )
+        }}
       </p>
       <Combobox
         class="w-full"
@@ -18,7 +21,7 @@
       <Button
         class="w-full"
         variant="solid"
-        label="Merge"
+        :label="__('Merge')"
         @click="emit('merge', categoryId, toCategory)"
       />
     </template>
@@ -45,6 +48,8 @@ watch(showDialog, (open) => {
   if (!open) return;
   // a pick made before a cancel must not survive
   toCategory.value = "";
+  // shared with other dialogs: drop their list before it shows here
+  categoryOptions.reset();
   categoryOptions.submit({ exclude: props.categoryId });
 });
 const joining = useCategoryVisibility(toCategory);

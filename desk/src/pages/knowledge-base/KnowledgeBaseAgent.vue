@@ -100,7 +100,7 @@ import {
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
 import { CUSTOMER_PORTAL_ROOT, getErrorMessage } from "@/utils";
-import { copyToClipboard } from "@helpdesk/shared/utils";
+import { copyToClipboard, countLabel } from "@helpdesk/shared/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import {
@@ -179,6 +179,9 @@ const headerOptions = [
   },
 ];
 
+// General only takes articles and subcategories
+const isNotGeneral = ({ group }) => group.value !== generalCategory.data;
+
 const groupByActions = [
   {
     label: __("Add New Article"),
@@ -209,31 +212,23 @@ const groupByActions = [
   },
   {
     label: __("Edit"),
+    condition: isNotGeneral,
     icon: "lucide-edit",
-    onClick: async ({ group }) => {
-      // the group label is "Parent › Sub", so read the plain name
-      let doc;
-      try {
-        doc = await call("frappe.client.get", {
-          doctype: "HD Article Category",
-          name: group.value,
-        });
-      } catch (error) {
-        getErrorMessage(error, true, __("Failed to load category."));
-        return;
-      }
+    onClick: ({ group }) => {
       editTitle.value = true;
-      category.title = doc.category_name;
+      // the label is "Parent › Sub"; the plain name comes apart
+      category.title = group.category_name;
       category.id = group.value;
-      category.icon = doc.icon || "lucide-folder";
-      category.parent = doc.parent_article_category || "";
+      category.icon = group.icon || "lucide-folder";
+      category.parent = group.parent_article_category || "";
       category.hasSubcategories = !!group.has_subcategories;
-      category.pinned = !!doc.pinned;
+      category.pinned = !!group.pinned;
       showCategoryModal.value = true;
     },
   },
   {
     label: __("Merge"),
+    condition: isNotGeneral,
     icon: LucideMerge,
     onClick: (groupedRow) => {
       mergeModal.value = true;
@@ -243,6 +238,7 @@ const groupByActions = [
   },
   {
     label: __("Change access"),
+    condition: isNotGeneral,
     icon: "lucide-lock",
     onClick: async ({ group }) => {
       category.title = group.label;
@@ -260,6 +256,7 @@ const groupByActions = [
   },
   {
     label: __("Copy link"),
+    condition: isNotGeneral,
     icon: "lucide-link",
     onClick: ({ group }) =>
       copyToClipboard(
@@ -271,6 +268,7 @@ const groupByActions = [
   },
   {
     label: __("Delete"),
+    condition: isNotGeneral,
     icon: "lucide-trash-2",
     theme: "red",
     onClick: ({ group }) => {
@@ -571,9 +569,11 @@ function handleCategoryDelete(alsoDeleteArticles: boolean) {
         deleteModal.value = false;
         toast.success(
           archived
-            ? __("Category deleted successfully. {0} articles were archived.", [
+            ? countLabel(
                 archived,
-              ])
+                __("Category deleted successfully. 1 article was archived."),
+                __("Category deleted successfully. {0} articles were archived.")
+              )
             : __("Category deleted successfully.")
         );
         listViewRef.value.reload();
@@ -596,9 +596,14 @@ function handleDeleteArticles() {
         listSelections.value?.clear();
         toast.success(
           archived
-            ? __(
-                "Articles deleted successfully. {0} cited by tickets were archived.",
-                [archived]
+            ? countLabel(
+                archived,
+                __(
+                  "Articles deleted successfully. 1 cited by tickets was archived."
+                ),
+                __(
+                  "Articles deleted successfully. {0} cited by tickets were archived."
+                )
               )
             : __("Articles deleted successfully.")
         );

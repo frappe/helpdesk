@@ -100,7 +100,10 @@ const parentOptions = computed(() => [
 ]);
 
 watch(showDialog, (open) => {
-  if (open) categoryOptions.submit();
+  if (!open) return;
+  // shared with other dialogs: drop their list before it shows here
+  categoryOptions.reset();
+  categoryOptions.submit();
 });
 
 const iconOptions = CATEGORY_ICONS.map((value) => ({

@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:open="showDialog" title="Move To" :actions="actions">
+  <Dialog v-model:open="showDialog" :title="__('Move To')" :actions="actions">
     <template #default>
       <div class="flex flex-col flex-1">
         <Combobox
@@ -49,12 +49,14 @@ watch(showDialog, (open) => {
   if (!open) return;
   // a pick made before a cancel must not survive
   category.value = "";
+  // shared with other dialogs: drop their list before it shows here
+  categoryOptions.reset();
   categoryOptions.submit({ exclude: props.excludeCategory });
 });
 
 const actions = [
   {
-    label: "Move",
+    label: __("Move"),
     variant: "solid",
     onClick: () => emit("move", category.value),
   },

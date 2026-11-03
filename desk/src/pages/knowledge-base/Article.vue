@@ -211,6 +211,7 @@
       :edit="editTitle"
       v-model:title="category.title"
       v-model:icon="category.icon"
+      v-model:parent="category.parent"
       v-model="showCategoryModal"
       @create="handleCategoryCreate"
     />
@@ -244,6 +245,7 @@ import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
 import {
+  categoryOptions,
   deleteArticles,
   moveToCategory,
   newCategory,
@@ -303,6 +305,7 @@ function handleCategoryCreate() {
     {
       title: category.title,
       icon: category.icon,
+      parent: category.parent || null,
     },
     {
       onSuccess: (data: any) => {
@@ -320,7 +323,11 @@ function handleCategoryCreate() {
         });
         //update category name in breadcrumb
         article.data.category_name = category.title;
-        article.data.parent_category_name = null;
+        article.data.parent_category_name = category.parent
+          ? categoryOptions.data?.find(
+              (option) => option.value === category.parent
+            )?.label ?? null
+          : null;
         toast.success(__("Category created successfully."));
       },
       onError: (error: string) => {
@@ -334,6 +341,7 @@ const category = reactive({
   title: "",
   id: "",
   icon: "lucide-folder",
+  parent: "",
 });
 
 const router = useRouter();
@@ -673,11 +681,9 @@ const breadcrumbs = computed(() => {
       route: { name: "AgentKnowledgeBase" },
     },
   ];
+  // no route: the list has no page per category
   if (article.data?.parent_category_name) {
-    items.push({
-      label: article.data.parent_category_name,
-      route: { name: "AgentKnowledgeBase" },
-    });
+    items.push({ label: article.data.parent_category_name });
   }
   if (article.data?.category_name) {
     items.push({

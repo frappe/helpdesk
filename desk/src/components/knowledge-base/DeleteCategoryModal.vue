@@ -26,7 +26,7 @@
         variant="solid"
         theme="red"
         :label="__('Confirm')"
-        :disabled="!summary"
+        :disabled="!summary && !categoryDeleteSummary.error"
         :loading="deleteCategory.loading"
         @click="emit('confirm', deleteArticles)"
       />
@@ -37,6 +37,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { Button, Checkbox, Dialog } from "frappe-ui";
+import { countLabel } from "@helpdesk/shared/utils";
 import { categoryDeleteSummary, deleteCategory } from "@/stores/knowledgeBase";
 import { __ } from "@/translation";
 
@@ -59,10 +60,21 @@ watch(showDialog, (open) => {
 
 const message = computed(() => {
   if (deleteArticles.value) {
-    return __("Deletes {0} subcategories and {1} articles", [
-      summary.value?.subcategories ?? 0,
-      summary.value?.articles ?? 0,
-    ]);
+    const subcategories = summary.value?.subcategories ?? 0;
+    // cited ones are archived, not deleted
+    const deleted =
+      (summary.value?.articles ?? 0) - (summary.value?.cited ?? 0);
+    const articles = countLabel(deleted, __("1 article"), __("{0} articles"));
+    return subcategories
+      ? __("Deletes {0} and {1}", [
+          countLabel(
+            subcategories,
+            __("1 subcategory"),
+            __("{0} subcategories")
+          ),
+          articles,
+        ])
+      : __("Deletes {0}", [articles]);
   }
   if (props.isSubcategory) {
     return __("Articles in this subcategory will move to the parent category.");

@@ -28,14 +28,8 @@ export async function createArticle(
   });
 }
 
-/** Pick an option in a frappe-ui Combobox-backed Link field. */
-export async function pickOption(
-  page: Page,
-  trigger: string,
-  option: string,
-  { opensItself = false } = {}
-) {
-  if (!opensItself) await page.getByRole("button", { name: trigger }).click();
+/** Pick an option in the open dialog's frappe-ui Combobox. */
+export async function chooseOption(page: Page, option: string) {
   await page.getByRole("combobox").last().fill(option);
   await page.getByRole("option", { name: option }).first().click();
 }

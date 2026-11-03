@@ -536,7 +536,19 @@ def _merge_category(source: str, target: str) -> None:
             _set_parent(target, None)
             subcategories.remove(target)
         elif get_parent(target):
-            frappe.throw(_("Move its subcategories first"))
+            names = dict(
+                frappe.get_all(
+                    "HD Article Category",
+                    filters={"name": ["in", [source, target]]},
+                    fields=["name", "category_name"],
+                    as_list=True,
+                )
+            )
+            frappe.throw(
+                _(
+                    "{0} has subcategories, and {1} is a subcategory. Move its subcategories first, or merge into a top-level category."
+                ).format(frappe.bold(names[source]), frappe.bold(names[target]))
+            )
         for subcategory in subcategories:
             _set_parent(subcategory, target)
     move_category_articles(source, target)

@@ -1,9 +1,9 @@
 import type { Page } from "@playwright/test";
 import { expect, test, uid, usePersona } from "../../helpers/fixtures";
 import {
+  chooseOption,
   createArticle,
   createCategory,
-  pickOption,
 } from "../../helpers/portal";
 
 usePersona("manager");
@@ -62,7 +62,7 @@ test("edit, unpublish, move and delete an article", async ({ page, api }) => {
   await expect.poll(async () => (await api.get("HD Article", article.name)).status).toBe("Draft");
 
   await openArticleMenu(page, "Move To");
-  await pickOption(page, "Category", to.category_name, { opensItself: true });
+  await chooseOption(page, to.category_name);
   await page.getByRole("dialog").getByRole("button", { name: "Move" }).click();
   await expect.poll(async () => (await api.get("HD Article", article.name)).category).toBe(to.name);
 
@@ -83,7 +83,7 @@ test("merge a category into another, then delete one", async ({ page, api }) => 
 
   await page.goto("/helpdesk/kb");
   await openCategoryMenu(page, source.category_name, "Merge");
-  await pickOption(page, "Category", target.category_name, { opensItself: true });
+  await chooseOption(page, target.category_name);
   await page.getByRole("dialog").getByRole("button", { name: "Merge" }).click();
   await expect.poll(async () => (await api.get("HD Article", moved.name)).category).toBe(target.name);
   expect(await api.exists("HD Article Category", { name: source.name })).toBeUndefined();
@@ -93,6 +93,34 @@ test("merge a category into another, then delete one", async ({ page, api }) => 
   await expect.poll(() => api.exists("HD Article Category", { name: doomed.name })).toBeUndefined();
   const general = await api.call("helpdesk.api.knowledge_base.get_general_category");
   expect((await api.get("HD Article", orphan.name)).category).toBe(general);
+});
+
+test("delete a category with its subcategory and articles; a cited one is archived", async ({
+  page,
+  api,
+  apiAs,
+}) => {
+  const parent = await createCategory(api);
+  const sub = await createCategory(api, undefined, { parent_article_category: parent.name });
+  const deleted = await createArticle(api, parent.name);
+  const cited = await createArticle(api, sub.name);
+  await (await apiAs("customer")).call("helpdesk.helpdesk.doctype.hd_ticket.api.new", {
+    doc: { subject: `E2E cites ${uid()}`, description: "<p>Cites an article</p>" },
+    origin: { from: "article", article: cited.name },
+  });
+
+  await page.goto("/helpdesk/kb");
+  await openCategoryMenu(page, parent.category_name, "Delete");
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("checkbox", { name: "Also delete articles" }).check();
+  await expect(dialog.getByText("Deletes 1 subcategory and 1 article")).toBeVisible();
+  await dialog.getByRole("button", { name: "Confirm" }).click();
+
+  await expect(page.getByText("1 article was archived")).toBeVisible();
+  expect(await api.exists("HD Article Category", { name: parent.name })).toBeUndefined();
+  expect(await api.exists("HD Article Category", { name: sub.name })).toBeUndefined();
+  expect(await api.exists("HD Article", { name: deleted.name })).toBeUndefined();
+  expect((await api.get("HD Article", cited.name)).status).toBe("Archived");
 });
 
 async function openArticleMenu(page: Page, item: string) {
