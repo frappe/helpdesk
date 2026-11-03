@@ -84,6 +84,7 @@
               variant="subtle"
               :label="__('Break start')"
               v-model="workDayData.break_start"
+              @change="setDefaultBreakEnd"
             />
             <FormControl
               type="time"
@@ -91,6 +92,7 @@
               variant="subtle"
               :label="__('Break end')"
               v-model="workDayData.break_end"
+              :disabled="!workDayData.break_start"
               @blur="validateBreak"
             />
           </div>
@@ -98,11 +100,22 @@
         </div>
 
         <!-- invisible, not v-if: a layout shift on blur would swallow the Save click -->
-        <Checkbox
+        <div
+          class="flex items-center justify-between"
           :class="{ invisible: !hasBreak }"
-          v-model="applyBreakToAll"
-          :label="__('Apply break to all workdays')"
-        />
+        >
+          <Checkbox
+            v-model="applyBreakToAll"
+            :label="__('Apply break to all workdays')"
+          />
+          <Button
+            variant="ghost"
+            size="sm"
+            icon-left="lucide-x"
+            :label="__('Remove break')"
+            @click="removeBreak"
+          />
+        </div>
       </div>
     </template>
     <template #actions>
@@ -151,6 +164,8 @@ type WorkDayRow = Partial<
 >;
 
 const TIME_FIELDS = ["start_time", "end_time", "break_start", "break_end"] as const;
+const DEFAULT_BREAK_MINUTES = 60;
+const MINUTES_IN_DAY = 24 * 60;
 
 const isConfirmingDelete = ref(false);
 const props = defineProps({
@@ -246,6 +261,21 @@ function validateTimeRange() {
 function validateBreak() {
   errors.break = getBreakError(workDayData);
   return !errors.break;
+}
+
+/** End a newly picked break an hour later, within the working hours. */
+function setDefaultBreakEnd(breakStart: string) {
+  if (!breakStart) return;
+  const dayEnd = workDayData.end_time ? toMinutes(workDayData.end_time) : MINUTES_IN_DAY - 1;
+  const breakEnd = Math.floor(Math.min(toMinutes(breakStart) + DEFAULT_BREAK_MINUTES, dayEnd));
+  workDayData.break_end = formatTimeToHHMMSS(`${Math.floor(breakEnd / 60)}:${breakEnd % 60}`);
+}
+
+function removeBreak() {
+  workDayData.break_start = "";
+  workDayData.break_end = "";
+  applyBreakToAll.value = false;
+  errors.break = "";
 }
 
 /** Replace the edited row in the list; false when it is no longer there. */
