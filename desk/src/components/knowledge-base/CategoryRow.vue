@@ -82,16 +82,11 @@
           <span class="truncate">{{ categoryAccess()[access]?.label }}</span>
         </span>
 
-        <span
+        <MultipleAvatar
           v-else-if="column.key === 'author'"
-          class="block truncate text-base text-ink-gray-7"
-        >
-          {{
-            authors.size === 1
-              ? [...authors][0]
-              : __("{0} authors", [authors.size])
-          }}
-        </span>
+          :avatars="[...authors]"
+          :max="3"
+        />
 
         <span
           v-else-if="column.type === 'Datetime'"
@@ -119,6 +114,7 @@
 </template>
 
 <script setup lang="ts">
+import { MultipleAvatar } from "@/components";
 import Icon from "@helpdesk/shared/Icon.vue";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import { __ } from "@/translation";
