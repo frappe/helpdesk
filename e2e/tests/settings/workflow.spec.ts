@@ -241,6 +241,7 @@ test.describe("preferences", () => {
     await page.goto("/helpdesk/tickets");
     const dialog = await openSettings(page, "Preferences");
     await dialog.getByRole("button", { name: "Select language" }).click();
+    await page.getByRole("combobox", { name: "Select language" }).fill("Svenska");
     await page.getByRole("option", { name: "Svenska" }).click();
     await dialog.locator("button", { hasText: /\w+\/\w+/ }).click();
     await page.getByRole("combobox").or(page.getByPlaceholder(/Search/)).last().fill("Europe/Berlin");
