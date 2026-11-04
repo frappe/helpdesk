@@ -52,7 +52,7 @@
         <PortalSkeleton
           variant="category-grid"
           :count="Math.min(count, 9)"
-          :columns="count === 2 ? 2 : 3"
+          :columns="homeCategoryColumns(count)"
           bare
         />
       </div>
@@ -436,6 +436,7 @@ import { Skeleton } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 // Relative, not @app: the desk imports this through NewTicketForm.
 import { conversationLayout } from "../../stores/conversationLayout";
+import { homeCategoryColumns } from "../../stores/knowledgeBase";
 
 defineOptions({ name: "PortalSkeleton" });
 
