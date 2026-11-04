@@ -3,9 +3,11 @@ name: Lint
 on:
   pull_request:
     branches:
-      - main
-      - main-hotfix
       - develop
+      - version-15
+      - version-15-hotfix
+      - version-16
+      - version-16-hotfix
 
 jobs:
   commit-lint:

@@ -10,7 +10,7 @@ test.describe("logged out", () => {
 
     await page.getByRole("textbox", { name: "Email" }).fill(personas.agent.email);
     await page.getByRole("textbox", { name: "Password" }).fill(PASSWORD);
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: /^(Login|Continue)$/ }).click();
 
     await expect(page).toHaveURL(/\/helpdesk\/tickets$/);
     await expect(page.getByRole("button", { name: "Filter", exact: true })).toBeVisible();
