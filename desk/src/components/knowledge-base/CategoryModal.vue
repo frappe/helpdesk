@@ -107,6 +107,21 @@
           @keydown.enter="submit"
         />
       </div>
+
+      <!-- Lines up with the name input, past the icon tile. -->
+      <div
+        class="mt-2 transition-[padding] duration-200 ease-out motion-reduce:transition-none"
+        :class="drawn ? 'pl-20' : 'pl-10 delay-150'"
+      >
+        <Textarea
+          v-model="description"
+          class="resize-none"
+          size="md"
+          :rows="2"
+          :placeholder="__('Add a short description')"
+          :aria-label="__('Description')"
+        />
+      </div>
     </template>
 
     <template #actions>
@@ -140,6 +155,7 @@ import {
   Checkbox,
   Combobox,
   Dialog,
+  Textarea,
   TextInput,
   Tooltip,
 } from "frappe-ui";
@@ -164,6 +180,7 @@ const emit = defineEmits(["update", "create"]);
 
 const showDialog = defineModel<boolean>();
 const newTitle = defineModel<string>("title");
+const description = defineModel<string>("description");
 const icon = defineModel<string>("icon");
 const parent = defineModel<string>("parent", { default: "" });
 
