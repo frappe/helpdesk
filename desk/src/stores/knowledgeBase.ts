@@ -43,9 +43,10 @@ export const deleteArticles = createResource({
 // Category
 export const newCategory = createResource({
   url: "helpdesk.api.knowledge_base.create_category",
-  makeParams({ title, icon, parent }) {
+  makeParams({ title, description, icon, parent }) {
     return {
       title,
+      description,
       icon,
       parent,
     };

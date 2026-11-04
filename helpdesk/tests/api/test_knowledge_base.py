@@ -21,6 +21,7 @@ from helpdesk.api.knowledge_base import (
     get_categories,
     get_category_access,
     get_category_delete_summary,
+    get_category_group_options,
     get_category_options,
     get_category_visibility,
     get_cited_articles,
@@ -1131,6 +1132,15 @@ class TestSubcategoryAccess(IntegrationTestCase):
         move_to_category(self.sub, [article])
 
         self.assertEqual(self.visibility(article), PRIVATE)
+
+    def test_a_new_category_keeps_its_description_for_the_desk_edit(self) -> None:
+        created = create_category(
+            unique_name("Fixture Described"), description="Refunds and invoices."
+        )
+
+        group = get_category_group_options([{"value": created["category"]}])[0]
+
+        self.assertEqual(group["description"], "Refunds and invoices.")
 
     def test_a_new_subcategory_starts_with_an_article_under_its_parent(self) -> None:
         created = create_category(unique_name("Fixture New Sub"), parent=self.parent)

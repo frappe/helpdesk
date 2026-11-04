@@ -29,6 +29,7 @@
       :edit="editTitle"
       v-model="showCategoryModal"
       v-model:title="category.title"
+      v-model:description="category.description"
       v-model:icon="category.icon"
       v-model:parent="category.parent"
       :category-id="category.id"
@@ -135,6 +136,7 @@ const { $dialog } = globalStore();
 
 const category = reactive({
   title: "",
+  description: "",
   id: "",
   icon: "lucide-folder",
   parent: "",
@@ -266,6 +268,7 @@ const groupByActions = [
       editTitle.value = true;
       // the label is "Parent › Sub"; the plain name comes apart
       category.title = group.category_name;
+      category.description = group.description || "";
       category.id = group.value;
       category.icon = group.icon || "lucide-folder";
       category.parent = group.parent_article_category || "";
@@ -733,6 +736,7 @@ function handleCategoryCreate() {
   newCategory.submit(
     {
       title: category.title,
+      description: category.description,
       icon: category.icon,
       parent: category.parent || null,
     },
@@ -777,6 +781,7 @@ function handleCategoryUpdate() {
       name: category.id,
       fieldname: {
         category_name: category.title,
+        description: category.description,
         icon: category.icon,
         parent_article_category: category.parent || null,
       },
@@ -865,6 +870,7 @@ function handleMergeCategory(source: string, target: string) {
 
 function resetState() {
   category.title = "";
+  category.description = "";
   category.id = "";
   category.icon = "lucide-folder";
   category.parent = "";

@@ -204,7 +204,12 @@ def _delete_article(name: str) -> None:
 
 
 @frappe.whitelist(methods=["POST"])
-def create_category(title: str, icon: str | None = None, parent: str | None = None):
+def create_category(
+    title: str,
+    icon: str | None = None,
+    parent: str | None = None,
+    description: str | None = None,
+):
     """Create an article category holding one "New Article"; returns both names.
     Under `parent` when given, as a Subcategory. Returns {"article": name,
     "category": name}. "General" is a reserved name."""
@@ -217,6 +222,7 @@ def create_category(title: str, icon: str | None = None, parent: str | None = No
     category = frappe.new_doc(
         "HD Article Category",
         category_name=title,
+        description=description,
         icon=icon,
         parent_article_category=parent,
     ).insert()
@@ -902,8 +908,14 @@ def get_category_group_options(options: list[dict]) -> list[dict]:
     groups = [option for option in options if option["value"]]
     empty = [option for option in options if not option["value"]]
     values = [option["value"] for option in groups]
-    # the desk's Edit reads the plain name and the pin from here
-    fields = ["name", "parent_article_category", "category_name", "pinned"]
+    # the desk's Edit reads the plain name, description and pin from here
+    fields = [
+        "name",
+        "parent_article_category",
+        "category_name",
+        "description",
+        "pinned",
+    ]
     rows = {
         row.name: row
         for row in frappe.get_all(
@@ -940,6 +952,7 @@ def get_category_group_options(options: list[dict]) -> list[dict]:
         row = rows.get(group["value"], frappe._dict())
         group["parent_article_category"] = row.parent_article_category
         group["category_name"] = row.category_name
+        group["description"] = row.description
         group["pinned"] = row.pinned
         group["has_subcategories"] = group["value"] in with_subcategories
     groups.sort(key=lambda group: category_label_sort_key(group["label"]))
