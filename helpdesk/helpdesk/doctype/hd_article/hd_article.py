@@ -10,6 +10,7 @@ from frappe.types.filter import Filters
 from frappe.utils import cint, evaluate_filters
 from frappe.website.utils import cleanup_page_name
 
+from helpdesk.helpdesk.doctype.hd_article.article_files import ArticleFiles
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     get_joining_visibility,
     index_articles,
@@ -74,6 +75,8 @@ class HDArticle(Document):
         self.inherit_category_visibility()
 
     def before_save(self):
+        if not self.is_new():
+            self.files.sync()
         self.excerpt = get_excerpt(self.content)
 
         # set published date of the hd_article
@@ -102,6 +105,7 @@ class HDArticle(Document):
             self.visibility = PRIVATE
 
     def after_insert(self):
+        self.files.sync_new_article()
         count = frappe.db.count("HD Article")
         if count == 1:
             return
@@ -116,6 +120,10 @@ class HDArticle(Document):
 
     def update_search_index(self):
         index_articles([self.name], queue="short")
+
+    @property
+    def files(self) -> ArticleFiles:
+        return ArticleFiles(self, private=self.visibility != PUBLIC)
 
     @staticmethod
     def default_list_data():

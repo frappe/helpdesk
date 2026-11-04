@@ -510,6 +510,10 @@ function save(values: Record<string, string | number>, message: string) {
         article.data.modified = doc.modified;
         // unpublishing unpins
         article.data.pinned = doc.pinned;
+        // an access change moves the article's files, which rewrites their links
+        if (!editable.value) {
+          article.data.content = content.value = doc.content;
+        }
         toast.success(message);
       },
       onError: (error: Error) => {
