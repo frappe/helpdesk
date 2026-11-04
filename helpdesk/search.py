@@ -378,6 +378,10 @@ def build_index():
 
 
 def update_article_index(article: str) -> None:
+    update_article_indexes([article])
+
+
+def update_article_indexes(articles: list[str]) -> None:
     search = HelpdeskSearch()
     try:
         search.redis.ft(search.index_name).info()
@@ -385,6 +389,11 @@ def update_article_index(article: str) -> None:
         return  # build_index_if_not_exists builds the whole index
     # skips index_exists, which counts every article's sections
     search._index_exists = True
+    for article in articles:
+        _reindex_article(search, article)
+
+
+def _reindex_article(search: "HelpdeskSearch", article: str) -> None:
     # one key per section; after_migrate's full rebuild fills the set
     sections_key = search.get_sections_key(article)
     if keys := search.redis.smembers(sections_key):

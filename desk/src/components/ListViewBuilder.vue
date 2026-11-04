@@ -184,6 +184,7 @@
       :rows="rows"
       v-slot="{ idx, column, item, row }"
       :group-by-actions="options.groupByActions"
+      :reveal-group="options.revealGroup"
       @scrollend="handleListScroll"
       class="list-rows"
     >
@@ -331,6 +332,8 @@ interface P {
     doctype: string;
     defaultFilters?: Record<string, any>;
     columnConfig?: Record<string, any>;
+    // what a Link quick filter shows for its value, by fieldname
+    quickFilterTitles?: Record<string, (value: string) => string | undefined>;
     emptyState?: {
       // type of a h componnt
       icon?: string | VNode;
@@ -342,6 +345,7 @@ interface P {
     selectable?: boolean;
     view?: ViewType;
     groupByActions?: Array<any>;
+    revealGroup?: string;
     showSelectBanner?: boolean;
     selectBannerActions?: Record<string, any>;
     default_page_length?: number;
@@ -754,6 +758,7 @@ const listViewData = reactive({
   filterableFields,
   quickFilters,
   sortableFields,
+  quickFilterTitles: computed(() => options.value?.quickFilterTitles || {}),
 });
 
 provide("listViewData", listViewData);

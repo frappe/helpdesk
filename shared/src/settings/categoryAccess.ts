@@ -8,6 +8,6 @@ export function categoryAccess(): Record<string, { icon: unknown; label: string 
     Public: { icon: "lucide-globe", label: __("Public") },
     Customers: { icon: markRaw(OrganizationsIcon), label: __("Customers") },
     Private: { icon: "lucide-lock", label: __("Private") },
-    Mixed: { icon: "lucide-blend", label: __("Mixed") },
+    Mixed: { icon: "lucide-layers", label: __("Mixed") },
   };
 }

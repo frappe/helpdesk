@@ -6,11 +6,13 @@ import {
   getCachedDocumentResource,
   toast,
 } from "frappe-ui";
+import { useDebounceFn } from "@vueuse/core";
 import { computed, effectScope, ref, shallowRef, watch } from "vue";
 import {
   KNOWLEDGE_BASE_PREVIEW_KEY,
   type KnowledgeBasePreview,
 } from "../knowledgeBasePreview";
+import { categoryIcon } from "../categoryIcons";
 import { __ } from "../translation";
 import { CUSTOMER_PORTAL_ROOT, getErrorMessage, isSafeLink } from "../utils";
 
@@ -36,6 +38,20 @@ function parseLinks(script: string): Link[] {
   }
 }
 
+export type PinKind = "categories" | "articles";
+
+// The home page features this many; the backend's MAX_PINNED_ARTICLES.
+export const MAX_PINNED_ARTICLES = 5;
+// Pickable articles shown before a search narrows them.
+const ARTICLE_SEARCH_LIMIT = 100;
+
+function getPinned(rows: { name: string; pinned: number; pinned_order: number }[]) {
+  return rows
+    .filter((row) => row.pinned)
+    .sort((a, b) => a.pinned_order - b.pinned_order)
+    .map((row) => row.name);
+}
+
 // Lazy singleton shared by desk and portal settings.
 export const knowledgeBaseDraft = shallowRef<ReturnType<
   typeof createDraft
@@ -53,20 +69,48 @@ function createDraft() {
     createDocumentResource({ doctype: "HD Settings", name: "HD Settings" });
   const categories = createListResource({
     doctype: "HD Article Category",
-    fields: ["name", "category_name", "icon", "pinned", "pinned_order"],
+    fields: [
+      "name",
+      "category_name",
+      "icon",
+      "pinned",
+      "pinned_order",
+      "parent_article_category",
+    ],
     orderBy: "category_name asc",
     pageLength: 99999,
     auto: true,
   });
-  const accessRows = createResource({
-    url: "frappe.client.get_list",
-    params: {
-      doctype: "HD Article",
-      fields: ["category", "visibility"],
-      group_by: "category, visibility",
-      order_by: "category asc",
-      limit_page_length: 0,
-    },
+  // Only Published articles customers can read stay pinned.
+  const articles = createListResource({
+    doctype: "HD Article",
+    fields: ["name", "title", "visibility", "pinned", "pinned_order"],
+    filters: { pinned: 1 },
+    pageLength: MAX_PINNED_ARTICLES,
+    auto: true,
+  });
+  // The rest load by search, once the pin dialog opens: a big knowledge base has too many to list.
+  const articleSearch = createListResource({
+    doctype: "HD Article",
+    fields: ["name", "title", "visibility"],
+    orderBy: "title asc",
+    pageLength: ARTICLE_SEARCH_LIMIT,
+  });
+  const searchArticles = useDebounceFn((query: string) => {
+    // a typed % or _ matches itself
+    const like = query.replace(/[\\%_]/g, "\\$&");
+    articleSearch.update({
+      filters: {
+        status: "Published",
+        visibility: ["!=", "Private"],
+        ...(query && { title: ["like", `%${like}%`] }),
+      },
+    });
+    articleSearch.reload();
+  }, 300);
+  // Each top-level category's access across its branch, or "Mixed".
+  const categoryAccess = createResource({
+    url: "helpdesk.api.knowledge_base.get_category_access",
     auto: true,
   });
   const linksScript = createResource({
@@ -80,15 +124,14 @@ function createDraft() {
   });
 
   const saved = computed<Draft | null>(() => {
-    if (!settings.doc || !categories.data || !linksScript.data) return null;
+    if (!settings.doc || !categories.data || !articles.data || !linksScript.data)
+      return null;
     const script: string = linksScript.data.script || "";
     return {
       banner_image: settings.doc.banner_image || "",
       banner_preset: settings.doc.banner_preset || "",
-      pinned: categories.data
-        .filter((row) => row.pinned)
-        .sort((a, b) => a.pinned_order - b.pinned_order)
-        .map((row) => row.name),
+      pinned: getPinned(categories.data),
+      pinned_articles: getPinned(articles.data),
       links: parseLinks(script),
     };
   });
@@ -114,20 +157,30 @@ function createDraft() {
     { immediate: true }
   );
 
-  const categoryOptions = computed(() => {
-    const access: Record<string, string> = {};
-    for (const row of accessRows.data || []) {
-      access[row.category] = access[row.category] ? "Mixed" : row.visibility;
-    }
+  const categoryOptions = computed(() =>
     // Customers never see Private categories; already pinned ones stay to unpin.
-    return (categories.data || [])
-      .filter((row) => access[row.name] !== "Private" || row.pinned)
-      .map((row) => ({
+    // Subcategories are never pinned.
+    (categories.data || [])
+      .filter((row) => !row.parent_article_category)
+      .map((row) => ({ row, access: categoryAccess.data?.[row.name] }))
+      .filter(({ row, access }) => access !== "Private" || row.pinned)
+      .map(({ row, access }) => ({
         label: row.category_name,
         value: row.name,
-        icon: row.icon?.startsWith("lucide-") ? row.icon : "lucide-folder",
-        access: access[row.name],
-      }));
+        icon: categoryIcon(row.icon),
+        access,
+      }))
+  );
+
+  // Pins stay listed whatever the search; A–Z, so an unpinned one snaps into place.
+  const articleOptions = computed(() => {
+    const rows = new Map(
+      [...(articles.data || []), ...(articleSearch.data || [])].map((row) => [
+        row.name,
+        { label: row.title, value: row.name, access: row.visibility },
+      ])
+    );
+    return [...rows.values()].sort((a, b) => a.label.localeCompare(b.label));
   });
 
   const changed = computed(() => {
@@ -168,12 +221,18 @@ function createDraft() {
         });
       }
       if (changed.value.includes("links")) await saveLinks(value.links);
-      if (changed.value.includes("pinned")) await savePinned(value.pinned);
+      if (changed.value.includes("pinned")) {
+        await savePinnedCategories(value.pinned);
+      }
+      if (changed.value.includes("pinned_articles")) {
+        await savePinnedArticles(value.pinned_articles);
+      }
       clearPreview();
       await Promise.all([
         settings.reload(),
         linksScript.reload(),
         categories.reload(),
+        articles.reload(),
       ]);
       toast.success(__("Settings updated"));
       return true;
@@ -185,7 +244,7 @@ function createDraft() {
   }
 
   // Order is 1-based; 0 means unpinned.
-  async function savePinned(pinned: string[]) {
+  async function savePinnedCategories(pinned: string[]) {
     const { failed_docs } = await call("frappe.client.bulk_update", {
       docs: categories.data
         .map((row) => ({ row, order: pinned.indexOf(row.name) + 1 }))
@@ -203,6 +262,12 @@ function createDraft() {
     if (failed_docs.length) {
       throw new Error(__("Could not update the pinned categories"));
     }
+  }
+
+  function savePinnedArticles(pinned: string[]) {
+    return call("helpdesk.api.knowledge_base.set_pinned_articles", {
+      names: pinned,
+    });
   }
 
   function saveLinks(links: Link[]) {
@@ -228,13 +293,29 @@ function createDraft() {
     });
   }
 
-  async function savePins(pinned: string[]) {
+  const pinLists = {
+    categories: {
+      save: savePinnedCategories,
+      rows: categories,
+      draftKey: "pinned",
+      saved: () => __("Pinned categories updated"),
+    },
+    articles: {
+      save: savePinnedArticles,
+      rows: articles,
+      draftKey: "pinned_articles",
+      saved: () => __("Pinned articles updated"),
+    },
+  } as const;
+
+  async function savePins(kind: PinKind, pinned: string[]) {
+    const { save, rows, draftKey, saved } = pinLists[kind];
     try {
-      await savePinned(pinned);
+      await save(pinned);
       // The merge watch keeps a draft that differs from the old saved order.
-      draft.value!.pinned = [...pinned];
-      await categories.reload();
-      toast.success(__("Pinned categories updated"));
+      draft.value![draftKey] = [...pinned];
+      await rows.reload();
+      toast.success(saved());
       return true;
     } catch (error) {
       getErrorMessage(error, true);
@@ -280,6 +361,8 @@ function createDraft() {
     setToggle,
     savePins,
     categoryOptions,
+    articleOptions,
+    searchArticles,
     isDirty,
     saving,
     save,

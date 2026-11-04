@@ -61,6 +61,7 @@ Every page embeds `header` and `kb_settings`.
 - `header`: the top bar. It has the brand, breadcrumbs, quick links, the theme toggle and the account menu. Its inputs (`crumb`, `parentRoute`, `drawerToggle` and others) are listed in the JSON.
 - `kb_settings`: the portal Settings dialog. It has profile, members, knowledge base and portal settings tabs. It has no inputs and binds to `useSettingsModal`.
 - `category_grid`: a Repeater of category cards. `public_kb` and `categories` use it.
+- `home_article_list`: the bordered list of article rows on `public_kb`. Its `articles` input feeds both the tabbed list and the Featured list above a lone category.
 
 ### Custom Vue components
 

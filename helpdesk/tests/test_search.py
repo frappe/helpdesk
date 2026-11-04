@@ -74,9 +74,10 @@ class TestArticleIndex(IntegrationTestCase):
 
         enqueue.assert_called_once()
         self.assertEqual(
-            enqueue.call_args.args[0], "helpdesk.search.update_article_index"
+            enqueue.call_args.args[0], "helpdesk.search.update_article_indexes"
         )
-        self.assertEqual(enqueue.call_args.kwargs["article"], self.article)
+        self.assertEqual(enqueue.call_args.kwargs["articles"], [self.article])
+        self.assertEqual(enqueue.call_args.kwargs["queue"], "short")
 
 
 class TestSearchQuery(IntegrationTestCase):

@@ -16,6 +16,7 @@ export function useKnowledgeBase() {
 export const sidebarState = {
   query: ref(''),
   openName: ref<string | null>(null),
+  openSubName: ref<string | null>(null),
   shown: reactive<Record<string, number>>({}),
   scrollTop: 0,
 }
