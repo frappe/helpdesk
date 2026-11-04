@@ -2,14 +2,14 @@ name: Pre-build assets
 
 on:
   push:
-    branches: [develop, main]
+    branches: [develop, version-16]
 
 jobs:
   assets:
     name: Pre-build assets
     uses: frappe/pilot/.github/workflows/app-assets.yml@develop
     with:
-      # main supports Frappe v15 and v16; Pilot benches run v16 or later.
-      frappe-branch: ${{ github.ref_name == 'main' && 'version-16' || 'develop' }}
+      # Pilot benches run Frappe v16 or later, so version-15 is not built.
+      frappe-branch: ${{ github.ref_name == 'version-16' && 'version-16' || 'develop' }}
     permissions:
       contents: write
