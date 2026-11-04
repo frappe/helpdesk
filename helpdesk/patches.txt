@@ -66,3 +66,4 @@ helpdesk.patches.backfill_template_field_visible_to
 helpdesk.patches.show_ticket_field_permission_notice
 helpdesk.patches.sync_customer_manager_roles
 helpdesk.patches.set_article_excerpts
+helpdesk.patches.hd_article_category_tree

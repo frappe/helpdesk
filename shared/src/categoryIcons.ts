@@ -55,3 +55,10 @@ export const CATEGORY_ICONS = [
   'lucide-image',
   'lucide-video',
 ]
+
+const KNOWN_ICONS = new Set(CATEGORY_ICONS)
+
+// A name outside the list has no CSS in the portal build: show the folder.
+export function categoryIcon(icon?: string | null) {
+  return icon && KNOWN_ICONS.has(icon) ? icon : 'lucide-folder'
+}

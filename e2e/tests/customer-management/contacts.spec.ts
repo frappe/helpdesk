@@ -8,7 +8,7 @@ import {
   pageMenu,
 } from "../../helpers/directory";
 import { expect, test, uid, usePersona } from "../../helpers/fixtures";
-import { pickOption } from "../../helpers/portal";
+import { chooseOption } from "../../helpers/portal";
 
 usePersona("manager");
 
@@ -65,7 +65,8 @@ test("a contact with a user is linked to a customer from its edit dialog", async
   await page.goto(contactUrl(contact.name));
 
   const dialog = await openEdit(page);
-  await pickOption(page, "Select Customer", customer);
+  await page.getByRole("button", { name: "Select Customer" }).click();
+  await chooseOption(page, customer);
   await dialog.getByRole("button", { name: "Save" }).click();
   await expect(dialog).toHaveCount(0);
   const members = (await api.get("HD Customer", customer)).contacts;
@@ -146,7 +147,7 @@ test("a contact invited with a customer carries the customer on the invite", asy
   await dialog.getByRole("textbox", { name: "First Name" }).fill("Noor");
   await dialog.getByRole("textbox", { name: "Email" }).fill(email);
   await dialog.getByRole("button", { name: "Customer", exact: true }).click();
-  await pickOption(page, "", customer, { opensItself: true });
+  await chooseOption(page, customer);
   await dialog.getByRole("button", { name: "Create" }).click();
 
   await expect(page).toHaveURL(/\/helpdesk\/contacts\/.+/);

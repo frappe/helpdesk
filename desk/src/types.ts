@@ -350,6 +350,7 @@ export interface Article {
   title: string;
   title_slug: string;
   category_name: string;
+  parent_category_name?: string | null;
   category: string;
   published_on: string;
   author: Author;
@@ -361,6 +362,8 @@ export interface Article {
   creation: string;
   content: string;
   modified: string;
+  weight: number;
+  pinned: 0 | 1;
 }
 
 export interface Author {
