@@ -73,12 +73,13 @@
           "flex",
           "flex-col",
           "mt-0",
+          "max-w-[830px]",
           "min-w-0",
           "w-full",
           "mx-auto",
           "px-4",
           "sm:px-6",
-          "lg:px-16"
+          "xl:px-0"
          ]
         },
         {
@@ -298,12 +299,13 @@
           "flex",
           "flex-col",
           "mt-0",
+          "max-w-[830px]",
           "min-w-0",
           "w-full",
           "mx-auto",
           "px-4",
           "sm:px-6",
-          "lg:px-16",
+          "xl:px-0",
           "portal-reveal"
          ],
          "componentId": "container-pdx9evglv",
