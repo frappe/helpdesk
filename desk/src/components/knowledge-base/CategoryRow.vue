@@ -83,12 +83,6 @@
           </Dropdown>
         </div>
 
-        <LiveRing
-          v-else-if="column.key === 'status'"
-          :published="published"
-          :total="total"
-        />
-
         <span
           v-else-if="column.key === 'visibility' && access"
           class="flex min-w-0 items-center gap-1.5 text-base text-ink-gray-7"
@@ -124,7 +118,6 @@
 
 <script setup lang="ts">
 import Icon from "@helpdesk/shared/Icon.vue";
-import LiveRing from "./LiveRing.vue";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import { __ } from "@/translation";
 import { Button, Checkbox, Dropdown, dayjsLocal } from "frappe-ui";
@@ -163,10 +156,6 @@ function toggleBranch() {
   }
 }
 
-const total = computed(() => props.rows.length);
-const published = computed(
-  () => props.rows.filter((row) => row.status === "Published").length
-);
 const access = computed(() => {
   const values = new Set(props.rows.map((row) => row.visibility));
   return values.size > 1 ? "Mixed" : [...values][0];
