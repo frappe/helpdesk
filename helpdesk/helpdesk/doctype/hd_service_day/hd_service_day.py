@@ -9,4 +9,6 @@ from frappe.model.document import Document
 
 
 class HDServiceDay(Document):
-    pass
+    def __setup__(self) -> None:
+        # Frappe v15 fills empty Time fields with the current time on insert
+        self.dont_update_if_missing = ["break_start", "break_end"]
