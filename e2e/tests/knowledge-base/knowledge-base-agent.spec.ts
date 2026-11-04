@@ -41,6 +41,30 @@ test("nest a new category under another from the category dialog", async ({
   ).toBe(parent.name);
 });
 
+test("a searched icon can be picked and shows in the portal", async ({
+  page,
+  api,
+  pageAs,
+}) => {
+  const category = await createCategory(api);
+  await createArticle(api, category.name);
+  await page.goto("/helpdesk/kb");
+  await openCategoryMenu(page, category.category_name, "Edit");
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("button", { name: "Choose an icon" }).click();
+  await page.getByRole("textbox", { name: "Search icons" }).fill("anchor");
+  await page.getByRole("button", { name: "anchor", exact: true }).click();
+  await dialog.getByRole("button", { name: "Save changes" }).click();
+  await expect(page.getByText("Category updated successfully.")).toBeVisible();
+
+  const customer = await pageAs("customer");
+  await customer.goto(`/help/category/${category.name}`);
+  const icon = customer.locator(".lucide-anchor").first();
+  await expect(icon).toBeVisible();
+  // No CSS for the name would leave an empty box.
+  await expect(icon).toHaveCSS("mask-image", /url/);
+});
+
 test("a category's description saves from the dialog and the portal shows it", async ({
   page,
   api,
