@@ -62,7 +62,10 @@
           :options="groupedActions"
           align="end"
         >
-          <Button icon="lucide-more-horizontal" />
+          <Button
+            icon="lucide-more-horizontal"
+            :aria-label="__('More actions')"
+          />
         </Dropdown>
       </div>
     </template>
