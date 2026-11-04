@@ -41,6 +41,39 @@ test("nest a new category under another from the category dialog", async ({
   ).toBe(parent.name);
 });
 
+test("a category's description saves from the dialog and the portal shows it", async ({
+  page,
+  api,
+  pageAs,
+}) => {
+  const name = `E2E Described ${uid()}`;
+  await page.goto("/helpdesk/kb");
+  await page.getByRole("button", { name: "Create" }).click();
+  await page.getByRole("menuitem", { name: "Category" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("textbox", { name: "Name" }).fill(name);
+  await dialog.getByRole("textbox", { name: "Description" }).fill("First words.");
+  await dialog.getByRole("button", { name: "Create category" }).click();
+  await expect(page).toHaveURL(/\/helpdesk\/kb\/articles\/\w+\?.*isEdit=1/);
+  const category = (await api.exists("HD Article Category", {
+    category_name: name,
+  }))!;
+  await createArticle(api, category);
+
+  // Edit opens on the saved text, so saving cannot wipe it.
+  await page.goto("/helpdesk/kb");
+  await openCategoryMenu(page, name, "Edit");
+  const description = dialog.getByRole("textbox", { name: "Description" });
+  await expect(description).toHaveValue("First words.");
+  await description.fill("Second words.");
+  await dialog.getByRole("button", { name: "Save changes" }).click();
+  await expect(page.getByText("Category updated successfully.")).toBeVisible();
+
+  const customer = await pageAs("customer");
+  await customer.goto(`/help/category/${category}`);
+  await expect(customer.getByText("Second words.")).toBeVisible();
+});
+
 test("create a category and article, publish it, customer can read it", async ({
   page,
   api,

@@ -251,6 +251,7 @@
     <CategoryModal
       :edit="editTitle"
       v-model:title="category.title"
+      v-model:description="category.description"
       v-model:icon="category.icon"
       v-model:parent="category.parent"
       v-model="showCategoryModal"
@@ -361,6 +362,7 @@ function handleCategoryCreate() {
   newCategory.submit(
     {
       title: category.title,
+      description: category.description,
       icon: category.icon,
       parent: category.parent || null,
     },
@@ -396,6 +398,7 @@ function handleCategoryCreate() {
 
 const category = reactive({
   title: "",
+  description: "",
   id: "",
   icon: "lucide-folder",
   parent: "",
