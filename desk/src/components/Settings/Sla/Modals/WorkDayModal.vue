@@ -77,13 +77,14 @@
         </div>
 
         <div>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-[1fr_1fr_auto] items-end gap-2">
             <FormControl
               type="time"
               size="sm"
               variant="subtle"
               :label="__('Break start')"
               v-model="workDayData.break_start"
+              @change="setDefaultBreakEnd"
             />
             <FormControl
               type="time"
@@ -91,7 +92,17 @@
               variant="subtle"
               :label="__('Break end')"
               v-model="workDayData.break_end"
+              :disabled="!workDayData.break_start"
               @blur="validateBreak"
+            />
+            <Button
+              :disabled="!workDayData.break_start && !workDayData.break_end"
+              variant="subtle"
+              size="sm"
+              icon="lucide-x"
+              :tooltip="__('Remove break')"
+              :aria-label="__('Remove break')"
+              @click="removeBreak"
             />
           </div>
           <ErrorMessage :message="errors.break" class="mt-2" />
@@ -151,6 +162,8 @@ type WorkDayRow = Partial<
 >;
 
 const TIME_FIELDS = ["start_time", "end_time", "break_start", "break_end"] as const;
+const DEFAULT_BREAK_MINUTES = 60;
+const MINUTES_IN_DAY = 24 * 60;
 
 const isConfirmingDelete = ref(false);
 const props = defineProps({
@@ -246,6 +259,21 @@ function validateTimeRange() {
 function validateBreak() {
   errors.break = getBreakError(workDayData);
   return !errors.break;
+}
+
+/** End a newly picked break an hour later, within the working hours. */
+function setDefaultBreakEnd(breakStart: string) {
+  if (!breakStart) return;
+  const dayEnd = workDayData.end_time ? toMinutes(workDayData.end_time) : MINUTES_IN_DAY - 1;
+  const breakEnd = Math.floor(Math.min(toMinutes(breakStart) + DEFAULT_BREAK_MINUTES, dayEnd));
+  workDayData.break_end = formatTimeToHHMMSS(`${Math.floor(breakEnd / 60)}:${breakEnd % 60}`);
+}
+
+function removeBreak() {
+  workDayData.break_start = "";
+  workDayData.break_end = "";
+  applyBreakToAll.value = false;
+  errors.break = "";
 }
 
 /** Replace the edited row in the list; false when it is no longer there. */
