@@ -215,5 +215,5 @@ async function pick(page: Page, label: string, option: string) {
 }
 
 async function openMoreMenu(page: Page) {
-  await page.getByRole("banner").getByRole("button").last().click();
+  await page.getByRole("banner").getByRole("button", { name: "More actions" }).click();
 }
