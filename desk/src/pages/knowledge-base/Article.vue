@@ -83,6 +83,21 @@
                     {{ __("Pinned article") }}
                   </span>
                 </template>
+                <template v-if="article.data.weight">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
+                  />
+                  <button
+                    class="flex items-center gap-1.5 hover:text-ink-gray-7"
+                    @click="showWeightModal = true"
+                  >
+                    <Icon
+                      icon="lucide-arrow-up-narrow-wide"
+                      class="size-4 shrink-0"
+                    />
+                    {{ __("Weight {0}", [article.data.weight]) }}
+                  </button>
+                </template>
               </div>
             </div>
             <div class="flex gap-4 justify-between sm:items-start">

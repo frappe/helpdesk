@@ -74,13 +74,16 @@
           "flex-col",
           "mt-0",
           "max-w-[700px]",
+          "xl:max-w-[830px]",
           "min-w-0",
           "w-full",
           "mx-auto",
+          "xl:mx-0",
           "px-4",
           "sm:px-6",
           "xl:px-0",
-          "xl:col-start-2"
+          "xl:col-start-2",
+          "xl:col-span-3"
          ]
         },
         {
@@ -301,13 +304,16 @@
           "flex-col",
           "mt-0",
           "max-w-[700px]",
+          "xl:max-w-[830px]",
           "min-w-0",
           "w-full",
           "mx-auto",
+          "xl:mx-0",
           "px-4",
           "sm:px-6",
           "xl:px-0",
           "xl:col-start-2",
+          "xl:col-span-3",
           "portal-reveal"
          ],
          "componentId": "container-pdx9evglv",
