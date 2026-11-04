@@ -224,10 +224,24 @@
              "componentId": "PortalArticleList-category",
              "componentName": "PortalArticleList",
              "componentProps": {
-              "articles": "{{ articles.data || [] }}"
+              "articles": "{{ moreArticles.rows }}"
              },
              "isCustomVueComponent": true,
              "visibilityCondition": "{{ loaded && articles.data.length }}"
+            },
+            {
+             "classes": [
+              "w-full"
+             ],
+             "componentId": "PortalInfiniteScroll-category",
+             "componentName": "PortalInfiniteScroll",
+             "componentProps": {
+              "failed": "{{ moreArticles.failed }}",
+              "loading": "{{ moreArticles.loading }}",
+              "onLoadMore": "() => moreArticles.loadMore()"
+             },
+             "isCustomVueComponent": true,
+             "visibilityCondition": "{{ loaded && moreArticles.hasMore }}"
             },
             {
              "classes": [
@@ -410,7 +424,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-11-03 12:00:00.000000",
+ "modified": "2026-11-04 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
@@ -423,7 +437,7 @@
    "fetch_document_using_filters": 0,
    "limit": 0,
    "method": "GET",
-   "params": "{\"category\": \"{{ route.params.category }}\"}",
+   "params": "{\"category\": \"{{ route.params.category }}\", \"limit\": 20}",
    "resource_name": "articles",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_articles"

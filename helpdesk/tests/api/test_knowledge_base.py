@@ -94,6 +94,22 @@ class TestPublicReads(IntegrationTestCase):
             row["title"] for row in get_articles(category=self.category.name, **kwargs)
         ]
 
+    def test_pages_share_no_article_when_published_together(self) -> None:
+        titles = ["Fixture published", "Fixture second", "Fixture third"]
+        for title in titles[1:]:
+            self.make_article(title)
+        article = frappe.qb.DocType("HD Article")
+        frappe.qb.update(article).set(
+            article.published_on, "2026-01-01 00:00:00"
+        ).where(article.category == self.category.name).run()
+
+        pages = [self.titles(limit=1, start=start) for start in range(len(titles))]
+
+        self.assertCountEqual(sum(pages, []), titles)
+
+    def test_a_negative_start_reads_from_the_top(self) -> None:
+        self.assertEqual(self.titles(start=-1), ["Fixture published"])
+
     def test_every_endpoint_is_reachable_without_a_session(self) -> None:
         for endpoint in (
             get_articles,
