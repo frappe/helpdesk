@@ -73,14 +73,12 @@
           "flex",
           "flex-col",
           "mt-0",
-          "max-w-[700px]",
           "min-w-0",
           "w-full",
           "mx-auto",
           "px-4",
           "sm:px-6",
-          "xl:px-0",
-          "xl:col-start-2"
+          "lg:px-16"
          ]
         },
         {
@@ -300,14 +298,12 @@
           "flex",
           "flex-col",
           "mt-0",
-          "max-w-[700px]",
           "min-w-0",
           "w-full",
           "mx-auto",
           "px-4",
           "sm:px-6",
-          "xl:px-0",
-          "xl:col-start-2",
+          "lg:px-16",
           "portal-reveal"
          ],
          "componentId": "container-pdx9evglv",
@@ -318,8 +314,7 @@
         {
          "blockName": "load-failed",
          "classes": [
-          "self-stretch",
-          "xl:col-span-4"
+          "self-stretch"
          ],
          "componentId": "PortalEmptyState-category-load-failed",
          "componentName": "PortalEmptyState",
@@ -334,8 +329,7 @@
         {
          "blockName": "not-found",
          "classes": [
-          "self-stretch",
-          "xl:col-span-4"
+          "self-stretch"
          ],
          "componentId": "PortalEmptyState-category-not-found",
          "componentName": "PortalEmptyState",
@@ -353,8 +347,6 @@
         "border-outline-gray-1",
         "grid",
         "grid-cols-1",
-        "xl:grid-cols-[minmax(24px,1fr)_minmax(0,700px)_minmax(24px,1fr)_300px]",
-        "xl:pe-4",
         "flex-1",
         "h-full",
         "min-w-0",
