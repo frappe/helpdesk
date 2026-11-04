@@ -4,7 +4,7 @@ import { findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useRememberedCount } from '@app/composables/useRememberedCount'
-import { prefetchOnHover } from '@app/stores/knowledgeBase'
+import { homeCategoryColumns, prefetchOnHover } from '@app/stores/knowledgeBase'
 
 // home lists show this many; the server caps Featured at MAX_PINNED_ARTICLES (hd_article.py)
 const ARTICLE_LIMIT = 5
@@ -127,6 +127,7 @@ export default function setup(context) {
     bannerBackground,
     bannerTextColor,
     homeCategories,
+    homeCategoryColumns,
     skeletonCount,
     hasHiddenCategories,
     sort,

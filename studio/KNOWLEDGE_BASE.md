@@ -79,7 +79,7 @@ The desk links to the portal copy of an article with `CUSTOMER_PORTAL_ROOT + ROU
 |---|---|---|
 | `public_kb` | `/help` | `get_categories`, `get_articles` (popular or recent), `get_featured_articles` |
 | `categories` | `/help/categories` | `get_categories` |
-| `category` | `/help/category/:category` | `get_articles` for one category |
+| `category` | `/help/category/:category` | `get_articles` for one category, 20 at a time as the reader scrolls |
 | `article` | `/help/articles/:name-slug` | `get_article`, `increment_views`, `vote_on_article`, `get_article_markdown` |
 
 All four pages allow guests and use `useKnowledgeBaseHeader` and the `kb_settings` Studio Component. The sidebar, the article cache and hover prefetch are in `studio/helpdesk/stores/knowledgeBase.ts`. The article parts (body, contents, feedback, sidebar, "copy for LLM") are in `studio/helpdesk/components/knowledge_base/`.

@@ -16,7 +16,7 @@
           {{ category.category_name }}
         </span>
         <span
-          class="lucide-arrow-up-right size-4 shrink-0 text-ink-gray-4 transition group-hover:text-ink-gray-8"
+          class="lucide-chevron-right size-4 shrink-0 text-ink-gray-4 transition group-hover:text-ink-gray-8"
           aria-hidden="true"
         />
       </PortalLink>

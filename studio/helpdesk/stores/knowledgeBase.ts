@@ -7,6 +7,9 @@ const sidebar = createResource({
   method: 'GET',
 })
 
+// Two or four cards only fill their rows in two columns.
+export const homeCategoryColumns = (count: number) => (count === 2 || count === 4 ? 2 : 3)
+
 export function useKnowledgeBase() {
   if (!sidebar.data && !sidebar.loading) sidebar.fetch()
   return { sidebar }
