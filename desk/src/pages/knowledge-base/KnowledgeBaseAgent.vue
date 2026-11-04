@@ -86,6 +86,7 @@
 
 <script setup lang="ts">
 import Icon from "@helpdesk/shared/Icon.vue";
+import { MultipleAvatar } from "@/components";
 import { ArticleIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
@@ -915,6 +916,9 @@ const options = computed(() => {
               h("span", { class: "truncate" }, categoryAccess()[item]?.label),
             ]
           ),
+      },
+      author: {
+        custom: ({ item }) => item && h(MultipleAvatar, { avatars: [item] }),
       },
     },
     emptyState: {

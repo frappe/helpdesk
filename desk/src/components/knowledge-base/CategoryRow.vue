@@ -82,12 +82,6 @@
           <span class="truncate">{{ categoryAccess()[access]?.label }}</span>
         </span>
 
-        <span
-          v-else-if="column.key === 'author' && authors.size === 1"
-          class="block truncate text-base text-ink-gray-7"
-        >
-          {{ [...authors][0] }}
-        </span>
         <MultipleAvatar
           v-else-if="column.key === 'author'"
           :avatars="[...authors]"
