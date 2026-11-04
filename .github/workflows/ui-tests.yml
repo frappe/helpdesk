@@ -4,7 +4,8 @@ on:
   pull_request:
     branches:
       - develop
-      - main-hotfix
+      - version-15-hotfix
+      - version-16-hotfix
     paths:
       - "desk/**"
       - "e2e/**"
@@ -19,7 +20,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FRAPPE_BRANCH: version-16
   SITE: helpdesk.test
 
 jobs:
@@ -53,10 +53,13 @@ jobs:
       - name: Clone
         uses: actions/checkout@v4
 
+      - name: Pick Frappe branch
+        run: bash .github/helpers/frappe_branch.sh "${{ github.base_ref || github.ref_name }}"
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
