@@ -4,13 +4,8 @@
 from datetime import timedelta
 
 import frappe
-<<<<<<< HEAD
 from frappe.tests.utils import FrappeTestCase
-from frappe.utils import add_to_date, get_datetime
-=======
-from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate
->>>>>>> c90a644 (feat(sla): stop the SLA clock during the workday break)
 
 from helpdesk.consts import DEFAULT_SLA
 from helpdesk.test_utils import (
