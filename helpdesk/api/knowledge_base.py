@@ -381,11 +381,12 @@ def get_articles(
     limit: int | None = None,
     sort: str = "latest",
     include_subcategories: bool = False,
+    start: int = 0,
 ) -> list[dict]:
     """List published articles the caller can read: name, title and excerpt.
     Optionally of one category, and its Subcategories with `include_subcategories`,
-    heaviest first, at most 100. `sort` "popular" orders by views, else newest first.
-    Guests only when the knowledge base is public."""
+    heaviest first, at most 100 from `start`. `sort` "popular" orders by views, else
+    newest first. Guests only when the knowledge base is public."""
     validate_public_access()
     filters = make_article_filters()
     order_by = "views desc" if sort == "popular" else "published_on desc"
@@ -400,7 +401,9 @@ def get_articles(
         "HD Article",
         filters=filters,
         fields=["name", "title", "excerpt"],
-        order_by=order_by,
+        # `name` keeps ties in one order, so pages never overlap
+        order_by=f"{order_by}, name",
+        limit_start=max(cint(start), 0),
         limit_page_length=min(cint(limit) or LIST_LIMIT, LIST_LIMIT),
     )
 

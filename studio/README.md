@@ -89,6 +89,7 @@ The stores are module-level singletons, not Pinia.
 - `useArticleSearch`: debounced article search, used by the search box and the new ticket form.
 - `useDrawer`: the ticket page's mobile side drawer. `useBottomSheet`: open state for the knowledge base sidebar, a frappe-ui `BottomSheet` on phones.
 - `useTicketThread`, `useReplyComposer`, `useTicketDetails`, `useTicketFeedback`, `useOutsideHoursBanner`, `useChatRows`: the parts of the `ticket` page.
+- `useMoreArticles`: the pages after a category's first, loaded as `PortalInfiniteScroll` nears the end of the list.
 - `useRememberedCount`: remembers a list's length so its skeleton keeps the same size.
 
 ### Shared code: `@helpdesk/shared`

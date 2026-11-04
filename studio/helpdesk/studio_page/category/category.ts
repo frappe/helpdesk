@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useBottomSheet } from '@app/composables/useDrawer'
+import { useMoreArticles } from '@app/composables/useMoreArticles'
 import { dayjsLocal } from '@helpdesk/shared/timezone'
 import { countLabel, DATE_FORMATS } from '@helpdesk/shared/utils'
 import { prefetchOnHover, useKnowledgeBase } from '@app/stores/knowledgeBase'
@@ -17,7 +18,7 @@ export default function setup(context) {
   const categoryDescription = computed(
     () => category.value?.description || __('Find answers to common {0} questions.', [categoryName.value]),
   )
-  // `articles` is capped server side; the count includes Subcategories.
+  // `articles` is one page; the count includes Subcategories.
   const countText = (count) => countLabel(count, __('1 article'), __('{0} articles'))
   const articleCount = computed(() => countText(category.value?.article_count))
 
@@ -52,6 +53,7 @@ export default function setup(context) {
     drawer: useBottomSheet(route),
     sidebar,
     prefetchOnHover,
+    moreArticles: useMoreArticles(context.articles, () => route.params.category),
     category,
     notFound,
     categoryName,
