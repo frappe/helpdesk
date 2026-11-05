@@ -141,10 +141,14 @@ import {
   MIN_QUERY_LENGTH,
   useArticleSearch,
 } from "@app/composables/useArticleSearch";
+import { visibleDocs } from "@app/composables/docsResults";
 import { useRecent } from "@app/stores/recent";
+import { useSession } from "@app/stores/session";
 import { articleMeta, countLabel } from "@helpdesk/shared/utils";
 
 const MAX_RESULTS = 6;
+const MAX_DOCS = 4;
+const MAX_ROWS = 8;
 const KEY_HINTS = [
   { keys: "↑ ↓", label: __("Navigate") },
   { keys: "↵", label: __("Open") },
@@ -170,7 +174,15 @@ useKeyboardShortcut({
   handler: () => combobox.value?.focus(),
 });
 
+const hasDocsSource = computed(() =>
+  Boolean(useSession().config.value?.docs_source_url)
+);
 const results = useArticleSearch(query, { limit: MAX_RESULTS });
+const docs = useArticleSearch(query, {
+  limit: MAX_DOCS,
+  url: "helpdesk.api.docs_source.search_docs",
+  enabled: () => hasDocsSource.value,
+});
 
 const searchText = computed(() => query.value.trim());
 const canSearch = computed(() => searchText.value.length >= MIN_QUERY_LENGTH);
@@ -212,12 +224,44 @@ const historyOptions = computed(() =>
 
 // False until this query's answer lands.
 const isCurrent = computed(() => results.settledQuery === searchText.value);
-const hasResults = computed(() => Boolean(results.data?.length));
+const isDocsCurrent = computed(() => docs.settledQuery === searchText.value);
+// "No results" waits for docs, so it never flashes before they answer.
+const isDocsSettled = computed(() => !hasDocsSource.value || isDocsCurrent.value);
+
+// Article rows never change when docs arrive; Docs rows go after them.
+const rows = computed(() =>
+  [...articleRows.value, ...docRows.value].slice(0, MAX_ROWS)
+);
+const articleRows = computed(() =>
+  (results.data || []).map((article) => ({
+    type: "custom",
+    key: article.name,
+    label: article.title,
+    article,
+    // Stale rows stay visible, but Enter must not open one.
+    disabled: !isCurrent.value,
+    onClick: () => router.push(ROUTES.article(article)),
+  }))
+);
+const docRows = computed(() =>
+  visibleDocs(results.data || [], docs.data || [], searchText.value)
+    .slice(0, MAX_DOCS)
+    .map((doc) => ({
+      type: "custom",
+      key: `doc:${doc.route}`,
+      label: doc.title,
+      article: doc,
+      disabled: !isDocsCurrent.value,
+      onClick: () => router.push(ROUTES.docsPage(doc.route)),
+    }))
+);
+
+const hasResults = computed(() => rows.value.length > 0);
 const isSearching = computed(
   () => canSearch.value && !isCurrent.value && !hasResults.value
 );
 const isEmpty = computed(
-  () => canSearch.value && isCurrent.value && !hasResults.value
+  () => canSearch.value && isCurrent.value && isDocsSettled.value && !hasResults.value
 );
 
 const resultOptions = computed(() =>
@@ -225,20 +269,8 @@ const resultOptions = computed(() =>
     ? [
         {
           key: "results",
-          group: countLabel(
-            results.data.length,
-            __("1 article"),
-            __("{0} articles")
-          ),
-          options: results.data.map((article) => ({
-            type: "custom",
-            key: article.name,
-            label: article.title,
-            article,
-            // Stale rows stay visible, but Enter must not open one.
-            disabled: !isCurrent.value,
-            onClick: () => router.push(ROUTES.article(article)),
-          })),
+          group: countLabel(rows.value.length, __("1 result"), __("{0} results")),
+          options: rows.value,
         },
       ]
     : []

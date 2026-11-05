@@ -414,3 +414,124 @@ test.describe("docs pages", () => {
     await expect(heading(page, "Doc helpdesk/sla")).toBeInViewport();
   });
 });
+
+const ARTICLE_SEARCH = "**/api/method/helpdesk.api.knowledge_base.search_articles*";
+const DOCS_SEARCH = "**/api/method/helpdesk.api.docs_source.search_docs*";
+
+const articleHit = (title: string, fields: Record<string, unknown> = {}) => ({
+  name: `art-${title.replace(/\W+/g, "-")}`,
+  title,
+  title_slug: "slug",
+  excerpt: "Article excerpt",
+  category_label: "Guides",
+  is_converted: false,
+  ...fields,
+});
+const docHit = (route: string, title: string) => ({
+  route,
+  title,
+  excerpt: "Docs excerpt",
+  category_label: "Helpdesk docs",
+});
+
+async function stubSearch(page: Page, articles: unknown[], docs: unknown[], docsDelay = 0) {
+  const docsCalls: string[] = [];
+  await page.route(ARTICLE_SEARCH, (route) => route.fulfill(json(articles)));
+  await page.route(DOCS_SEARCH, async (route) => {
+    docsCalls.push(route.request().url());
+    if (docsDelay) await new Promise((resolve) => setTimeout(resolve, docsDelay));
+    await route.fulfill(json(docs));
+  });
+  return docsCalls;
+}
+
+async function searchFor(page: Page, text: string) {
+  await page.goto("/help/");
+  const box = page.getByPlaceholder("Search articles").first();
+  await box.fill(text);
+  return box;
+}
+
+const rowsOf = (page: Page) => page.getByRole("option");
+
+test.describe("search list", () => {
+  docsTest("Docs pages sit under Articles in one list with no tag", async ({ page, connected }) => {
+    await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta guide")]);
+    await searchFor(page, "guide");
+    await expect(rowsOf(page)).toHaveCount(2);
+    await expect(rowsOf(page).nth(0)).toContainText("Alpha guide");
+    await expect(rowsOf(page).nth(1)).toContainText("Beta guide");
+    await expect(page.getByText("1 result").or(page.getByText("2 results"))).toHaveCount(1);
+    await expect(page.getByText(/^Docs$/)).toHaveCount(0);
+  });
+
+  docsTest("Matching Article drops its Docs page", async ({ page, connected }) => {
+    await stubSearch(
+      page,
+      [articleHit("Reports & dashboards")],
+      [docHit("helpdesk/reports", "Reports &amp; dashboards"), docHit("helpdesk/other", "Other reports")]
+    );
+    await searchFor(page, "reports");
+    await expect(rowsOf(page)).toHaveCount(2);
+    await expect(rowsOf(page).filter({ hasText: "Docs excerpt" })).toHaveCount(1);
+    await expect(rowsOf(page).nth(1)).toContainText("Other reports");
+  });
+
+  docsTest("Converted Article does not drop other same-title pages", async ({ page, connected }) => {
+    await stubSearch(
+      page,
+      [articleHit("Introduction", { is_converted: true })],
+      [docHit("helpdesk/introduction", "Introduction"), docHit("crm/introduction", "Introduction")]
+    );
+    await searchFor(page, "introduction");
+    await expect(rowsOf(page)).toHaveCount(3);
+  });
+
+  docsTest("rows above do not move when docs arrive", async ({ page, connected }) => {
+    await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta guide")], 800);
+    await searchFor(page, "guide");
+    const first = rowsOf(page).first();
+    await expect(first).toContainText("Alpha guide");
+    const before = await first.boundingBox();
+    await expect(page.getByText("No articles match")).toHaveCount(0);
+    await expect(rowsOf(page)).toHaveCount(2);
+    expect(await first.boundingBox()).toEqual(before);
+    await expect(first).toContainText("Alpha guide");
+  });
+
+  docsTest("source down shows Articles and no message", async ({ page, connected }) => {
+    await stubSearch(page, [articleHit("Alpha guide")], []);
+    await searchFor(page, "guide");
+    await expect(rowsOf(page)).toHaveCount(1);
+    await expect(page.getByText(/unavailable|error|failed/i)).toHaveCount(0);
+  });
+
+  docsTest("no result flash while docs are pending", async ({ page, connected }) => {
+    await stubSearch(page, [], [docHit("helpdesk/beta", "Beta guide")], 800);
+    await searchFor(page, "guide");
+    await page.waitForTimeout(400);
+    await expect(page.getByText("No articles match")).toHaveCount(0);
+    await expect(rowsOf(page)).toHaveCount(1);
+  });
+
+  test("no source sends no docs request", async ({ page }) => {
+    const docsCalls = await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta guide")]);
+    await searchFor(page, "guide");
+    await expect(rowsOf(page)).toHaveCount(1);
+    await page.waitForTimeout(500);
+    expect(docsCalls).toEqual([]);
+  });
+
+  docsTest("a Docs row opens /help/articles/<route>", async ({ page, connected }) => {
+    await stubDocs(page, { "helpdesk/beta": docPage("helpdesk/beta") });
+    await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta <mark>guide</mark>")]);
+    const box = await searchFor(page, "guide");
+    await expect(rowsOf(page)).toHaveCount(2);
+    await expect(rowsOf(page).nth(1).locator("mark")).toHaveText("guide");
+    await box.press("ArrowDown");
+    await box.press("ArrowDown");
+    await box.press("Enter");
+    await expect(page).toHaveURL(/\/help\/articles\/helpdesk\/beta$/);
+    await expect(heading(page, "Doc helpdesk/beta")).toBeVisible();
+  });
+});

@@ -1462,6 +1462,16 @@ class TestSearch(IntegrationTestCase):
         self.assertNotIn("<b>", row["excerpt"])
         self.assertEqual(row["category_name"], "Fixture Search")
 
+    def test_search_hit_flags_converted_article(self) -> None:
+        converted = make_article(
+            "Fixture zebra copy", docs_page_route="a/copy", visibility="Public"
+        )
+        self.found(self.public, converted)
+
+        flags = {row["name"]: row["is_converted"] for row in search_articles("zebra")}
+
+        self.assertEqual(flags, {self.public: False, converted: True})
+
     def test_an_article_found_in_two_sections_is_listed_once(self) -> None:
         self.hd_search.return_value = make_search_page(
             make_search_hit(self.public, "intro"),

@@ -694,7 +694,7 @@ def _get_categories(with_creators: bool = False) -> list[dict]:
 def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
     """Search published articles the caller can read; returns at most 5 hits.
     Each hit: name, title and excerpt with matches in <mark> tags, title_slug, first
-    image, minutes to read, category_name. Empty without RediSearch. Guests only when
+    image, minutes to read, category_name, is_converted. Empty without RediSearch. Guests only when
     the knowledge base is public."""
     validate_public_access()
     query = query.strip()[:SEARCH_QUERY_LENGTH]
@@ -714,6 +714,7 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
                 "name",
                 "content",
                 "category",
+                "docs_page_route",
                 "category.category_name as category_name",
             ],
         )
@@ -738,6 +739,7 @@ def _get_search_hit(row: dict, article: frappe._dict, labels: dict) -> dict:
         "minutes": _get_reading_minutes(BeautifulSoup(content, "html.parser")),
         "category_name": article.category_name,
         "category_label": labels.get(article.category),
+        "is_converted": bool(article.docs_page_route),
     }
 
 
