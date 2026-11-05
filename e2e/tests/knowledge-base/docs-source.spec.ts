@@ -1,11 +1,16 @@
 import type { Page } from "@playwright/test";
 import { expect, test, usePersona } from "../../helpers/fixtures";
+import { createArticle, createCategory } from "../../helpers/portal";
+import { snapshotSettings } from "../../helpers/settings";
 
 usePersona("manager");
 
 const GET = "**/api/method/helpdesk.api.docs_source.get_docs_source*";
 const CONNECT = "**/api/method/helpdesk.api.docs_source.connect_docs_source*";
 const HIDE = "**/api/method/helpdesk.api.docs_source.set_hidden_sections*";
+const DOC_PAGE = "**/api/method/helpdesk.api.docs_source.get_doc_page*";
+const SOURCE = "https://docs.example.com";
+const PHONE = { width: 390, height: 844 };
 
 const BASE = {
   url: "https://docs.example.com",
@@ -132,5 +137,280 @@ test.describe("plain agent", () => {
     await expect(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Docs source" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Connect" })).toHaveCount(0);
+  });
+});
+
+const docsTest = test.extend<{ connected: void }>({
+  connected: async ({ api }, use) => {
+    const restore = await snapshotSettings(api, ["docs_source_url"]);
+    await api.update("HD Settings", "HD Settings", { docs_source_url: SOURCE });
+    await use();
+    await restore();
+  },
+});
+
+function docPage(route: string, fields: Record<string, unknown> = {}) {
+  return {
+    route,
+    title: `Doc ${route}`,
+    content: "<h2>First part</h2><p>Body of the page</p><h2>Second part</h2><p>More of it</p>",
+    label: "Helpdesk docs",
+    last_updated: "5 months ago",
+    source_url: `${SOURCE}/${route}`,
+    site_url: `${SOURCE}/helpdesk`,
+    related: { docs: [], articles: [] },
+    ...fields,
+  };
+}
+
+// Answers known routes, 404s the rest; returns the routes the portal asked for.
+async function stubDocs(page: Page, pages: Record<string, unknown>) {
+  const asked: string[] = [];
+  await page.route(DOC_PAGE, (route) => {
+    const path = new URL(route.request().url()).searchParams.get("route")!;
+    asked.push(path);
+    if (path in pages) return route.fulfill(json(pages[path]));
+    return route.fulfill({ status: 404, json: { exc_type: "DoesNotExistError" } });
+  });
+  return asked;
+}
+
+const heading = (page: Page, name: string) => page.getByRole("heading", { name, level: 1 });
+const robots = (page: Page) => page.locator('head meta[name="robots"]');
+const canonical = (page: Page) => page.locator('head link[rel="canonical"]');
+
+async function seedArticle(api) {
+  const category = await createCategory(api);
+  return createArticle(api, category.name);
+}
+
+test.describe("docs pages", () => {
+  docsTest("multi-segment path shows the Docs page", async ({ page, connected }) => {
+    await stubDocs(page, { "helpdesk/setup": docPage("helpdesk/setup") });
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(heading(page, "Doc helpdesk/setup")).toBeVisible();
+    await expect(page.getByText("Helpdesk docs")).toBeVisible();
+    await expect(page.getByText("Updated 5 months ago")).toBeVisible();
+    await expect(page.getByRole("link", { name: "View on docs.example.com" })).toHaveAttribute(
+      "href",
+      `${SOURCE}/helpdesk/setup`
+    );
+    await expect(page.getByText("Body of the page")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Second part" })).toBeVisible();
+    await expect(page).toHaveTitle(/^Doc helpdesk\/setup \| .+/);
+  });
+
+  docsTest("single-segment path falls back to the Docs page", async ({ page, connected }) => {
+    await stubDocs(page, { introduction: docPage("introduction") });
+    await page.goto("/help/articles/introduction");
+    await expect(heading(page, "Doc introduction")).toBeVisible();
+    await expect(page.getByText("Article not found")).toHaveCount(0);
+  });
+
+  docsTest("a missing Article never flashes the empty state", async ({ page, connected }) => {
+    await stubDocs(page, { introduction: docPage("introduction") });
+    let release = () => {};
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route("**/api/method/helpdesk.api.config.get_config*", async (route) => {
+      await held;
+      await route.continue();
+    });
+    const missing = page.waitForResponse(/knowledge_base\.get_article/);
+    await page.goto("/help/articles/introduction");
+    await missing;
+    await page.waitForTimeout(300);
+    await expect(page.getByText("Article not found")).toHaveCount(0);
+    release();
+    await expect(heading(page, "Doc introduction")).toBeVisible();
+  });
+
+  docsTest("an Article wins over a Docs page", async ({ page, api, connected }) => {
+    const article = await seedArticle(api);
+    const asked = await stubDocs(page, { [article.name]: docPage(article.name) });
+    for (const path of [article.name, `${article.name}/`]) {
+      await page.goto(`/help/articles/${path}`);
+      await expect(heading(page, article.title)).toBeVisible();
+    }
+    expect(asked).toEqual([]);
+  });
+
+  docsTest("settings path stays a Docs page", async ({ page, connected }) => {
+    const routes = ["helpdesk/settings", "crm/settings/sales-hierarchy"];
+    await stubDocs(page, Object.fromEntries(routes.map((route) => [route, docPage(route)])));
+    for (const route of routes) {
+      await page.goto(`/help/articles/${route}`);
+      await expect(heading(page, `Doc ${route}`)).toBeVisible();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(page).toHaveURL(new RegExp(`/help/articles/${route}$`));
+    }
+  });
+
+  docsTest("Article settings dialog still opens", async ({ page, api, connected }) => {
+    const article = await seedArticle(api);
+    const asked = await stubDocs(page, {});
+    await page.goto(`/help/articles/${article.name}/settings/profile`);
+    await expect(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page).toHaveURL(new RegExp(`/help/articles/${article.name}-[^/]+$`));
+    await expect(heading(page, article.title)).toBeVisible();
+    expect(asked).toEqual([]);
+  });
+
+  test("Article settings dialog opens with no source", async ({ page, api }) => {
+    const article = await seedArticle(api);
+    await page.goto(`/help/articles/${article.name}/settings/profile`);
+    await expect(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(new RegExp(`/help/articles/${article.name}-[^/]+$`));
+  });
+
+  docsTest("the account menu opens settings over the same Docs page", async ({ page, connected }) => {
+    const asked = await stubDocs(page, { "helpdesk/setup": docPage("helpdesk/setup") });
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(heading(page, "Doc helpdesk/setup")).toBeVisible();
+    await page.getByRole("button", { name: "Helpdesk", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Settings" }).click();
+    await expect(page).toHaveURL(/\/helpdesk\/setup\/settings\/profile$/);
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\/articles\/helpdesk\/setup$/);
+    await expect(heading(page, "Doc helpdesk/setup")).toBeVisible();
+    expect(asked.every((route) => route === "helpdesk/setup")).toBe(true);
+  });
+
+  test("no source shows the Article empty state", async ({ page }) => {
+    const asked = await stubDocs(page, {});
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(page.getByText("Article not found")).toBeVisible();
+    await page.goto("/help/articles/");
+    await expect(page.getByText("The page you are looking for does not exist.")).toBeVisible();
+    expect(asked).toEqual([]);
+  });
+
+  docsTest("a failed read shows Page not found and a source link", async ({ page, connected }) => {
+    await stubDocs(page, {});
+    await page.goto("/help/articles/helpdesk/gone");
+    await expect(page.getByText("Page not found")).toBeVisible();
+    await expect(page.getByText("Article not found")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "View on docs.example.com" })).toHaveAttribute(
+      "href",
+      `${SOURCE}/helpdesk/gone`
+    );
+  });
+
+  docsTest("sidebar shows Help center, Related, All docs", async ({ page, connected }) => {
+    const related = {
+      docs: [{ route: "helpdesk/sla", title: "<b>SLA</b> rules" }],
+      articles: [{ name: "abc", title: "<i>Reset</i> a password", title_slug: "reset" }],
+    };
+    await stubDocs(page, {
+      "helpdesk/setup": docPage("helpdesk/setup", { related }),
+      "helpdesk/sla": docPage("helpdesk/sla", { title: "<b>Plain</b> title" }),
+    });
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(page.getByRole("link", { name: "Help center" })).toHaveAttribute("href", "/help/");
+    const links = page.getByRole("navigation", { name: "Related" }).getByRole("link");
+    await expect(links).toHaveText(["<b>SLA</b> rules", "<i>Reset</i> a password"]);
+    await expect(links.nth(0)).toHaveAttribute("href", "/help/articles/helpdesk/sla");
+    await expect(links.nth(1)).toHaveAttribute("href", "/help/articles/abc-reset");
+    await expect(page.getByRole("link", { name: "All docs" })).toHaveAttribute("href", `${SOURCE}/helpdesk`);
+    await links.nth(0).click();
+    await expect(heading(page, "<b>Plain</b> title")).toBeVisible();
+  });
+
+  docsTest("page has noindex and canonical, removed on leaving", async ({ page, connected }) => {
+    const related = { docs: [{ route: "helpdesk/sla", title: "SLA" }], articles: [] };
+    await stubDocs(page, {
+      "helpdesk/setup": docPage("helpdesk/setup", { related }),
+      "helpdesk/sla": docPage("helpdesk/sla"),
+    });
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(canonical(page)).toHaveAttribute("href", `${SOURCE}/helpdesk/setup`);
+    await expect(robots(page)).toHaveAttribute("content", "noindex");
+    await page.getByRole("link", { name: "SLA" }).click();
+    await expect(canonical(page)).toHaveAttribute("href", `${SOURCE}/helpdesk/sla`);
+    await expect(robots(page)).toHaveCount(1);
+    await page.getByRole("link", { name: "Help center" }).click();
+    await expect(page).toHaveURL(/\/help\/?$/);
+    await expect(canonical(page)).toHaveCount(0);
+    await expect(robots(page)).toHaveCount(0);
+  });
+
+  docsTest.describe("phone", () => {
+    docsTest.use({ viewport: PHONE });
+
+    docsTest("phone shows a back link", async ({ page, connected }) => {
+      await stubDocs(page, { "helpdesk/setup": docPage("helpdesk/setup") });
+      await page.goto("/help/articles/helpdesk/setup");
+      await expect(heading(page, "Doc helpdesk/setup")).toBeVisible();
+      await expect(page.getByRole("button", { name: /^Articles/ })).toHaveCount(0);
+      await page.getByRole("link", { name: "Help center" }).click();
+      await expect(page).toHaveURL(/\/help\/?$/);
+    });
+  });
+
+  docsTest("moving from a Docs page to an Article shows the Article", async ({ page, api, connected }) => {
+    const article = await seedArticle(api);
+    const related = { docs: [], articles: [{ name: article.name, title: article.title, title_slug: "" }] };
+    await stubDocs(page, { introduction: docPage("introduction", { related }) });
+    await page.goto("/help/articles/introduction");
+    await page.getByRole("link", { name: article.title }).click();
+    await expect(heading(page, article.title)).toBeVisible();
+    await expect(page).toHaveTitle(new RegExp(`^${article.title} \\| `));
+    await expect(robots(page)).toHaveCount(0);
+    await page.goBack();
+    await expect(heading(page, "Doc introduction")).toBeVisible();
+    await expect(page).toHaveTitle(/^Doc introduction \| /);
+  });
+
+  docsTest("a get_doc_page answer with article redirects to that Article", async ({ page, api, connected }) => {
+    const article = await seedArticle(api);
+    await stubDocs(page, { "helpdesk/setup": { article: { name: article.name, title_slug: "moved" } } });
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(heading(page, article.title)).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/help/articles/${article.name}-`));
+  });
+
+  docsTest("leaving during a read skips its redirect", async ({ page, connected }) => {
+    let release = () => {};
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route(DOC_PAGE, async (route) => {
+      await held;
+      await route.fulfill(json({ article: { name: "abc", title_slug: "moved" } }));
+    });
+    await page.goto("/help/articles/helpdesk/setup");
+    await page.getByRole("link", { name: "Help center" }).click();
+    await expect(page).toHaveURL(/\/help\/?$/);
+    const answered = page.waitForResponse(DOC_PAGE);
+    release();
+    await answered;
+    await page.waitForTimeout(300);
+    await expect(page).toHaveURL(/\/help\/?$/);
+  });
+
+  docsTest("fetched fixed styles stay inside the Docs page", async ({ page, connected }) => {
+    await stubDocs(page, { "helpdesk/setup": docPage("helpdesk/setup") });
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(heading(page, "Doc helpdesk/setup")).toBeVisible();
+    const top = await page.evaluate(() => {
+      const fixed = Object.assign(document.createElement("div"), { style: "position:fixed;inset:0" });
+      document.querySelector(".ProseMirror")!.append(fixed);
+      return fixed.getBoundingClientRect().top;
+    });
+    expect(top).toBeGreaterThan(0);
+  });
+
+  docsTest("a hash scrolls to its heading and a new page starts at the top", async ({ page, connected }) => {
+    const long = `<h2>First part</h2>${"<p>Filler</p>".repeat(120)}<h2>Second part</h2><p>More of it</p>`;
+    const related = { docs: [{ route: "helpdesk/sla", title: "SLA" }], articles: [] };
+    await stubDocs(page, {
+      "helpdesk/setup": docPage("helpdesk/setup", { content: long, related }),
+      "helpdesk/sla": docPage("helpdesk/sla", { content: long }),
+    });
+    await page.goto("/help/articles/helpdesk/setup#second-part");
+    const target = page.locator(".ProseMirror #second-part");
+    await expect(target).toBeInViewport();
+    await page.getByRole("link", { name: "SLA" }).click();
+    await expect(heading(page, "Doc helpdesk/sla")).toBeInViewport();
   });
 });

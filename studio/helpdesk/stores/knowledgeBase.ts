@@ -1,5 +1,6 @@
 import { reactive, ref, toValue, watch, type MaybeRefOrGetter } from 'vue'
 import { createResource, frappeRequest } from 'frappe-ui'
+import { findArticleHeading } from '@helpdesk/shared/utils'
 
 // Module-level, not `cache`: what a reader sees depends on who they are.
 const sidebar = createResource({
@@ -67,7 +68,8 @@ export function useArticle(name: MaybeRefOrGetter<string>) {
   watch(
     () => toValue(name),
     async (current) => {
-      if (!current) return
+      article.error = null
+      if (!current) return Object.assign(article, { data: null, loading: false })
       article.loading = true
       try {
         const data = await prefetchArticle(current)
@@ -81,4 +83,29 @@ export function useArticle(name: MaybeRefOrGetter<string>) {
     { immediate: true },
   )
   return article
+}
+
+export function scrollToHash(tries = 40) {
+  const heading = findHeading(decodeHash())
+  if (heading) heading.scrollIntoView()
+  else if (tries) setTimeout(() => scrollToHash(tries - 1), 50)
+}
+
+// A hand-typed `#100%` is not valid percent-encoding.
+function decodeHash() {
+  try {
+    return decodeURIComponent(location.hash.slice(1))
+  } catch {
+    return location.hash.slice(1)
+  }
+}
+
+// Old desk KB ids kept edge dashes: "What's new?" was `what-s-new-`.
+function findHeading(id: string) {
+  return (
+    findArticleHeading(id) ||
+    [...document.querySelectorAll('h2, h3, h4, h5, h6')].find(
+      (heading) => heading.textContent.trim().replace(/[^a-z0-9]+/gi, '-').toLowerCase() === id,
+    )
+  )
 }

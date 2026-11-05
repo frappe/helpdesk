@@ -7,6 +7,7 @@ export const ROUTES = {
   // Lists link the bare name; the article page adds the slug.
   article: ({ name, title_slug }: { name: string; title_slug?: string }) =>
     `/articles/${[name, title_slug].filter(Boolean).join('-')}`,
+  docsPage: (route: string) => `/articles/${route}`,
   category: (name: string) => `/category/${name}`,
   ticketList: '/my-tickets',
   newTicket: (origin?: TicketOrigin) => ({ path: '/my-tickets/new', query: originQuery(origin) }),

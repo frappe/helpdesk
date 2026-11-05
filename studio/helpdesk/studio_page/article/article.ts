@@ -1,4 +1,4 @@
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { call } from 'frappe-ui'
 import { dayjsLocal } from '@helpdesk/shared/timezone'
 import { __ } from '@helpdesk/shared/translation'
@@ -8,19 +8,38 @@ import {
   copyPageLink,
   countLabel,
   DATE_FORMATS,
-  findArticleHeading,
 } from '@helpdesk/shared/utils'
 import { useRecent } from '@app/stores/recent'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { saveArticleFeedback } from '@app/components/knowledge_base/articleFeedback'
 import { useBottomSheet } from '@app/composables/useDrawer'
-import { articleName, prefetchOnHover, useArticle, useKnowledgeBase } from '@app/stores/knowledgeBase'
+import {
+  articleName,
+  prefetchOnHover,
+  scrollToHash,
+  useArticle,
+  useKnowledgeBase,
+} from '@app/stores/knowledgeBase'
+import { useSession } from '@app/stores/session'
+import { decodePath, pagePath } from '@app/stores/settings/core'
 
 const RELATED_LIMIT = 5
 
 export default function setup(context) {
   const { route, router } = context
-  const article = useArticle(() => articleName(route?.params?.name))
+  const session = useSession()
+  const hasDocsSource = computed(() => Boolean(session.config.value?.docs_source_url))
+  const isMultiSegment = computed(() => String(route?.params?.name).includes('/'))
+  const article = useArticle(() =>
+    hasDocsSource.value && isMultiSegment.value ? '' : articleName(route?.params?.name),
+  )
+  const isDocsPage = computed(() => hasDocsSource.value && (isMultiSegment.value || Boolean(article.error)))
+  // The alias cuts `name` short at `/settings`, so use the path.
+  const docsRoute = computed(() => decodePath(pagePath(route)).replace(/^\/articles\//, ''))
+  // Only the config tells a missing Article from a Docs page.
+  const isConfigSettled = ref(false)
+  session.loadSession().then(() => (isConfigSettled.value = true))
+  const isArticleMissing = computed(() => Boolean(article.error) && isConfigSettled.value && !hasDocsSource.value)
   const { sidebar } = useKnowledgeBase()
   const settings = useKnowledgeBaseHeader(context)
 
@@ -55,31 +74,6 @@ export default function setup(context) {
   function isCurrentArticle(routeName) {
     const name = article.data?.name
     return Boolean(name) && (routeName === name || routeName?.startsWith(`${name}-`))
-  }
-
-  function scrollToHash(tries = 40) {
-    const heading = findHeading(decodeHash())
-    if (heading) heading.scrollIntoView()
-    else if (tries) setTimeout(() => scrollToHash(tries - 1), 50)
-  }
-
-  // A hand-typed `#100%` is not valid percent-encoding.
-  function decodeHash() {
-    try {
-      return decodeURIComponent(location.hash.slice(1))
-    } catch {
-      return location.hash.slice(1)
-    }
-  }
-
-  // Old desk KB ids kept edge dashes: "What's new?" was `what-s-new-`.
-  function findHeading(id) {
-    return (
-      findArticleHeading(id) ||
-      [...document.querySelectorAll('h2, h3, h4, h5, h6')].find(
-        (heading) => heading.textContent.trim().replace(/[^a-z0-9]+/gi, '-').toLowerCase() === id,
-      )
-    )
   }
 
   // The reader's own feedback: 1 like, 2 dislike, 0 none.
@@ -138,5 +132,8 @@ export default function setup(context) {
     copyPageLink,
     isPublicArticle,
     isCurrentArticle,
+    isDocsPage,
+    docsRoute,
+    isArticleMissing,
   }
 }

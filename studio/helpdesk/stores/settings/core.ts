@@ -145,41 +145,43 @@ export function createSettingsDialog(core, organization, session) {
     return settingsPath(page, screens)
   }
 
-  // The `<page>/settings/:settings*` alias from router.ts; null off it.
-  function readScreens(route) {
-    const screens = route.params?.settings
-    if (screens === undefined) return null
-    return Array.isArray(screens) ? screens : [screens].filter(Boolean)
-  }
-
-  function pagePath(route) {
-    const screens = readScreens(route)
-    if (!screens) return route.path
-    return route.path.replace(/\/$/, '').split('/').slice(0, -(screens.length + 1)).join('/') || '/'
-  }
-
-  // Paths come from the router, the address bar and here, each escaped its own way.
-  function decode(path) {
-    try {
-      return decodeURIComponent(String(path || ''))
-    } catch {
-      return String(path || '')
-    }
-  }
-
   function pushPath() {
     const current = currentRoute()
     if (!current.path) return
     const path = targetPath(current)
-    if (decode(current.path) === decode(path)) return
+    if (decodePath(current.path) === decodePath(path)) return
     // Unwind history, or back points into the closed screen.
     const previous = previousLocation()
-    if (previous !== null && decode(previous.split(/[?#]/)[0]) === decode(path)) return navigateBack()
+    if (previous !== null && decodePath(previous.split(/[?#]/)[0]) === decodePath(path)) return navigateBack()
     navigateTo({ path, query: current.query, hash: current.hash })
   }
 
   return {
     openSettings,
     watchRoute,
+  }
+}
+
+// The `<page>/settings/:settings*` alias from router.ts; null off it.
+function readScreens(route) {
+  const params = route.params?.settings
+  if (params === undefined) return null
+  const screens = Array.isArray(params) ? params : [params].filter(Boolean)
+  // ponytail: a Docs page at `x/settings/profile` still opens the dialog, tab paths win.
+  return route.path.startsWith('/articles/') && !TABS.includes(screens[0]) ? null : screens
+}
+
+export function pagePath(route) {
+  const screens = readScreens(route)
+  if (!screens) return route.path
+  return route.path.replace(/\/$/, '').split('/').slice(0, -(screens.length + 1)).join('/') || '/'
+}
+
+// Paths come from the router, the address bar and here, each escaped its own way.
+export function decodePath(path) {
+  try {
+    return decodeURIComponent(String(path || ''))
+  } catch {
+    return String(path || '')
   }
 }
