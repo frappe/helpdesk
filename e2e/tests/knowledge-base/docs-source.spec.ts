@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import { expect, test, usePersona } from "../../helpers/fixtures";
-import { createArticle, createCategory } from "../../helpers/portal";
+import { chooseOption, createArticle, createCategory } from "../../helpers/portal";
 import { snapshotSettings } from "../../helpers/settings";
 
 usePersona("manager");
@@ -71,7 +71,8 @@ test("a failed save restores the box and shows the error", async ({ page }) => {
       json: { exc_type: "ValidationError", _server_messages: JSON.stringify([JSON.stringify({ message: "Nope, not now" })]) },
     })
   );
-  await dialog.getByRole("checkbox", { name: "Legal" }).uncheck();
+  // click, not uncheck: the failed save flips the box back before uncheck can verify it.
+  await dialog.getByRole("checkbox", { name: "Legal" }).click();
   await expect(dialog.getByText("Nope, not now")).toBeVisible();
   await expect(dialog.getByRole("checkbox", { name: "Legal" })).toBeChecked();
 });
@@ -867,4 +868,180 @@ test.describe("ticket form suggestions", () => {
       expect(asked).toEqual([]);
     });
   });
+});
+
+const CATEGORIES = "**/api/method/helpdesk.api.knowledge_base.get_category_options*";
+const CONVERT = "**/api/method/helpdesk.api.docs_source.convert_docs_page*";
+const LIST = "**/api/method/helpdesk.api.docs_source.list_docs_pages*";
+const BULK = "**/api/method/helpdesk.api.docs_source.bulk_convert_docs_pages*";
+const RESULT = "**/api/method/helpdesk.api.docs_source.get_bulk_convert_result*";
+const dialogOf = (page: Page) => page.getByRole("dialog");
+
+async function stubCategories(page: Page) {
+  await page.route(CATEGORIES, (route) =>
+    route.fulfill(json([{ value: "cat-1", label: "Guides" }, { value: "cat-2", label: "Billing" }]))
+  );
+}
+
+function listed(count: number, section: string, fields: Record<string, unknown> = {}) {
+  return Array.from({ length: count }, (_, i) => ({
+    route: `${section}/p${i}`,
+    title: `${section} page ${i}`,
+    section,
+    converted: null,
+    matching: null,
+    ...fields,
+  }));
+}
+
+test.describe("convert: customer", () => {
+  test.use({ storageState: "e2e/.auth/customer.json" });
+
+  docsTest("readers see no Convert button", async ({ page, connected }) => {
+    await stubDocs(page, { "helpdesk/setup": docPage("helpdesk/setup") });
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(heading(page, "Doc helpdesk/setup")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Convert to article" })).toHaveCount(0);
+  });
+});
+
+test.describe("convert: one page", () => {
+  docsTest("an agent converts one page into a draft", async ({ page, api, connected }) => {
+    const article = await seedArticle(api);
+    await stubCategories(page);
+    await stubDocs(page, { "helpdesk/setup": docPage("helpdesk/setup", { converted: null, matching: null }) });
+    let sent: any;
+    await page.route(CONVERT, (route) => {
+      sent = route.request().postDataJSON();
+      return route.fulfill(json(article.name));
+    });
+    await page.goto("/help/articles/helpdesk/setup");
+    await page.getByRole("button", { name: "Convert to article" }).click();
+    const submit = dialogOf(page).getByRole("button", { name: "Convert", exact: true });
+    await expect(submit).toBeDisabled();
+    await chooseOption(page, "Guides");
+    await expect(submit).toBeEnabled();
+    const [popup] = await Promise.all([page.waitForEvent("popup"), submit.click()]);
+    await expect(popup).toHaveURL(new RegExp(`/helpdesk/kb/articles/${article.name}`));
+    expect(sent).toEqual({ route: "helpdesk/setup", category: "cat-1" });
+    await expect(heading(page, "Doc helpdesk/setup")).toBeVisible();
+  });
+
+  docsTest("a converted page links to its Article", async ({ page, connected }) => {
+    await stubDocs(page, {
+      "helpdesk/setup": docPage("helpdesk/setup", { converted: { name: "ART-9", title: "Setup draft" } }),
+    });
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(page.getByRole("button", { name: "Convert to article" })).toHaveCount(0);
+    const link = page.getByRole("link", { name: "Setup draft" });
+    await expect(link).toHaveAttribute("href", "/helpdesk/kb/articles/ART-9");
+    await expect(link).toHaveAttribute("target", "_blank");
+  });
+
+  docsTest("a Matching Article shows a warning, not a block", async ({ page, connected }) => {
+    await stubCategories(page);
+    await stubDocs(page, {
+      "helpdesk/setup": docPage("helpdesk/setup", { matching: { name: "ART-5", title: "Existing setup" } }),
+    });
+    await page.goto("/help/articles/helpdesk/setup");
+    await page.getByRole("button", { name: "Convert to article" }).click();
+    const link = dialogOf(page).getByRole("link", { name: "Existing setup" });
+    await expect(link).toHaveAttribute("href", "/helpdesk/kb/articles/ART-5");
+    await chooseOption(page, "Guides");
+    await expect(dialogOf(page).getByRole("button", { name: "Convert", exact: true })).toBeEnabled();
+  });
+});
+
+test.describe("convert: bulk", () => {
+  async function openBulk(page: Page, source: unknown, pages: any[] | ((section: string | null) => any[])) {
+    await stubCategories(page);
+    await page.route(LIST, (route) => {
+      const section = new URL(route.request().url()).searchParams.get("section");
+      return route.fulfill(json(typeof pages === "function" ? pages(section) : pages));
+    });
+    return open(page, source);
+  }
+
+  test("bulk list groups by section and searches", async ({ page }) => {
+    const pages = [
+      ...listed(2, "Guides"),
+      ...listed(1, "Legal"),
+      { ...listed(1, "Legal")[0], route: "legal/done", title: "Legal done", converted: { name: "ART-1", title: "Legal copy" } },
+    ];
+    const dialog = await openBulk(page, INDEXED, pages);
+    await expect(dialog.getByRole("button", { name: "Guides" })).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Legal", exact: true })).toBeVisible();
+    await dialog.getByRole("button", { name: "Guides" }).click();
+    await expect(dialog.getByRole("checkbox", { name: "Guides page 1" })).toBeVisible();
+    await dialog.getByPlaceholder("Search pages").fill("page 1");
+    await expect(dialog.getByRole("checkbox", { name: "Guides page 0" })).toHaveCount(0);
+    await expect(dialog.getByRole("checkbox", { name: "Guides page 1" })).toBeVisible();
+    await dialog.getByPlaceholder("Search pages").fill("Legal done");
+    await expect(dialog.getByRole("checkbox", { name: "Legal done" })).toHaveCount(0);
+    await expect(dialog.getByRole("link", { name: "Legal copy" })).toHaveAttribute("href", "/helpdesk/kb/articles/ART-1");
+  });
+
+  test("wiki sections load pages lazily", async ({ page }) => {
+    const asked: (string | null)[] = [];
+    const dialog = await openBulk(page, WIKI, (section) => {
+      asked.push(section);
+      return listed(2, section!);
+    });
+    expect(asked).toEqual([]);
+    await dialog.getByRole("button", { name: "Legal", exact: true }).click();
+    await expect(dialog.getByRole("checkbox", { name: "legal page 0" })).toBeVisible();
+    expect(asked).toEqual(["legal"]);
+  });
+
+  test("bulk refuses a 51st tick", async ({ page }) => {
+    const dialog = await openBulk(page, INDEXED, listed(60, "Guides"));
+    await dialog.getByRole("button", { name: "Guides" }).click();
+    for (let i = 0; i < 50; i++) await dialog.getByRole("checkbox", { name: `Guides page ${i}`, exact: true }).check();
+    await expect(dialog.getByRole("checkbox", { name: "Guides page 50", exact: true })).toBeDisabled();
+    await expect(dialog.getByText("You can pick up to 50 pages at a time.")).toBeVisible();
+    await dialog.getByRole("checkbox", { name: "Guides page 0", exact: true }).uncheck();
+    await expect(dialog.getByRole("checkbox", { name: "Guides page 50", exact: true })).toBeEnabled();
+  });
+
+  test("bulk shows 42 created, 8 skipped and shows API errors", async ({ page }) => {
+    const dialog = await openBulk(page, INDEXED, listed(3, "Guides", { matching: { name: "ART-5", title: "Same" } }));
+    let enqueued = 0;
+    let results = 0;
+    let sent: any;
+    await page.route(BULK, (route) => {
+      enqueued++;
+      if (enqueued === 1) {
+        return route.fulfill({
+          status: 417,
+          json: { exc_type: "ValidationError", _server_messages: JSON.stringify([JSON.stringify({ message: "A bulk convert is already running." })]) },
+        });
+      }
+      sent = route.request().postDataJSON();
+      return route.fulfill(json(null));
+    });
+    await page.route(RESULT, (route) => route.fulfill(json(++results < 2 ? null : { created: 42, skipped: 8 })));
+    await dialog.getByRole("button", { name: "Guides" }).click();
+    await dialog.getByRole("checkbox", { name: "Guides page 0" }).check();
+    await dialog.getByRole("checkbox", { name: "Guides page 1" }).check();
+    await dialog.getByRole("button", { name: "Convert 2 pages" }).click();
+    await chooseOption(page, "Billing");
+    await dialogOf(page).last().getByRole("button", { name: "Convert", exact: true }).click();
+    await expect(page.getByText("A bulk convert is already running.")).toBeVisible();
+    await dialogOf(page).last().getByRole("button", { name: "Convert", exact: true }).click();
+    await expect(dialog.getByText("42 created, 8 skipped")).toBeVisible({ timeout: 10_000 });
+    expect(sent).toEqual({ routes: ["Guides/p0", "Guides/p1"], category: "cat-2" });
+    expect(results).toBe(2);
+  });
+});
+
+test("desk Article shows Copied from docs on <date>", async ({ page, api }) => {
+  const article = await seedArticle(api);
+  await api.update("HD Article", article.name, {
+    docs_page_url: `${SOURCE}/helpdesk/setup`,
+    docs_copied_on: "2026-03-04 12:00:00",
+  });
+  await page.goto(`/helpdesk/kb/articles/${article.name}`);
+  const link = page.getByRole("link", { name: "Copied from docs on Mar 4, 2026" });
+  await expect(link).toHaveAttribute("href", `${SOURCE}/helpdesk/setup`);
+  await expect(link).toHaveAttribute("target", "_blank");
 });

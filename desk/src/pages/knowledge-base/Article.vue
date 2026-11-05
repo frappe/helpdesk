@@ -227,6 +227,19 @@
             </div>
           </div>
         </div>
+        <a
+          v-if="article.data?.docs_page_url"
+          :href="article.data.docs_page_url"
+          target="_blank"
+          rel="noopener"
+          class="mt-3 block text-p-sm text-ink-gray-6 underline"
+        >
+          {{
+            __("Copied from docs on {0}", [
+              dateFormat(article.data.docs_copied_on, "MMM D, YYYY"),
+            ])
+          }}
+        </a>
       </div>
     </div>
     <!-- First load only: reloads after a save or move keep the page shown. -->
@@ -308,6 +321,7 @@ import { Article, Breadcrumb, Error, Resource } from "@/types";
 import {
   ConfirmDelete,
   CUSTOMER_PORTAL_ROOT,
+  dateFormat,
   getErrorMessage,
   uploadFunction,
 } from "@/utils";

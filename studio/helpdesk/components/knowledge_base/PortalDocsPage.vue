@@ -70,7 +70,28 @@
                 {{ __("View on {0}", [host]) }}
               </a>
             </div>
+            <div v-if="session.isAgent.value" class="flex flex-wrap items-center gap-2">
+              <a
+                v-if="page.converted"
+                :href="articleHref(page.converted.name)"
+                target="_blank"
+                rel="noopener"
+                class="text-base text-ink-gray-7 underline"
+              >
+                {{ page.converted.title }}
+              </a>
+              <Button
+                v-else
+                :label="__('Convert to article')"
+                @click="showConvert = true"
+              />
+            </div>
           </div>
+          <DocsConvertDialog
+            v-model:open="showConvert"
+            :routes="[page.route]"
+            :matching="page.matching"
+          />
           <PortalTableOfContents
             v-if="parsed.toc.length > 1"
             :items="parsed.toc"
@@ -92,7 +113,9 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch, watchEffect } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-import { frappeRequest } from "frappe-ui";
+import { Button, frappeRequest } from "frappe-ui";
+import DocsConvertDialog from "@helpdesk/shared/settings/DocsConvertDialog.vue";
+import { articleHref } from "@helpdesk/shared/settings/docsLinks";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { __ } from "@helpdesk/shared/translation";
 import { addHeadingIds } from "@helpdesk/shared/utils";
@@ -111,6 +134,7 @@ const session = useSession();
 const panel = ref<HTMLElement | null>(null);
 const page = ref<any>(null);
 const failed = ref(false);
+const showConvert = ref(false);
 
 const docsUrl = computed<string>(() => session.config.value.docs_source_url);
 const siteUrl = computed(() => page.value?.site_url || docsUrl.value);

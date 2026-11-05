@@ -67,6 +67,7 @@
           />
         </div>
       </div>
+      <DocsBulkConvert :source="source!" />
     </template>
   </section>
 </template>
@@ -75,6 +76,7 @@
 import { call, Button, Checkbox, TextInput } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { __ } from "../translation";
+import DocsBulkConvert from "./DocsBulkConvert.vue";
 import { getErrorMessage, timeAgo } from "../utils";
 
 const API = "helpdesk.api.docs_source";
