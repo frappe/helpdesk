@@ -333,6 +333,15 @@ class TestSync(IntegrationTestCase):
             self.assertTrue(is_syncing())
         job.assert_called_once_with(job_id("https://docs.example.com"))
 
+    def test_web_request_reads_never_commit(self):
+        with (
+            patch("frappe.db.commit") as commit,
+            patch("helpdesk.docs_source.sync.is_job_enqueued", return_value=False),
+        ):
+            enqueue_sync()
+            is_syncing()
+        commit.assert_not_called()
+
     def test_job_id_is_per_url_and_enqueues_after_commit(self):
         self.assertNotEqual(job_id("https://a.example"), job_id("https://b.example"))
         enqueue_sync()

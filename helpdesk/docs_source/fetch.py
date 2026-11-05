@@ -49,6 +49,7 @@ def fetch_live(url: str, host: str, params: dict | None = None) -> requests.Resp
     except DocsFetchError as e:
         if e.transient or e.status in DOWN_STATUSES:
             frappe.cache.set_value(DOWN_KEY, 1, expires_in_sec=SKIP_SECONDS)
+            frappe.log_error("Docs source is down", str(e))
         raise
 
 

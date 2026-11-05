@@ -109,6 +109,14 @@ class TestFetch(IntegrationTestCase):
                 fetch_live(URL, HOST)
         self.assertEqual(get.call_count, 1)
 
+    def test_outage_is_logged_once_when_the_breaker_trips(self, get, validate):
+        get.side_effect = requests.ConnectionError("down")
+        with patch("helpdesk.docs_source.fetch.frappe.log_error") as log:
+            for _ in range(3):
+                with self.assertRaises(DocsFetchError):
+                    fetch_live(URL, HOST)
+        log.assert_called_once()
+
     def test_live_trips_only_on_gateway_statuses(self, get, validate):
         for status in (404, 500):
             get.return_value = make_response(URL, status)

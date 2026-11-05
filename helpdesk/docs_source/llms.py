@@ -106,7 +106,7 @@ class LlmsSource(IndexedSource):
                 parts.append(text)
                 following = NEXT_PART.search(text)
                 url = urljoin(url, following[1]) if following else None
-        except DocsFetchError, ValueError:
+        except (DocsFetchError, ValueError):
             pass  # ponytail: titles and summaries still index
         return "\n".join(parts)
 

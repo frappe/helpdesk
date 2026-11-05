@@ -17,7 +17,7 @@ JOB_TIMEOUT = 1800
 
 
 def enqueue_sync() -> None:
-    url = _current_url()
+    url = _read_url()
     frappe.enqueue(
         "helpdesk.docs_source.sync.run_sync",
         queue="long",
@@ -64,7 +64,7 @@ def rebuild_if_missing() -> None:
 
 
 def is_syncing() -> bool:
-    return is_job_enqueued(job_id(_current_url()))
+    return is_job_enqueued(job_id(_read_url()))
 
 
 def job_id(url: str) -> str:
@@ -72,7 +72,13 @@ def job_id(url: str) -> str:
     return f"{JOB_PREFIX}_{hashlib.sha1((url or '').encode()).hexdigest()[:10]}"
 
 
+def _read_url() -> str | None:
+    """Plain read, safe in a web request: no lock, no commit."""
+    return frappe.db.get_single_value("HD Settings", "docs_source_url", cache=False)
+
+
 def _current_url() -> str | None:
+    """For run_sync only: it commits."""
     # Locking read: a cached or snapshot read would miss a URL changed during the sync.
     url = frappe.db.get_single_value("HD Settings", "docs_source_url", for_update=True)
     frappe.db.commit()  # release the lock
