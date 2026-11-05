@@ -23,7 +23,7 @@
         />
         <PortalRelatedArticles
           v-if="suggestArticles"
-          :articles="suggestions.data"
+          :articles="suggestions"
         />
       </div>
       <div class="flex w-full flex-col">
@@ -102,7 +102,11 @@ import ApiOptionsField from "./ApiOptionsField.vue";
 import PortalSkeleton from "../ui/PortalSkeleton.vue";
 import PortalRelatedArticles from "../knowledge_base/PortalRelatedArticles.vue";
 import PortalAttachments from "./PortalAttachments.vue";
-import { useArticleSearch } from "../../composables/useArticleSearch";
+import { pickSuggestions, type Hit } from "../../composables/docsResults";
+import {
+  MIN_QUERY_LENGTH,
+  useArticleSearch,
+} from "../../composables/useArticleSearch";
 import { useRememberedCount } from "../../composables/useRememberedCount";
 import { getPriority, loadPriorities } from "../../stores/ticketMeta";
 
@@ -172,6 +176,8 @@ const props = withDefaults(
     origin?: Record<string, unknown>;
     isAgent?: boolean;
     suggestArticles?: boolean;
+    // The Docs source URL, empty with none; null until the config loads.
+    docsSource?: string | null;
     dateFormat?: string;
     timeFormat?: string;
     // The desk's `$dialog`, so its form scripts render as on the ticket page.
@@ -333,8 +339,32 @@ const about = computed(() => {
 const suggestionQuery = computed(() =>
   props.suggestArticles ? subject.value : ""
 );
-const suggestions = useArticleSearch(suggestionQuery, {
+const articleSearch = useArticleSearch(suggestionQuery, {
   limit: SUGGESTION_LIMIT,
+});
+const hasDocs = () => Boolean(props.docsSource);
+const docsSearch = useArticleSearch(suggestionQuery, {
+  limit: SUGGESTION_LIMIT,
+  url: "helpdesk.api.docs_source.search_docs",
+  enabled: hasDocs,
+});
+
+// The query both lists answered; null while either is in flight or config loads.
+const settledQuery = computed(() => {
+  const query = articleSearch.settledQuery;
+  if (!query || props.docsSource == null) return null;
+  return hasDocs() && docsSearch.settledQuery !== query ? null : query;
+});
+// Kept until the next pair settles, so no link moves.
+const suggestions = ref<Hit[]>([]);
+watch(settledQuery, (query) => {
+  if (!query) return;
+  const articles = articleSearch.error ? [] : articleSearch.data || [];
+  const docs = !hasDocs() || docsSearch.error ? [] : docsSearch.data || [];
+  suggestions.value = pickSuggestions(articles, docs, query, SUGGESTION_LIMIT);
+});
+watch(suggestionQuery, (query) => {
+  if (query.trim().length < MIN_QUERY_LENGTH) suggestions.value = [];
 });
 
 // Only priority shows its description, as on the ticket page.

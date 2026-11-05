@@ -19,3 +19,13 @@ export function visibleDocs(articles: Hit[], docs: Hit[], query: string): Hit[] 
   const full = kept.filter((doc) => hasQueryWords(doc.title, query))
   return [...full, ...kept.filter((doc) => !full.includes(doc))]
 }
+
+// Scores from the two engines can't be compared.
+export function pickSuggestions(articles: Hit[], docs: Hit[], query: string, limit = 3): Hit[] {
+  const docsLeft = visibleDocs(articles, docs, query)
+  const pool = [...articles, ...docsLeft]
+  const full = pool.filter((hit) => hasQueryWords(hit.title, query))
+  const top = [...full, ...pool.filter((hit) => !full.includes(hit))].slice(0, limit)
+  if (docsLeft.length && !top.some((hit) => hit.route)) top[limit - 1] = docsLeft[0]
+  return top
+}

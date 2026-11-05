@@ -623,3 +623,128 @@ test.describe("search list", () => {
     await expect(heading(page, "Doc helpdesk/beta")).toBeVisible();
   });
 });
+
+const suggestionLinks = (page: Page) =>
+  page.locator("section").filter({ hasText: "Related articles:" }).getByRole("link");
+
+async function typeSubject(page: Page, text: string) {
+  await page.goto("/help/my-tickets/new");
+  const box = page.getByPlaceholder("A short description");
+  await box.fill(text);
+  return box;
+}
+
+test.describe("ticket form suggestions", () => {
+  docsTest("title match outranks an Article", async ({ page, connected }) => {
+    await stubSearch(page, [articleHit("Account help"), articleHit("Billing")], [docHit("helpdesk/reset", "Reset password")]);
+    await typeSubject(page, "reset password");
+    await expect(suggestionLinks(page)).toHaveCount(3);
+    await expect(suggestionLinks(page).first()).toContainText("Reset password");
+  });
+
+  docsTest("slot 3 goes to the best Docs page when none made it", async ({ page, connected }) => {
+    await stubSearch(
+      page,
+      [articleHit("One"), articleHit("Two"), articleHit("Three")],
+      [docHit("helpdesk/best", "Best page"), docHit("helpdesk/next", "Next page")]
+    );
+    await typeSubject(page, "zzz");
+    await expect(suggestionLinks(page)).toHaveCount(3);
+    await expect(suggestionLinks(page).nth(2)).toContainText("Best page");
+  });
+
+  docsTest("suggestions wait for both lists", async ({ page, connected }) => {
+    const docsGate = gate();
+    const answered = page.waitForResponse(ARTICLE_SEARCH);
+    await stubSearch(page, [articleHit("One"), articleHit("Two")], async () => {
+      await docsGate.held;
+      return [docHit("helpdesk/best", "Best page")];
+    });
+    await typeSubject(page, "zzz");
+    await answered;
+    await page.waitForTimeout(500);
+    expect(await suggestionLinks(page).count()).toBe(0);
+    docsGate.open();
+    await expect(suggestionLinks(page)).toHaveCount(3);
+  });
+
+  docsTest("old suggestions stay until the new list is ready", async ({ page, connected }) => {
+    const hold = gate();
+    await stubSearch(
+      page,
+      async (query) => [articleHit(query === "first" ? "Old link" : "New link")],
+      async (query) => (query === "first" ? [] : (await hold.held, []))
+    );
+    const box = await typeSubject(page, "first");
+    await expect(suggestionLinks(page)).toHaveCount(1);
+    await box.fill("second");
+    await page.waitForTimeout(700);
+    await expect(suggestionLinks(page).first()).toContainText("Old link");
+    hold.open();
+    await expect(suggestionLinks(page).first()).toContainText("New link");
+    await box.fill("ab");
+    await expect(suggestionLinks(page)).toHaveCount(0);
+  });
+
+  docsTest("source failure still shows Articles", async ({ page, connected }) => {
+    await stubSearch(page, [articleHit("Alpha guide")], async () => 500);
+    await typeSubject(page, "guide");
+    await expect(suggestionLinks(page)).toHaveCount(1);
+    await expect(suggestionLinks(page).first()).toContainText("Alpha guide");
+  });
+
+  docsTest("an Articles failure still shows Docs pages", async ({ page, connected }) => {
+    await stubSearch(page, async () => 500, [docHit("helpdesk/beta", "Beta guide")]);
+    await typeSubject(page, "guide");
+    await expect(suggestionLinks(page)).toHaveCount(1);
+    await expect(suggestionLinks(page).first()).toContainText("Beta guide");
+  });
+
+  docsTest("typing before the config loads waits, then shows both lists", async ({ page, connected }) => {
+    const configGate = gate();
+    await page.route("**/api/method/helpdesk.api.config.get_config*", async (route) => {
+      await configGate.held;
+      await route.continue();
+    });
+    await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta guide")]);
+    await typeSubject(page, "guide");
+    await page.waitForTimeout(700);
+    expect(await suggestionLinks(page).count()).toBe(0);
+    configGate.open();
+    await expect(suggestionLinks(page)).toHaveCount(2);
+  });
+
+  test("no source sends no docs request and waits for none", async ({ page }) => {
+    const docsCalls = await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta guide")]);
+    await typeSubject(page, "guide");
+    await expect(suggestionLinks(page)).toHaveCount(1);
+    expect(docsCalls).toEqual([]);
+  });
+
+  docsTest("a Docs suggestion opens in a new tab and keeps the draft", async ({ page, connected }) => {
+    await stubDocs(page, { "helpdesk/beta": docPage("helpdesk/beta") });
+    await stubSearch(page, [], [docHit("helpdesk/beta", "Beta guide")]);
+    const box = await typeSubject(page, "guide");
+    const link = suggestionLinks(page).first();
+    await expect(link).toHaveAttribute("href", "/help/articles/helpdesk/beta");
+    await expect(link).toHaveAttribute("target", "_blank");
+    await link.hover();
+    await expect(page.getByText("Docs excerpt")).toBeVisible();
+    const [popup] = await Promise.all([page.waitForEvent("popup"), link.click()]);
+    await expect(popup).toHaveURL(/\/help\/articles\/helpdesk\/beta$/);
+    await expect(box).toHaveValue("guide");
+  });
+
+  test.describe("desk", () => {
+    test.use({ storageState: "e2e/.auth/agent.json" });
+
+    test("desk TicketNew still fetches nothing", async ({ page }) => {
+      const asked: string[] = [];
+      page.on("request", (req) => /search_articles|search_docs/.test(req.url()) && asked.push(req.url()));
+      await page.goto("/helpdesk/tickets/new");
+      await page.getByPlaceholder("A short description").fill("a long enough subject");
+      await page.waitForTimeout(700);
+      expect(asked).toEqual([]);
+    });
+  });
+});
