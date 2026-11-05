@@ -205,6 +205,13 @@ class TestLlmsSource(IndexCase):
         self.assertTrue(DocsIndex().find("custom domain"))
         self.assertTrue(get_source().get_page("guides/domain"))
 
+    def test_github_alert_marker_is_dropped(self):
+        self.site[f"{self.url}/guides/domain.md"] = "Intro.\n\n> [!NOTE]\n>\n> In beta.\n"
+        self.sync()
+        content = get_source().get_page("guides/domain")["content"]
+        self.assertIn("In beta.", content)
+        self.assertNotIn("[!NOTE]", content)
+
     def test_get_page_is_cleaned_and_linked(self):
         self.sync()
         page = get_source().get_page("guides/domain")
@@ -220,6 +227,28 @@ class TestLlmsSource(IndexCase):
         for route in ("nope", "guides/../llms", "%2e%2e/x"):
             with self.assertRaises(frappe.DoesNotExistError):
                 get_source().get_page(route)
+
+    def test_list_pages_groups_below_the_connected_path(self):
+        self.url = f"{self.url}/docs"
+        DocsIndex().replace(
+            [
+                {"route": "docs/guides/start", "title": "Start", "url": f"{self.url}/guides/start.md", "body": "x"},
+                {"route": "docs/intro", "title": "Intro", "url": f"{self.url}/intro.md", "body": "x"},
+            ],
+            "Acme",
+        )
+        source = LlmsSource(self.url)
+        self.assertEqual({p["section"] for p in source.list_pages()}, {"guides", "intro"})
+        self.assertEqual([p["route"] for p in source.list_pages("guides")], ["docs/guides/start"])
+
+    def test_index_text_has_no_markup_inside_links_and_no_entities(self):
+        self.site[f"{self.url}/llms-full.txt"] = (
+            "# Custom domain\n\nOpen [**Customization**](/c.md) now&#x20;\n"
+        )
+        self.sync()
+        excerpt = DocsIndex().find("customization")[0]["excerpt"]
+        self.assertNotIn("*", excerpt)
+        self.assertNotIn("x20", excerpt)
 
     def test_list_pages_groups_by_first_segment(self):
         self.sync()

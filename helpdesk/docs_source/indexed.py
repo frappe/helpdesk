@@ -48,9 +48,10 @@ class IndexedSource(DocsSource):
 
     def list_pages(self, section: str | None = None) -> list[dict]:
         pages = []
+        base = f"{urlsplit(self.url).path.strip('/')}/"
         for route, page in (frappe.cache.hgetall(PAGES_KEY) or {}).items():
             route = route if isinstance(route, str) else route.decode()
-            key = route.partition("/")[0]
+            key = route.removeprefix(base).partition("/")[0]
             if section in (None, key):
                 pages.append({"route": route, "title": page["title"], "section": key})
         return pages

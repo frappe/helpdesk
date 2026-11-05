@@ -52,12 +52,13 @@ def clean_markdown(text: str, title: str) -> str:
     """A page for readers: no agent section, leading quote, GitBook tags or repeated title."""
     text = text.split("\n# Agent Instructions")[0]
     text = re.sub(r"\A(?:> .*\n)+", "", _strip_gitbook_tags(text).lstrip())
+    text = re.sub(r"^> \[!\w+\]$", ">", text, flags=re.M)  # GitHub alert markers
     return re.sub(rf"\A\s*# {re.escape(title)}\s*\n", "", text)
 
 
 def to_plain(markdown: str) -> str:
-    text = strip_html_tags(_strip_gitbook_tags(markdown))
-    return re.sub(r"\[([^\]]*)\]\([^)]*\)|[*`#>]+", r"\1", text)
+    text = unescape(strip_html_tags(_strip_gitbook_tags(markdown)))
+    return re.sub(r"[*`#>]+", "", re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text))
 
 
 def _strip_gitbook_tags(text: str) -> str:
