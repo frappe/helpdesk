@@ -98,10 +98,8 @@ class TestWikiSource(IntegrationTestCase):
             f"{URL}/erpnext/old": ("<html>", f"{URL}/erpnext/stock"),
             PAGE: 404,
         }
-        calls = []
 
         def fake(url, host, *a, params=None):
-            calls.append(params)
             if url == PAGE and params["route"] == "erpnext/stock":
                 return fake_docs_fetch({PAGE: {"message": {
                     "title": "Stock", "rendered_content": "<p>x</p>", "last_updated": None}}})(url, host)
@@ -145,11 +143,59 @@ class TestWikiSource(IntegrationTestCase):
         self.assertEqual(self.run_with(lambda s: s.list_pages("helpdesk"), site, hidden=["helpdesk"]), [])
         self.assertEqual(self.run_with(lambda s: s.list_pages(None), site, hidden=["helpdesk"]), [])
 
-    def test_html_is_sanitized_before_rewriting(self):
+    def test_unsafe_markup_is_removed(self):
         html = '<a href="javascript:alert(1)" onclick="x()">a</a><script>x</script>'
         content = self.page(html)["content"]
         self.assertNotIn("script", content)
         self.assertNotIn("onclick", content)
+
+    def test_phishing_markup_is_removed(self):
+        html = '<form action="https://evil.com"><input type="password"><button>Go</button></form><p>ok</p>'
+        content = self.page(html)["content"]
+        for tag in ("form", "input", "button"):
+            self.assertNotIn(f"<{tag}", content)
+
+    def test_broken_html_is_still_sanitized(self):
+        content = self.page("<img src=x onerror=alert(1)//")["content"]
+        self.assertNotIn("onerror", content)
+
+    def test_bad_body_is_a_fetch_error(self):
+        with self.assertRaises(DocsFetchError):
+            self.run_with(lambda s: s.search("q"), {SEARCH: "<html>nope</html>"})
+        with self.assertRaises(DocsFetchError):
+            self.page(extra={PAGE: "<html>nope</html>"})
+        with self.assertRaises(DocsFetchError):
+            self.page(extra={PAGE: {"message": {"title": "x"}}})
+
+    def test_links_in_code_text_are_not_rewritten(self):
+        html = '<code>&lt;a href="/helpdesk/setup"&gt;</code><p data-href="/helpdesk/x">p</p>'
+        content = self.page(html)["content"]
+        self.assertNotIn("/help/articles", content)
+        self.assertIn("&lt;a href=\"/helpdesk/setup\"&gt;", content)
+
+    def test_dot_segments_are_not_pages(self):
+        with self.assertRaises(frappe.DoesNotExistError):
+            self.page(route="helpdesk/%2e%2e/%2e%2e/api/method/x")
+        html = '<a href="/helpdesk/%2e%2e/%2e%2e/api/method/x">a</a><a href="/helpdesk/../x">b</a>'
+        self.assertNotIn("/help/articles", self.page(html)["content"])
+
+    def test_title_is_plain(self):
+        site = {PAGE: {"message": {"title": "A &amp; <b>B</b>", "rendered_content": "<p>x</p>"}}}
+        self.assertEqual(self.run_with(lambda s: s.get_page("helpdesk/setup"), site)["title"], "A & B")
+
+    def test_section_list_uses_the_live_fetch(self):
+        def sync(*a, **k):
+            raise AssertionError("sections must not use the sync fetch")
+
+        with (
+            patch("helpdesk.docs_source.wiki.fetch", sync),
+            patch("helpdesk.docs_source.wiki.fetch_live", fake_docs_fetch(self.site)),
+        ):
+            self.assertTrue(self.source().sections())
+        frappe.cache.delete_keys("helpdesk_docs_wiki")
+        with patch("helpdesk.docs_source.wiki.fetch_live", fake_docs_fetch({f"{URL}/llms.txt": 503})):
+            with self.assertRaises(DocsFetchError):
+                self.source().sections()
 
     def test_internal_links_point_at_articles_route(self):
         html = (

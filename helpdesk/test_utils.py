@@ -1235,8 +1235,7 @@ def make_response(url, status=200, location=None, chunks=(b"ok",)):
 
 
 def fake_docs_fetch(site: dict):
-    """side_effect for a patched docs fetch. `site` maps a URL to a str or JSON body, an int
-    status (raised as DocsFetchError) or (body, final_url) for a redirect. Unknown URLs are 404."""
+    """side_effect for a patched docs fetch: URL -> body, int status (raised) or (body, final_url); else 404."""
     from helpdesk.docs_source.fetch import DocsFetchError
 
     def fake(url, host, *args, params=None):

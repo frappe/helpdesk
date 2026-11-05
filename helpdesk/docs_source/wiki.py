@@ -3,12 +3,11 @@ from urllib.parse import urlsplit
 
 import frappe
 from frappe import _
-from frappe.utils.html_utils import sanitize_html
 
 from helpdesk.api.knowledge_base import escape_marked
 from helpdesk.docs_source import DocsSource
 from helpdesk.docs_source.fetch import DocsFetchError, fetch, fetch_live
-from helpdesk.docs_source.text import plain_title, rewrite_links
+from helpdesk.docs_source.text import clean_html, has_dot_segment, plain_title, rewrite_links
 
 API = "api/method/wiki.frappe_wiki.doctype.wiki_document"
 SEARCH_SECONDS = 300
@@ -38,7 +37,7 @@ class WikiSource(DocsSource):
         hits = self._cached(
             f"search:{query.lower()}",
             SEARCH_SECONDS,
-            lambda: self._call("search.search", live=True, query=query)["results"],
+            lambda: self._read_hits(query),
         )
         return [self._to_hit(hit) for hit in hits if self._is_visible(hit["route"])]
 
@@ -79,15 +78,11 @@ class WikiSource(DocsSource):
         ]
 
     def _get_page(self, route: str) -> dict:
-        data = self._cached(
-            f"page:{route}",
-            PAGE_SECONDS,
-            lambda: self._call("wiki_document.get_page_data", live=True, route=route),
-        )
+        data = self._cached(f"page:{route}", PAGE_SECONDS, lambda: self._read_page(route))
         base = f"{self.url}/{route}"
         return {
             "title": data["title"],
-            "content": rewrite_links(sanitize_html(data["rendered_content"]), base, self._is_visible),
+            "content": rewrite_links(data["content"], base, self._is_visible),
             "label": f"{self._title_of(route)} docs",
             "last_updated": data.get("last_updated"),
             "source_url": base,
@@ -106,6 +101,20 @@ class WikiSource(DocsSource):
             raise frappe.DoesNotExistError(_("Docs page not found"))
         return final
 
+    def _read_hits(self, query: str) -> list[dict]:
+        results = self._call("search.search", live=True, query=query)["results"]
+        return _shaped(lambda: [{k: r[k] for k in ("route", "title", "content")} for r in results])
+
+    def _read_page(self, route: str) -> dict:
+        data = self._call("wiki_document.get_page_data", live=True, route=route)
+        return _shaped(
+            lambda: {
+                "title": plain_title(data["title"]),
+                "content": clean_html(data["rendered_content"]),
+                "last_updated": data.get("last_updated"),
+            }
+        )
+
     def _to_hit(self, hit: dict) -> dict:
         return {
             "route": hit["route"],
@@ -117,6 +126,7 @@ class WikiSource(DocsSource):
     def _is_visible(self, route: str) -> bool:
         return (
             not _is_old_version(route)
+            and not has_dot_segment(route)
             and (key := self._section_of(route)) is not None
             and key not in self.hidden
         )
@@ -134,7 +144,7 @@ class WikiSource(DocsSource):
 
     def _read_sections(self) -> dict[str, str]:
         sections = {}
-        for title, link in LLMS_LINK.findall(self._read_llms("llms.txt")):
+        for title, link in LLMS_LINK.findall(fetch_live(f"{self.url}/llms.txt", self.host).text):
             path = urlsplit(link).path
             if path.endswith("/llms.txt"):
                 sections[path.removesuffix("/llms.txt").strip("/")] = plain_title(title)
@@ -149,7 +159,8 @@ class WikiSource(DocsSource):
 
     def _call(self, method: str, live: bool = False, **params) -> dict:
         get = fetch_live if live else fetch
-        return get(f"{self.url}/{API}.{method}", self.host, params=params).json()["message"]
+        response = get(f"{self.url}/{API}.{method}", self.host, params=params)
+        return _shaped(lambda: response.json()["message"])
 
     def _cached(self, key: str, seconds: int, read):
         key = f"{CACHE}:{self.url}:{key}"
@@ -157,6 +168,14 @@ class WikiSource(DocsSource):
             value = read()
             frappe.cache.set_value(key, value, expires_in_sec=seconds)
         return value
+
+
+def _shaped(read):
+    """Turn a malformed 200 body into a DocsFetchError."""
+    try:
+        return read()
+    except (ValueError, KeyError, TypeError) as e:
+        raise DocsFetchError(f"Unexpected response: {e}") from e
 
 
 def _is_old_version(route: str) -> bool:
