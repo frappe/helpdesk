@@ -112,6 +112,8 @@ import { getPriority, loadPriorities } from "../../stores/ticketMeta";
 
 const UPLOAD_FOLDER = "Home/Helpdesk";
 const SUGGESTION_LIMIT = 3;
+// Longest the Articles wait for the Docs pages.
+const DOCS_WAIT_MS = 2000;
 // Longer Select lists get a search box if there are more than 10 results
 const SEARCHABLE_FROM = 10;
 const editorExtensions = [HandleExcelPaste];
@@ -349,18 +351,37 @@ const docsSearch = useArticleSearch(suggestionQuery, {
   enabled: hasDocs,
 });
 
+// After the wait, the Articles show alone and later docs are ignored for that query.
+const gaveUpOn = ref<string | null>(null);
+let docsTimer: ReturnType<typeof setTimeout>;
+const articlesAnswered = computed(() =>
+  props.docsSource == null ? null : articleSearch.settledQuery
+);
+watch(articlesAnswered, (query) => {
+  clearTimeout(docsTimer);
+  gaveUpOn.value = null;
+  if (query && hasDocs())
+    docsTimer = setTimeout(() => (gaveUpOn.value = query), DOCS_WAIT_MS);
+});
+onBeforeUnmount(() => clearTimeout(docsTimer));
+
 // The query both lists answered; null while either is in flight or config loads.
 const settledQuery = computed(() => {
-  const query = articleSearch.settledQuery;
-  if (!query || props.docsSource == null) return null;
-  return hasDocs() && docsSearch.settledQuery !== query ? null : query;
+  const query = articlesAnswered.value;
+  if (!query) return null;
+  const docsDone =
+    !hasDocs() ||
+    docsSearch.settledQuery === query ||
+    gaveUpOn.value === query;
+  return docsDone ? query : null;
 });
 // Kept until the next pair settles, so no link moves.
 const suggestions = ref<Hit[]>([]);
 watch(settledQuery, (query) => {
   if (!query) return;
   const articles = articleSearch.error ? [] : articleSearch.data || [];
-  const docs = !hasDocs() || docsSearch.error ? [] : docsSearch.data || [];
+  const docsIn = hasDocs() && docsSearch.settledQuery === query;
+  const docs = docsIn && !docsSearch.error ? docsSearch.data || [] : [];
   suggestions.value = pickSuggestions(articles, docs, query, SUGGESTION_LIMIT);
 });
 watch(suggestionQuery, (query) => {

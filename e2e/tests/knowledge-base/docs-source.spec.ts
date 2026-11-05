@@ -668,6 +668,22 @@ test.describe("ticket form suggestions", () => {
     await expect(suggestionLinks(page)).toHaveCount(3);
   });
 
+  docsTest("a docs request held past 2s shows Articles once and later docs change nothing", async ({ page, connected }) => {
+    const docsGate = gate();
+    await stubSearch(page, [articleHit("One"), articleHit("Two")], async () => {
+      await docsGate.held;
+      return [docHit("helpdesk/best", "Best page")];
+    });
+    const started = Date.now();
+    await typeSubject(page, "zzz");
+    await expect(suggestionLinks(page)).toHaveCount(2);
+    expect(Date.now() - started).toBeGreaterThan(1800);
+    docsGate.open();
+    await page.waitForTimeout(700);
+    expect(await suggestionLinks(page).count()).toBe(2);
+    await expect(suggestionLinks(page).nth(1)).toContainText("Two");
+  });
+
   docsTest("old suggestions stay until the new list is ready", async ({ page, connected }) => {
     const hold = gate();
     await stubSearch(
