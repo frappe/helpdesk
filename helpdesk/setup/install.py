@@ -199,6 +199,10 @@ def update_agent_role_permissions():
         add_permission("Contact", "Agent", 0)
         add_permission("Email Account", "Agent", 0)
         add_permission("Communication", "Agent", 0)
+        # the Telephony settings page loads and saves the agent's own record
+        add_permission("TP Telephony Agent", "Agent", 0)
+        for p in ["create", "write"]:
+            update_permission_property("TP Telephony Agent", "Agent", 0, p, 1)
 
 
 def add_agent_manager_permissions():
@@ -209,6 +213,7 @@ def add_agent_manager_permissions():
         "File": ["create", "delete", "write"],
         "Contact": ["create", "delete", "write", "select"],
         "Communication": ["create", "delete", "write"],
+        "TP Telephony Agent": ["create", "write"],
         "User Invitation": ["create", "write"],
         "Role": [],
         "Assignment Rule": ["create", "delete", "write"],
