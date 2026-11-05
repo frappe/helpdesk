@@ -1218,13 +1218,17 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     return {card["title"]: card for card in cards}
 
 
+class _Raw(io.BytesIO):
+    def read1(self, size=-1, decode_content=None):
+        return super().read1(size)
+
+
 def make_response(url, status=200, location=None, chunks=(b"ok",)):
-    """Build a requests.Response that streams `chunks`, with an optional Location header."""
+    """Build a requests.Response that serves `chunks` as its raw body, with an optional Location header."""
     response = requests.Response()
     response.status_code = status
     response.url = url
-    response.raw = io.BytesIO()
     if location:
         response.headers["Location"] = location
-    response.iter_content = lambda chunk_size=None: iter(chunks)
+    response.raw = _Raw(b"".join(chunks))
     return response

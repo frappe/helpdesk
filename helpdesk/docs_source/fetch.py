@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 import frappe
 import requests
 from frappe.utils.data import validate_egress_url
+from urllib3.exceptions import HTTPError
 from urllib3.util import parse_url
 
 LIVE_TIMEOUT = 2
@@ -52,6 +53,7 @@ def fetch_live(url: str, host: str, params: dict | None = None) -> requests.Resp
 
 
 def _get(url, host, deadline, params):
+    # ponytail: header drip and DNS lookup are not bounded here, the worker timeout caps them.
     try:
         # Validate and send the same prepared URL, so no parser can disagree about the host.
         prepared = requests.Request("GET", url, params=params).prepare().url
@@ -85,20 +87,25 @@ def _read_body(response, deadline):
     try:
         if response.status_code >= 300:
             raise DocsFetchError(f"HTTP {response.status_code}", status=response.status_code)
-        body = b""
-        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-            body += chunk
-            if len(body) > MAX_BYTES:
-                raise DocsFetchError("Response too large")
-            _remaining(deadline)
-        response._content = body
-        response._content_consumed = True
-    except requests.RequestException as e:
+        _read_capped(response, deadline)
+    except (requests.RequestException, HTTPError) as e:
         response.close()
         raise _as_fetch_error(e) from e
     except Exception:
         response.close()
         raise
+
+
+def _read_capped(response, deadline):
+    # One recv per loop so the deadline is checked between recvs.
+    body = b""
+    while chunk := response.raw.read1(CHUNK_SIZE, decode_content=True):
+        body += chunk
+        if len(body) > MAX_BYTES:
+            raise DocsFetchError("Response too large")
+        _remaining(deadline)
+    response._content = body
+    response._content_consumed = True
 
 
 def _remaining(deadline):
@@ -110,6 +117,11 @@ def _remaining(deadline):
 
 def _as_fetch_error(e):
     transient = isinstance(
-        e, (requests.ConnectionError, requests.Timeout, requests.exceptions.ChunkedEncodingError)
+        e, (
+            requests.ConnectionError,
+            requests.Timeout,
+            requests.exceptions.ChunkedEncodingError,
+            HTTPError,
+        )
     )
     return DocsFetchError(str(e), transient=transient)

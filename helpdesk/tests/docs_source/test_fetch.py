@@ -1,4 +1,7 @@
+import gzip
+import threading
 import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from unittest.mock import patch
 
 import frappe
@@ -11,6 +14,7 @@ from helpdesk.docs_source.fetch import (
     MAX_REDIRECTS,
     DocsFetchError,
     fetch,
+    _read_capped,
     fetch_live,
 )
 from helpdesk.test_utils import make_response
@@ -98,18 +102,6 @@ class TestFetch(IntegrationTestCase):
                 fetch(URL, HOST)
             self.assertEqual(ctx.exception.status, status)
 
-    def test_timeout_is_a_total_deadline(self, get, validate):
-        def slow():
-            for _ in range(50):
-                time.sleep(0.02)
-                yield b"x"
-
-        response = make_response(URL)
-        response.iter_content = lambda chunk_size=None: slow()
-        get.return_value = response
-        with self.assertRaises(DocsFetchError):
-            fetch(URL, HOST, timeout=0.1)
-
     def test_live_failure_skips_next_calls(self, get, validate):
         get.side_effect = requests.ConnectionError("down")
         for _ in range(2):
@@ -130,3 +122,53 @@ class TestFetch(IntegrationTestCase):
         with self.assertRaises(DocsFetchError):
             fetch_live(URL, HOST)
         self.assertTrue(frappe.cache.get_value(DOWN_KEY))
+
+
+class _Handler(BaseHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
+
+    def do_GET(self):
+        if self.path == "/gzip":
+            body = gzip.compress(b"hello docs" * 100)
+            self.send_response(200)
+            self.send_header("Content-Encoding", "gzip")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        self.send_response(200)
+        self.send_header("Content-Length", "100")
+        self.end_headers()
+        try:
+            for _ in range(100):
+                self.wfile.write(b"x")
+                self.wfile.flush()
+                time.sleep(0.05)
+        except OSError:
+            pass
+
+
+class TestReadCapped(IntegrationTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.server = HTTPServer(("127.0.0.1", 0), _Handler)
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        cls.addClassCleanup(cls.server.server_close)
+        cls.addClassCleanup(cls.server.shutdown)
+
+    def get(self, path):
+        url = f"http://127.0.0.1:{self.server.server_port}{path}"
+        return requests.get(url, stream=True, timeout=2)
+
+    def test_slow_body_stops_at_deadline(self):
+        started = time.monotonic()
+        with self.assertRaises(DocsFetchError):
+            _read_capped(self.get("/drip"), time.monotonic() + 0.3)
+        self.assertLess(time.monotonic() - started, 0.8)
+
+    def test_gzip_body_is_decoded(self):
+        response = self.get("/gzip")
+        _read_capped(response, time.monotonic() + 1)
+        self.assertEqual(response.content, b"hello docs" * 100)
