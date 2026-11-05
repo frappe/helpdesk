@@ -30,7 +30,7 @@ class WikiSource(DocsSource):
     def is_available(self) -> bool:
         try:
             return "results" in self._call("search.search", query="docs")
-        except (DocsFetchError, KeyError, ValueError):
+        except DocsFetchError:
             return False
 
     def search(self, query: str) -> list[dict]:
@@ -102,8 +102,10 @@ class WikiSource(DocsSource):
         return final
 
     def _read_hits(self, query: str) -> list[dict]:
-        results = self._call("search.search", live=True, query=query)["results"]
-        return _shaped(lambda: [{k: r[k] for k in ("route", "title", "content")} for r in results])
+        message = self._call("search.search", live=True, query=query)
+        return _shaped(
+            lambda: [{k: r[k] for k in ("route", "title", "content")} for r in message["results"]]
+        )
 
     def _read_page(self, route: str) -> dict:
         data = self._call("wiki_document.get_page_data", live=True, route=route)
@@ -160,7 +162,10 @@ class WikiSource(DocsSource):
     def _call(self, method: str, live: bool = False, **params) -> dict:
         get = fetch_live if live else fetch
         response = get(f"{self.url}/{API}.{method}", self.host, params=params)
-        return _shaped(lambda: response.json()["message"])
+        message = _shaped(lambda: response.json()["message"])
+        if not isinstance(message, dict):
+            raise DocsFetchError("Unexpected response: message is not an object")
+        return message
 
     def _cached(self, key: str, seconds: int, read):
         key = f"{CACHE}:{self.url}:{key}"

@@ -167,6 +167,18 @@ class TestWikiSource(IntegrationTestCase):
         with self.assertRaises(DocsFetchError):
             self.page(extra={PAGE: {"message": {"title": "x"}}})
 
+    def test_malformed_message_is_a_fetch_error(self):
+        for message in ({}, [], "x", None):
+            frappe.cache.delete_keys("helpdesk_docs_wiki")
+            with self.assertRaises(DocsFetchError):
+                self.run_with(lambda s: s.search("q"), {SEARCH: {"message": message}})
+
+    def test_is_available_is_false_for_a_null_message(self):
+        site = {SEARCH: {"message": None}}
+        self.assertFalse(self.run_with(lambda s: s.is_available(), site))
+        site = {SEARCH: {"message": {"results": []}}}
+        self.assertTrue(self.run_with(lambda s: s.is_available(), site))
+
     def test_links_in_code_text_are_not_rewritten(self):
         html = '<code>&lt;a href="/helpdesk/setup"&gt;</code><p data-href="/helpdesk/x">p</p>'
         content = self.page(html)["content"]
