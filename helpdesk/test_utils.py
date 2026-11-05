@@ -1,9 +1,11 @@
+import io
 import json
 from datetime import datetime
 from typing import Any
 from unittest.mock import MagicMock, patch
 
 import frappe
+import requests
 from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
 from frappe.permissions import rights
@@ -1214,3 +1216,15 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
     cards = HelpdeskDashboard(filters).get_number_card_data()
     return {card["title"]: card for card in cards}
+
+
+def make_response(url, status=200, location=None, chunks=(b"ok",)):
+    """Build a requests.Response that streams `chunks`, with an optional Location header."""
+    response = requests.Response()
+    response.status_code = status
+    response.url = url
+    response.raw = io.BytesIO()
+    if location:
+        response.headers["Location"] = location
+    response.iter_content = lambda chunk_size=None: iter(chunks)
+    return response
