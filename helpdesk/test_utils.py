@@ -1247,3 +1247,14 @@ def fake_docs_fetch(site: dict):
         return make_response(final, chunks=(body.encode(),))
 
     return fake
+
+
+def has_redisearch() -> bool:
+    """True when redis has the RediSearch module (CI's apt redis does not)."""
+    from redis.exceptions import ResponseError
+
+    try:
+        frappe.cache().ft("helpdesk_no_such_idx").info()
+    except ResponseError as e:
+        return "unknown command" not in str(e).lower()
+    return True

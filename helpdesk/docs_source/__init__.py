@@ -26,9 +26,12 @@ def get_source() -> DocsSource | None:
     if not settings.docs_source_url:
         return None
     # Imported here: source modules import this one.
+    from helpdesk.docs_source.llms import LlmsSource
     from helpdesk.docs_source.wiki import WikiSource
 
     hidden = json.loads(settings.docs_source_hidden_sections or "[]")
     if settings.docs_source_type == "Frappe Wiki":
         return WikiSource(settings.docs_source_url, hidden)
+    if settings.docs_source_type == "llms.txt":
+        return LlmsSource(settings.docs_source_url)
     return None

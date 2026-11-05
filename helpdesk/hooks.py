@@ -43,6 +43,7 @@ scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
         "helpdesk.search.download_corpus",
+        "helpdesk.docs_source.sync.rebuild_if_missing",
     ],
     "daily": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
@@ -197,7 +198,12 @@ override_whitelisted_methods = {
 }
 
 # The article search index; frappe.clear_cache() would otherwise empty it until the next rebuild
-persistent_cache_keys = ["search_doc:*", "search_doc_sections:*"]
+persistent_cache_keys = [
+    "search_doc:*",
+    "search_doc_sections:*",
+    "docs_page:*",
+    "helpdesk_docs_pages",
+]
 
 notification_skip_email_types = [
     "Reaction",
