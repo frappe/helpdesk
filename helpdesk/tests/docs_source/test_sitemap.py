@@ -1,3 +1,4 @@
+import time
 from unittest.mock import patch
 
 import frappe
@@ -6,7 +7,7 @@ from frappe.tests.utils import change_settings
 
 from helpdesk.docs_source import get_source
 from helpdesk.docs_source.fetch import DocsFetchError
-from helpdesk.docs_source.sitemap import MAX_PAGES, MIN_TEXT, SitemapSource
+from helpdesk.docs_source.sitemap import MAX_PAGES, MIN_TEXT, SitemapSource, _locs
 from helpdesk.test_utils import fake_docs_fetch, make_docs_page as page
 
 SITEMAP = """<?xml version="1.0" encoding="UTF-8"?>
@@ -256,3 +257,12 @@ class TestSitemap(IntegrationTestCase):
             f"<url><loc>https://{self.host}/docs/x/</loc></url></urlset>"
         )
         self.assertEqual(len(self.source._page_urls()), 1)
+
+    def test_loc_scan_is_linear_on_unclosed_loc(self):
+        started = time.monotonic()
+        _locs("<loc>" + " " * 5_000_000 + "<")
+        self.assertLess(time.monotonic() - started, 1)
+
+    def test_sub_path_sitemap_without_loc_falls_through_to_host_root(self):
+        self.site[f"{self.url}/sitemap.xml"] = "<html><body>SPA catch-all</body></html>"
+        self.assertEqual(len(self.source._page_urls()), 2)

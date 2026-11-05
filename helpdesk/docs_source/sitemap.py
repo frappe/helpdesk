@@ -17,7 +17,7 @@ MAX_SITEMAPS = 50
 PAGE_DELAY = 0.5
 SAMPLE_PAGES = 3
 MIN_TEXT = 200
-LOC = re.compile(r"<loc>\s*([^<]*?)\s*</loc>")
+LOC = re.compile(r"<loc>([^<]*)</loc>")
 VERSION = re.compile(r"^(v?\d+(\.(\d+|x))*|next)$")
 MAIN = ("article", "[role=main]", "main")
 NOISE = "nav, header, footer, script, style, .theme-doc-toc-mobile, .theme-doc-version-badge"
@@ -120,9 +120,13 @@ class SitemapSource(IndexedSource):
         error = None
         for url in dict.fromkeys([f"{self.url}/sitemap.xml", f"https://{self.host}/sitemap.xml"]):
             try:
-                return fetch(url, self.host).text
+                text = fetch(url, self.host).text
             except DocsFetchError as e:
                 error = e
+                continue
+            if "<loc>" in text:
+                return text
+            error = DocsFetchError("No sitemap found")
         raise error
 
     def _in_scope(self, locs: list[str]) -> list[str]:
@@ -147,7 +151,7 @@ class SitemapSource(IndexedSource):
 
 
 def _locs(text: str) -> list[str]:
-    return [unescape(loc) for loc in LOC.findall(text)]
+    return [unescape(loc.strip()) for loc in LOC.findall(text)]
 
 
 def _is_versioned(path: str) -> bool:
