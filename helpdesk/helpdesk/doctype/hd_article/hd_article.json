@@ -107,6 +107,7 @@
    "fieldname": "docs_page_route",
    "fieldtype": "Data",
    "label": "Docs page route",
+   "length": 500,
    "read_only": 1,
    "search_index": 1
   },
@@ -114,6 +115,7 @@
    "fieldname": "docs_page_url",
    "fieldtype": "Data",
    "label": "Docs page URL",
+   "length": 1000,
    "read_only": 1
   },
   {

@@ -9,8 +9,9 @@ class DocsSource:
     def search(self, query: str) -> list[dict]:
         raise NotImplementedError
 
-    def get_page(self, route: str) -> dict:
-        """Raises frappe.DoesNotExistError for a missing or hidden page."""
+    def get_page(self, route: str, live: bool = True) -> dict:
+        """Raises frappe.DoesNotExistError for a missing or hidden page. `live=False`
+        reads with the sync timeout and never trips the outage breaker."""
         raise NotImplementedError
 
     def list_pages(self, section: str | None = None) -> list[dict]:

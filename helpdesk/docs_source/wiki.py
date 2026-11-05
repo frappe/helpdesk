@@ -41,17 +41,18 @@ class WikiSource(DocsSource):
         )
         return [self._to_hit(hit) for hit in hits if self._is_visible(hit["route"])]
 
-    def get_page(self, route: str) -> dict:
+    def get_page(self, route: str, live: bool = True) -> dict:
         route = route.strip("/")
+        self._all_sections(live)
         if not self._is_visible(route):
             raise frappe.DoesNotExistError(_("Docs page not found"))
         try:
-            return self._get_page(route)
+            return self._get_page(route, live)
         except DocsFetchError as e:
             if e.status not in MOVED_STATUSES:
                 raise
         try:
-            return self._get_page(self._follow_redirect(route))
+            return self._get_page(self._follow_redirect(route, live), live)
         except DocsFetchError as e:
             if e.status not in MOVED_STATUSES:
                 raise
@@ -77,8 +78,8 @@ class WikiSource(DocsSource):
             if not _is_old_version(key)
         ]
 
-    def _get_page(self, route: str) -> dict:
-        data = self._cached(f"page:{route}", PAGE_SECONDS, lambda: self._read_page(route))
+    def _get_page(self, route: str, live: bool = True) -> dict:
+        data = self._cached(f"page:{route}", PAGE_SECONDS, lambda: self._read_page(route, live))
         base = f"{self.url}/{route}"
         return {
             "route": route,
@@ -90,10 +91,10 @@ class WikiSource(DocsSource):
             "site_url": f"{self.url}/{self._section_of(route)}",
         }
 
-    def _follow_redirect(self, route: str) -> str:
+    def _follow_redirect(self, route: str, live: bool = True) -> str:
         """Final route of a page the API refuses, if it stays on a visible page."""
         try:
-            final = urlsplit(fetch_live(f"{self.url}/{route}", self.host).url).path.strip("/")
+            final = urlsplit((fetch_live if live else fetch)(f"{self.url}/{route}", self.host).url).path.strip("/")
         except DocsFetchError as e:
             if e.status not in MOVED_STATUSES:
                 raise
@@ -108,8 +109,8 @@ class WikiSource(DocsSource):
             lambda: [{k: r[k] for k in ("route", "title", "content")} for r in message["results"]]
         )
 
-    def _read_page(self, route: str) -> dict:
-        data = self._call("wiki_document.get_page_data", live=True, route=route)
+    def _read_page(self, route: str, live: bool = True) -> dict:
+        data = self._call("wiki_document.get_page_data", live=live, route=route)
         return _shaped(
             lambda: {
                 "title": plain_title(data["title"]),
@@ -142,12 +143,13 @@ class WikiSource(DocsSource):
     def _title_of(self, route: str) -> str:
         return self._all_sections()[self._section_of(route)]
 
-    def _all_sections(self) -> dict[str, str]:
-        return self._cached("sections", SECTIONS_SECONDS, self._read_sections)
+    def _all_sections(self, live: bool = True) -> dict[str, str]:
+        return self._cached("sections", SECTIONS_SECONDS, lambda: self._read_sections(live))
 
-    def _read_sections(self) -> dict[str, str]:
+    def _read_sections(self, live: bool = True) -> dict[str, str]:
         sections = {}
-        for title, link in LLMS_LINK.findall(fetch_live(f"{self.url}/llms.txt", self.host).text):
+        get = fetch_live if live else fetch
+        for title, link in LLMS_LINK.findall(get(f"{self.url}/llms.txt", self.host).text):
             path = urlsplit(link).path
             if path.endswith("/llms.txt"):
                 sections[path.removesuffix("/llms.txt").strip("/")] = plain_title(title)

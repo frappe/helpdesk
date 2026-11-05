@@ -1278,11 +1278,13 @@ class FakeSource(DocsSource):
 
     def __init__(self, hits=(), pages=None, sections=()):
         self.hits, self.pages, self._sections = list(hits), pages or {}, list(sections)
+        self.live_calls = []
 
     def search(self, query):
         return self.hits
 
-    def get_page(self, route):
+    def get_page(self, route, live=True):
+        self.live_calls.append(live)
         if route not in self.pages:
             raise frappe.DoesNotExistError
         return {"route": route, **self.pages[route]}

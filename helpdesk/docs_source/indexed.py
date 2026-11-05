@@ -5,7 +5,7 @@ from frappe import _
 from frappe.utils import md_to_html
 
 from helpdesk.docs_source import DocsSource
-from helpdesk.docs_source.fetch import DocsFetchError, fetch_live
+from helpdesk.docs_source.fetch import DocsFetchError, fetch, fetch_live
 from helpdesk.docs_source.index import PAGES_KEY, DocsIndex
 from helpdesk.docs_source.text import clean_html, clean_markdown, has_dot_segment, rewrite_links
 
@@ -31,7 +31,7 @@ class IndexedSource(DocsSource):
     def search(self, query: str) -> list[dict]:
         return DocsIndex().find(query)
 
-    def get_page(self, route: str) -> dict:
+    def get_page(self, route: str, live: bool = True) -> dict:
         route = route.strip("/")
         page = None if has_dot_segment(route) else frappe.cache.hget(PAGES_KEY, route)
         if not page:
@@ -39,7 +39,7 @@ class IndexedSource(DocsSource):
         return {
             "route": route,
             "title": page["title"],
-            "content": rewrite_links(self._read_html(page), page["url"], self._is_page),
+            "content": rewrite_links(self._read_html(page, live), page["url"], self._is_page),
             "label": page["label"],
             "last_updated": None,
             "source_url": page["url"].removesuffix(".md"),
@@ -58,11 +58,11 @@ class IndexedSource(DocsSource):
     def sections(self) -> list[dict]:
         return []
 
-    def _read_html(self, page: dict) -> str:
+    def _read_html(self, page: dict, live: bool = True) -> str:
         key = f"{CACHE}:{page['url']}"
         if (html := frappe.cache.get_value(key)) is None:
             try:
-                text = fetch_live(page["url"], self.host).text
+                text = (fetch_live if live else fetch)(page["url"], self.host).text
             except DocsFetchError as e:
                 if e.status in GONE_STATUSES:
                     raise frappe.DoesNotExistError(_("Docs page not found")) from None

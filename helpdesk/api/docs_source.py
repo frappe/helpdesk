@@ -17,6 +17,7 @@ from helpdesk.docs_source.convert import (
     MAX_BULK,
     convert_page,
     converted_article,
+    job_id,
     mark_pages,
     readable_converted_routes,
     result_key,
@@ -212,6 +213,7 @@ def convert_docs_page(route: str, category: str) -> str:
 def bulk_convert_docs_pages(routes: list[str], category: str) -> None:
     """Convert up to 50 Docs pages into Drafts in `category`, in the background.
     Read the counts with get_bulk_convert_result. Agent Managers only."""
+    frappe.has_permission("HD Article", "create", throw=True)
     _validate_category(category)
     if not isinstance(routes, list) or not all(isinstance(r, str) for r in routes):
         frappe.throw(_("Routes must be a list."))
@@ -222,6 +224,8 @@ def bulk_convert_docs_pages(routes: list[str], category: str) -> None:
     frappe.enqueue(
         run_bulk,
         queue="long",
+        job_id=job_id(frappe.session.user),
+        deduplicate=True,
         enqueue_after_commit=True,
         routes=routes,
         category=category,
