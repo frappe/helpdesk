@@ -555,11 +555,14 @@ def get_kb_sidebar() -> list[dict]:
 def get_article(name: str) -> dict:
     """Get a readable article: content, author, category, reading time, caller's vote.
     `name` may be the URL path `<name>-<title slug>`. `feedback` is 0 none, 1 helpful,
-    2 not helpful. Agents also get `pinned` and `weight`. Doesn't count a view (see
+    2 not helpful. Agents also get `pinned`, `weight`,
+    `docs_page_url` and `docs_copied_on`. Doesn't count a view (see
     increment_views). Guests only when the knowledge base is public."""
     name = _get_article_name(name)
     # the desk article page shows the pin and edits the weight
-    desk_fields = ["pinned", "weight"] if is_agent() else []
+    desk_fields = (
+        ["pinned", "weight", "docs_page_url", "docs_copied_on"] if is_agent() else []
+    )
     article = _get_viewable_article(
         name, [*PUBLIC_ARTICLE_FIELDS, "content", *desk_fields]
     )

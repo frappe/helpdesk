@@ -398,6 +398,8 @@ class TestPublicReads(IntegrationTestCase):
                 "content",
                 "pinned",
                 "weight",
+                "docs_page_url",
+                "docs_copied_on",
                 "category_name",
                 "category_label",
                 "parent_article_category",

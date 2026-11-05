@@ -1287,6 +1287,13 @@ class FakeSource(DocsSource):
             raise frappe.DoesNotExistError
         return {"route": route, **self.pages[route]}
 
+    def list_pages(self, section=None):
+        return [
+            {"route": r, "title": p["title"], "section": r.partition("/")[0]}
+            for r, p in self.pages.items()
+            if section in (None, r.partition("/")[0])
+        ]
+
     def sections(self):
         return self._sections
 

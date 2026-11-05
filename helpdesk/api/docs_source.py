@@ -7,8 +7,21 @@ from frappe.rate_limiter import rate_limit
 from frappe.utils import cint
 
 from helpdesk.api.article import get_related
-from helpdesk.api.knowledge_base import SEARCH_QUERY_LENGTH, validate_public_access
+from helpdesk.api.knowledge_base import (
+    SEARCH_QUERY_LENGTH,
+    _validate_category,
+    validate_public_access,
+)
 from helpdesk.docs_source import get_source
+from helpdesk.docs_source.convert import (
+    MAX_BULK,
+    convert_page,
+    converted_article,
+    mark_pages,
+    readable_converted_routes,
+    result_key,
+    run_bulk,
+)
 from helpdesk.docs_source.fetch import DOWN_KEY, DocsFetchError, log_failure
 from helpdesk.docs_source.index import DocsIndex
 from helpdesk.docs_source.indexed import IndexedSource
@@ -17,6 +30,7 @@ from helpdesk.docs_source.sitemap import SitemapSource
 from helpdesk.docs_source.sync import enqueue_sync, is_syncing
 from helpdesk.docs_source.text import plain_title
 from helpdesk.docs_source.wiki import WikiSource
+from helpdesk.utils import agent_manager_only, is_agent
 
 WIKI = "Frappe Wiki"
 SEARCH_LIMIT = 4
@@ -136,6 +150,8 @@ def search_docs(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
         log_failure(e)
         return []
     limit = cint(limit)
+    hidden = readable_converted_routes([h["route"] for h in hits])
+    hits = [h for h in hits if h["route"] not in hidden]
     return hits[: limit if 0 < limit <= SEARCH_LIMIT else SEARCH_LIMIT]
 
 
@@ -143,8 +159,12 @@ def search_docs(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
 @rate_limit(limit=120, seconds=60, user_based=True)
 def get_doc_page(route: str) -> dict:
     """A Docs page plus `related: {docs, articles}`. Raises DoesNotExistError for a
-    missing or hidden page, no source, or a source that is down."""
+    missing or hidden page, no source, or a source that is down. A readable Converted
+    Article gives `{article: {name, title_slug}}` alone, with no live fetch. Agents also
+    get `converted` and `matching`, each `{name, title}` or None."""
     validate_public_access()
+    if article := converted_article(route):
+        return {"article": article}
     source = get_source()
     if not source:
         frappe.throw(_("Docs page not found"), frappe.DoesNotExistError)
@@ -153,8 +173,67 @@ def get_doc_page(route: str) -> dict:
     except DocsFetchError as e:
         log_failure(e)
         frappe.throw(_("Docs page not found"), frappe.DoesNotExistError)
+    if article := converted_article(page["route"]):
+        return {"article": article}
     page["related"] = _related(source, page["route"], page["title"])
+    if is_agent():
+        mark_pages([page])
     return page
+
+
+@frappe.whitelist(methods=["GET"])
+def list_docs_pages(section: str | None = None) -> list[dict]:
+    """Agents: Docs pages as route, title, section, `converted` and `matching`
+    ({name, title} or None). Empty with no source."""
+    if not is_agent():
+        frappe.throw(_("You are not permitted to access this resource."), frappe.PermissionError)
+    source = get_source()
+    if not source:
+        return []
+    try:
+        pages = source.list_pages(section)
+    except DocsFetchError as e:
+        log_failure(e)
+        frappe.throw(_("The docs pages could not be read right now."))
+    if pages:
+        mark_pages(pages)
+    return pages
+
+
+@frappe.whitelist(methods=["POST"])
+def convert_docs_page(route: str, category: str) -> str:
+    """Copy one Docs page into a Draft Article in `category`. Returns the Article name.
+    Needs create on HD Article."""
+    return convert_page(route, category)
+
+
+@frappe.whitelist(methods=["POST"])
+@agent_manager_only
+def bulk_convert_docs_pages(routes: list[str], category: str) -> None:
+    """Convert up to 50 Docs pages into Drafts in `category`, in the background.
+    Read the counts with get_bulk_convert_result. Agent Managers only."""
+    _validate_category(category)
+    if not isinstance(routes, list) or not all(isinstance(r, str) for r in routes):
+        frappe.throw(_("Routes must be a list."))
+    routes = list(dict.fromkeys(routes))
+    if not routes or len(routes) > MAX_BULK:
+        frappe.throw(_("Choose between 1 and {0} pages.").format(MAX_BULK))
+    frappe.cache.delete_value(result_key(frappe.session.user))
+    frappe.enqueue(
+        run_bulk,
+        queue="long",
+        enqueue_after_commit=True,
+        routes=routes,
+        category=category,
+        user=frappe.session.user,
+    )
+
+
+@frappe.whitelist(methods=["GET"])
+@agent_manager_only
+def get_bulk_convert_result() -> dict | None:
+    """The caller's last bulk run, as `{created, skipped}`, for one hour. None before."""
+    return frappe.cache.get_value(result_key(frappe.session.user))
 
 
 def _normalize_url(url: str) -> str:
@@ -211,7 +290,8 @@ def _related_docs(source, route: str, title: str, articles: list[dict]) -> list[
     except Exception:
         frappe.log_error("Docs page: related docs failed")
         return []
-    article_titles, converted_routes = _article_matches(articles)
+    article_titles = _article_titles(articles)
+    converted_routes = readable_converted_routes([h["route"] for h in hits])
     docs, seen = [], set()
     for hit in hits:
         hit_title = plain_title(hit["title"]).casefold()
@@ -228,13 +308,13 @@ def _related_docs(source, route: str, title: str, articles: list[dict]) -> list[
     return docs[:RELATED_DOCS_LIMIT]
 
 
-def _article_matches(articles: list[dict]) -> tuple[set[str], set[str]]:
-    """Casefolded titles of Related Articles that are not Converted, and the Docs routes of those that are."""
-    rows = frappe.get_all(
-        "HD Article",
-        filters={"name": ["in", [a["name"] for a in articles]]},
-        fields=["name", "docs_page_route"],
+def _article_titles(articles: list[dict]) -> set[str]:
+    """Casefolded titles of Related Articles that are not Converted."""
+    converted = set(
+        frappe.get_all(
+            "HD Article",
+            filters={"name": ["in", [a["name"] for a in articles]], "docs_page_route": ["is", "set"]},
+            pluck="name",
+        )
     )
-    converted = {r.name: r.docs_page_route for r in rows if r.docs_page_route}
-    titles = {plain_title(a["title"]).casefold() for a in articles if a["name"] not in converted}
-    return titles, set(converted.values())
+    return {plain_title(a["title"]).casefold() for a in articles if a["name"] not in converted}
