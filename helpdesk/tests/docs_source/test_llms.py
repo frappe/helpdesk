@@ -104,6 +104,17 @@ class TestLlmsSource(IndexCase):
         self.assertEqual(DocsIndex().find("webhooks")[0]["route"], "api/hooks")
         self.assertEqual(DocsIndex().find("start")[0]["route"], "guides/start")
 
+    def test_mintlify_underscore_indexes_are_read_and_full_text_is_not_an_index(self):
+        self.site[f"{self.url}/llms.txt"] = (
+            f"# Acme\n\n- [Build (3 pages)](https://{self.host}/_llms/build.txt): All of it.\n"
+            f"- [Everything](https://{self.host}/llms-full.txt)\n"
+        )
+        self.site[f"{self.url}/_llms/build.txt"] = "# Build\n- [Webhooks](/api/hooks.md): Events.\n"
+        self.assertTrue(LlmsSource(self.url).is_available())
+        self.sync()
+        self.assertEqual(DocsIndex().find("webhooks")[0]["route"], "api/hooks")
+        self.assertEqual(frappe.db.get_single_value("HD Settings", "docs_source_page_count"), 1)
+
     def test_nested_child_outside_connected_path_is_ignored(self):
         self.url = f"{self.url}/guides"
         self.site = {

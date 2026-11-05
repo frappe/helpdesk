@@ -9,6 +9,8 @@ from helpdesk.docs_source.text import clean_markdown, has_dot_segment, plain_tit
 MAX_PARTS = 20
 LINE = re.compile(r"^\s*[-*] \[(.+?)\]\((\S+?)\)(?:: (.*))?$", re.M)
 NEXT_PART = re.compile(r"^> Next part: (\S+)", re.M)
+# Mintlify lists big sites as /_llms/<section>.txt.
+CHILD_INDEX = re.compile(r"/llms\.txt$|/_llms/.+\.txt$")
 
 
 class LlmsSource(IndexedSource):
@@ -58,7 +60,7 @@ class LlmsSource(IndexedSource):
                 continue
             if host != self.host or not self._is_in_scope(parts.path):
                 continue
-            if parts.path.endswith("/llms.txt"):
+            if CHILD_INDEX.search(parts.path):
                 children.append(link)
             elif parts.path.endswith(".md"):
                 route = parts.path.strip("/").removesuffix(".md")
