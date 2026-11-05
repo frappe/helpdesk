@@ -1045,3 +1045,146 @@ test("desk Article shows Copied from docs on <date>", async ({ page, api }) => {
   await expect(link).toHaveAttribute("href", `${SOURCE}/helpdesk/setup`);
   await expect(link).toHaveAttribute("target", "_blank");
 });
+
+test.describe("fix round 1", () => {
+  const settle = (page: Page, ms = 2600) => page.waitForTimeout(ms);
+
+  test("unstubbed: the settings tab loads and the three GET endpoints answer 200", async ({ page }) => {
+    await page.goto("/help/settings/knowledge-base");
+    const dialog = page.getByRole("dialog", { name: "Settings" });
+    await expect(dialog.getByRole("heading", { name: "Docs source" })).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Connect" })).toBeVisible();
+    await expect(dialog.getByText("Not permitted")).toHaveCount(0);
+    for (const method of ["get_docs_source", "list_docs_pages", "get_bulk_convert_result"]) {
+      const res = await page.request.get(`/api/method/helpdesk.api.docs_source.${method}`);
+      expect(res.status(), method).toBe(200);
+    }
+  });
+
+  docsTest("after a convert the link replaces the button", async ({ page, api, connected }) => {
+    const article = await seedArticle(api);
+    await stubCategories(page);
+    await stubDocs(page, { "helpdesk/setup": docPage("helpdesk/setup") });
+    await page.route(CONVERT, (route) => route.fulfill(json(article.name)));
+    await page.goto("/help/articles/helpdesk/setup");
+    await page.getByRole("button", { name: "Convert to article" }).click();
+    await chooseOption(page, "Guides");
+    await dialogOf(page).getByRole("button", { name: "Convert", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Convert to article" })).toHaveCount(0);
+    await expect(page.locator(`a[href="/helpdesk/kb/articles/${article.name}"]`)).toBeVisible();
+  });
+
+  test("unmount during an in-flight poll stops polling", async ({ page }) => {
+    let calls = 0;
+    let release = () => {};
+    const held = new Promise<void>((resolve) => (release = resolve));
+    const dialog = await openBulkWith(page, INDEXED, listed(2, "Guides"));
+    await page.route(BULK, (route) => route.fulfill(json(null)));
+    await page.route(RESULT, async (route) => {
+      calls++;
+      if (calls === 2) await held;
+      await route.fulfill(json(null));
+    });
+    await dialog.getByRole("button", { name: "Guides" }).click();
+    await dialog.getByRole("checkbox", { name: "Guides page 0" }).check();
+    await dialog.getByRole("button", { name: "Convert 1 page", exact: true }).click();
+    await chooseOption(page, "Billing");
+    await dialogOf(page).last().getByRole("button", { name: "Convert", exact: true }).click();
+    await expect.poll(() => calls).toBe(2);
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    release();
+    await settle(page);
+    expect(calls).toBe(2);
+  });
+
+  test("a poll that gives up shows a message", async ({ page }) => {
+    await page.clock.install();
+    const dialog = await openBulkWith(page, INDEXED, listed(2, "Guides"));
+    await page.route(BULK, (route) => route.fulfill(json(null)));
+    await page.route(RESULT, (route) => route.fulfill(json(null)));
+    await dialog.getByRole("button", { name: "Guides" }).click();
+    await dialog.getByRole("checkbox", { name: "Guides page 0" }).check();
+    await dialog.getByRole("button", { name: "Convert 1 page", exact: true }).click();
+    await chooseOption(page, "Billing");
+    await dialogOf(page).last().getByRole("button", { name: "Convert", exact: true }).click();
+    await page.clock.fastForward("10:00");
+    await expect(dialog.getByText("The bulk convert is taking too long.")).toBeVisible();
+  });
+
+  test("one failed poll does not end polling", async ({ page }) => {
+    const dialog = await openBulkWith(page, INDEXED, listed(2, "Guides"));
+    let calls = 0;
+    await page.route(BULK, (route) => route.fulfill(json(null)));
+    await page.route(RESULT, (route) => {
+      calls++;
+      if (calls === 2) return route.fulfill({ status: 500, json: { exc_type: "ValidationError" } });
+      return route.fulfill(json(calls < 3 ? null : { created: 1, skipped: 0 }));
+    });
+    await dialog.getByRole("button", { name: "Guides" }).click();
+    await dialog.getByRole("checkbox", { name: "Guides page 0" }).check();
+    await dialog.getByRole("button", { name: "Convert 1 page", exact: true }).click();
+    await chooseOption(page, "Billing");
+    await dialogOf(page).last().getByRole("button", { name: "Convert", exact: true }).click();
+    await expect(dialog.getByText("1 created, 0 skipped")).toBeVisible({ timeout: 12_000 });
+  });
+
+  test("wiki search loads unopened sections one at a time, skipping failures", async ({ page }) => {
+    const asked: (string | null)[] = [];
+    await stubCategories(page);
+    await page.route(LIST, (route) => {
+      const section = new URL(route.request().url()).searchParams.get("section");
+      asked.push(section);
+      if (section === "guides") return route.fulfill({ status: 417, json: { exc_type: "ValidationError" } });
+      return route.fulfill(json(listed(2, section!)));
+    });
+    const dialog = await open(page, WIKI);
+    await dialog.getByPlaceholder("Search pages").fill("page");
+    await expect(dialog.getByRole("checkbox", { name: "legal page 1" })).toBeVisible();
+    expect(asked).toEqual(["guides", "legal"]);
+    await dialog.getByPlaceholder("Search pages").fill("page 0");
+    await settle(page, 500);
+    expect(asked).toEqual(["guides", "legal"]);
+  });
+
+  test("the list reloads after a run and converted pages cannot be ticked", async ({ page }) => {
+    let lists = 0;
+    await stubCategories(page);
+    await page.route(LIST, (route) => {
+      lists++;
+      const rows = listed(2, "Guides");
+      if (lists > 1) rows[0].converted = { name: "ART-7", title: "Guides copy" } as any;
+      return route.fulfill(json(rows));
+    });
+    const dialog = await open(page, INDEXED);
+    await page.route(BULK, (route) => route.fulfill(json(null)));
+    let results = 0;
+    await page.route(RESULT, (route) => route.fulfill(json(++results < 2 ? null : { created: 1, skipped: 0 })));
+    await dialog.getByRole("button", { name: "Guides" }).click();
+    await dialog.getByRole("checkbox", { name: "Guides page 0" }).check();
+    await dialog.getByRole("button", { name: "Convert 1 page", exact: true }).click();
+    await chooseOption(page, "Billing");
+    await dialogOf(page).last().getByRole("button", { name: "Convert", exact: true }).click();
+    await expect(dialog.getByRole("link", { name: "Guides copy" })).toBeVisible({ timeout: 10_000 });
+    await expect(dialog.getByRole("checkbox", { name: "Guides page 0" })).toHaveCount(0);
+    expect(lists).toBe(2);
+  });
+
+  test("a cached result shows on mount", async ({ page }) => {
+    let calls = 0;
+    await page.route(RESULT, (route) => {
+      calls++;
+      return route.fulfill(json({ created: 3, skipped: 1 }));
+    });
+    const dialog = await openBulkWith(page, INDEXED, listed(1, "Guides"));
+    await expect(dialog.getByText("3 created, 1 skipped")).toBeVisible();
+    await settle(page);
+    expect(calls).toBe(1);
+  });
+});
+
+async function openBulkWith(page: Page, source: unknown, pages: any[]) {
+  await stubCategories(page);
+  await page.route(LIST, (route) => route.fulfill(json(pages)));
+  return open(page, source);
+}

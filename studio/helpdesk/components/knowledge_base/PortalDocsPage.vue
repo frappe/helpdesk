@@ -91,6 +91,7 @@
             v-model:open="showConvert"
             :routes="[page.route]"
             :matching="page.matching"
+            @done="(name) => (page.converted = { name, title: page.title })"
           />
           <PortalTableOfContents
             v-if="parsed.toc.length > 1"

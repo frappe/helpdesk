@@ -77,6 +77,7 @@ import { call, Button, Checkbox, TextInput } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { __ } from "../translation";
 import DocsBulkConvert from "./DocsBulkConvert.vue";
+import { getDocs } from "./docsApi";
 import { getErrorMessage, timeAgo } from "../utils";
 
 const API = "helpdesk.api.docs_source";
@@ -105,7 +106,7 @@ const statusLine = computed(() => {
 
 onMounted(async () => {
   try {
-    source.value = await call(`${API}.get_docs_source`);
+    source.value = await getDocs("get_docs_source");
   } catch (e) {
     loadFailed.value = true;
     error.value = getErrorMessage(e);
@@ -165,7 +166,7 @@ function poll(before: { synced_on: unknown; error: string }, seen = false, count
   clearTimeout(timer);
   timer = setTimeout(async () => {
     try {
-      source.value = await call(`${API}.get_docs_source`);
+      source.value = await getDocs("get_docs_source");
     } catch {
       // keep polling through a blip
     }

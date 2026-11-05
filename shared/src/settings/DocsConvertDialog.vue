@@ -4,7 +4,7 @@
       <div class="space-y-3">
         <p
           v-if="matching"
-          class="rounded bg-surface-amber-2 p-2 text-p-sm text-ink-amber-3"
+          class="rounded bg-surface-amber-2 p-2 text-p-sm text-ink-gray-9"
         >
           {{ __("An Article with this title already exists:") }}
           <a
@@ -42,7 +42,7 @@ import { call, Button, Combobox, Dialog } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { __ } from "../translation";
 import { getErrorMessage } from "../utils";
-import { articleHref } from "./docsLinks";
+import { articleHref, pagesLabel } from "./docsLinks";
 
 const API = "helpdesk.api.docs_source";
 
@@ -61,7 +61,7 @@ const error = ref("");
 
 const title = computed(() =>
   props.bulk
-    ? __("Convert {0} pages", [props.routes.length])
+    ? pagesLabel(props.routes.length)
     : __("Convert to article")
 );
 
