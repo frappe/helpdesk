@@ -5,6 +5,7 @@ import frappe
 from frappe import _
 from frappe.rate_limiter import rate_limit
 from frappe.utils import cint
+from frappe.utils.background_jobs import is_job_enqueued
 
 from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
@@ -220,6 +221,8 @@ def bulk_convert_docs_pages(routes: list[str], category: str) -> None:
     routes = list(dict.fromkeys(routes))
     if not routes or len(routes) > MAX_BULK:
         frappe.throw(_("Choose between 1 and {0} pages.").format(MAX_BULK))
+    if is_job_enqueued(job_id(frappe.session.user)):
+        frappe.throw(_("A bulk convert is already running."))
     frappe.cache.delete_value(result_key(frappe.session.user))
     frappe.enqueue(
         run_bulk,

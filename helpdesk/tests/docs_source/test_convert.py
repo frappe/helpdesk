@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from unittest.mock import patch
 
 import frappe
@@ -17,7 +18,9 @@ from helpdesk.docs_source.convert import (
     MAX_BULK,
     convert_page,
     converted_article,
+    mark_pages,
     readable_converted_routes,
+    result_key,
     run_bulk,
 )
 from helpdesk.docs_source.fetch import DOWN_KEY, DocsFetchError
@@ -37,6 +40,7 @@ from helpdesk.test_utils import (
 )
 
 API = "helpdesk.api.docs_source"
+HOOK = "helpdesk.helpdesk.doctype.hd_article.hd_article.capture_event"
 CONVERT = "helpdesk.docs_source.convert"
 
 
@@ -64,6 +68,17 @@ class ConvertCase(DocsCase):
     def convert(self, route=None):
         with self.set_user(self.agent):
             return convert_docs_page(route or self.route, self.category)
+
+    @contextmanager
+    def job_db(self):
+        """Commit and rollback act on a savepoint, so the test's own data survives."""
+        rollback = frappe.db.rollback
+        frappe.db.savepoint("job")
+        with (
+            patch("frappe.db.commit", side_effect=lambda: frappe.db.savepoint("job")) as commit,
+            patch("frappe.db.rollback", side_effect=lambda: rollback(save_point="job")),
+        ):
+            yield commit
 
     def field(self, article, name):
         return frappe.db.get_value("HD Article", article, name)
@@ -122,7 +137,7 @@ class TestConvert(ConvertCase):
         for i in range(3):
             self.pages[f"{self.route}-d{i}"] = {**self.pages[self.route], "source_url": f"u{i}"}
         routes = [f"{self.route}-d{i}" for i in range(3)]
-        with patch("frappe.db.commit"):
+        with self.job_db():
             run_bulk(routes, self.category, self.manager)
         self.assertEqual(frappe.db.count("HD Article", {"docs_page_route": ["in", routes]}), 3)
 
@@ -175,10 +190,53 @@ class TestBulk(ConvertCase):
         enqueue.assert_not_called()
 
     def test_bulk_queues_one_index_job_and_pauses_between_pages(self):
-        with patch("frappe.db.commit"), patch("frappe.enqueue") as enqueue, patch(f"{CONVERT}.time.sleep") as sleep:
+        with self.job_db(), patch("frappe.enqueue") as enqueue, patch(f"{CONVERT}.time.sleep") as sleep:
             run_bulk([self.route, self.other], self.category, self.manager)
         self.assertEqual(len(article_index_jobs(enqueue)), 1)
         self.assertEqual(sleep.call_count, 2)
+
+    def test_a_failure_after_insert_leaves_no_row_and_can_be_retried(self):
+        calls = []
+
+        def boom(*args, **kwargs):
+            calls.append(1)
+            if len(calls) == 1:
+                raise frappe.ValidationError("hook")
+
+        with (
+            self.job_db(),
+            patch("frappe.enqueue"),
+            patch(HOOK, side_effect=boom),
+            patch(f"{CONVERT}.frappe.log_error") as log,
+        ):
+            run_bulk([self.route, self.other], self.category, self.manager)
+            self.assertFalse(frappe.db.exists("HD Article", {"docs_page_route": self.route}))
+            self.assertTrue(frappe.db.exists("HD Article", {"docs_page_route": self.other}))
+            log.assert_called_once()  # a ValidationError after insert is unexpected
+            run_bulk([self.route], self.category, self.manager)
+        self.assertTrue(frappe.db.exists("HD Article", {"docs_page_route": self.route}))
+        with self.set_user(self.manager):
+            self.assertEqual(get_bulk_convert_result(), {"created": 1, "skipped": 0})
+
+    def test_a_second_bulk_is_refused_while_one_runs(self):
+        key = result_key(self.manager)
+        frappe.cache.set_value(key, {"created": 1, "skipped": 0})
+        self.addCleanup(frappe.cache.delete_value, key)
+        with (
+            self.set_user(self.manager),
+            patch(f"{API}.is_job_enqueued", return_value=True),
+            patch(f"{API}.frappe.enqueue") as enqueue,
+        ):
+            with self.assertRaisesRegex(frappe.ValidationError, "already running"):
+                bulk_convert_docs_pages([self.route], self.category)
+        enqueue.assert_not_called()
+        self.assertEqual(frappe.cache.get_value(key), {"created": 1, "skipped": 0})
+
+    def test_marking_pages_ignores_an_empty_route(self):
+        make_article(docs_page_route=None)
+        page = {"route": "", "title": "Whatever"}
+        mark_pages([page])
+        self.assertEqual((page["converted"], page["matching"]), (None, None))
 
     def test_a_timeout_in_a_bulk_run_does_not_trip_the_breaker(self):
         wiki = WikiSource("https://docs.example.com", [])
@@ -187,11 +245,12 @@ class TestBulk(ConvertCase):
             patch(f"{CONVERT}.get_source", return_value=wiki),
             patch("helpdesk.docs_source.wiki.fetch", side_effect=timeout),
             patch("helpdesk.docs_source.fetch.fetch", side_effect=timeout),
-            patch("frappe.db.commit"),
+            self.job_db(),
             patch(f"{CONVERT}.time.sleep"),
-            patch("helpdesk.docs_source.fetch.frappe.log_error"),
+            patch(f"{CONVERT}.frappe.log_error") as log,
         ):
             run_bulk([self.route, self.other], self.category, self.manager)
+        log.assert_called_once()  # the outage, once per run
         self.assertFalse(frappe.cache.get_value(DOWN_KEY))
         with self.set_user(self.manager):
             self.assertEqual(get_bulk_convert_result(), {"created": 0, "skipped": 2})
@@ -209,7 +268,7 @@ class TestBulk(ConvertCase):
     def test_bulk_reports_created_and_skipped(self):
         self.convert(self.other)
         routes = [self.route, self.other, "helpdesk/missing"]
-        with patch("frappe.db.commit") as commit, patch(f"{CONVERT}.frappe.log_error") as log:
+        with self.job_db() as commit, patch(f"{CONVERT}.frappe.log_error") as log:
             run_bulk(routes, self.category, self.manager)
         self.assertEqual(commit.call_count, 4)  # a page each, then the end
         log.assert_not_called()  # refusals are plain skips
@@ -229,7 +288,7 @@ class TestBulk(ConvertCase):
             return original(route)
 
         self.source.get_page = broken
-        with patch("frappe.db.commit"), patch(f"{CONVERT}.frappe.log_error") as log:
+        with self.job_db(), patch(f"{CONVERT}.frappe.log_error") as log:
             run_bulk([self.other, self.route], self.category, self.manager)
         log.assert_called_once()
         self.assertFalse(frappe.db.exists("HD Article", {"docs_page_route": self.other}))

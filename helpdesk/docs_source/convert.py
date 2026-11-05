@@ -52,7 +52,7 @@ def readable_converted_routes(routes: list[str]) -> set[str]:
 
 def mark_pages(pages: list[dict]) -> None:
     """For agents: add `converted` and `matching` ({name, title} or None) with 2 queries."""
-    routes = [p["route"] for p in pages]
+    routes = [p["route"] for p in pages if p["route"]]
     converted = {
         r.docs_page_route: _ref(r)
         for r in frappe.get_all(
@@ -82,17 +82,27 @@ def mark_pages(pages: list[dict]) -> None:
 def run_bulk(routes: list[str], category: str, user: str) -> None:
     """The background job: convert each page, skip failures, store the counts."""
     created = skipped = 0
+    outage_logged = False
     with batched_article_index():
         for route in routes:
             time.sleep(PAGE_PAUSE)
+            page = None
             try:
-                _convert(route, category, live=False)
+                page = _read(route, live=False)
+                _insert(page, category)
                 created += 1
-            except frappe.ValidationError:
+            except Exception as e:
+                # drops a row the insert hooks left behind; the log has its own connection
+                frappe.db.rollback()
                 skipped += 1
-            except Exception:
-                skipped += 1
-                frappe.log_error(f"Docs bulk convert failed: {route}")
+                if page is None and isinstance(e, frappe.ValidationError):
+                    pass  # a refusal made before the insert
+                elif isinstance(e, DocsFetchError):
+                    if not outage_logged:
+                        frappe.log_error("Docs bulk convert could not read pages", str(e))
+                        outage_logged = True
+                else:
+                    frappe.log_error(f"Docs bulk convert failed: {route}")
             # a commit per page keeps the work of a killed job
             frappe.db.commit()
     frappe.db.commit()  # sends the index job
@@ -109,18 +119,28 @@ def result_key(user: str) -> str:
     return f"docs_bulk_convert:{user}"
 
 
-def _convert(route: str, category: str, live: bool = True) -> str:
-    source = get_source()
-    if not source:
-        frappe.throw(_("No docs source is connected."))
+def _convert(route: str, category: str) -> str:
     try:
-        page = source.get_page(route, live=live)
+        page = _read(route)
     except DocsFetchError as e:
         log_failure(e)
         frappe.throw(_("The docs page could not be read right now."))
+    return _insert(page, category)
+
+
+def _read(route: str, live: bool = True) -> dict:
+    """The Docs page to copy. Raises DocsFetchError, or a ValidationError for a refusal."""
+    source = get_source()
+    if not source:
+        frappe.throw(_("No docs source is connected."))
+    page = source.get_page(route, live=live)
     # ponytail: check-then-insert races, a unique index if concurrent converts matter
     if frappe.db.exists("HD Article", {"docs_page_route": page["route"]}):
         frappe.throw(_("This docs page is already converted."))
+    return page
+
+
+def _insert(page: dict, category: str) -> str:
     return (
         frappe.get_doc(
             {
