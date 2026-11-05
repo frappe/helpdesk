@@ -245,9 +245,10 @@ const articleRows = computed(() =>
 );
 // Docs join only once they answer the same query as the Articles.
 const docRows = computed(() => {
-  const sameQuery = results.settledQuery === docs.settledQuery;
+  const sameQuery =
+    docs.settledQuery && results.settledQuery === docs.settledQuery;
   const hits = docs.error || !sameQuery ? [] : docs.data || [];
-  return visibleDocs(results.data || [], hits, docs.settledQuery || "")
+  return visibleDocs(results.data || [], hits, docs.settledQuery)
     .slice(0, MAX_DOCS)
     .map((doc) => ({
       type: "custom",

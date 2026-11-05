@@ -554,6 +554,25 @@ test.describe("search list", () => {
     await expect(page.getByText(/unavailable|error|failed/i)).toHaveCount(0);
   });
 
+  docsTest("no old Docs row shows while a new query is in flight", async ({ page, connected }) => {
+    const hold = gate();
+    await stubSearch(
+      page,
+      async (query) => (query === "third" ? (await hold.held, []) : [articleHit(query === "guide" ? "Alpha guide" : "Art report")]),
+      async (query) => (query === "guide" ? [docHit("helpdesk/old", "Stale guide")] : (await hold.held, []))
+    );
+    const box = await searchFor(page, "guide");
+    await expect(rowsOf(page)).toHaveCount(2);
+    const reportArticles = page.waitForResponse(ARTICLE_SEARCH);
+    await box.fill("report");
+    await reportArticles;
+    await expect(rowsOf(page).filter({ hasText: "Art report" })).toHaveCount(1);
+    await box.fill("third");
+    await page.waitForTimeout(700);
+    expect(await rowsOf(page).filter({ hasText: "Stale guide" }).count()).toBe(0);
+    hold.open();
+  });
+
   docsTest("no empty state while docs are pending", async ({ page, connected }) => {
     const docsGate = gate();
     const answered = page.waitForResponse(ARTICLE_SEARCH);
