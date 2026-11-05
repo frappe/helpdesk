@@ -20,7 +20,7 @@ MIN_TEXT = 200
 LOC = re.compile(r"<loc>([^<]*)</loc>")
 VERSION = re.compile(r"^(v?\d+(\.(\d+|x))*|next)$")
 MAIN = ("article", "[role=main]", "main")
-NOISE = "nav, header, footer, script, style, .theme-doc-toc-mobile, .theme-doc-version-badge"
+NOISE = "nav, header, footer, script, style, button, .theme-doc-toc-mobile, .theme-doc-version-badge"
 PERMALINKS = "a.headerlink, a.hash-link"
 
 

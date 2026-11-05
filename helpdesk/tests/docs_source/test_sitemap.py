@@ -47,6 +47,7 @@ DOCUSAURUS = f"""<!doctype html><html><head><title>Custom domain | Acme</title><
     <nav class="breadcrumbs">Breadcrumb</nav>
     <div class="theme-doc-toc-mobile">Mobile TOC</div><span class="theme-doc-version-badge">Version 3</span>
     <p>{TEXT}</p><script>alert(1)</script><style>p {{}}</style>
+    <div><pre><code>npm start</code></pre><button type="button">Copy</button></div>
     <p>See <a href="/docs/intro">intro</a>.</p>
   </article></div>
   <div class="col col--3"><div class="tableOfContents"><ul><li>On this page TOC</li></ul></div></div>
@@ -130,7 +131,7 @@ class TestSitemap(IntegrationTestCase):
     def test_main_drops_nav_and_footer(self):
         title, html = self.source.extract_main(DOCUSAURUS)
         self.assertEqual(title, "Custom domain")
-        for gone in ("Menu", "Sidebar", "Breadcrumb", "On this page", "Mobile TOC", "Version 3", "Copyright", "alert", "<h1", "<script"):
+        for gone in ("Menu", "Sidebar", "Breadcrumb", "On this page", "Mobile TOC", "Version 3", "Copy", "alert", "<h1", "<script"):
             self.assertNotIn(gone, html)
         self.assertIn("verify the record", html)
 
