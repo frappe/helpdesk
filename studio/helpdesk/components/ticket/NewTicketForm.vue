@@ -91,6 +91,7 @@ import { applyFieldFilters } from "@helpdesk/shared/formScripts";
 import { __ } from "@helpdesk/shared/translation";
 import { HandleExcelPaste } from "@helpdesk/shared/tiptap";
 import {
+  SEARCH_DEBOUNCE_MS,
   isContentEmpty,
   parseLinkFilters,
   runAction,
@@ -351,41 +352,49 @@ const docsSearch = useArticleSearch(suggestionQuery, {
   enabled: hasDocs,
 });
 
-// After the wait, the Articles show alone and later docs are ignored for that query.
-const gaveUpOn = ref<string | null>(null);
-let docsTimer: ReturnType<typeof setTimeout>;
-const articlesAnswered = computed(() =>
-  props.docsSource == null ? null : articleSearch.settledQuery
-);
-watch(articlesAnswered, (query) => {
-  clearTimeout(docsTimer);
-  gaveUpOn.value = null;
-  if (query && hasDocs())
-    docsTimer = setTimeout(() => (gaveUpOn.value = query), DOCS_WAIT_MS);
-});
-onBeforeUnmount(() => clearTimeout(docsTimer));
-
-// The query both lists answered; null while either is in flight or config loads.
-const settledQuery = computed(() => {
-  const query = articlesAnswered.value;
-  if (!query) return null;
-  const docsDone =
-    !hasDocs() ||
-    docsSearch.settledQuery === query ||
-    gaveUpOn.value === query;
-  return docsDone ? query : null;
-});
-// Kept until the next pair settles, so no link moves.
+// Kept until the next subject is ready, so no link moves.
 const suggestions = ref<Hit[]>([]);
-watch(settledQuery, (query) => {
-  if (!query) return;
-  const articles = articleSearch.error ? [] : articleSearch.data || [];
-  const docsIn = hasDocs() && docsSearch.settledQuery === query;
-  const docs = docsIn && !docsSearch.error ? docsSearch.data || [] : [];
-  suggestions.value = pickSuggestions(articles, docs, query, SUGGESTION_LIMIT);
+// One deadline per subject, from the keystroke plus the search debounce.
+const subjectText = computed(() => suggestionQuery.value.trim());
+const deadlineFor = ref<string | null>(null);
+const shownFor = ref<string | null>(null);
+let deadlineTimer: ReturnType<typeof setTimeout>;
+watch(
+  subjectText,
+  (text) => {
+    clearTimeout(deadlineTimer);
+    deadlineFor.value = shownFor.value = null;
+    if (text.length < MIN_QUERY_LENGTH) return void (suggestions.value = []);
+    deadlineTimer = setTimeout(() => {
+      if (text === subjectText.value) deadlineFor.value = text;
+    }, SEARCH_DEBOUNCE_MS + DOCS_WAIT_MS);
+  },
+  { immediate: true }
+);
+onBeforeUnmount(() => clearTimeout(deadlineTimer));
+
+// Both lists for the current subject, or whichever settled once the deadline passed.
+const ready = computed(() => {
+  const text = subjectText.value;
+  if (text.length < MIN_QUERY_LENGTH || shownFor.value === text) return null;
+  const late = deadlineFor.value === text;
+  const articlesIn = articleSearch.settledQuery === text;
+  const docsIn = Boolean(props.docsSource) && docsSearch.settledQuery === text;
+  // Unloaded config counts as no docs only after the deadline.
+  const docsDone = props.docsSource == null ? false : !props.docsSource || docsIn;
+  if (!late && !(articlesIn && docsDone)) return null;
+  return {
+    text,
+    late,
+    articles: articlesIn && !articleSearch.error ? articleSearch.data || [] : [],
+    docs: docsIn && !docsSearch.error ? docsSearch.data || [] : [],
+  };
 });
-watch(suggestionQuery, (query) => {
-  if (query.trim().length < MIN_QUERY_LENGTH) suggestions.value = [];
+watch(ready, (now) => {
+  if (!now) return;
+  suggestions.value = pickSuggestions(now.articles, now.docs, now.text, SUGGESTION_LIMIT);
+  // An empty deadline stays open, so a late answer still shows.
+  if (!now.late || suggestions.value.length) shownFor.value = now.text;
 });
 
 // Only priority shows its description, as on the ticket page.

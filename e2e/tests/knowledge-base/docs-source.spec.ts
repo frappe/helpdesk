@@ -674,14 +674,118 @@ test.describe("ticket form suggestions", () => {
       await docsGate.held;
       return [docHit("helpdesk/best", "Best page")];
     });
-    const started = Date.now();
     await typeSubject(page, "zzz");
+    const started = Date.now();
     await expect(suggestionLinks(page)).toHaveCount(2);
-    expect(Date.now() - started).toBeGreaterThan(1800);
+    const waited = Date.now() - started;
+    expect(waited).toBeGreaterThan(1500);
+    expect(waited).toBeLessThan(3200);
     docsGate.open();
     await page.waitForTimeout(700);
     expect(await suggestionLinks(page).count()).toBe(2);
     await expect(suggestionLinks(page).nth(1)).toContainText("Two");
+  });
+
+  docsTest("late Articles for a cut subject do not come back", async ({ page, connected }) => {
+    const hold = gate();
+    await stubSearch(page, async () => (await hold.held, [articleHit("Stale article")]), []);
+    const box = await typeSubject(page, "abcd");
+    await page.waitForTimeout(500);
+    await box.fill("ab");
+    hold.open();
+    await page.waitForTimeout(800);
+    expect(await suggestionLinks(page).count()).toBe(0);
+  });
+
+  docsTest("the cap timer of an old subject shows nothing for the new one", async ({ page, connected }) => {
+    const hold = gate();
+    await stubSearch(
+      page,
+      async (query) => (query === "older" ? [articleHit("Older link")] : (await hold.held, [articleHit("Newer link")])),
+      async () => (await hold.held, [])
+    );
+    const box = await typeSubject(page, "older");
+    await page.waitForTimeout(1000);
+    await box.fill("newer");
+    await page.waitForTimeout(2500);
+    expect(await suggestionLinks(page).filter({ hasText: "Older link" }).count()).toBe(0);
+    hold.open();
+    await expect(suggestionLinks(page)).toHaveCount(1);
+    await expect(suggestionLinks(page).first()).toContainText("Newer link");
+  });
+
+  docsTest("slow Articles do not push the cap past 2s from the search", async ({ page, connected }) => {
+    const docsGate = gate();
+    await stubSearch(
+      page,
+      async () => {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        return [articleHit("Slow article")];
+      },
+      async () => (await docsGate.held, [docHit("helpdesk/best", "Best page")])
+    );
+    await typeSubject(page, "zzz");
+    const started = Date.now();
+    await expect(suggestionLinks(page)).toHaveCount(1);
+    expect(Date.now() - started).toBeLessThan(3000);
+    docsGate.open();
+  });
+
+  docsTest("held Articles with answered docs still show the Docs pages", async ({ page, connected }) => {
+    const hold = gate();
+    await stubSearch(page, async () => (await hold.held, [articleHit("Late article")]), [docHit("helpdesk/best", "Best page")]);
+    await typeSubject(page, "zzz");
+    await expect(suggestionLinks(page)).toHaveCount(1, { timeout: 5000 });
+    await expect(suggestionLinks(page).first()).toContainText("Best page");
+    hold.open();
+    await page.waitForTimeout(500);
+    expect(await suggestionLinks(page).count()).toBe(1);
+  });
+
+  docsTest("an empty deadline does not lose a late answer", async ({ page, connected }) => {
+    const hold = gate();
+    await stubSearch(page, async () => (await hold.held, [articleHit("Late article")]), async () => (await hold.held, []));
+    await typeSubject(page, "zzz");
+    await page.waitForTimeout(2800);
+    expect(await suggestionLinks(page).count()).toBe(0);
+    hold.open();
+    await expect(suggestionLinks(page)).toHaveCount(1);
+  });
+
+  docsTest("a failed config load still shows Articles", async ({ page, connected }) => {
+    await page.route("**/api/method/helpdesk.api.config.get_config*", (route) =>
+      route.fulfill({ status: 500, json: { exc_type: "ValidationError" } })
+    );
+    await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta guide")]);
+    await typeSubject(page, "guide");
+    await expect(suggestionLinks(page)).toHaveCount(1, { timeout: 5000 });
+    await expect(suggestionLinks(page).first()).toContainText("Alpha guide");
+  });
+
+  docsTest("a failed docs answer does not bring back the old Docs pages", async ({ page, connected }) => {
+    await stubSearch(
+      page,
+      async (query) => [articleHit(query === "first" ? "Alpha" : "Beta")],
+      async (query) => (query === "first" ? [docHit("helpdesk/old", "Old docs")] : 500)
+    );
+    const box = await typeSubject(page, "first");
+    await expect(suggestionLinks(page)).toHaveCount(2);
+    await box.fill("second");
+    await expect(suggestionLinks(page)).toHaveCount(1);
+    await expect(suggestionLinks(page).first()).toContainText("Beta");
+  });
+
+  docsTest("a failed Articles answer does not bring back the old Articles", async ({ page, connected }) => {
+    await stubSearch(
+      page,
+      async (query) => (query === "first" ? [articleHit("Alpha")] : 500),
+      async (query) => (query === "first" ? [] : [docHit("helpdesk/new", "New docs")])
+    );
+    const box = await typeSubject(page, "first");
+    await expect(suggestionLinks(page)).toHaveCount(1);
+    await box.fill("second");
+    await expect(suggestionLinks(page).first()).toContainText("New docs");
+    await expect(suggestionLinks(page)).toHaveCount(1);
   });
 
   docsTest("old suggestions stay until the new list is ready", async ({ page, connected }) => {
