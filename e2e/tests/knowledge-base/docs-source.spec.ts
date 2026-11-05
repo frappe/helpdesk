@@ -36,7 +36,8 @@ const INDEXED = {
   type: "llms.txt",
   label: "docs.example.com",
   page_count: 142,
-  synced_on: new Date(Date.now() - 3 * 86400_000).toISOString().replace("T", " ").slice(0, 19),
+  // Half a day of margin, so the label is 3 or 4 days at any hour.
+  synced_on: new Date(Date.now() - 3.5 * 86400_000).toISOString().replace("T", " ").slice(0, 19),
 };
 
 const json = (message: unknown) => ({ json: { message } });
@@ -84,7 +85,7 @@ test("unreadable wiki sections show a message, not an empty list", async ({ page
 test("indexed source shows Resync and the page line", async ({ page }) => {
   const dialog = await open(page, { ...INDEXED, truncated: true });
   await expect(dialog.getByRole("button", { name: "Resync" })).toBeVisible();
-  await expect(dialog.getByText(/142 pages · synced 3 days ago/)).toBeVisible();
+  await expect(dialog.getByText(/142 pages · synced [34] days ago/)).toBeVisible();
   await expect(dialog.getByText(/not all pages/i)).toBeVisible();
   await expect(dialog.getByRole("checkbox")).toHaveCount(0);
 });
