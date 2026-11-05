@@ -7,9 +7,13 @@ from redis.exceptions import ResponseError
 
 from helpdesk.docs_source import get_source
 from helpdesk.docs_source.index import DocsIndex
+from helpdesk.docs_source.fetch import DocsFetchError
+from helpdesk.docs_source.llms import LlmsSource
 from helpdesk.docs_source.sync import (
     REBUILD_KEY,
+    enqueue_sync,
     is_syncing,
+    job_id,
     rebuild_if_missing,
     run_sync,
 )
@@ -138,6 +142,52 @@ class TestLlmsSource(IndexCase):
         self.assertFalse(DocsIndex().find("custom"))
         self.fetch.assert_not_called()
 
+    def test_sync_writes_nothing_when_url_changes_mid_read(self):
+        def read_pages():
+            # raw SQL: another connection's commit, with this one's cached value stale
+            frappe.db.sql(
+                "update tabSingles set value=%s where field='docs_source_url'", "https://x.example"
+            )
+            return "L", [{"route": "a", "title": "A", "url": "u", "body": "b"}]
+
+        before = frappe.db.get_single_value("HD Settings", "docs_source_page_count")
+        with patch.object(LlmsSource, "read_pages", side_effect=read_pages):
+            self.sync()
+        self.assertFalse(DocsIndex().find("a"))
+        self.assertEqual(frappe.db.get_single_value("HD Settings", "docs_source_page_count"), before)
+
+    def test_deleted_page_is_not_found(self):
+        self.sync()
+        for status in (404, 410):
+            self.site[f"{self.url}/guides/domain.md"] = status
+            frappe.cache.delete_keys("helpdesk_docs_llms")
+            with self.assertRaises(frappe.DoesNotExistError):
+                get_source().get_page("guides/domain")
+        self.site[f"{self.url}/guides/domain.md"] = 500
+        frappe.cache.delete_keys("helpdesk_docs_llms")
+        with self.assertRaises(DocsFetchError):
+            get_source().get_page("guides/domain")
+
+    def test_page_reads_cache_the_cleaned_html(self):
+        self.sync()
+        get_source().get_page("guides/domain")
+        self.site[f"{self.url}/guides/domain.md"] = 500
+        self.assertIn("CNAME", get_source().get_page("guides/domain")["content"])
+        cached = frappe.cache.get_value(f"helpdesk_docs_llms:{self.url}/guides/domain.md")
+        self.assertNotIn("script", cached)
+        self.assertNotIn("/help/articles", cached)
+
+    def test_words_after_a_line_break_are_searchable(self):
+        self.site[f"{self.url}/llms-full.txt"] = "# Custom domain\n\nkiwi\n\nzebra tail\n"
+        self.sync()
+        self.assertTrue(DocsIndex().find("zebra"))
+
+    def test_bad_link_line_is_skipped(self):
+        self.site[f"{self.url}/llms.txt"] += "- [Bad](https://[bad/x.md)\n"
+        self.sync()
+        self.assertFalse(frappe.db.get_single_value("HD Settings", "docs_source_sync_error"))
+        self.assertEqual(frappe.db.get_single_value("HD Settings", "docs_source_page_count"), 3)
+
     def test_clear_cache_keeps_index(self):
         self.sync()
         frappe.clear_cache()
@@ -169,6 +219,59 @@ class TestLlmsSource(IndexCase):
             ["guides/domain", "guides/start"],
         )
         self.assertEqual(len(source.list_pages(None)), 3)
+
+
+class TestLlmsParsing(IntegrationTestCase):
+    def source(self, site):
+        url = "https://docs.example.com"
+        patcher = patch("helpdesk.docs_source.llms.fetch", side_effect=fake_docs_fetch(site))
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        return LlmsSource(url)
+
+    def test_is_available_for_flat_nested_and_missing(self):
+        root = "https://docs.example.com/llms.txt"
+        flat = self.source({root: "# D\n- [A](https://docs.example.com/a.md)\n"})
+        self.assertTrue(flat.is_available())
+        nested = self.source({root: "# D\n- [API](https://docs.example.com/api/llms.txt)\n"})
+        self.assertTrue(nested.is_available())
+        self.assertFalse(self.source({root: "# D\nnothing here\n"}).is_available())
+        self.assertFalse(self.source({}).is_available())
+
+    def test_full_text_skips_agent_sections_and_unmatched_headings(self):
+        site = {
+            "https://docs.example.com/llms.txt": "# D\n- [A](https://docs.example.com/a.md): s\n- [B](https://docs.example.com/b.md): t\n",
+            "https://docs.example.com/llms-full.txt": "# A\n\n> agent quote\n\nkiwi\n\n```\n# not a heading\nzebra\n```\n"
+            "# Agent Instructions\n\nhijack payload\n\n# B\n\nfine\n",
+        }
+        bodies = {p["route"]: p["body"] for p in self.source(site).read_pages()[1]}
+        self.assertIn("kiwi", bodies["a"])
+        self.assertIn("zebra", bodies["a"])
+        self.assertNotIn("hijack", bodies["a"])
+        self.assertNotIn("quote", bodies["a"])
+        self.assertEqual(bodies["b"], "fine")
+        self.assertNotIn("\n", bodies["a"])
+
+    def test_pages_have_the_documented_shape(self):
+        root = "https://docs.example.com/llms.txt"
+        source = self.source(
+            {
+                root: "# D\n- [A](https://docs.example.com/a.md): sum\n",
+                "https://docs.example.com/llms-full.txt": "# A\n\nfull text\n",
+            }
+        )
+        _, pages = source.read_pages()
+        self.assertEqual(
+            pages,
+            [
+                {
+                    "route": "a",
+                    "title": "A",
+                    "url": "https://docs.example.com/a.md",
+                    "body": "full text",
+                }
+            ],
+        )
 
 
 class TestSync(IntegrationTestCase):
@@ -204,10 +307,14 @@ class TestSync(IntegrationTestCase):
         self.enqueue.assert_called_once()
 
     def test_rebuild_waits_an_hour_after_attempt(self):
-        with patch.object(DocsIndex, "index_exists", return_value=False):
+        with (
+            patch.object(DocsIndex, "index_exists", return_value=False),
+            patch.object(frappe.cache, "set_value", wraps=frappe.cache.set_value) as setter,
+        ):
             rebuild_if_missing()
             rebuild_if_missing()
         self.enqueue.assert_called_once()
+        setter.assert_any_call(REBUILD_KEY, 1, expires_in_sec=3600)
 
     def test_rebuild_skips_while_syncing_and_for_wiki(self):
         with (
@@ -221,7 +328,28 @@ class TestSync(IntegrationTestCase):
                 rebuild_if_missing()
         self.enqueue.assert_not_called()
 
-    def test_is_syncing_reads_the_job(self):
+    def test_is_syncing_reads_the_job_of_the_current_url(self):
         with patch("helpdesk.docs_source.sync.is_job_enqueued", return_value=True) as job:
             self.assertTrue(is_syncing())
-        job.assert_called_once_with("docs_source_sync")
+        job.assert_called_once_with(job_id("https://docs.example.com"))
+
+    def test_job_id_is_per_url_and_enqueues_after_commit(self):
+        self.assertNotEqual(job_id("https://a.example"), job_id("https://b.example"))
+        enqueue_sync()
+        kwargs = self.enqueue.call_args.kwargs
+        self.assertEqual(kwargs["job_id"], job_id("https://docs.example.com"))
+        self.assertTrue(kwargs["enqueue_after_commit"])
+        self.assertTrue(kwargs["deduplicate"])
+
+    def test_other_redis_errors_are_logged_not_blamed_on_redisearch(self):
+        with (
+            patch.object(LlmsSource, "read_pages", return_value=("L", [])),
+            patch.object(
+                DocsIndex, "replace", side_effect=ResponseError("OOM command not allowed")
+            ),
+            patch("helpdesk.docs_source.sync.frappe.log_error") as log,
+        ):
+            run_sync("https://docs.example.com")
+        error = frappe.db.get_single_value("HD Settings", "docs_source_sync_error")
+        self.assertIn("OOM", error)
+        log.assert_called_once()

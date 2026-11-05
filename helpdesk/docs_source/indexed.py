@@ -5,12 +5,13 @@ from frappe import _
 from frappe.utils import md_to_html
 
 from helpdesk.docs_source import DocsSource
-from helpdesk.docs_source.fetch import fetch_live
+from helpdesk.docs_source.fetch import DocsFetchError, fetch_live
 from helpdesk.docs_source.index import PAGES_KEY, DocsIndex
 from helpdesk.docs_source.text import clean_html, clean_markdown, has_dot_segment, rewrite_links
 
 PAGE_SECONDS = 600
 CACHE = "helpdesk_docs_llms"
+GONE_STATUSES = (404, 410)
 
 
 class IndexedSource(DocsSource):
@@ -35,10 +36,9 @@ class IndexedSource(DocsSource):
         page = None if has_dot_segment(route) else frappe.cache.hget(PAGES_KEY, route)
         if not page:
             raise frappe.DoesNotExistError(_("Docs page not found"))
-        html = md_to_html(clean_markdown(self._read_markdown(page["url"]), page["title"]))
         return {
             "title": page["title"],
-            "content": rewrite_links(clean_html(html), page["url"], self._is_page),
+            "content": rewrite_links(self._read_html(page), page["url"], self._is_page),
             "label": page["label"],
             "last_updated": None,
             "source_url": page["url"].removesuffix(".md"),
@@ -57,12 +57,18 @@ class IndexedSource(DocsSource):
     def sections(self) -> list[dict]:
         return []
 
-    def _read_markdown(self, url: str) -> str:
-        key = f"{CACHE}:{url}"
-        if (text := frappe.cache.get_value(key)) is None:
-            text = fetch_live(url, self.host).text
-            frappe.cache.set_value(key, text, expires_in_sec=PAGE_SECONDS)
-        return text
+    def _read_html(self, page: dict) -> str:
+        key = f"{CACHE}:{page['url']}"
+        if (html := frappe.cache.get_value(key)) is None:
+            try:
+                text = fetch_live(page["url"], self.host).text
+            except DocsFetchError as e:
+                if e.status in GONE_STATUSES:
+                    raise frappe.DoesNotExistError(_("Docs page not found")) from None
+                raise
+            html = clean_html(md_to_html(clean_markdown(text, page["title"])))
+            frappe.cache.set_value(key, html, expires_in_sec=PAGE_SECONDS)
+        return html
 
     def _is_page(self, route: str) -> bool:
         return not has_dot_segment(route) and frappe.cache.hexists(PAGES_KEY, route)

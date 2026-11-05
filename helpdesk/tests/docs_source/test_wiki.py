@@ -191,6 +191,10 @@ class TestWikiSource(IntegrationTestCase):
         html = '<a href="/helpdesk/%2e%2e/%2e%2e/api/method/x">a</a><a href="/helpdesk/../x">b</a>'
         self.assertNotIn("/help/articles", self.page(html)["content"])
 
+    def test_md_links_point_at_articles_route(self):
+        html = '<a href="/helpdesk/install.md#top">a</a>'
+        self.assertIn('href="/help/articles/helpdesk/install#top"', self.page(html)["content"])
+
     def test_title_is_plain(self):
         site = {PAGE: {"message": {"title": "A &amp; <b>B</b>", "rendered_content": "<p>x</p>"}}}
         self.assertEqual(self.run_with(lambda s: s.get_page("helpdesk/setup"), site)["title"], "A & B")

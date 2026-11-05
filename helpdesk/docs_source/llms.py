@@ -4,7 +4,7 @@ from urllib.parse import urljoin, urlsplit
 
 from helpdesk.docs_source.fetch import DocsFetchError, fetch
 from helpdesk.docs_source.indexed import IndexedSource
-from helpdesk.docs_source.text import has_dot_segment, plain_title, to_plain
+from helpdesk.docs_source.text import clean_markdown, has_dot_segment, plain_title, to_plain
 
 MAX_PARTS = 20
 LINE = re.compile(r"^\s*[-*] \[(.+?)\]\((\S+?)\)(?:: (.*))?$", re.M)
@@ -20,31 +20,48 @@ class LlmsSource(IndexedSource):
 
     def is_available(self) -> bool:
         try:
-            return bool(self._read_index(f"{self.url}/llms.txt")[1])
+            _, pages, children = self._parse(f"{self.url}/llms.txt")
+            return bool(pages or children)
         except DocsFetchError:
             return False
 
     def read_pages(self) -> tuple[str, list[dict]]:
-        label, pages = self._read_index(f"{self.url}/llms.txt", nested=True)
+        label, pages = self._read_index(f"{self.url}/llms.txt")
         bodies = self._read_bodies(pages)
         for page in pages:
-            page["body"] = bodies.get(page["route"]) or page.pop("summary")
+            summary = page.pop("summary")
+            page["body"] = bodies.get(page["route"]) or summary
         return label, pages
 
-    def _read_index(self, url: str, nested: bool = False) -> tuple[str, list[dict]]:
+    def _read_index(self, url: str) -> tuple[str, list[dict]]:
+        label, pages, children = self._parse(url)
+        pages = {page["route"]: page for page in pages}
+        if url == f"{self.url}/llms.txt":
+            self.truncated = len(children) > MAX_PARTS
+            for child in children[:MAX_PARTS]:
+                for page in self._parse(child)[1]:
+                    pages.setdefault(page["route"], page)
+        return label, list(pages.values())
+
+    def _parse(self, url: str) -> tuple[str, list[dict], list[str]]:
+        """The label, the pages and the child index URLs of one llms.txt."""
         text = fetch(url, self.host).text
         title = re.search(r"^# (.+)$", text, re.M)
         label = plain_title(title[1]) if title else self.host
         pages, children = {}, []
         for name, link, summary in LINE.findall(text):
-            link = urljoin(url, link)
-            path = urlsplit(link).path
-            if urlsplit(link).hostname != self.host or not self._is_in_scope(path):
+            try:
+                link = urljoin(url, link)
+                parts = urlsplit(link)
+                host = parts.hostname
+            except ValueError:
                 continue
-            if path.endswith("/llms.txt"):
+            if host != self.host or not self._is_in_scope(parts.path):
+                continue
+            if parts.path.endswith("/llms.txt"):
                 children.append(link)
-            elif path.endswith(".md"):
-                route = path.strip("/").removesuffix(".md")
+            elif parts.path.endswith(".md"):
+                route = parts.path.strip("/").removesuffix(".md")
                 if route and not has_dot_segment(route):
                     pages.setdefault(
                         route,
@@ -55,29 +72,31 @@ class LlmsSource(IndexedSource):
                             "summary": summary,
                         },
                     )
-        if nested:
-            children = list(dict.fromkeys(children))
-            self.truncated = len(children) > MAX_PARTS
-            for child in children[:MAX_PARTS]:
-                for page in self._read_index(child)[1]:
-                    pages.setdefault(page["route"], page)
-        return label, list(pages.values())
+        return label, list(pages.values()), list(dict.fromkeys(children))
 
     def _read_bodies(self, pages: list[dict]) -> dict[str, str]:
-        """Split llms-full.txt at each page title, in the order the titles appear."""
+        """Split llms-full.txt at each page title; any other H1 ends the page."""
         waiting = defaultdict(deque)
+        titles = {}
         for page in pages:
             waiting[page["title"]].append(page["route"])
+            titles[page["route"]] = page["title"]
         bodies: dict[str, list[str]] = {}
-        current = None
+        current, in_code = None, False
         for line in self._read_full().splitlines():
-            title = plain_title(line[2:]) if line.startswith("# ") else None
-            if title and waiting[title]:
-                current = waiting[title].popleft()
-                bodies[current] = []
+            if line.startswith("```"):
+                in_code = not in_code
+            title = plain_title(line[2:]) if line.startswith("# ") and not in_code else None
+            if title is not None:
+                current = waiting[title].popleft() if waiting[title] else None
+                if current:
+                    bodies[current] = []
             elif current:
                 bodies[current].append(line)
-        return {route: to_plain("\n".join(body)).strip() for route, body in bodies.items()}
+        return {
+            route: " ".join(to_plain(clean_markdown("\n".join(body), titles[route])).split())
+            for route, body in bodies.items()
+        }
 
     def _read_full(self) -> str:
         parts, url = [], f"{self.url}/llms-full.txt"
@@ -87,7 +106,7 @@ class LlmsSource(IndexedSource):
                 parts.append(text)
                 following = NEXT_PART.search(text)
                 url = urljoin(url, following[1]) if following else None
-        except DocsFetchError:
+        except DocsFetchError, ValueError:
             pass  # ponytail: titles and summaries still index
         return "\n".join(parts)
 

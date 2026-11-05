@@ -1,3 +1,5 @@
+import hashlib
+
 import frappe
 from frappe import _
 from frappe.utils import now
@@ -8,20 +10,22 @@ from helpdesk.docs_source import get_source
 from helpdesk.docs_source.index import DocsIndex
 from helpdesk.docs_source.indexed import IndexedSource
 
-JOB_ID = "docs_source_sync"
+JOB_PREFIX = "docs_source_sync"
 REBUILD_KEY = "docs_source_rebuild_tried"
 REBUILD_WAIT = 3600
-SYNC_TIMEOUT = 1800
+JOB_TIMEOUT = 1800
 
 
 def enqueue_sync() -> None:
+    url = _current_url()
     frappe.enqueue(
         "helpdesk.docs_source.sync.run_sync",
         queue="long",
-        timeout=SYNC_TIMEOUT,
-        job_id=JOB_ID,
+        timeout=JOB_TIMEOUT,
+        job_id=job_id(url),
         deduplicate=True,
-        url=frappe.db.get_single_value("HD Settings", "docs_source_url"),
+        enqueue_after_commit=True,
+        url=url,
     )
 
 
@@ -35,17 +39,8 @@ def run_sync(url: str) -> None:
         if _current_url() != url:
             return
         DocsIndex().replace(pages, label)
-    except ResponseError:
-        _save(
-            {
-                "docs_source_sync_error": _(
-                    "Redis has no RediSearch module, so docs cannot be indexed."
-                )
-            }
-        )
     except Exception as e:
-        frappe.log_error("Docs source sync failed")
-        _save({"docs_source_sync_error": str(e)[:140] or type(e).__name__})
+        _save({"docs_source_sync_error": _error_message(e)})
     else:
         _save(
             {
@@ -69,11 +64,26 @@ def rebuild_if_missing() -> None:
 
 
 def is_syncing() -> bool:
-    return is_job_enqueued(JOB_ID)
+    return is_job_enqueued(job_id(_current_url()))
+
+
+def job_id(url: str) -> str:
+    """One job per site URL, so a new site's sync is not dropped by an old one's."""
+    return f"{JOB_PREFIX}_{hashlib.sha1((url or '').encode()).hexdigest()[:10]}"
 
 
 def _current_url() -> str | None:
-    return frappe.db.get_single_value("HD Settings", "docs_source_url")
+    # Locking read: a cached or snapshot read would miss a URL changed during the sync.
+    url = frappe.db.get_single_value("HD Settings", "docs_source_url", for_update=True)
+    frappe.db.commit()  # release the lock
+    return url
+
+
+def _error_message(e: Exception) -> str:
+    if isinstance(e, ResponseError) and "unknown command" in str(e).lower():
+        return _("Redis has no RediSearch module, so docs cannot be indexed.")
+    frappe.log_error("Docs source sync failed")
+    return str(e)[:140] or type(e).__name__
 
 
 def _save(values: dict) -> None:

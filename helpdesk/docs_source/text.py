@@ -51,15 +51,15 @@ def rewrite_links(html: str, base_url: str, is_page: Callable[[str], bool]) -> s
 def clean_markdown(text: str, title: str) -> str:
     """A page for readers: no agent section, leading quote, GitBook tags or repeated title."""
     text = text.split("\n# Agent Instructions")[0]
-    text = re.sub(r"\A(?:> .*\n)+", "", _strip_tags(text).lstrip())
+    text = re.sub(r"\A(?:> .*\n)+", "", _strip_gitbook_tags(text).lstrip())
     return re.sub(rf"\A\s*# {re.escape(title)}\s*\n", "", text)
 
 
 def to_plain(markdown: str) -> str:
-    text = strip_html_tags(_strip_tags(markdown))
+    text = strip_html_tags(_strip_gitbook_tags(markdown))
     return re.sub(r"\[([^\]]*)\]\([^)]*\)|[*`#>]+", r"\1", text)
 
 
-def _strip_tags(text: str) -> str:
+def _strip_gitbook_tags(text: str) -> str:
     # GitBook's own block tags
     return re.sub(r"^\s*\{%.*?%\}\s*$", "", text, flags=re.M)
