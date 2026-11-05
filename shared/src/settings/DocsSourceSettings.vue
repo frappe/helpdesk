@@ -30,7 +30,7 @@
         />
       </template>
       <Button
-        v-else
+        v-else-if="!loadFailed"
         variant="solid"
         :label="__('Connect')"
         :loading="busy"
@@ -49,7 +49,7 @@
       <p v-if="statusLine" class="mt-2 text-p-sm text-ink-gray-5">
         {{ statusLine }}
       </p>
-      <p v-if="isIndexed && source?.truncated" class="mt-1 text-p-sm text-ink-amber-3">
+      <p v-if="isIndexed && source?.truncated" class="mt-1 text-p-sm text-ink-amber-6">
         {{ __("Not all pages were indexed.") }}
       </p>
       <div v-if="!isIndexed" class="mt-3">
@@ -61,6 +61,7 @@
             v-for="section in source?.sections"
             :key="section.key"
             :label="section.title"
+            :disabled="saving"
             :model-value="!section.hidden"
             @update:model-value="(shown) => setShown(section, shown)"
           />
@@ -83,6 +84,8 @@ const MAX_POLLS = 100;
 const url = ref("");
 const source = ref<Record<string, any> | null>(null);
 const busy = ref(false);
+const saving = ref(false);
+const loadFailed = ref(false);
 const error = ref("");
 let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -99,10 +102,16 @@ const statusLine = computed(() => {
 });
 
 onMounted(async () => {
-  source.value = await call(`${API}.get_docs_source`);
+  try {
+    source.value = await call(`${API}.get_docs_source`);
+  } catch (e) {
+    loadFailed.value = true;
+    error.value = getErrorMessage(e);
+    return;
+  }
   url.value = source.value?.url || "";
-  if (isIndexed.value && (syncing.value || !source.value?.synced_on)) {
-    poll({ synced_on: null, error: source.value?.error || "" });
+  if (isIndexed.value && syncing.value) {
+    poll({ synced_on: source.value?.synced_on, error: source.value?.error || "" }, true);
   }
 });
 onBeforeUnmount(() => clearTimeout(timer));
@@ -138,16 +147,19 @@ async function setShown(section: Record<string, any>, shown: boolean) {
   section.hidden = !shown;
   error.value = "";
   const hidden = source.value!.sections.filter((s) => s.hidden).map((s) => s.key);
+  saving.value = true;
   try {
     await call(`${API}.set_hidden_sections`, { sections: hidden });
   } catch (e) {
     section.hidden = hiddenBefore;
     error.value = getErrorMessage(e);
+  } finally {
+    saving.value = false;
   }
 }
 
-// Polls until the sync moves on from `before`; gives up after MAX_POLLS.
-function poll(before: { synced_on: unknown; error: string }, count = 0) {
+// Polls until the job ran (seen syncing, or state changed, or 3 polls) and stopped.
+function poll(before: { synced_on: unknown; error: string }, seen = false, count = 0) {
   clearTimeout(timer);
   timer = setTimeout(async () => {
     try {
@@ -156,9 +168,10 @@ function poll(before: { synced_on: unknown; error: string }, count = 0) {
       // keep polling through a blip
     }
     const s = source.value;
-    const done =
-      !s || (!s.syncing && (s.synced_on !== before.synced_on || s.error !== before.error));
-    if (!done && count < MAX_POLLS) poll(before, count + 1);
+    seen = seen || Boolean(s?.syncing);
+    const changed = s?.synced_on !== before.synced_on || s?.error !== before.error;
+    const done = !s || (!s.syncing && (seen || changed || count >= 2));
+    if (!done && count < MAX_POLLS) poll(before, seen, count + 1);
   }, POLL_MS);
 }
 

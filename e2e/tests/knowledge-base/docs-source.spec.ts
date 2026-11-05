@@ -90,14 +90,12 @@ test("a sync error shows the server text", async ({ page }) => {
 });
 
 test("connect on an indexed site polls until the sync ends", async ({ page }) => {
-  let polls = 0;
   let connected = false;
+  let release = false;
   await page.route(GET, (route) => {
     if (!connected) return route.fulfill(json(null));
-    polls++;
-    return route.fulfill(
-      json(polls < 2 ? { ...INDEXED, synced_on: null, page_count: 0, syncing: true } : INDEXED)
-    );
+    const syncing = { ...INDEXED, synced_on: null, page_count: 0, syncing: true };
+    return route.fulfill(json(release ? INDEXED : syncing));
   });
   await page.route(CONNECT, (route) => {
     connected = true;
@@ -107,9 +105,23 @@ test("connect on an indexed site polls until the sync ends", async ({ page }) =>
   const dialog = page.getByRole("dialog", { name: "Settings" });
   await dialog.getByPlaceholder("https://docs.example.com").fill("https://docs.example.com");
   await dialog.getByRole("button", { name: "Connect" }).click();
-  await expect(dialog.getByRole("button", { name: /Syncing/ })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: /Syncing/ })).toBeVisible({ timeout: 15_000 });
+  release = true;
   await expect(dialog.getByText(/142 pages/)).toBeVisible({ timeout: 15_000 });
   await expect(dialog.getByRole("button", { name: "Resync" })).toBeVisible();
+});
+
+test("a failed load shows the error and offers no Connect", async ({ page }) => {
+  await page.route(GET, (route) =>
+    route.fulfill({
+      status: 417,
+      json: { exc_type: "ValidationError", _server_messages: JSON.stringify([JSON.stringify({ message: "Settings are down" })]) },
+    })
+  );
+  await page.goto("/help/settings/knowledge-base");
+  const dialog = page.getByRole("dialog", { name: "Settings" });
+  await expect(dialog.getByText("Settings are down")).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Connect" })).toHaveCount(0);
 });
 
 test.describe("plain agent", () => {
