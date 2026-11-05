@@ -27,6 +27,7 @@ def get_source() -> DocsSource | None:
         return None
     # Imported here: source modules import this one.
     from helpdesk.docs_source.llms import LlmsSource
+    from helpdesk.docs_source.sitemap import SitemapSource
     from helpdesk.docs_source.wiki import WikiSource
 
     hidden = json.loads(settings.docs_source_hidden_sections or "[]")
@@ -34,4 +35,6 @@ def get_source() -> DocsSource | None:
         return WikiSource(settings.docs_source_url, hidden)
     if settings.docs_source_type == "llms.txt":
         return LlmsSource(settings.docs_source_url)
+    if settings.docs_source_type == "Sitemap":
+        return SitemapSource(settings.docs_source_url)
     return None
