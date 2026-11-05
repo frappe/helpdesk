@@ -1232,3 +1232,19 @@ def make_response(url, status=200, location=None, chunks=(b"ok",)):
         response.headers["Location"] = location
     response.raw = _Raw(b"".join(chunks))
     return response
+
+
+def fake_docs_fetch(site: dict):
+    """side_effect for a patched docs fetch. `site` maps a URL to a str or JSON body, an int
+    status (raised as DocsFetchError) or (body, final_url) for a redirect. Unknown URLs are 404."""
+    from helpdesk.docs_source.fetch import DocsFetchError
+
+    def fake(url, host, *args, params=None):
+        entry = site.get(url, 404)
+        if isinstance(entry, int):
+            raise DocsFetchError(f"HTTP {entry}", status=entry)
+        body, final = entry if isinstance(entry, tuple) else (entry, url)
+        body = body if isinstance(body, str) else json.dumps(body)
+        return make_response(final, chunks=(body.encode(),))
+
+    return fake
