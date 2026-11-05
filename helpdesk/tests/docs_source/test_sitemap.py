@@ -7,7 +7,7 @@ from frappe.tests.utils import change_settings
 from helpdesk.docs_source import get_source
 from helpdesk.docs_source.fetch import DocsFetchError
 from helpdesk.docs_source.sitemap import MAX_PAGES, MIN_TEXT, SitemapSource
-from helpdesk.test_utils import fake_docs_fetch
+from helpdesk.test_utils import fake_docs_fetch, make_docs_page as page
 
 SITEMAP = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -44,16 +44,15 @@ DOCUSAURUS = f"""<!doctype html><html><head><title>Custom domain | Acme</title><
   <main><div class="container"><article>
     <header><h1>Custom <b>domain</b></h1></header>
     <nav class="breadcrumbs">Breadcrumb</nav>
+    <div class="theme-doc-toc-mobile">Mobile TOC</div><span class="theme-doc-version-badge">Version 3</span>
     <p>{TEXT}</p><script>alert(1)</script><style>p {{}}</style>
     <p>See <a href="/docs/intro">intro</a>.</p>
-  </article></div></main>
+  </article></div>
+  <div class="col col--3"><div class="tableOfContents"><ul><li>On this page TOC</li></ul></div></div>
+  </main>
 </div>
 <footer>Copyright Acme</footer>
 </div></body></html>"""
-
-
-def page(name="Page", text=TEXT):
-    return f"<html><head><title>{name}</title></head><body><main><h1>{name}</h1><p>{text}</p></main></body></html>"
 
 
 class TestSitemap(IntegrationTestCase):
@@ -62,9 +61,11 @@ class TestSitemap(IntegrationTestCase):
         self.url = f"https://{self.host}/docs"
         self.site = {f"https://{self.host}/sitemap.xml": SITEMAP.format(host=self.host)}
         self.source = SitemapSource(self.url)
-        self.enterContext(patch("helpdesk.docs_source.sitemap.fetch", side_effect=self._fetch))
+        self.fetch = self.enterContext(
+            patch("helpdesk.docs_source.sitemap.fetch", side_effect=self._fetch)
+        )
         self.enterContext(
-            patch("helpdesk.docs_source.sitemap.fetch_live", side_effect=self._fetch)
+            patch("helpdesk.docs_source.indexed.fetch_live", side_effect=self._fetch)
         )
         self.sleep = self.enterContext(patch("helpdesk.docs_source.sitemap.time.sleep"))
         frappe.cache.delete_keys("helpdesk_docs_llms")
@@ -128,7 +129,7 @@ class TestSitemap(IntegrationTestCase):
     def test_main_drops_nav_and_footer(self):
         title, html = self.source.extract_main(DOCUSAURUS)
         self.assertEqual(title, "Custom domain")
-        for gone in ("Menu", "Sidebar", "Breadcrumb", "Copyright", "alert", "<h1", "<script"):
+        for gone in ("Menu", "Sidebar", "Breadcrumb", "On this page", "Mobile TOC", "Version 3", "Copyright", "alert", "<h1", "<script"):
             self.assertNotIn(gone, html)
         self.assertIn("verify the record", html)
 
@@ -136,10 +137,10 @@ class TestSitemap(IntegrationTestCase):
         title, _ = self.source.extract_main(
             "<html><head><title>Only &amp; title</title></head><body><main><p>x</main>"
         )
-        self.assertEqual(title, "Only & title")
+        self.assertEqual(title, "Only & title")  # no h1 in main
         for html in ("", "<<<", None):
             self.assertEqual(self.source.extract_main(html), ("", ""))
-        self.source.extract_main("<main><div></main></span>")
+        self.assertEqual(self.source.extract_main("<main><div></main></span>")[0], "")
 
     def test_no_main_or_article_skips_page(self):
         self._add("/docs/intro", "<html><body><div>%s</div></body></html>" % TEXT)
@@ -182,3 +183,76 @@ class TestSitemap(IntegrationTestCase):
         ):
             frappe.clear_cache(doctype="HD Settings")
             self.assertIsInstance(get_source(), SitemapSource)
+
+    def test_tries_sub_path_sitemap_then_host_root(self):
+        root = self.site.pop(f"https://{self.host}/sitemap.xml")
+        self.site[f"{self.url}/sitemap.xml"] = root
+        self.assertEqual(len(self.source._page_urls()), 2)
+
+    def test_index_cap_counts_only_in_scope_urls(self):
+        self.site[f"https://{self.host}/sitemap.xml"] = INDEX.format(host=self.host)
+        blog = "".join(f"<url><loc>https://{self.host}/blog/{i}</loc></url>" for i in range(2500))
+        self._add("/sitemap-a.xml", f"<urlset>{blog}</urlset>")
+        self._add("/sitemap-b.xml", "<urlset>%s</urlset>" % "".join(
+            f"<url><loc>https://{self.host}/docs/d{i}</loc></url>" for i in range(50)))
+        self.assertEqual(len(self.source._page_urls()), 50)
+
+    def test_sphinx_permalink_and_nav_h1_stay_out(self):
+        title, html = self.source.extract_main(
+            '<main><nav><h1>Nav</h1></nav><h1>Quickstart<a class="headerlink" href="#q">\u00b6</a></h1>'
+            '<h2>Step<a class="hash-link" href="#s">#</a></h2><p>Body</p></main>'
+        )
+        self.assertEqual(title, "Quickstart")
+        self.assertNotIn("\u00b6", html)
+        self.assertNotIn("#</a>", html)
+
+    def test_article_beats_main_and_role_main_beats_main(self):
+        _, html = self.source.extract_main(DOCUSAURUS)
+        self.assertNotIn("TOC", html)
+        _, html = self.source.extract_main(
+            '<main>Wrapper</main><div role="main"><p>Real</p></div>'
+        )
+        self.assertIn("Real", html)
+        self.assertNotIn("Wrapper", html)
+
+    def test_aside_dropped_except_inside_article(self):
+        _, html = self.source.extract_main("<main><aside>Side</aside><p>Text</p></main>")
+        self.assertNotIn("Side", html)
+        _, html = self.source.extract_main(
+            "<article><aside>Callout</aside><p>Text</p></article>"
+        )
+        self.assertIn("Callout", html)
+
+    def test_versioned_urls_sort_last_before_cap(self):
+        locs = [f"https://{self.host}/docs/{v}/x" for v in ("2.x", "v3", "3.10.2", "next")]
+        locs += [f"https://{self.host}/docs/installation", f"https://{self.host}/docs/guide/a"]
+        self.site[f"https://{self.host}/sitemap.xml"] = "<urlset>%s</urlset>" % "".join(
+            f"<url><loc>{u}</loc></url>" for u in locs
+        )
+        urls = self.source._page_urls()
+        self.assertEqual(len(urls), 6)
+        self.assertEqual([u.split("/")[4] for u in urls[:2]], ["installation", "guide"])
+
+    def test_outage_keeps_old_index(self):
+        self._add("/docs/intro", page("Intro"))
+        self.site[f"https://{self.host}/sitemap.xml"] = "<urlset>%s</urlset>" % "".join(
+            f"<url><loc>https://{self.host}/docs/p{i}</loc></url>" for i in range(3)
+        )
+        self._add("/docs/p0", page("P0"))
+        with self.assertRaises(DocsFetchError):  # 2 of 3 failed
+            self.source.read_pages()
+
+    def test_is_available_stops_at_first_sitemap_with_urls(self):
+        self.site[f"https://{self.host}/sitemap.xml"] = INDEX.format(host=self.host)
+        self._add("/sitemap-a.xml", CHILD.format(host=self.host, name="a"))
+        self._add("/docs/a", page("A", "x " * MIN_TEXT))
+        self.assertTrue(self.source.is_available())
+        requested = [c.args[0] for c in self.fetch.call_args_list]
+        self.assertNotIn(f"https://{self.host}/sitemap-b.xml", requested)
+
+    def test_same_route_with_trailing_slash_counts_once(self):
+        self.site[f"https://{self.host}/sitemap.xml"] = (
+            f"<urlset><url><loc>https://{self.host}/docs/x</loc></url>"
+            f"<url><loc>https://{self.host}/docs/x/</loc></url></urlset>"
+        )
+        self.assertEqual(len(self.source._page_urls()), 1)

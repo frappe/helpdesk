@@ -1249,6 +1249,11 @@ def fake_docs_fetch(site: dict):
     return fake
 
 
+def make_docs_page(name: str = "Page", text: str = "Point your own domain at the site. " * 6) -> str:
+    """A minimal docs page with a main element, a title and an h1."""
+    return f"<html><head><title>{name}</title></head><body><main><h1>{name}</h1><p>{text}</p></main></body></html>"
+
+
 def has_redisearch() -> bool:
     """True when redis has the RediSearch module (CI's apt redis does not)."""
     from redis.exceptions import ResponseError

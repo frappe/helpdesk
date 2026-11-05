@@ -66,9 +66,13 @@ class IndexedSource(DocsSource):
                 if e.status in GONE_STATUSES:
                     raise frappe.DoesNotExistError(_("Docs page not found")) from None
                 raise
-            html = clean_html(md_to_html(clean_markdown(text, page["title"])))
+            html = self._to_html(text, page)
             frappe.cache.set_value(key, html, expires_in_sec=PAGE_SECONDS)
         return html
+
+    def _to_html(self, text: str, page: dict) -> str:
+        """Safe HTML for a fetched page body; Markdown by default."""
+        return clean_html(md_to_html(clean_markdown(text, page["title"])))
 
     def _is_page(self, route: str) -> bool:
         return not has_dot_segment(route) and frappe.cache.hexists(PAGES_KEY, route)
