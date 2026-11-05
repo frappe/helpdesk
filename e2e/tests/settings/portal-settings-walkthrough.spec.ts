@@ -168,7 +168,7 @@ test.describe("guest", () => {
     const restore = await setHelpdeskSetting(api, "public_knowledge_base", 1);
     try {
       await page.goto("/help/settings/profile");
-      await expect(page.getByRole("heading", { name: "Here's what might help" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: /^How can .+ help you\?$/ })).toBeVisible();
       await expect(page).toHaveURL(/\/help\/?$/);
       await page.waitForLoadState("networkidle");
       await expect(page.getByRole("dialog"), "a guest gets no settings dialog").toHaveCount(0);
