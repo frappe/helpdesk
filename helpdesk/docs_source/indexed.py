@@ -37,6 +37,7 @@ class IndexedSource(DocsSource):
         if not page:
             raise frappe.DoesNotExistError(_("Docs page not found"))
         return {
+            "route": route,
             "title": page["title"],
             "content": rewrite_links(self._read_html(page), page["url"], self._is_page),
             "label": page["label"],

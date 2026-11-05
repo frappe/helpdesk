@@ -9,7 +9,7 @@ from frappe.utils import cint
 from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import SEARCH_QUERY_LENGTH, validate_public_access
 from helpdesk.docs_source import get_source
-from helpdesk.docs_source.fetch import DocsFetchError
+from helpdesk.docs_source.fetch import DOWN_KEY, DocsFetchError, log_failure
 from helpdesk.docs_source.index import DocsIndex
 from helpdesk.docs_source.indexed import IndexedSource
 from helpdesk.docs_source.llms import LlmsSource
@@ -79,6 +79,7 @@ def connect_docs_source(url: str) -> dict:
             "docs_source_label": label,
         }
     )
+    frappe.cache.delete_value(DOWN_KEY)
     if source_type != WIKI:
         enqueue_sync()
     return get_docs_source()
@@ -89,6 +90,7 @@ def disconnect_docs_source() -> None:
     """Forget the Docs source and delete its index. Converted Articles stay."""
     frappe.has_permission("HD Settings", "write", throw=True)
     _save(CLEARED)
+    frappe.cache.delete_value(DOWN_KEY)
     DocsIndex().clear()
 
 
@@ -130,7 +132,8 @@ def search_docs(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
         return []
     try:
         hits = source.search(query)
-    except DocsFetchError:
+    except DocsFetchError as e:
+        log_failure(e)
         return []
     limit = cint(limit)
     return hits[: limit if 0 < limit <= SEARCH_LIMIT else SEARCH_LIMIT]
@@ -147,21 +150,23 @@ def get_doc_page(route: str) -> dict:
         frappe.throw(_("Docs page not found"), frappe.DoesNotExistError)
     try:
         page = source.get_page(route)
-    except DocsFetchError:
+    except DocsFetchError as e:
+        log_failure(e)
         frappe.throw(_("Docs page not found"), frappe.DoesNotExistError)
-    page["related"] = _related(source, route.strip("/"), page["title"])
+    page["related"] = _related(source, page["route"], page["title"])
     return page
 
 
 def _normalize_url(url: str) -> str:
     url = (url or "").strip().rstrip("/")
+    message = _("Enter an https URL with a host and no user or password.")
     try:
         parts = urlsplit(url)
         host = parts.hostname
     except ValueError:
-        host = None
+        frappe.throw(message)
     if parts.scheme != "https" or not host or "@" in parts.netloc:
-        frappe.throw(_("Enter an https URL with a host and no user or password."))
+        frappe.throw(message)
     if parts.query or parts.fragment or "?" in url or "#" in url:
         frappe.throw(_("The URL must not have a query or a fragment."))
     return url
@@ -200,34 +205,36 @@ def _related_docs(source, route: str, title: str, articles: list[dict]) -> list[
     section = route.partition("/")[0]
     try:
         hits = source.search(title)
-    except DocsFetchError:
+    except DocsFetchError as e:
+        log_failure(e)
         return []
     except Exception:
         frappe.log_error("Docs page: related docs failed")
         return []
-    article_titles = _article_titles(articles)
+    article_titles, converted_routes = _article_matches(articles)
     docs, seen = [], set()
     for hit in hits:
-        hit_title = plain_title(hit["title"])
+        hit_title = plain_title(hit["title"]).casefold()
         if (
             hit["route"] == route
+            or hit["route"] in converted_routes
             or hit["route"].partition("/")[0] != section
             or hit_title in seen
             or hit_title in article_titles
         ):
             continue
         seen.add(hit_title)
-        docs.append({"route": hit["route"], "title": hit_title})
+        docs.append({"route": hit["route"], "title": plain_title(hit["title"])})
     return docs[:RELATED_DOCS_LIMIT]
 
 
-def _article_titles(articles: list[dict]) -> set[str]:
-    """Titles of Related Articles that are not Converted Articles."""
-    converted = set(
-        frappe.get_all(
-            "HD Article",
-            filters={"name": ["in", [a["name"] for a in articles]], "docs_page_route": ["is", "set"]},
-            pluck="name",
-        )
+def _article_matches(articles: list[dict]) -> tuple[set[str], set[str]]:
+    """Casefolded titles of Related Articles that are not Converted, and the Docs routes of those that are."""
+    rows = frappe.get_all(
+        "HD Article",
+        filters={"name": ["in", [a["name"] for a in articles]]},
+        fields=["name", "docs_page_route"],
     )
-    return {plain_title(a["title"]) for a in articles if a["name"] not in converted}
+    converted = {r.name: r.docs_page_route for r in rows if r.docs_page_route}
+    titles = {plain_title(a["title"]).casefold() for a in articles if a["name"] not in converted}
+    return titles, set(converted.values())

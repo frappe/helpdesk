@@ -13,6 +13,7 @@ MAX_BYTES = 5 * 1024 * 1024
 MAX_REDIRECTS = 3
 SKIP_SECONDS = 60
 DOWN_KEY = "docs_source_down"
+LOG_KEY = "docs_source_failure_logged"
 HEADERS = {"User-Agent": "helpdesk-docs-source"}
 DOWN_STATUSES = (502, 503, 504)
 CHUNK_SIZE = 8 * 1024
@@ -47,10 +48,22 @@ def fetch_live(url: str, host: str, params: dict | None = None) -> requests.Resp
     try:
         return fetch(url, host, LIVE_TIMEOUT, params)
     except DocsFetchError as e:
-        if e.transient or e.status in DOWN_STATUSES:
+        if _trips_breaker(e):
             frappe.cache.set_value(DOWN_KEY, 1, expires_in_sec=SKIP_SECONDS)
             frappe.log_error("Docs source is down", str(e))
         raise
+
+
+def log_failure(error: DocsFetchError) -> None:
+    """Log a failure that did not trip the breaker, at most once per SKIP_SECONDS."""
+    if _trips_breaker(error) or frappe.cache.get_value(LOG_KEY):
+        return
+    frappe.cache.set_value(LOG_KEY, 1, expires_in_sec=SKIP_SECONDS)
+    frappe.log_error("Docs source failed", str(error))
+
+
+def _trips_breaker(error: DocsFetchError) -> bool:
+    return error.transient or error.status in DOWN_STATUSES
 
 
 def _get(url, host, deadline, params):

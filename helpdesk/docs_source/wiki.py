@@ -81,6 +81,7 @@ class WikiSource(DocsSource):
         data = self._cached(f"page:{route}", PAGE_SECONDS, lambda: self._read_page(route))
         base = f"{self.url}/{route}"
         return {
+            "route": route,
             "title": data["title"],
             "content": rewrite_links(data["content"], base, self._is_visible),
             "label": f"{self._title_of(route)} docs",
