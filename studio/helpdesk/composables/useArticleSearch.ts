@@ -29,6 +29,8 @@ export function useArticleSearch(
     else results.reset()
   }, SEARCH_DEBOUNCE_MS)
   watch(query, search, { immediate: true })
+  // The source can turn on after typing starts (config still loading).
+  watch(enabled, (on) => on && search())
 
   return results
 }

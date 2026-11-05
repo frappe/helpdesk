@@ -243,8 +243,11 @@ const articleRows = computed(() =>
     onClick: () => router.push(ROUTES.article(article)),
   }))
 );
-const docRows = computed(() =>
-  visibleDocs(results.data || [], docs.data || [], searchText.value)
+// Docs join only once they answer the same query as the Articles.
+const docRows = computed(() => {
+  const sameQuery = results.settledQuery === docs.settledQuery;
+  const hits = docs.error || !sameQuery ? [] : docs.data || [];
+  return visibleDocs(results.data || [], hits, docs.settledQuery || "")
     .slice(0, MAX_DOCS)
     .map((doc) => ({
       type: "custom",
@@ -253,12 +256,15 @@ const docRows = computed(() =>
       article: doc,
       disabled: !isDocsCurrent.value,
       onClick: () => router.push(ROUTES.docsPage(doc.route)),
-    }))
-);
+    }));
+});
 
 const hasResults = computed(() => rows.value.length > 0);
 const isSearching = computed(
-  () => canSearch.value && !isCurrent.value && !hasResults.value
+  () =>
+    canSearch.value &&
+    !hasResults.value &&
+    !(isCurrent.value && isDocsSettled.value)
 );
 const isEmpty = computed(
   () => canSearch.value && isCurrent.value && isDocsSettled.value && !hasResults.value

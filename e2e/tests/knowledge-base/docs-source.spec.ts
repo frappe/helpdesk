@@ -434,15 +434,29 @@ const docHit = (route: string, title: string) => ({
   category_label: "Helpdesk docs",
 });
 
-async function stubSearch(page: Page, articles: unknown[], docs: unknown[], docsDelay = 0) {
+type Answer = unknown[] | ((query: string) => Promise<unknown[] | number>);
+
+// An answer is a list, or a function that may wait and may return a status.
+async function stubSearch(page: Page, articles: Answer, docs: Answer) {
   const docsCalls: string[] = [];
-  await page.route(ARTICLE_SEARCH, (route) => route.fulfill(json(articles)));
-  await page.route(DOCS_SEARCH, async (route) => {
+  const answer = async (route, what: Answer) => {
+    const query = new URL(route.request().url()).searchParams.get("query")!;
+    const out = typeof what === "function" ? await what(query) : what;
+    if (typeof out === "number") return route.fulfill({ status: out, json: { exc_type: "ValidationError" } });
+    return route.fulfill(json(out));
+  };
+  await page.route(ARTICLE_SEARCH, (route) => answer(route, articles));
+  await page.route(DOCS_SEARCH, (route) => {
     docsCalls.push(route.request().url());
-    if (docsDelay) await new Promise((resolve) => setTimeout(resolve, docsDelay));
-    await route.fulfill(json(docs));
+    return answer(route, docs);
   });
   return docsCalls;
+}
+
+function gate() {
+  let open = () => {};
+  const held = new Promise<void>((resolve) => (open = resolve));
+  return { held, open };
 }
 
 async function searchFor(page: Page, text: string) {
@@ -488,30 +502,84 @@ test.describe("search list", () => {
   });
 
   docsTest("rows above do not move when docs arrive", async ({ page, connected }) => {
-    await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta guide")], 800);
+    const docsGate = gate();
+    await stubSearch(page, [articleHit("Alpha guide")], async () => {
+      await docsGate.held;
+      return [docHit("helpdesk/beta", "Beta guide")];
+    });
     await searchFor(page, "guide");
     const first = rowsOf(page).first();
     await expect(first).toContainText("Alpha guide");
     const before = await first.boundingBox();
-    await expect(page.getByText("No articles match")).toHaveCount(0);
+    expect(await page.getByText("No articles match").count()).toBe(0);
+    docsGate.open();
     await expect(rowsOf(page)).toHaveCount(2);
     expect(await first.boundingBox()).toEqual(before);
     await expect(first).toContainText("Alpha guide");
   });
 
-  docsTest("source down shows Articles and no message", async ({ page, connected }) => {
-    await stubSearch(page, [articleHit("Alpha guide")], []);
+  docsTest("docs answered before Articles do not reorder rows", async ({ page, connected }) => {
+    const articlesGate = gate();
+    const asked = page.waitForResponse(DOCS_SEARCH);
+    await stubSearch(
+      page,
+      async () => {
+        await articlesGate.held;
+        return [articleHit("Alpha guide")];
+      },
+      [docHit("helpdesk/beta", "Beta guide")]
+    );
     await searchFor(page, "guide");
+    await asked;
+    await page.waitForTimeout(300);
+    expect(await rowsOf(page).count()).toBe(0);
+    articlesGate.open();
+    await expect(rowsOf(page)).toHaveCount(2);
+    await expect(rowsOf(page).nth(0)).toContainText("Alpha guide");
+    await expect(rowsOf(page).nth(1)).toContainText("Beta guide");
+  });
+
+  docsTest("a failed docs answer drops the old Docs rows", async ({ page, connected }) => {
+    await stubSearch(
+      page,
+      async (query) => [articleHit(query === "guide" ? "Alpha guide" : "New report")],
+      async (query) => (query === "guide" ? [docHit("helpdesk/beta", "Beta guide")] : 500)
+    );
+    const box = await searchFor(page, "guide");
+    await expect(rowsOf(page)).toHaveCount(2);
+    await box.fill("report");
     await expect(rowsOf(page)).toHaveCount(1);
+    await expect(rowsOf(page).first()).toContainText("New report");
     await expect(page.getByText(/unavailable|error|failed/i)).toHaveCount(0);
   });
 
-  docsTest("no result flash while docs are pending", async ({ page, connected }) => {
-    await stubSearch(page, [], [docHit("helpdesk/beta", "Beta guide")], 800);
+  docsTest("no empty state while docs are pending", async ({ page, connected }) => {
+    const docsGate = gate();
+    const answered = page.waitForResponse(ARTICLE_SEARCH);
+    await stubSearch(page, [], async () => {
+      await docsGate.held;
+      return [docHit("helpdesk/beta", "Beta guide")];
+    });
     await searchFor(page, "guide");
+    await answered;
     await page.waitForTimeout(400);
-    await expect(page.getByText("No articles match")).toHaveCount(0);
+    expect(await page.getByText("No articles match").count()).toBe(0);
+    docsGate.open();
     await expect(rowsOf(page)).toHaveCount(1);
+  });
+
+  docsTest("typing before the config loads still searches docs", async ({ page, connected }) => {
+    const configGate = gate();
+    await page.route("**/api/method/helpdesk.api.config.get_config*", async (route) => {
+      await configGate.held;
+      await route.continue();
+    });
+    const docsCalls = await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta guide")]);
+    await searchFor(page, "guide");
+    await expect(rowsOf(page)).toHaveCount(1);
+    expect(docsCalls).toEqual([]);
+    configGate.open();
+    await expect(rowsOf(page)).toHaveCount(2);
   });
 
   test("no source sends no docs request", async ({ page }) => {
