@@ -103,8 +103,10 @@
               </template>
             </SidebarItem>
 
+            <!-- -mr-1 cancels the pr-1 below so chevrons line up at every depth. -->
             <PortalCollapse
               :id="`kb-sidebar-${category.name}`"
+              class="-mr-1"
               :open="category.isOpen"
               lazy
             >
