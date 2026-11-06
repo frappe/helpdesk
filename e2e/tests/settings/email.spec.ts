@@ -113,7 +113,7 @@ test("each notification saves its content and switch, and share feedback its sta
       await dialog.getByRole("button", { name: "Save", exact: true }).click();
       await expect.poll(() => setting(api, notification.content)).toBe(content);
       expect(await setting(api, notification.enabled)).toBe(before[notification.enabled] ? 0 : 1);
-      await dialog.getByRole("button", { name: "back to email event list" }).click();
+      await dialog.getByRole("button", { name: notification.label, exact: true }).click();
     }
     expect(await setting(api, "send_email_feedback_on_status")).toBe("Resolved");
   } finally {
@@ -136,7 +136,7 @@ test("notification content resets to the default, and leaving unsaved edits asks
   await expect(content).not.toHaveValue("<p>E2E draft that is never saved</p>");
 
   await content.fill("<p>E2E second draft</p>");
-  await dialog.getByRole("button", { name: "back to email event list" }).click();
+  await dialog.getByRole("button", { name: "Reply from agent", exact: true }).click();
   await page.getByRole("dialog", { name: "Unsaved changes" }).getByRole("button", { name: "Confirm" }).click();
   await expect(dialog.getByRole("heading", { name: "Reply from agent", level: 2 })).toBeVisible();
   expect(await setting(api, "reply_via_agent_email_content")).not.toContain("E2E second draft");
@@ -194,7 +194,7 @@ async function fillServers(dialog: Locator, incomingPort: string, outgoingPort: 
 
 async function openNotification(dialog: Locator, label: string) {
   await dialog.getByRole("listitem").filter({ hasText: label }).click();
-  await expect(dialog.getByRole("heading", { name: label, level: 1 })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: label, exact: true })).toBeVisible();
 }
 
 async function setting(api: Api, field: string) {
