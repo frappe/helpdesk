@@ -12,7 +12,7 @@
     >
       <div class="space-y-5 bg-surface-elevation-2 p-6">
         <div class="space-y-1.5 text-center">
-          <h2 class="text-3xl text-ink-gray-9">{{ __("You're all set") }}</h2>
+          <h2 class="text-2xl-semibold text-ink-gray-9">{{ __("You're all set") }}</h2>
           <p class="text-p-base text-ink-gray-6">
             {{ __("You can change any of this later from Settings.") }}
           </p>
@@ -21,7 +21,7 @@
         <div
           class="flex flex-col items-center gap-2 border-t border-outline-gray-1 pt-5"
         >
-          <p class="text-base text-ink-gray-7">
+          <p class="text-base-medium text-ink-gray-7">
             {{ __("How was setting up Helpdesk?") }}
           </p>
           <Rating v-model="rating" />

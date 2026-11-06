@@ -25,7 +25,7 @@
         <div class="flex-1 px-3 pb-10 pt-20 sm:px-8 lg:px-12 lg:pt-[12vh]">
           <div class="mx-auto w-full max-w-[480px]">
             <div class="mb-8 space-y-2">
-              <p class="text-sm text-ink-gray-6">
+              <p class="text-sm-medium text-ink-gray-6">
                 {{ __("Step {0} of {1}", [step, TOTAL_STEPS]) }}
               </p>
               <Progress
@@ -120,6 +120,13 @@ const status = createResource({
   url: "helpdesk.api.onboarding.get_setup_status",
   method: "GET",
   auto: true,
+  onError() {
+    // One toast however often the poll fails; the flow itself stays usable.
+    toast.error(__("Couldn't check your email setup"), {
+      id: "setup-status-error",
+      description: __("You can keep going. We'll try again shortly."),
+    });
+  },
 });
 
 // The saved value wins, so an earlier opt-out stays opted out. Read once: polling must

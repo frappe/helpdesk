@@ -1,7 +1,7 @@
 <template>
   <section class="space-y-6">
     <div class="space-y-1">
-      <h1 class="text-3xl text-ink-gray-9">{{ __("Invite your agents") }}</h1>
+      <h1 class="text-2xl-semibold text-ink-gray-9">{{ __("Invite your agents") }}</h1>
       <p class="text-p-base text-ink-gray-6">
         {{ __("They get an email with a link to join your Helpdesk.") }}
       </p>

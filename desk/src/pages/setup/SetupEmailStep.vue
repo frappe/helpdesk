@@ -1,7 +1,7 @@
 <template>
   <section class="space-y-6">
     <div class="space-y-1">
-      <h1 class="text-3xl text-ink-gray-9">
+      <h1 class="text-2xl-semibold text-ink-gray-9">
         {{ __("Connect your support email") }}
       </h1>
       <p class="text-p-base text-ink-gray-6">
@@ -19,7 +19,7 @@
       <div v-if="!arrived" class="flex items-start gap-3">
         <LucideLoader class="mt-0.5 size-4 animate-spin text-ink-gray-5" />
         <div class="space-y-0.5">
-          <p class="text-base text-ink-gray-8">
+          <p class="text-base-medium text-ink-gray-8">
             {{ __("Waiting for your first ticket") }}
           </p>
           <p class="text-p-sm text-ink-gray-5">
@@ -33,7 +33,7 @@
       </div>
       <div v-else class="flex items-start gap-3">
         <LucideCircleCheck class="mt-0.5 size-4 shrink-0 text-ink-gray-8" />
-        <p class="text-base text-ink-gray-8">
+        <p class="text-base-medium text-ink-gray-8">
           {{ __("Your first ticket has arrived") }}
         </p>
       </div>
