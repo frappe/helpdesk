@@ -66,7 +66,6 @@ import { Button, call } from "frappe-ui";
 import { computed, watch } from "vue";
 import LucideCircleCheck from "~icons/lucide/circle-check";
 import LucideLoader from "~icons/lucide/loader";
-import { shouldPoll } from "./polling";
 
 const POLL_MS = 5000;
 
@@ -82,7 +81,7 @@ const poll = useIntervalFn(() => props.status.reload(), POLL_MS, {
   immediate: false,
 });
 watch(
-  () => shouldPoll({ arrived: arrived.value, hidden: visibility.value === "hidden" }),
+  () => !arrived.value && visibility.value !== "hidden",
   (on) => (on ? poll.resume() : poll.pause()),
   { immediate: true }
 );
