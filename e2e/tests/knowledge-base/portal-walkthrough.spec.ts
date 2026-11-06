@@ -153,13 +153,13 @@ test.describe("header", () => {
   test.describe("guest on a phone", () => {
     test.use({ ...GUEST, viewport: PHONE });
 
-    test("H10 a guest's logo menu holds only the text links", async ({ page, api, kb }) => {
+    test("H10 a guest's logo menu holds the text links and Home", async ({ page, api, kb }) => {
       await kb({ public_knowledge_base: 1 });
       await saveQuickLinks(api, [{ label: "E2E Guest link", url: "https://example.com/guest", open_in_new_tab: 0 }]);
       try {
         await page.goto("/help");
         await accountMenu(page).click();
-        await expect(page.getByRole("menuitem")).toHaveText(["E2E Guest link"]);
+        await expect(page.getByRole("menuitem")).toHaveText(["E2E Guest link", "Home"]);
       } finally {
         await api.delete("HD Form Script", QUICK_LINKS);
       }
