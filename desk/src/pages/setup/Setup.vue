@@ -32,11 +32,6 @@
                 :value="(step / TOTAL_STEPS) * 100"
                 :intervals="TOTAL_STEPS"
                 size="sm"
-                role="progressbar"
-                :aria-valuenow="step"
-                aria-valuemin="1"
-                :aria-valuemax="TOTAL_STEPS"
-                :aria-label="__('Step {0} of {1}', [step, TOTAL_STEPS])"
               />
             </div>
 
