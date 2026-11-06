@@ -95,7 +95,7 @@
             />
           </svg>
         </Transition>
-        <CategoryIconPicker v-model="icon" />
+        <IconPicker v-model="icon" />
         <TextInput
           ref="nameInput"
           v-model="newTitle"
@@ -162,7 +162,7 @@ import {
 import { categoryOptions } from "@/stores/knowledgeBase";
 import { categoryIcon } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
-import CategoryIconPicker from "./CategoryIconPicker.vue";
+import IconPicker from "@helpdesk/shared/IconPicker.vue";
 
 const props = defineProps({
   edit: {

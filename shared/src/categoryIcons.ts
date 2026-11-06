@@ -50,6 +50,7 @@ export const CATEGORY_ICONS = [
   'lucide-chart-bar',
   'lucide-calendar',
   'lucide-clock',
+  'lucide-clock-alert',
   'lucide-map-pin',
   'lucide-camera',
   'lucide-image',
