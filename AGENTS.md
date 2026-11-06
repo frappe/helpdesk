@@ -38,6 +38,8 @@ Frappe Helpdesk is an open-source ticket management tool built on the [Frappe Fr
   - State: `desk/src/stores/`
   - Routing: `desk/src/router/`
   - Styles: Tailwind via `desk/index.css`, config in `desk/tailwind.config.js`
+- **Customer portal and knowledge base (Studio app):** Located in `studio/helpdesk/`, served at `/help`. Read `studio/README.md` and `studio/KNOWLEDGE_BASE.md` before working on them.
+- **Shared frontend code:** `shared/src`, imported as `@helpdesk/shared` by the desk and the portal.
 
 # Frontend: Vue 3 Development Standards
 

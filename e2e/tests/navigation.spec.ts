@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../helpers/api";
+import { runScheduledJob, type Api } from "../helpers/api";
 import { raiseTicket } from "../helpers/factories";
 import { expect, test, uid, usePersona } from "../helpers/fixtures";
 import { TicketList } from "../helpers/list";
@@ -64,10 +64,12 @@ test("dashboard presets and custom range drive the stats period", async ({ page 
   await page.goto("/helpdesk/dashboard");
   const trigger = page.getByText("Last 30 Days");
   await trigger.click();
+  // the site's date, as the dashboard counts it; the browser's UTC date can differ
+  const timeZone = await page.evaluate(() => (window as any).timezone.system);
   const request = page.waitForRequest(
     (request) =>
       request.url().includes("get_dashboard_data") &&
-      request.postData()!.includes(daysAgo(6))
+      request.postData()!.includes(daysAgo(6, timeZone))
   );
   await page.getByRole("menuitem", { name: "Last 7 Days" }).click();
   await request;
@@ -125,6 +127,17 @@ test("the command palette finds a ticket and opens it", async ({ page, api, apiA
   await palette.getByRole("combobox").fill(token);
   await palette.getByRole("option", { name: new RegExp(`${token} subject`) }).click();
   await expect(page).toHaveURL(new RegExp(`/helpdesk/tickets/${ticket.name}`));
+});
+
+test("the command palette does not open over the settings dialog", async ({ page }) => {
+  await new TicketList(page).goto();
+  await page.keyboard.press("Control+,");
+  const settings = page.getByRole("dialog");
+  await expect(settings).toBeVisible();
+
+  await page.keyboard.press("Control+k");
+  await expect(page.getByRole("dialog", { name: "Command Palette" })).toBeHidden();
+  await expect(settings).toBeVisible();
 });
 
 test("search finds a ticket by text that is only in a comment", async ({
@@ -339,14 +352,7 @@ async function indexForSearch(api: Api, token: string) {
     .toBeGreaterThan(0);
 }
 
-async function runScheduledJob(api: Api, method: string) {
-  const [job] = await api.list("Scheduled Job Type", { filters: { method } });
-  await api.call("frappe.core.doctype.scheduled_job_type.scheduled_job_type.execute_event", {
-    doc: JSON.stringify({ name: job.name }),
-  });
-}
-
 // The browser runs in UTC (see playwright.config.ts), so the date is computed in UTC too.
-function daysAgo(days: number) {
-  return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+function daysAgo(days: number, timeZone: string) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone }).format(Date.now() - days * 86_400_000);
 }

@@ -1,0 +1,259 @@
+{
+ "allow_guest": 1,
+ "blocks": [
+  {
+   "blockName": "body",
+   "children": [
+    {
+     "blockName": "Header",
+     "componentId": "header-categories",
+     "componentName": "header",
+     "componentProps": {},
+     "isStudioComponent": true
+    },
+    {
+     "componentEvents": {
+      "click": {
+       "action": "Run Script",
+       "event": "click",
+       "script": "drawer.toggle()"
+      }
+     },
+     "componentId": "PortalSectionBar-categories",
+     "componentName": "PortalSectionBar",
+     "componentProps": {
+      "label": "{{ t('All categories') }}",
+      "open": "{{ drawer.open }}"
+     },
+     "isCustomVueComponent": true
+    },
+    {
+     "blockName": "sidebar",
+     "classes": [
+      "md:hidden"
+     ],
+     "componentEvents": {
+      "close": {
+       "action": "Run Script",
+       "event": "close",
+       "script": "drawer.close()"
+      }
+     },
+     "componentId": "PortalArticleSidebar-categories",
+     "componentName": "PortalArticleSidebar",
+     "componentProps": {
+      "categories": "{{ sidebar.data || [] }}",
+      "open": "{{ drawer.open }}",
+      "loading": "{{ !sidebar.data }}",
+      "searchShortcut": false
+     },
+     "isCustomVueComponent": true
+    },
+    {
+     "blockName": "categories-body",
+     "children": [
+      {
+       "blockName": "categories-section",
+       "children": [
+        {
+         "blockName": "categories-heading",
+         "children": [
+          {
+           "classes": [
+            "text-ink-gray-7",
+            "font-semibold"
+           ],
+           "componentId": "TextBlock-fbq9hffj6-all",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-lg",
+            "tag": "h1",
+            "text": "{{ t(\"All categories\") }}"
+           }
+          },
+          {
+           "classes": [
+            "w-full",
+            "sm:w-60",
+            "[&_input]:!shadow-none"
+           ],
+           "componentId": "TextInput-categories-search",
+           "componentName": "TextInput",
+           "componentProps": {
+            "modelValue": {
+             "$type": "variable",
+             "name": "search"
+            },
+            "placeholder": "{{ t('Search categories') }}",
+            "size": "sm",
+            "type": "text",
+            "variant": "outline",
+            "aria-label": "{{ t('Search categories') }}"
+           },
+           "componentSlots": {
+            "prefix": {
+             "slotContent": [
+              {
+               "classes": [
+                "size-4",
+                "text-ink-gray-4"
+               ],
+               "componentId": "TextInput-categories-search-icon",
+               "componentName": "Icon",
+               "componentProps": {
+                "icon": "lucide-search"
+               },
+               "componentSlots": {}
+              }
+             ],
+             "slotId": "categories-search-slot-prefix",
+             "slotName": "prefix"
+            },
+            "suffix": {
+             "slotContent": [
+              {
+               "componentId": "PortalSearchShortcut-categories-search",
+               "componentName": "PortalSearchShortcut",
+               "componentProps": {
+                "description": "{{ t('Search categories') }}",
+                "hideKey": "{{ Boolean(search) }}"
+               },
+               "componentSlots": {},
+               "isCustomVueComponent": true
+              }
+             ],
+             "slotId": "categories-search-slot-suffix",
+             "slotName": "suffix"
+            }
+           },
+           "visibilityCondition": "{{ !categories.data || categories.data.length }}"
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-col",
+          "gap-3",
+          "sm:flex-row",
+          "sm:items-center",
+          "sm:justify-between",
+          "sm:gap-4"
+         ],
+         "componentId": "container-categories-heading",
+         "componentName": "container",
+         "originalElement": "div"
+        },
+        {
+         "blockName": "Category grid",
+         "componentId": "category_grid-categories",
+         "componentName": "category_grid",
+         "componentProps": {
+          "categories": "{{ shownCategories }}"
+         },
+         "isStudioComponent": true,
+         "visibilityCondition": "{{ shownCategories.length }}"
+        },
+        {
+         "componentId": "PortalEmptyState-categories-no-match",
+         "componentName": "PortalEmptyState",
+         "componentProps": {
+          "description": "{{ t('Try a different search.') }}",
+          "title": "{{ t('No categories found') }}"
+         },
+         "isCustomVueComponent": true,
+         "visibilityCondition": "{{ categories.data?.length && !shownCategories.length }}",
+         "classes": [
+          "flex-1"
+         ]
+        },
+        {
+         "componentId": "PortalSkeleton-categories",
+         "componentName": "PortalSkeleton",
+         "isCustomVueComponent": true,
+         "componentProps": {
+          "variant": "category-grid",
+          "count": "{{ skeletonCount }}"
+         },
+         "visibilityCondition": "{{ !categories.data }}"
+        }
+       ],
+       "classes": [
+        "flex",
+        "flex-col",
+        "gap-5",
+        "mx-auto",
+        "max-w-[700px]",
+        "w-full",
+        "px-4",
+        "md:px-0",
+        "pt-6",
+        "sm:pt-[41px]",
+        "pb-8",
+        "flex-1"
+       ],
+       "componentId": "container-categories-section",
+       "componentName": "container",
+       "originalElement": "div"
+      }
+     ],
+     "classes": [
+      "flex",
+      "flex-1",
+      "flex-col",
+      "min-h-0",
+      "overflow-y-auto",
+      "w-full"
+     ],
+     "componentId": "container-categories-content",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "KB Settings",
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "componentProps": {},
+     "componentSlots": {},
+     "isStudioComponent": true
+    }
+   ],
+   "classes": [
+    "bg-surface-base",
+    "flex",
+    "flex-col",
+    "w-full",
+    "h-full"
+   ],
+   "componentId": "container-categories-body",
+   "componentName": "container",
+   "originalElement": "div"
+  }
+ ],
+ "creation": "2026-10-07 13:53:30.898956",
+ "docstatus": 0,
+ "doctype": "Studio Page",
+ "frappe_app": "helpdesk",
+ "idx": 0,
+ "is_standard": 1,
+ "modified": "2026-10-23 19:30:00.000000",
+ "modified_by": "Administrator",
+ "name": "categories",
+ "owner": "Administrator",
+ "page_name": "page-aaf46b8b",
+ "page_title": "Categories",
+ "published": 1,
+ "resources": [
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{}",
+   "resource_name": "categories",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_categories"
+  }
+ ],
+ "route": "/categories",
+ "studio_app": "helpdesk",
+ "tab_title": "{{ t('All categories') }} | {{ brandName }}"
+}

@@ -4,8 +4,6 @@ ALLOWED_APP_ROLES = {
     "Agent",
     "Agent Manager",
     "System Manager",
-    "HD Customer",
-    "HD Customer Manager",
 }
 
 

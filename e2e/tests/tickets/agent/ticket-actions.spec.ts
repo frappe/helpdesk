@@ -25,7 +25,7 @@ async function mergeFromUi(page: Page, source: Ticket, target: Ticket) {
 
 async function openMergeDialog(page: Page, source: Ticket, target: Ticket) {
   await openTicket(page, source.name);
-  await page.getByRole("banner").getByRole("button").last().click();
+  await page.getByRole("banner").getByRole("button", { name: "More actions" }).click();
   await page.getByRole("menuitem", { name: "Merge Ticket" }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("button", { name: "Ticket", exact: true }).click();
@@ -171,7 +171,7 @@ test("activity, emails, comments and analytics tabs render", async ({ page, apiA
 test.describe("deleting", () => {
   test("agents are not offered delete", async ({ page, ticket }) => {
     await openTicket(page, ticket.name);
-    await page.getByRole("banner").getByRole("button").last().click();
+    await page.getByRole("banner").getByRole("button", { name: "More actions" }).click();
     await expect(page.getByRole("menuitem", { name: "Merge Ticket" })).toBeVisible();
     await expect(page.getByRole("menuitem", { name: "Delete" })).toHaveCount(0);
   });
@@ -179,7 +179,7 @@ test.describe("deleting", () => {
   test("an admin deletes a ticket", async ({ api, pageAs, ticket }) => {
     const admin = await pageAs("admin");
     await openTicket(admin, ticket.name);
-    await admin.getByRole("banner").getByRole("button").last().click();
+    await admin.getByRole("banner").getByRole("button", { name: "More actions" }).click();
     await admin.getByRole("menuitem", { name: "Delete" }).click();
     await admin.getByRole("dialog").getByRole("button", { name: "Delete" }).click();
 

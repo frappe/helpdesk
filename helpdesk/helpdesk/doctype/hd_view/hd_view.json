@@ -28,6 +28,7 @@
   "load_default_columns",
   "columns",
   "rows",
+  "list_group_by",
   "group_by_tab",
   "group_by_field"
  ],
@@ -138,6 +139,13 @@
    "label": "Rows"
   },
   {
+   "description": "Fields to group the list by, with the counts and totals shown for each group",
+   "fieldname": "list_group_by",
+   "fieldtype": "Code",
+   "label": "List Group By",
+   "options": "JSON"
+  },
+  {
    "fieldname": "group_by_tab",
    "fieldtype": "Tab Break",
    "label": "Group By"
@@ -162,7 +170,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-27 19:42:04.891287",
+ "modified": "2026-10-16 11:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD View",

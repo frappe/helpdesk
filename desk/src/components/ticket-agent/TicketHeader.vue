@@ -62,7 +62,10 @@
           :options="groupedActions"
           align="end"
         >
-          <Button icon="lucide-more-horizontal" />
+          <Button
+            icon="lucide-more-horizontal"
+            :aria-label="__('More actions')"
+          />
         </Dropdown>
       </div>
     </template>
@@ -79,17 +82,15 @@
 <script setup lang="ts">
 import LucideChevronUp from "~icons/lucide/chevron-up";
 import LucideChevronDown from "~icons/lucide/chevron-down";
-import Icon from "@/components/Icon.vue";
+import Icon from "@helpdesk/shared/Icon.vue";
 import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
 import { showMergeModal } from "@/pages/ticket/modalStates";
-import {
-  createToast,
-  setupCustomizations,
-} from "@/composables/formCustomisation";
+import { setupCustomizations } from "@helpdesk/shared/formScripts";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
+import { reloadTicketFeed } from "@/composables/useTicket";
 import { useView } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
@@ -150,7 +151,10 @@ const statusDropdown = computed(() => {
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
-      ticket.value.setValue.submit({ status: o.label_agent });
+      ticket.value.setValue.submit(
+        { status: o.label_agent },
+        { onSuccess: () => reloadTicketFeed(ticket.value.name) }
+      );
     },
     icon: () =>
       h(IndicatorIcon, {
@@ -316,10 +320,8 @@ const customizationCtx = computed(() => ({
   doc: ticket?.value?.doc,
   call,
   router,
-  toast,
   $dialog: globalStore().$dialog,
   updateField,
-  createToast,
 }));
 
 // to manage the correct  customization context for actions, happens because of navigation between tickets using buttons

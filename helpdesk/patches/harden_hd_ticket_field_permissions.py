@@ -7,7 +7,7 @@ AGENT_GRANTS = {"System Manager": 1, "Agent": 1, "Agent Manager": 1}
 
 CUSTOMER_ROLES = ("HD Customer", "HD Customer Manager")
 # add_permission opens read; these are the rest of what hd_ticket.json grants
-CUSTOMER_BASE_PERMS = ("write", "create", "email", "print")
+CUSTOMER_BASE_PERMS = ("write", "create", "email", "export", "print")
 
 
 def execute():

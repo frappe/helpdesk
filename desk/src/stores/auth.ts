@@ -52,14 +52,17 @@ export const useAuthStore = defineStore("auth", () => {
   const availabilityChangedBy: ComputedRef<string> = computed(
     () => user__.value.availability_changed_by || ""
   );
+  const availabilityExpiresOn: ComputedRef<string> = computed(
+    () => user__.value.availability_expires_on || ""
+  );
+  const defaultAgentStatus: ComputedRef<string> = computed(
+    () => user__.value.default_agent_status || ""
+  );
   const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
   const userTeams: ComputedRef<string[]> = computed(
     () => user__.value.user_teams
   );
   const language: ComputedRef<string> = computed(() => user__.value.language);
-  const personaCaptured: ComputedRef<boolean> = computed(
-    () => !!user__.value.persona_captured
-  );
 
   function sessionUser() {
     const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
@@ -98,10 +101,11 @@ export const useAuthStore = defineStore("auth", () => {
     availability,
     availabilityChangedOn,
     availabilityChangedBy,
+    availabilityExpiresOn,
+    defaultAgentStatus,
     timezone,
     userTeams,
     language,
-    personaCaptured,
     user,
     logout,
   };

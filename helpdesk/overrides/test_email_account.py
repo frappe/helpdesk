@@ -6,6 +6,7 @@ import frappe
 
 # a module import: importing the TestCase itself makes the loader run its tests here
 from frappe.email.doctype.email_account import test_email_account as frappe_email_tests
+from frappe.email.receive import EmailServer
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.overrides.email_account import _failed_recipient, auto_generated_reason
@@ -168,7 +169,16 @@ class TestParkedMailTicketComment(IntegrationTestCase):
                 "message_id": self.message_id,
             }
         ).insert(ignore_permissions=True)
-        self.account = frappe.get_last_doc("Email Account")
+        # its own account: the newest one depends on which tests ran first
+        self.account = frappe.get_doc(
+            {
+                "doctype": "Email Account",
+                "email_account_name": "Parked Mail Test",
+                "email_id": "parked-mail@example.com",
+                "email_server": "imap.example.com",
+                "use_imap": 1,
+            }
+        ).insert(ignore_permissions=True, ignore_if_duplicate=True)
 
     def ticket_comments(self):
         return frappe.get_all(
@@ -223,8 +233,12 @@ class TestParkedMailTicketComment(IntegrationTestCase):
         )
 
         messages = {'"INBOX"': {"latest_messages": [raw.encode()], "uid_list": [b"7"]}}
-        # handle_bad_emails commits; keep the class rollback able to undo it
-        with patch.object(frappe.db, "commit"):
+        # handle_bad_emails commits; keep the class rollback able to undo it.
+        # No mail server here, and a failed connect now raises.
+        with (
+            patch.object(frappe.db, "commit"),
+            patch.object(EmailServer, "connect", return_value=True),
+        ):
             for _pull in range(3):
                 frappe_email_tests.TestEmailAccount.mocked_get_inbound_mails(
                     self.account, messages

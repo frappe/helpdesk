@@ -19,7 +19,7 @@ import {
   ERPNextSettingsIcon,
   FieldDependencyIcon,
   PhoneIcon,
-  SlidersIcon
+  SlidersIcon,
 } from "@/components/icons";
 import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
 import TelephonyPage from "./Telephony/TelephonyPage.vue";
@@ -29,12 +29,30 @@ import SavedReplies from "./SavedReplies/SavedReplies.vue";
 import { Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import General from "./General/General.vue";
+import KnowledgeBase from "./KnowledgeBase/KnowledgeBase.vue";
+import PortalPermissions from "./Customers/PortalPermissions.vue";
+import LucideUserCog from "~icons/lucide/user-cog";
+import LucideBookOpen from "~icons/lucide/book-open";
 import SettingsGear from "~icons/lucide/settings";
 import ZapIcon from "~icons/lucide/zap";
 import ProfilePage from "./Profile/ProfilePage.vue";
 import Preferences from "./Preferences/Preferences.vue";
+import CloudPanel from "./CloudSettings/CloudPanel.vue";
+import { isCloudSettingsAvailable } from "@/composables/fc";
+import type { CloudSettingsPanel } from "@frappe/cloud-sdk";
+import LucideCreditCard from "~icons/lucide/credit-card";
+import LucideStore from "~icons/lucide/store";
+import LucideGlobe from "~icons/lucide/globe";
+import LucideBolt from "~icons/lucide/bolt";
 
 export const showSettingsModal = ref(false);
+
+const cloudPanel = (panel: CloudSettingsPanel) =>
+  markRaw(() => h(CloudPanel, { panel }));
+const CloudBilling = cloudPanel("billing");
+const CloudMarketplace = cloudPanel("marketplace");
+const CloudDomains = cloudPanel("domains");
+const CloudAdvanced = cloudPanel("advanced");
 
 const auth = useAuthStore();
 
@@ -136,6 +154,22 @@ export const tabs = computed(() => {
       ],
     },
     {
+      label: __("Customer Portal"),
+      condition: () => auth.isAdmin || auth.isManager,
+      items: [
+        {
+          label: __("Portal Settings"),
+          icon: markRaw(LucideUserCog),
+          component: markRaw(PortalPermissions),
+        },
+        {
+          label: __("Knowledge Base"),
+          icon: markRaw(LucideBookOpen),
+          component: markRaw(KnowledgeBase),
+        },
+      ],
+    },
+    {
       label: __("Integrations"),
       items: [
         {
@@ -148,6 +182,32 @@ export const tabs = computed(() => {
           icon: markRaw(ERPNextSettingsIcon),
           component: markRaw(ERPNextIntegrationSettings),
           condition: () => auth.isAdmin || auth.isManager,
+        },
+      ],
+    },
+    {
+      label: __("Frappe Cloud"),
+      condition: () => isCloudSettingsAvailable(),
+      items: [
+        {
+          label: __("Billing"),
+          icon: markRaw(LucideCreditCard),
+          component: CloudBilling,
+        },
+        {
+          label: __("Marketplace"),
+          icon: markRaw(LucideStore),
+          component: CloudMarketplace,
+        },
+        {
+          label: __("Domains"),
+          icon: markRaw(LucideGlobe),
+          component: CloudDomains,
+        },
+        {
+          label: __("Advanced"),
+          icon: markRaw(LucideBolt),
+          component: CloudAdvanced,
         },
       ],
     },
@@ -177,6 +237,8 @@ type TabName =
   | "Email Accounts"
   | "Email Notifications"
   | "General"
+  | "Knowledge Base"
+  | "Portal Settings"
   | "Agents"
   | "Invite Agents"
   | "Teams"
@@ -186,7 +248,8 @@ type TabName =
   | "Field Dependencies"
   | "Telephony"
   | "ERPNext"
-  | "Saved Replies";
+  | "Saved Replies"
+  | "Billing";
 
 export const setActiveSettingsTab = (tabName: TabName) => {
   activeTab.value =
@@ -197,3 +260,8 @@ export const setActiveSettingsTab = (tabName: TabName) => {
         .find((tab) => tab.label == __(tabName))) ||
     tabs.value[0].items[0];
 };
+
+export function openBillingSettings() {
+  setActiveSettingsTab("Billing");
+  showSettingsModal.value = true;
+}

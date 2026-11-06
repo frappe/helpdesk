@@ -1,0 +1,167 @@
+import { toast } from "frappe-ui";
+import { h, isVNode, type Component } from "vue";
+import StoredIcon from "./Icon.vue";
+import { __ } from "./translation";
+
+type ToastType = "success" | "error" | "warning" | "info";
+
+// vue-sonner renders icons via `<component :is>`.
+function resolveIcon(icon: unknown): Component | undefined {
+  if (icon == null) return undefined;
+  if (typeof icon === "string") {
+    return () => h(StoredIcon, { icon, class: "size-4" });
+  }
+  if (isVNode(icon)) return () => icon;
+  return icon as Component;
+}
+
+// Shim for pre-v1 `toast.create({ message })` in form scripts.
+function createToast({
+  message,
+  type,
+  icon,
+  ...options
+}: {
+  message: string;
+  type?: ToastType;
+  icon?: unknown;
+  [key: string]: unknown;
+}) {
+  const data: Record<string, unknown> = { ...options };
+  if (icon) data.icon = resolveIcon(icon);
+  if (typeof options.duration === "number") {
+    data.duration = toMilliseconds(options.duration);
+  }
+  return type ? toast[type](message, data) : toast(message, data);
+}
+
+// The old API took seconds, with 0 meaning stay open.
+function toMilliseconds(seconds: number) {
+  return seconds === 0 ? Infinity : seconds * 1000;
+}
+
+export async function setupCustomizations(doc, obj) {
+  // Supporting old format, will have to refactor later
+  let data = doc.data ?? doc;
+  if (!data) return;
+  if (!data._form_script) return [];
+  const scripts = Array.isArray(data._form_script)
+    ? data._form_script
+    : [data._form_script];
+  let actions = [];
+  let links = [];
+  let onChangeFieldMap = {};
+  for (const script of scripts) {
+    const parsed = await parseScript(script, { toast, createToast, ...obj });
+    actions = actions.concat(parsed.actions);
+    links = links.concat(parsed.links);
+    if (parsed.onChange) {
+      parseOnChangeFn(onChangeFieldMap, parsed.onChange);
+    }
+  }
+  data._customActions = withLegacyGroupOptions(actions);
+  data._customLinks = links;
+  if (Object.keys(onChangeFieldMap).length) {
+    data._customOnChange = onChangeFieldMap;
+  }
+}
+
+// Pre-v1 scripts name a group's children `items`.
+function withLegacyGroupOptions(actions: any[]) {
+  return actions.map((action) =>
+    action.items && !action.options
+      ? { ...action, options: action.items }
+      : action
+  );
+}
+
+function parseOnChangeFn(fieldMap: object, currentField: object) {
+  for (const [key, value] of Object.entries(currentField)) {
+    if (!fieldMap[key]) {
+      fieldMap[key] = new Set();
+    }
+    fieldMap[key].add(value);
+  }
+}
+
+async function parseScript(script, obj) {
+  try {
+    const scriptFn = new Function(script + "\nreturn setupForm")();
+    const formScript = await scriptFn(obj);
+    return {
+      actions: formScript?.actions || [],
+      links: formScript?.links || [],
+      onChange: formScript?.onChange || null,
+    };
+  } catch (error) {
+    console.error(error);
+    toast.error(__("A form script on this page failed to run"));
+    return { actions: [], links: [], onChange: null };
+  }
+}
+
+function handleSelectFieldUpdate(
+  f: any,
+  fieldname: string,
+  filters: any,
+  doc: any,
+  oldDoc: any
+) {
+  if (!filters || !filters.length) {
+    f.options = oldDoc.find((f) => f.fieldname === fieldname).options;
+    f.disabled = true;
+  } else {
+    f.options = filters.join("\n");
+    f.disabled = false;
+  }
+  // reset dependent field
+  doc[fieldname] = "";
+}
+
+function handleLinkFieldUpdate(
+  f: any,
+  fieldname: string,
+  filters: any,
+  doc: any,
+  oldDoc: any
+) {
+  if (!filters || !filters.length) {
+    f.link_filters = oldDoc.find((f) => f.fieldname === fieldname).link_filters;
+    f.disabled = true;
+    return;
+  }
+  f.link_filters = JSON.stringify([[f.options, "name", "in", filters]]);
+  f.disabled = false;
+
+  // reset dependent field
+  doc[fieldname] = "";
+}
+
+// Backs form scripts' `applyFilters(fieldname, values)`.
+export function applyFieldFilters(
+  fields: any[],
+  fieldname: string,
+  filters: any,
+  doc: any,
+  oldFields: any[]
+) {
+  const f = fields.find((f) => f.fieldname === fieldname);
+  if (f?.fieldtype === "Select") {
+    handleSelectFieldUpdate(f, fieldname, filters, doc, oldFields);
+  } else if (f?.fieldtype === "Link") {
+    handleLinkFieldUpdate(f, fieldname, filters, doc, oldFields);
+  }
+}
+
+// Callable context so form scripts written for `onClick(close)` keep working
+// alongside frappe-ui v1's `onClick({ close })`.
+export function withLegacyCloseContext(actions) {
+  return actions?.map((action) =>
+    action.onClick
+      ? {
+          ...action,
+          onClick: ({ close }) => action.onClick(Object.assign(() => close(), { close })),
+        }
+      : action
+  );
+}

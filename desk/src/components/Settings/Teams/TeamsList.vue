@@ -110,7 +110,7 @@
         title="No team found"
         :description="
           teamsSearchQuery.length
-            ? 'Change your search terms to find teams.'
+            ? 'Try a different search.'
             : 'Add one to get started.'
         "
       />

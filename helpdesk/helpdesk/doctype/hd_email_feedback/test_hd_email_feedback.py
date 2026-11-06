@@ -40,6 +40,22 @@ class IntegrationTestHDEmailFeedback(IntegrationTestCase):
         frappe.set_user("Administrator")
         self.assertEqual(frappe.db.get_value("HD Ticket", name, "feedback_rating"), 0.6)
 
+    def test_the_email_cannot_rerate_a_ticket_rated_on_the_portal(self):
+        name = close_emailed_ticket(CUSTOMER)
+        self.addCleanup(frappe.delete_doc, "HD Ticket", name, force=True)
+        frappe.db.set_value("HD Ticket", name, "feedback_rating", 0.4)
+        key = frappe.db.get_value("HD Ticket", name, "key")
+
+        frappe.set_user("Guest")
+        feedback = frappe.get_doc(
+            doctype="HD Email Feedback", key=key, feedback_rating=1
+        )
+        with self.assertRaises(frappe.PermissionError):
+            feedback.insert(ignore_permissions=True)
+
+        frappe.set_user("Administrator")
+        self.assertEqual(frappe.db.get_value("HD Ticket", name, "feedback_rating"), 0.4)
+
     def test_rating_does_not_let_a_customer_edit_the_closed_ticket(self):
         """The exemption covers the rating, not the ticket it is attached to."""
         name = close_emailed_ticket(CUSTOMER)

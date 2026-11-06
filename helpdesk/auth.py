@@ -62,6 +62,18 @@ ALLOWED_PATHS = [
     "/api/method/frappe.core.api.user_invitation.cancel_invitation",
     "/api/method/frappe.core.api.user_invitation.invite_by_email",
     "/api/method/frappe.desk.reportview.export_query",
+    # the Studio portal at /help
+    "/api/method/frappe.studio.doctype.studio_page.studio_page.get_page",
+    "/api/method/frappe.translate.get_boot_translations",
+    "/api/method/frappe.core.api.file.get_max_file_size",
+    "/api/method/frappe.desk.form.activity.get_activity_timeline",
+    "/api/method/frappe.desk.form.activity.get_more_email_activities",
+    "/api/method/frappe.desk.form.activity.get_more_milestone_activities",
+    "/api/method/frappe.core.doctype.user.user.get_timezones",
+    "/api/v2/mcp",
+    "/api/method/frappe.integrations.oauth2.register_client",
+    "/api/method/frappe.integrations.oauth2.introspect_token",
+    "/api/method/frappe.integrations.oauth2.revoke_token",
 ]
 
 WILDCARD_PATHS = [
@@ -76,7 +88,8 @@ def authenticate():
     if frappe.form_dict.cmd:
         path = f"/api/method/{frappe.form_dict.cmd}"
     else:
-        path = frappe.request.path
+        path = as_v1_method_path(frappe.request.path)
+    path = path.removesuffix("/")
     user_type = frappe.db.get_value("User", frappe.session.user, "user_type")
 
     if user_type == "System User":
@@ -103,6 +116,14 @@ def authenticate():
     if path in ALLOWED_PATHS:
         return
     frappe.throw(f"Access not allowed for this URL: {path}", frappe.PermissionError)
+
+
+def as_v1_method_path(path: str) -> str:
+    """Read /api/v1|v2/method/<m> as /api/method/<m>, so frappectl's v2 calls get the same rules."""
+    for prefix in ("/api/v1/method/", "/api/v2/method/"):
+        if path.startswith(prefix):
+            return "/api/method/" + path.removeprefix(prefix)
+    return path
 
 
 def is_server_script_path(path):

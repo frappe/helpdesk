@@ -6,14 +6,12 @@
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
-    <span class="ml-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
+    <span class="ms-0.5 me-1 text-base text-ink-gray-4" aria-hidden="true">
+      /
+    </span>
     <Dropdown v-model:open="isOpen" :options="options">
       <template #default="{ open }">
-        <Button
-          variant="ghost"
-          class="max-w-[200px] sm:max-w-none !bg-transparent hover:!bg-surface-gray-3 focus-visible:!ring-0"
-          :class="open && '!bg-surface-gray-3'"
-        >
+        <Button variant="ghost" class="max-w-[200px] sm:max-w-none">
           <span class="text-lg-medium text-nowrap truncate">{{
             currentView.label
           }}</span>
@@ -84,7 +82,7 @@
 import LucideChevronUp from "~icons/lucide/chevron-up";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideCheck from "~icons/lucide/check";
-import Icon from "@/components/Icon.vue";
+import Icon from "@helpdesk/shared/Icon.vue";
 import { useScreenSize } from "@/composables/screen";
 import { Badge, Dropdown } from "frappe-ui";
 import { ref } from "vue";

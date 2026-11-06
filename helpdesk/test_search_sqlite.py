@@ -5,7 +5,7 @@ from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.patches import relabel_comment_search_index
 from helpdesk.search_sqlite import HelpdeskSearch
-from helpdesk.test_utils import create_user, make_ticket
+from helpdesk.test_utils import create_user, make_ticket, use_test_index
 
 RESTRICTED_USER = "helpdesk-search-user@example.com"
 
@@ -78,18 +78,13 @@ class TestSearchIndexRelabel(FrappeTestCase):
     TEST_INDEX = "test_relabel_search.db"
 
     def setUp(self):
-        self.search = HelpdeskSearch(db_name=self.TEST_INDEX)
-        self.search.drop_index()
+        self.search = use_test_index(
+            self, HelpdeskSearch, self.TEST_INDEX, relabel_comment_search_index
+        )
         self.search._ensure_fts_table()
-        self.addCleanup(self.search.drop_index)
 
     def run_patch(self) -> None:
-        with patch.object(
-            relabel_comment_search_index,
-            "HelpdeskSearch",
-            lambda: HelpdeskSearch(db_name=self.TEST_INDEX),
-        ):
-            relabel_comment_search_index.execute()
+        relabel_comment_search_index.execute()
 
     def insert_row(self, doc_id: str, doctype: str, name: str, ticket) -> None:
         self.search.sql(

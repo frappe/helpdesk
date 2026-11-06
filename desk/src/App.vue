@@ -15,7 +15,6 @@ import { h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { __ } from "./translation";
-import { isCustomerPortal } from "./utils";
 
 const configStore = useConfigStore();
 const { favicon } = storeToRefs(configStore);
@@ -39,7 +38,7 @@ onMounted(() => {
       icon: () => h(WifiOff, { class: "text-ink-base" }),
     });
   });
-  !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);
+  setConfig("localTimezone", window.timezone?.user);
   setConfig("systemTimezone", window.timezone?.system || null);
 });
 </script>

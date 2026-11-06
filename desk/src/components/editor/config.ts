@@ -3,7 +3,8 @@ import {
   ComponentUtils,
   DismissSuggestionsOnOutsideClick,
   HandleExcelPaste,
-} from "@/tiptap-extensions";
+  PreserveWhitespace,
+} from "@helpdesk/shared/tiptap";
 import {
   AlignCenter,
   AlignLeft,
@@ -57,6 +58,7 @@ export function buildEditorExtensions(
     HandleExcelPaste,
     CleanStyles,
     DismissSuggestionsOnOutsideClick,
+    PreserveWhitespace,
     ...(options.extra ?? []),
   ];
 }

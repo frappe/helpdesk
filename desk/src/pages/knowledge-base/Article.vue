@@ -5,23 +5,31 @@
         <div class="flex gap-2 items-center crumbs max-w-[50vw]">
           <Breadcrumbs :items="breadcrumbs" class="-ms-0.5 truncate" />
           <Badge
-            v-if="!article.loading"
+            v-if="article.data"
             variant="subtle"
-            :theme="article.data?.status === 'Draft' ? 'amber' : 'green'"
+            :theme="
+              { Draft: 'amber', Archived: 'gray' }[article.data?.status] ||
+              'green'
+            "
             size="md"
-            >{{ article.data?.status }}</Badge
+            >{{ __(article.data?.status) }}</Badge
           >
         </div>
       </template>
-      <template #right-header v-if="!isCustomerPortal">
+      <template #right-header>
         <!-- Default Buttons -->
-        <div class="flex gap-2" v-if="!editable && !article.loading">
+        <div class="flex gap-2" v-if="!editable && article.data">
           <Button
-            :label="
-              article.data?.status === 'Draft' ? __('Publish') : __('Unpublish')
-            "
-            :iconLeft="article.data?.status !== 'Published' && 'lucide-globe'"
-            @click="toggleStatus()"
+            v-if="isArchived"
+            :label="__('Restore')"
+            iconLeft="lucide-archive-restore"
+            @click="restoreModal = true"
+          />
+          <Button
+            v-else
+            :label="isPublished ? __('Unpublish') : __('Publish')"
+            :iconLeft="isPublished ? undefined : 'lucide-globe'"
+            @click="togglePublished()"
           />
         </div>
       </template>
@@ -29,7 +37,7 @@
 
     <div
       class="py-4 mx-auto w-full max-w-3xl px-5 flex flex-col"
-      v-if="!article.loading"
+      v-if="article.data"
     >
       <!-- article Info -->
       <div
@@ -53,76 +61,72 @@
                 :disabled="!editable"
               />
               <div
-                v-if="!editable && isCustomerPortal"
-                class="flex gap-1 items-center pt-1.5"
+                v-if="!editable && !isMobileView"
+                class="flex items-center gap-2 text-p-sm text-ink-gray-5"
               >
-                <!-- Avatar -->
-                <div class="flex gap-2 pb-1.5 items-center justify-center">
-                  <Avatar
-                    :image="article.data.author.image"
-                    :label="article.data.author.name"
-                    size="md"
+                <span>{{ viewsLabel }}</span>
+                <template v-if="access && isPublished">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
                   />
-                  <div class="flex gap-1 items-end">
-                    <p class="truncate capitalize text-base text-ink-gray-7">
-                      {{ article.data.author.name }}
-                    </p>
-                    <IconDot class="h-4 w-4 text-ink-gray-5" />
-                    <div class="text-base text-ink-gray-7">
-                      {{
-                        dayjsLocal(article.data.modified).format(
-                          "MMM D, h:mm A"
-                        )
-                      }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                v-if="!editable && !isCustomerPortal && !isMobileView"
-                class="text-p-sm text-ink-gray-4 items-center"
-              >
-                <span>{{ views }} {{ __("views") }}</span>
+                  <span class="flex items-center gap-1.5">
+                    <Icon :icon="access.icon" class="size-4 shrink-0" />
+                    {{ access.label }}
+                  </span>
+                </template>
+                <template v-if="article.data.pinned">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
+                  />
+                  <span class="flex items-center gap-1.5">
+                    <Icon icon="lucide-pin" class="size-4 shrink-0" />
+                    {{ __("Pinned article") }}
+                  </span>
+                </template>
+                <template v-if="article.data.weight">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
+                  />
+                  <button
+                    class="flex items-center gap-1.5 hover:text-ink-gray-7"
+                    @click="showWeightModal = true"
+                  >
+                    <Icon
+                      icon="lucide-arrow-up-narrow-wide"
+                      class="size-4 shrink-0"
+                    />
+                    {{ __("Weight {0}", [article.data.weight]) }}
+                  </button>
+                </template>
               </div>
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
               <div class="flex gap-4 text-p-sm items-center">
-                <div
-                  class="flex items-center gap-2"
-                  v-if="!editable && !isCustomerPortal"
-                >
+                <div class="flex items-center gap-2" v-if="!editable">
                   <Button
                     variant="ghost"
                     size="md"
                     class="flex shrink-0 !w-auto"
-                    :disabled="!isCustomerPortal"
+                    disabled
                   >
                     <template #suffix>
                       {{ likes }}
                     </template>
                     <template #icon>
-                      <ThumbsUpFilledIcon
-                        v-if="feedback === 1 && isCustomerPortal"
-                        class="size-4"
-                      />
-                      <ThumbsUpIcon v-else class="size-4" />
+                      <ThumbsUpIcon class="size-4" />
                     </template>
                   </Button>
                   <Button
                     variant="ghost"
                     size="md"
                     class="flex shrink-0 !w-auto"
-                    :disabled="!isCustomerPortal"
+                    disabled
                   >
                     <template #suffix>
                       {{ dislikes }}
                     </template>
                     <template #icon>
-                      <ThumbsDownFilledIcon
-                        v-if="feedback === 2 && isCustomerPortal"
-                        class="size-4"
-                      />
-                      <ThumbsDownIcon v-else class="size-4" />
+                      <ThumbsDownIcon class="size-4" />
                     </template>
                   </Button>
                 </div>
@@ -130,7 +134,7 @@
               <div class="flex gap-1 items-start justify-between">
                 <Dropdown
                   :options="articleActions"
-                  v-if="!editable && !isCustomerPortal"
+                  v-if="!editable"
                   @update:open="
                     (open) => open && (isConfirmingDeleteArticle = false)
                   "
@@ -177,7 +181,10 @@
           <template #default>
             <!-- Scroll here so selected nodes aren't clipped. -->
             <div :class="editorScrollClass">
-              <EditorContent class="rounded-b-6 max-w-[unset] prose-sm" />
+              <EditorContent
+                class="rounded-b-6 max-w-[unset] prose-sm"
+                :class="ARTICLE_IMAGE_CLASSES"
+              />
             </div>
             <EditorFixedMenu
               v-if="editable"
@@ -187,10 +194,7 @@
             <EditorTableMenu v-if="editable" />
           </template>
         </Editor>
-        <div
-          v-if="!editable && !isCustomerPortal"
-          class="flex gap-1 items-center pt-1.5 mt-4"
-        >
+        <div v-if="!editable" class="flex gap-1 items-center pt-1.5 mt-4">
           <!-- Avatar -->
           <div class="flex gap-2 items-center justify-center">
             <Avatar
@@ -211,29 +215,23 @@
                     dayjsLocal(article.data.modified).format("MMM D, h:mm A")
                   }}
                 </span>
-                <IconDot
-                  v-if="!editable && !isCustomerPortal && isMobileView"
-                  class="h-4 w-4 text-ink-gray-5"
-                />
+                <IconDot v-if="isMobileView" class="h-4 w-4 text-ink-gray-5" />
 
                 <span
-                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  v-if="isMobileView"
                   class="text-p-xs text-ink-gray-4 items-center"
-                  >{{ views }} views</span
                 >
+                  {{ viewsLabel }}
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div class="p-4" v-if="isCustomerPortal">
-        <ArticleFeedback :feedback="feedback" :article-id="articleId" />
-      </div>
     </div>
-    <!-- Loading State -->
+    <!-- First load only: reloads after a save or move keep the page shown. -->
     <div
-      v-if="article.loading"
+      v-if="!article.data"
       class="w-full h-screen flex items-center justify-center"
     >
       <LoadingIndicator class="size-10" />
@@ -241,13 +239,46 @@
     <MoveToCategoryModal
       v-model="moveToModal"
       @move="handleMoveToCategory"
-      :exclude-category="article.data?.category_id"
+      :exclude-category="article.data?.category"
+    />
+    <MoveToCategoryModal
+      v-model="restoreModal"
+      :title="__('Restore article')"
+      :action-label="__('Restore')"
+      :default-category="generalCategory.data"
+      @move="handleMoveToCategory"
     />
     <CategoryModal
       :edit="editTitle"
       v-model:title="category.title"
+      v-model:description="category.description"
+      v-model:icon="category.icon"
+      v-model:parent="category.parent"
       v-model="showCategoryModal"
       @create="handleCategoryCreate"
+    />
+    <ArticleAccessModal
+      v-if="article.data"
+      v-model="showAccessModal"
+      :title="
+        isPublished ? __('Change article access') : __('Publish article as')
+      "
+      :visibility="article.data.visibility"
+      :action-label="isPublished ? __('Update access') : __('Publish')"
+      @publish="publishArticle"
+    >
+      <template #default="{ access }">
+        <p v-if="access" class="text-p-sm text-ink-gray-7">
+          {{ accessNote(access) }}
+        </p>
+      </template>
+    </ArticleAccessModal>
+    <ArticleWeightModal
+      v-if="article.data"
+      v-model="showWeightModal"
+      :count="1"
+      :initial-weight="article.data.weight"
+      @save="saveWeight"
     />
   </div>
 </template>
@@ -256,38 +287,44 @@
 import DiscardButton from "@/components/DiscardButton.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
-import {
-  ThumbsDownFilledIcon,
-  ThumbsDownIcon,
-  ThumbsUpFilledIcon,
-  ThumbsUpIcon,
-} from "@/components/icons";
-import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
+import { ARTICLE_IMAGE_CLASSES } from "@helpdesk/shared/tiptap";
+import { ThumbsDownIcon, ThumbsUpIcon } from "@/components/icons";
+import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
+import ArticleWeightModal from "@/components/knowledge-base/ArticleWeightModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
-import { useAuthStore } from "@/stores/auth";
+import { globalStore } from "@/stores/globalStore";
 import {
-  deleteRes as deleteArticle,
-  incrementView,
+  categoryOptions,
+  deleteArticles,
   moveToCategory,
   newCategory,
   updateRes as updateArticle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
+import { Article, Breadcrumb, Error, Resource } from "@/types";
 import {
   ConfirmDelete,
-  copyToClipboard,
-  isCustomerPortal,
+  CUSTOMER_PORTAL_ROOT,
+  getErrorMessage,
   uploadFunction,
 } from "@/utils";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
+import Icon from "@helpdesk/shared/Icon.vue";
+import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
+import {
+  addHeadingIds,
+  copyToClipboard,
+  countLabel,
+} from "@helpdesk/shared/utils";
 import {
   Avatar,
   Badge,
   Breadcrumbs,
   Button,
+  call,
   createResource,
   dayjsLocal,
   debounce,
@@ -308,6 +345,7 @@ import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 
 const extensions = buildEditorExtensions();
+const { $dialog } = globalStore();
 const { isMobileView } = useScreenSize();
 
 const props = defineProps({
@@ -324,6 +362,9 @@ function handleCategoryCreate() {
   newCategory.submit(
     {
       title: category.title,
+      description: category.description,
+      icon: category.icon,
+      parent: category.parent || null,
     },
     {
       onSuccess: (data: any) => {
@@ -341,6 +382,11 @@ function handleCategoryCreate() {
         });
         //update category name in breadcrumb
         article.data.category_name = category.title;
+        article.data.parent_category_name = category.parent
+          ? categoryOptions.data?.find(
+              (option) => option.value === category.parent
+            )?.label ?? null
+          : null;
         toast.success(__("Category created successfully."));
       },
       onError: (error: string) => {
@@ -352,21 +398,28 @@ function handleCategoryCreate() {
 
 const category = reactive({
   title: "",
+  description: "",
   id: "",
+  icon: "lucide-folder",
+  parent: "",
 });
 
 const router = useRouter();
 const route = useRoute();
-const authStore = useAuthStore();
 
 const editorRef = ref(null);
 const editable = ref(route.query.isEdit ?? false);
 const likes = ref(0);
 const dislikes = ref(0);
 const views = ref(0);
+const access = computed(
+  () => categoryAccess()[article.data?.visibility as string]
+);
+const viewsLabel = computed(() =>
+  countLabel(views.value, __("1 view"), __("{0} views"))
+);
 const content = ref("");
 const title = ref("");
-const feedback = ref<FeedbackAction>();
 
 const titleRef = ref(null);
 watch(
@@ -390,6 +443,7 @@ const categories = createResource({
 
 const article: Resource<Article> = createResource({
   url: "helpdesk.api.knowledge_base.get_article",
+  method: "GET",
   params: {
     name: props.articleId,
   },
@@ -397,24 +451,13 @@ const article: Resource<Article> = createResource({
   onSuccess: (data: Article) => {
     content.value = data.content;
     title.value = data.title;
-    feedback.value = data.feedback;
-    if (isCustomerPortal.value) {
-      capture("article_viewed", {
-        data: {
-          user: authStore.userId,
-          article: data.name,
-          title: data.title,
-        },
-      });
-      incrementArticleViews(data.name);
-    }
   },
   onError: (err: Error) => {
-    if (err.exc_type === "PermissionError") {
-      router.replace({
-        name: "CustomerKnowledgeBase",
-      });
+    if (!["DoesNotExistError", "PermissionError"].includes(err.exc_type)) {
+      return;
     }
+    toast.error(__("Article not found"));
+    router.replace({ name: "AgentKnowledgeBase" });
   },
 });
 
@@ -429,45 +472,75 @@ const articleStats = createResource({
   auto: true,
 });
 
-function incrementArticleViews(articleId: string) {
-  incrementView.submit(
-    {
-      article: articleId,
-    },
-    {
-      onError: (err: Error) => {
-        if (err.exc_type === "RateLimitExceededError") {
-          return;
-        }
-      },
-    }
+const isPublished = computed(() => article.data?.status === "Published");
+const isArchived = computed(() => article.data?.status === "Archived");
+
+const togglePublished = debounce(
+  () =>
+    isPublished.value
+      ? save({ status: "Draft" }, __("Article unpublished."))
+      : (showAccessModal.value = true),
+  300
+);
+
+const showAccessModal = ref(false);
+
+function accessNote(access: string) {
+  return {
+    Public: __(
+      "Anyone, including visitors who aren't logged in, can read this article."
+    ),
+    Customers: __("Only logged-in customers and agents can read this article."),
+    Private: __("Only agents can read this article."),
+  }[access];
+}
+
+function publishArticle(visibility: string) {
+  save(
+    { status: "Published", visibility },
+    isPublished.value ? __("Access updated.") : __("Article published.")
   );
 }
 
-const toggleStatus = debounce(() => {
-  const status = article.data?.status === "Published" ? "Draft" : "Published";
+// Show the new status at once. A reload would wait a second round trip and
+// swap the page for the loading state.
+function save(values: Record<string, string | number>, message: string) {
+  Object.assign(article.data, values);
   updateArticle.submit(
+    { doctype: "HD Article", name: article.data.name, fieldname: values },
     {
-      doctype: "HD Article",
-      name: article.data.name,
-      fieldname: "status",
-      value: status,
-    },
-    {
-      onSuccess: () => {
-        if (status === "Published")
-          toast.success("Article published successfully.");
-        else toast.success("Article unpublished successfully.");
+      onSuccess: (doc: Article) => {
+        article.data.modified = doc.modified;
+        // unpublishing unpins
+        article.data.pinned = doc.pinned;
+        toast.success(message);
+      },
+      onError: (error: Error) => {
+        toast.error(error?.messages?.[0] || error.message);
         article.reload();
       },
     }
   );
-}, 300);
+}
 const isDirty = ref(false);
 
+const showWeightModal = ref(false);
+
+function saveWeight(weight: number) {
+  if (weight === (article.data.weight || 0)) return;
+  save({ weight }, __("Weight updated."));
+}
+
 const moveToModal = ref(false);
+const restoreModal = ref(false);
+// restores pick General unless the agent changes it
+const generalCategory = createResource({
+  url: "helpdesk.api.knowledge_base.get_general_category",
+  auto: true,
+});
 
 function handleMoveToCategory(category: string) {
+  const restoring = isArchived.value;
   moveToCategory.submit(
     {
       category,
@@ -476,13 +549,17 @@ function handleMoveToCategory(category: string) {
     {
       onSuccess: () => {
         article.reload();
-        moveToModal.value = false;
-        toast.success(__(`Article has been successfully moved.`));
+        moveToModal.value = restoreModal.value = false;
+        toast.success(
+          restoring
+            ? __("Article restored as a draft.")
+            : __(`Article has been successfully moved.`)
+        );
       },
       onError: (error: Error) => {
         let msg = error?.messages?.[0] || error.message;
         toast.error(msg);
-        moveToModal.value = false;
+        moveToModal.value = restoreModal.value = false;
       },
     }
   );
@@ -498,7 +575,7 @@ function handleDiscard() {
   isDirty.value = false;
   title.value = article.data.title;
   content.value = article.data.content;
-  const original = addLinksToHeadings(article.data.content);
+  const original = addHeadingIds(article.data.content).html;
   textEditorContentWithIDs.value = null;
   nextTick(() => {
     textEditorContentWithIDs.value = original;
@@ -559,39 +636,123 @@ function handleArticleUpdate() {
   );
 }
 
-function handleDelete() {
-  deleteArticle.submit(
-    { doctype: "HD Article", name: article.data.name },
+// A ticket links it: ask whether to archive it or delete it from the ticket too.
+async function handleDelete() {
+  let cited: string[] = [];
+  try {
+    cited = await call("helpdesk.api.knowledge_base.get_cited_articles", {
+      articles: [article.data.name],
+    });
+  } catch (error) {
+    getErrorMessage(error, true);
+    return;
+  }
+  if (!cited.length) return deleteArticle();
+  // archived already, so deleting is the only way out
+  if (isArchived.value) {
+    return $dialog({
+      title: __("Delete archived article"),
+      message: __(
+        "This archived article is linked to tickets. Deleting it removes it from those tickets."
+      ),
+      actions: [
+        {
+          label: __("Delete"),
+          theme: "red",
+          iconLeft: "lucide-trash-2",
+          variant: "solid",
+          onClick({ close }) {
+            close();
+            deleteArticle();
+          },
+        },
+      ],
+    });
+  }
+  $dialog({
+    title: __("This article is linked to tickets"),
+    message: __(
+      "Archive it to keep the link, or delete it and remove it from those tickets."
+    ),
+    actions: [
+      {
+        label: __("Archive"),
+        variant: "subtle",
+        onClick({ close }) {
+          close();
+          archiveArticle();
+        },
+      },
+      {
+        label: __("Delete"),
+        theme: "red",
+        iconLeft: "lucide-trash-2",
+        variant: "solid",
+        onClick({ close }) {
+          close();
+          deleteArticle();
+        },
+      },
+    ],
+  });
+}
+
+function deleteArticle() {
+  deleteArticles.submit(
+    { articles: [article.data.name] },
     {
       onSuccess: () => {
         toast.success(__("Article deleted successfully."));
         router.push({ name: "AgentKnowledgeBase" });
       },
+      onError: (error: Error) => getErrorMessage(error, true),
     }
   );
+}
+
+function confirmArchive() {
+  $dialog({
+    title: __("Archive article"),
+    message: __(
+      "The article leaves its category and readers can't open it. Restore it later as a Draft."
+    ),
+    actions: [
+      {
+        label: __("Archive"),
+        iconLeft: "lucide-archive",
+        variant: "solid",
+        onClick({ close }) {
+          close();
+          archiveArticle();
+        },
+      },
+    ],
+  });
+}
+
+async function archiveArticle() {
+  try {
+    await call("helpdesk.api.knowledge_base.archive_articles", {
+      articles: [article.data.name],
+    });
+  } catch (error) {
+    getErrorMessage(error, true);
+    return;
+  }
+  toast.success(__("Article archived."));
+  router.push({ name: "AgentKnowledgeBase" });
 }
 const textEditorContentWithIDs = ref(null);
 watch(
   () => article.data?.content,
   (newContent) => {
     if (newContent) {
-      textEditorContentWithIDs.value = addLinksToHeadings(newContent);
+      textEditorContentWithIDs.value = addHeadingIds(newContent).html;
     }
   },
   { immediate: true }
 );
 
-function addLinksToHeadings(content: string) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(content, "text/html");
-  const headings = doc.querySelectorAll("h2, h3, h4, h5, h6");
-  headings.forEach((heading) => {
-    const text = heading.textContent.trim();
-    const id = text.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
-    heading.setAttribute("id", id);
-  });
-  return doc.body.innerHTML;
-}
 function scrollToHeading() {
   const articleHeading = window.location.hash;
   if (!articleHeading) return;
@@ -631,79 +792,123 @@ const editorScrollClass = computed(
 
 const isConfirmingDeleteArticle = ref(false);
 
-const articleActions = computed(() => [
-  {
-    label: __("Edit"),
-    icon: "lucide-edit",
-    onClick: () => {
-      handleEditMode();
-    },
+const editAction = {
+  label: __("Edit"),
+  icon: "lucide-edit",
+  onClick: () => {
+    handleEditMode();
   },
+};
+const deleteActions = computed(() =>
+  ConfirmDelete({
+    onConfirmDelete: handleDelete,
+    isConfirmingDelete: isConfirmingDeleteArticle,
+  })
+);
 
-  ...(categories.data && categories.data > 1
-    ? [
-        {
-          label: __("Move To"),
-          icon: "lucide-corner-up-right",
-          onClick: () => (moveToModal.value = true),
-        },
-      ]
+// an archived article has no category or readers, so it's only edited or deleted
+const articleActions = computed(() =>
+  isArchived.value
+    ? [editAction, ...deleteActions.value]
     : [
+        editAction,
         {
-          label: __("Add Category"),
-          icon: "lucide-folder-plus",
-          onClick: () => (showCategoryModal.value = true),
+          label: __("Copy link"),
+          icon: "lucide-link",
+          onClick: () =>
+            copyToClipboard(
+              window.location.origin +
+                CUSTOMER_PORTAL_ROOT +
+                ROUTES.article({
+                  name: props.articleId,
+                  title_slug: article.data?.title_slug,
+                }),
+              __("Article link copied to clipboard.")
+            ),
         },
-      ]),
-  {
-    label: __("Share"),
-    icon: "lucide-link",
-    onClick: () => {
-      const url = new URL(window.location.href);
-      url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;
-      copyToClipboard(url.toString(), __("Article link copied to clipboard"));
-    },
-  },
-  {
-    group: __("Danger"),
-    hideLabel: true,
-    options: [
-      ...ConfirmDelete({
-        onConfirmDelete: handleDelete,
-        isConfirmingDelete: isConfirmingDeleteArticle,
-      }),
-    ],
-  },
-]);
+        // Drafts pick their access when published; the modal publishes them.
+        ...(isPublished.value
+          ? [
+              {
+                label: __("Change access"),
+                icon: "lucide-lock",
+                onClick: () => (showAccessModal.value = true),
+              },
+            ]
+          : []),
+        ...(categories.data && categories.data > 1
+          ? [
+              {
+                label: __("Move To"),
+                icon: "lucide-corner-up-right",
+                onClick: () => (moveToModal.value = true),
+              },
+            ]
+          : [
+              {
+                label: __("Add Category"),
+                icon: "lucide-folder-plus",
+                onClick: () => (showCategoryModal.value = true),
+              },
+            ]),
+        // Customers never see Private articles, so they are never pinned.
+        ...(isPublished.value && article.data?.visibility !== "Private"
+          ? [
+              {
+                label: article.data?.pinned
+                  ? __("Unpin from home page")
+                  : __("Pin to home page"),
+                icon: article.data?.pinned ? "lucide-pin-off" : "lucide-pin",
+                onClick: () =>
+                  article.data.pinned
+                    ? save(
+                        { pinned: 0 },
+                        __("Article unpinned from the home page.")
+                      )
+                    : save(
+                        { pinned: 1 },
+                        __("Article pinned to the home page.")
+                      ),
+              },
+            ]
+          : []),
+        {
+          label: __("Set weight"),
+          icon: "lucide-arrow-up-narrow-wide",
+          onClick: () => (showWeightModal.value = true),
+        },
+        {
+          label: __("Archive"),
+          icon: "lucide-archive",
+          onClick: confirmArchive,
+        },
+        ...deleteActions.value,
+      ]
+);
 
 const breadcrumbs = computed(() => {
   const items: Breadcrumb[] = [
     {
       label: isMobileView.value ? __("KB") : __("Knowledge Base"),
-      route: {
-        name: isCustomerPortal.value
-          ? "CustomerKnowledgeBase"
-          : "AgentKnowledgeBase",
-      },
+      route: { name: "AgentKnowledgeBase" },
     },
   ];
+  // the list opens the category it's sent to
+  const inList = (category: string) => ({
+    name: "AgentKnowledgeBase",
+    query: { category },
+  });
+  if (article.data?.parent_category_name) {
+    items.push({
+      label: article.data.parent_category_name,
+      route: inList(article.data.parent_article_category),
+    });
+  }
   if (article.data?.category_name) {
-    let item = {
+    items.push({
       label: article.data?.category_name,
-    };
-    if (isCustomerPortal.value) {
-      item["route"] = {
-        name: "Articles",
-        params: {
-          categoryId: article.data?.category_id,
-        },
-      };
-    } else {
-      item["route"] = {
-        name: "AgentKnowledgeBase",
-      };
-    }
-    items.push(item);
+      route: inList(article.data.category),
+    });
   }
   if (article.data?.title) {
     items.push({

@@ -1,11 +1,16 @@
 import frappe
+from frappe import _
+from frappe.core.doctype.user.user import get_timezones
 
-from helpdesk.utils import agent_only, get_agent_name, get_agents_team
+from helpdesk.utils import agent_only, get_agent_name, get_agents_team, get_user_contact
 from helpdesk.utils import is_agent as _is_agent
 
 
 @frappe.whitelist()
 def get_user():
+    """The session user's profile and role flags, loaded when the app boots.
+    Name, image, language, time zone, teams, agent availability, and whether they are an
+    agent, agent manager or admin and have desk access."""
     current_user = frappe.session.user
     filters = {"name": current_user}
     fields = [
@@ -35,7 +40,12 @@ def get_user():
         frappe.db.get_value(
             "HD Agent",
             agent_name,
-            ["availability", "availability_changed_on", "availability_changed_by"],
+            [
+                "availability",
+                "availability_changed_on",
+                "availability_changed_by",
+                "availability_expires_on",
+            ],
             as_dict=True,
         )
         if agent_name
@@ -51,10 +61,6 @@ def get_user():
     user_team_names = [team["team_name"] for team in user_team]
     language = user.language or frappe.db.get_single_value(
         "System Settings", "language"
-    )
-    # Ride the boot so the onboarding guard decides without an extra round-trip.
-    persona_captured = bool(
-        frappe.db.get_single_value("HD Settings", "persona_captured")
     )
 
     return {
@@ -74,13 +80,75 @@ def get_user():
         "availability": availability.get("availability"),
         "availability_changed_on": availability.get("availability_changed_on"),
         "availability_changed_by": availability.get("availability_changed_by"),
-        "persona_captured": persona_captured,
+        "availability_expires_on": availability.get("availability_expires_on"),
+        # what "Clear now" in the availability menu moves the agent to
+        "default_agent_status": (
+            frappe.db.get_single_value("HD Settings", "default_agent_status")
+            if agent_name
+            else None
+        ),
     }
+
+
+@frappe.whitelist(methods=["POST"])
+def update_profile(
+    first_name: str | None = None,
+    last_name: str | None = None,
+    image: str | None = None,
+    language: str | None = None,
+    time_zone: str | None = None,
+) -> None:
+    """Update the current user's name, image, language and time zone.
+    Also copies name and image to their contact. None leaves a field as is; an empty
+    `image` removes it. The image must be an uploaded /files/ path and the time zone a
+    known one."""
+    user = frappe.get_doc("User", frappe.session.user)
+    if first_name is not None:
+        user.first_name = first_name
+    if last_name is not None:
+        user.last_name = last_name
+    validate_uploaded_image(image)
+    if image is not None:
+        user.user_image = image or None
+    if language:
+        user.language = language
+    if time_zone:
+        # Autocomplete field: unvalidated, and a bad zone breaks every date
+        if time_zone not in get_timezones()["timezones"]:
+            frappe.throw(_("Unknown time zone: {0}").format(time_zone))
+        user.time_zone = time_zone
+    user.save(ignore_permissions=True)
+    _sync_contact(user)
+
+
+def validate_uploaded_image(image: str | None) -> None:
+    if image and not image.startswith("/files/"):
+        frappe.throw(_("Please upload the picture rather than linking to it"))
+
+
+def _sync_contact(user) -> None:
+    # Frappe syncs Contact after commit, too late for the client reload.
+    contact_name = get_user_contact(user.name)
+    if not contact_name:
+        return
+    # Locked: races the User's own after-commit Contact save.
+    contact = frappe.get_doc("Contact", contact_name, for_update=True)
+    contact.update(
+        {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "image": user.user_image,
+        }
+    )
+    contact.save(ignore_permissions=True)
 
 
 @frappe.whitelist()
 @agent_only
 def get_current_user_email_info():
+    """The current agent's email signature, email and outgoing email accounts.
+    Returns {email_signature, email, outgoing_emails (linked to them), available_emails
+    (every account with outgoing enabled)}. Agents only."""
     user = frappe.session.user
 
     email_signature, email = frappe.db.get_value(

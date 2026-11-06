@@ -60,6 +60,12 @@
   "email_account",
   "column_break_16",
   "via_customer_portal",
+  "origin_section",
+  "entry_point",
+  "source_article",
+  "column_break_origin",
+  "source_search",
+  "utm_source",
   "split_and_merge_section",
   "is_merged",
   "merged_with",
@@ -356,7 +362,8 @@
    "in_standard_filter": 1,
    "label": "Customer",
    "options": "HD Customer",
-   "permlevel": 7
+   "permlevel": 7,
+   "search_index": 1
   },
   {
    "fieldname": "email_account",
@@ -429,6 +436,58 @@
    "fieldtype": "Text Editor",
    "label": "Summary",
    "permlevel": 8
+  },
+  {
+   "fieldname": "origin_section",
+   "fieldtype": "Section Break",
+   "label": "Ticket Origin"
+  },
+  {
+   "description": "Where the customer started when they raised this ticket in the portal. Empty for tickets from outside the portal.\n<ul><li><b>Article</b>: an article page</li><li><b>Search</b>: knowledge base search</li><li><b>Ticket List</b>: their ticket list</li><li><b>Closed Ticket</b>: a closed ticket they could not reply to</li><li><b>Direct</b>: the new ticket page with no source</li><li><b>External</b>: a link from another site</li></ul>",
+   "fieldname": "entry_point",
+   "fieldtype": "Select",
+   "label": "Entry Point",
+   "no_copy": 1,
+   "options": "\nArticle\nSearch\nTicket List\nClosed Ticket\nDirect\nExternal",
+   "permlevel": 8,
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.entry_point=='Article'",
+   "description": "The article the customer was reading. Empty if they cannot read it or it no longer exists.",
+   "fieldname": "source_article",
+   "fieldtype": "Link",
+   "label": "Source Article",
+   "no_copy": 1,
+   "options": "HD Article",
+   "permlevel": 8,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_origin",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.entry_point=='Search'",
+   "description": "What the customer searched for, cut to 140 characters.",
+   "fieldname": "source_search",
+   "fieldtype": "Data",
+   "label": "Source Search",
+   "length": 140,
+   "no_copy": 1,
+   "permlevel": 8,
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.entry_point=='External'",
+   "description": "The utm_source tag on the link from the other site, for example frappe-cloud.",
+   "fieldname": "utm_source",
+   "fieldtype": "Data",
+   "label": "UTM Source",
+   "length": 140,
+   "no_copy": 1,
+   "permlevel": 8,
+   "read_only": 1
   },
   {
    "fieldname": "split_and_merge_section",
@@ -512,7 +571,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-09-30 12:00:00.000000",
+ "modified": "2026-10-27 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
@@ -557,6 +616,7 @@
   {
    "create": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
    "role": "HD Customer",
@@ -565,6 +625,7 @@
   {
    "create": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
    "role": "HD Customer Manager",

@@ -33,6 +33,10 @@ def get_list_data(
     view: dict | None = None,
     is_default: bool = False,
 ) -> dict:
+    """One page of a list view of any doctype, with columns, rows and total count.
+    Also filterable fields for HD Ticket. `is_default` uses the user's default HD View;
+    `view` sets grouping. Filters accept "@me" and `__assigned_on`. Respects
+    permissions."""
     is_custom = False
 
     rows = frappe.parse_json(rows or "[]")
@@ -45,6 +49,7 @@ def get_list_data(
     group_by_field = view.get("group_by_field") if view else None
     label_doc = view.get("label_doc") if view else None
     label_field = view.get("label_field") if view else None
+    icon_field = view.get("icon_field") if view else None
 
     _list = get_controller(doctype)
     default_rows = []
@@ -101,6 +106,7 @@ def get_list_data(
 
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
+    handle_category_filter(filters, doctype)
 
     if rows is None:
         rows = []
@@ -179,20 +185,29 @@ def get_list_data(
                 options = list(set([d.get(group_by_field) for d in data]))
                 options = [u for u in options if u]
                 options = [category_name for category_name in options if category_name]
+                details = _get_group_by_option_details(
+                    label_doc or doctype,
+                    options,
+                    label_field or group_by_field,
+                    icon_field,
+                )
                 options = [
                     {
-                        "label": frappe.db.get_value(
-                            label_doc if label_doc else doctype,
-                            option,
-                            label_field if label_field else group_by_field,
-                        ),
+                        "label": details.get(option, {}).get("label"),
                         "value": option,
+                        "icon": details.get(option, {}).get("icon"),
                     }
                     for option in options
                     if option
                 ]
                 if has_empty_values:
                     options.append({"label": "", "value": ""})
+
+                if doctype == "HD Article" and group_by_field == "category":
+                    # local import: circular via the article controller
+                    from helpdesk.api.knowledge_base import get_category_group_options
+
+                    return get_category_group_options(options)
 
                 if order_by and group_by_field in order_by:
                     order_by_fields = order_by.split(",")
@@ -244,12 +259,38 @@ def get_list_data(
     }
 
 
+def _get_group_by_option_details(
+    doctype: str, options: list[str], label_field: str, icon_field: str | None
+) -> dict[str, dict]:
+    # Fields come from the client: must exist; get_list enforces perms.
+    meta = frappe.get_meta(doctype)
+    fields = ["name"]
+    if _is_plain_field(meta, label_field):
+        fields.append(f"{label_field} as label")
+    if icon_field and _is_plain_field(meta, icon_field):
+        fields.append(f"{icon_field} as icon")
+    if not options or len(fields) == 1:
+        return {}
+    rows = frappe.get_list(doctype, filters={"name": ["in", options]}, fields=fields)
+    return {row.name: row for row in rows}
+
+
+def _is_plain_field(meta, fieldname: str) -> bool:
+    if fieldname == "name":
+        return True
+    field = meta.get_field(fieldname)
+    return bool(field) and field.fieldtype not in frappe.model.table_fields
+
+
 @frappe.whitelist()
 def get_filterable_fields(
     doctype: str,
     show_customer_portal_fields: bool = False,
     ignore_team_restrictions: bool = False,
 ):
+    """Fields a list of `doctype` can be filtered on, with type, label and options.
+    Visible fields, custom fields and standard ones. Portal mode keeps only
+    customer-visible ones; agent_group drops out under team restrictions. Needs read."""
     check_permissions(doctype, None)
     QBDocField = frappe.qb.DocType("DocField")
     QBCustomField = frappe.qb.DocType("Custom Field")
@@ -389,6 +430,9 @@ def get_filterable_fields(
 
 @frappe.whitelist()
 def sort_options(doctype: str, show_customer_portal_fields: bool = False):
+    """Fields a list of `doctype` can be sorted by, as {label, value}.
+    Includes standard fields; only customer-visible ones with
+    `show_customer_portal_fields`."""
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
     fields = [
@@ -418,6 +462,9 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
 
 @frappe.whitelist()
 def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
+    """The quick filters above a list of `doctype`, as {label, name, type, options}.
+    ID and fields marked as standard filters; options are Select choices or a Link's
+    doctype. Contact and TP Call Log get ID only."""
     meta = frappe.get_meta(doctype)
     fields = [field for field in meta.fields if field.in_standard_filter]
     quick_filters = []
@@ -529,6 +576,46 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
     return [columns, rows]
 
 
+@frappe.whitelist()
+def get_grouped_list(
+    doctype: str,
+    fields: str | list,
+    filters: str | list | dict | None = None,
+    group_by: str | None = None,
+    order_by: str | None = None,
+    limit_start: int = 0,
+    limit_page_length: int = 20,
+):
+    """`get_list` for Group By, with `@me` and assigned-on filters handled like `get_list_data`."""
+    filters = frappe.parse_json(filters) or []
+    handle_at_me_support(filters)
+    handle_assigned_on_filter(filters, doctype)
+    handle_category_filter(filters, doctype)
+    return frappe.get_list(
+        doctype,
+        fields=frappe.parse_json(fields),
+        filters=filters,
+        group_by=group_by,
+        order_by=order_by,
+        limit_start=limit_start,
+        limit_page_length=limit_page_length,
+    )
+
+
+@frappe.whitelist()
+@frappe.read_only()
+def export_grouped_list(doctype: str, filters: str | list | dict | None = None):
+    """`export_query` for the Group By summary, with the filters resolved as in `get_grouped_list`."""
+    from frappe.desk.reportview import export_query
+
+    filters = frappe.parse_json(filters) or []
+    handle_at_me_support(filters)
+    handle_assigned_on_filter(filters, doctype)
+    handle_category_filter(filters, doctype)
+    frappe.form_dict.update(doctype=doctype, filters=filters)
+    return export_query()
+
+
 def handle_at_me_support(filters):
     # Converts @me in filters to current user
     if isinstance(filters, dict):
@@ -550,6 +637,44 @@ def _replace_at_me(container, key):
         container[key] = frappe.session.user
     elif value == "%@me%":
         container[key] = "%" + frappe.session.user + "%"
+
+
+def handle_category_filter(filters, doctype):
+    """An article category filter also matches its Subcategories: "=" and "in" widen
+    to them, "!=" and "not in" leave them out too."""
+    if doctype != "HD Article":
+        return
+    if isinstance(filters, dict):
+        value = filters.get("category")
+        if isinstance(value, str) and value:
+            filters["category"] = _category_branch_condition("=", value)
+        elif isinstance(value, list) and len(value) == 2:
+            filters["category"] = _category_branch_condition(*value)
+        return
+    for condition in filters:
+        if (
+            isinstance(condition, list)
+            and len(condition) >= 3
+            and condition[-3] == "category"
+        ):
+            condition[-2:] = _category_branch_condition(*condition[-2:])
+
+
+def _category_branch_condition(operator, value) -> list:
+    # local import: circular via the article controller
+    from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+        get_branch,
+    )
+
+    operator = str(operator).lower()
+    if operator in ("=", "!=") and value:
+        names = [value]
+    elif operator in ("in", "not in") and value:
+        names = value.split(",") if isinstance(value, str) else value
+    else:
+        return [operator, value]
+    branch = [name for category in names for name in get_branch(category.strip())]
+    return ["not in" if operator in ("!=", "not in") else "in", branch]
 
 
 def handle_assigned_on_filter(filters, doctype):
@@ -669,6 +794,8 @@ def apply_datetime_filter(query, field, filter_value):
 @frappe.whitelist()
 @agent_only
 def remove_assignments(doctype: str, name: str, assignees: list[str]):
+    """Unassign `assignees` (user ids) from a document by cancelling their ToDos.
+    Agents only."""
     assignees = frappe.parse_json(assignees)
 
     if not assignees:

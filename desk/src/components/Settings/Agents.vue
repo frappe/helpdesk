@@ -90,7 +90,7 @@
           title="No agent found"
           :description="
             activeFilter.length
-              ? 'Change your search terms or filters'
+              ? 'Try a different search or filter.'
               : 'Add one to get started.'
           "
         />
@@ -231,6 +231,7 @@ function getOptions(agent) {
     {
       label: "Disable Agent",
       icon: "lucide-x-circle",
+      theme: "red",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
         agents.reload({ ...filters, search: search.value });

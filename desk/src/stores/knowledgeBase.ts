@@ -1,4 +1,5 @@
 import { createResource } from "frappe-ui";
+import { type Ref, watch } from "vue";
 
 // Title
 export const newArticle = createResource({
@@ -42,9 +43,12 @@ export const deleteArticles = createResource({
 // Category
 export const newCategory = createResource({
   url: "helpdesk.api.knowledge_base.create_category",
-  makeParams({ title }) {
+  makeParams({ title, description, icon, parent }) {
     return {
       title,
+      description,
+      icon,
+      parent,
     };
   },
   validate({ title }) {
@@ -52,11 +56,23 @@ export const newCategory = createResource({
   },
 });
 
-export const updateCategoryTitle = createResource({
+export const updateCategory = createResource({
   url: "frappe.client.set_value",
-  validate({ name, value }) {
-    if (!value) throw "Title is required";
+  validate({ fieldname }) {
+    if (!fieldname.category_name) throw "Title is required";
   },
+});
+
+export const categoryOptions = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_options",
+});
+
+export const categoryDeleteSummary = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_delete_summary",
+});
+
+export const deleteCategory = createResource({
+  url: "helpdesk.api.knowledge_base.delete_category",
 });
 
 export const moveToCategory = createResource({
@@ -87,38 +103,18 @@ export const mergeCategory = createResource({
   },
 });
 
-export const categories = createResource({
-  url: "helpdesk.api.knowledge_base.get_categories",
-  cache: ["categories"],
-});
-
-export const categoryName = createResource({
-  url: "helpdesk.api.knowledge_base.get_category_title",
-  cache: ["categoryName"],
-  makeParams({ category }) {
-    return { category };
-  },
-});
-
-//feedback
-export const setFeedback = createResource({
-  url: "run_doc_method",
-  debounce: 300,
-  makeParams: ({ articleId, action }) => ({
-    dt: "HD Article",
-    dn: articleId,
-    method: "set_feedback",
-    args: {
-      value: action,
-    },
-  }),
-});
-
-// view count
-export const incrementView = createResource({
-  url: "helpdesk.api.knowledge_base.increment_views",
-  makeParams: ({ article }) => ({
-    article,
-  }),
-});
-
+// `data` is null when the category's articles differ in access.
+export function useCategoryVisibility(
+  category: Ref<string | null | undefined>
+) {
+  const visibility = createResource({
+    url: "helpdesk.api.knowledge_base.get_category_visibility",
+  });
+  watch(
+    category,
+    (name) =>
+      name ? visibility.submit({ category: name }) : visibility.reset(),
+    { immediate: true }
+  );
+  return visibility;
+}

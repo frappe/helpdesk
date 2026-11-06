@@ -12,7 +12,8 @@
   "is_active",
   "availability",
   "availability_changed_on",
-  "availability_changed_by"
+  "availability_changed_by",
+  "availability_expires_on"
  ],
  "fields": [
   {
@@ -60,11 +61,16 @@
    "label": "Availability Changed By",
    "options": "User",
    "read_only": 1
+  },
+  {
+   "fieldname": "availability_expires_on",
+   "fieldtype": "Datetime",
+   "label": "Availability Expires On"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-09-28 12:00:00.000000",
+ "modified": "2026-09-29 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",

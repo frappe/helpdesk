@@ -4,6 +4,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import get_datetime, now_datetime
 
 from helpdesk.helpdesk.doctype.hd_agent_status.hd_agent_status import (
     get_default_agent_status,
@@ -18,12 +19,13 @@ class HDAgent(Document):
 
     def validate(self):
         self.validate_availability()
+        self.validate_availability_expiry()
 
     def before_save(self):
         old_doc = self.get_doc_before_save()
         if self.has_value_changed("availability"):
             self.availability_changed_on = frappe.utils.now()
-            self.availability_changed_by = frappe.session.user
+            self.availability_changed_by = self.get_availability_changed_by()
         if old_doc and old_doc.agent_name != self.agent_name:
             if self.agent_name:
                 agent_name = self.agent_name.split()
@@ -65,21 +67,61 @@ class HDAgent(Document):
         ):
             frappe.throw(_("Invalid availability"), frappe.ValidationError)
 
-    def availability_changed(self) -> bool:
-        """Whether this save changes the availability of an existing agent.
+    def validate_availability_expiry(self):
+        if not self.availability_expires_on:
+            return
+
+        expiry_changed = self.has_value_changed("availability_expires_on")
+        if (
+            self.has_value_changed("availability") and not expiry_changed
+        ) or self.availability == get_default_agent_status():
+            self.availability_expires_on = None
+            return
+
+        if expiry_changed and self.is_availability_expired():
+            frappe.throw(_("Pick a time in the future."))
+
+    def reset_availability(self):
+        """Move the agent to the default status. Saves through the controller
+        so the timestamp and the realtime update happen as for any change."""
+        self.availability = get_default_agent_status()
+        self.save(ignore_permissions=True)
+
+    def expire_availability(self):
+        """Reset a status whose timer ran out. Credited to the agent, who set
+        the timer, so it does not read as someone else changing it."""
+        # the agent may have changed status since the scheduler queried
+        if not self.is_availability_expired():
+            return
+        self.flags.availability_changed_by = self.user
+        self.reset_availability()
+
+    def is_availability_expired(self) -> bool:
+        return (
+            bool(self.availability_expires_on)
+            and get_datetime(self.availability_expires_on) <= now_datetime()
+        )
+
+    def get_availability_changed_by(self) -> str:
+        return self.flags.get("availability_changed_by") or frappe.session.user
+
+    def existing_value_changed(self, fieldname: str) -> bool:
+        """Whether this save changes `fieldname` of an existing agent.
 
         Inserts are excluded: has_value_changed is True when there is no doc
         before save, but a new agent seeded with a default has not changed
         anything. Note validate_availability deliberately does not use this —
         a new agent must still be validated.
         """
-        return bool(self.get_doc_before_save()) and self.has_value_changed(
-            "availability"
-        )
+        return bool(self.get_doc_before_save()) and self.has_value_changed(fieldname)
 
     def publish_availability_update(self):
         """Broadcast an availability change to every connected client."""
-        if not self.availability_changed():
+        # an expiry-only change still has to reach the agent's other tabs
+        if not (
+            self.existing_value_changed("availability")
+            or self.existing_value_changed("availability_expires_on")
+        ):
             return
 
         publish_event(
@@ -88,13 +130,14 @@ class HDAgent(Document):
                 "agent": self.name,
                 "availability": self.availability,
                 "availability_changed_on": self.availability_changed_on,
+                "availability_expires_on": self.availability_expires_on,
                 # so the client can tell if someone else changed their status
-                "changed_by": frappe.session.user,
+                "changed_by": self.get_availability_changed_by(),
             },
         )
 
     def capture_availability_telemetry(self):
-        if not self.availability_changed():
+        if not self.existing_value_changed("availability"):
             return
 
         capture_event("agent_availability_updated")
@@ -118,6 +161,27 @@ def has_permission(doc: Document, ptype: str, user: str) -> bool:
         return True
 
     return is_agent_manager(user) or doc.user == user
+
+
+def reset_expired_availability():
+    """Scheduler job: move agents whose status timer ran out to the default."""
+    agents = frappe.get_all(
+        "HD Agent",
+        filters={"availability_expires_on": ["<=", now_datetime()]},
+        pluck="name",
+    )
+    # a savepoint per agent, so one failure does not undo the others
+    for name in agents:
+        try:
+            frappe.db.savepoint("expire_availability")
+            frappe.get_doc("HD Agent", name).expire_availability()
+        except Exception:
+            frappe.db.rollback(save_point="expire_availability")
+            frappe.log_error(
+                title="Could not clear an expired agent status",
+                reference_doctype="HD Agent",
+                reference_name=name,
+            )
 
 
 @frappe.whitelist()

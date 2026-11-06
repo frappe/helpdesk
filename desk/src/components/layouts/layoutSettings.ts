@@ -51,16 +51,3 @@ export const agentPortalSidebarOptions = [
     to: "CallLogs",
   },
 ];
-
-export const customerPortalSidebarOptions = [
-  {
-    label: __("Tickets"),
-    icon: LucideTicket,
-    to: "TicketsCustomer",
-  },
-  {
-    label: __("Knowledge Base"),
-    icon: LucideBookOpen,
-    to: "CustomerKnowledgeBase",
-  },
-];
