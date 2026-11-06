@@ -4,6 +4,7 @@ import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { bindRouter, navigateTo } from '@app/stores/router'
 import { askConfirm } from '@helpdesk/shared/utils'
+import { useThemeMenuItem } from '@helpdesk/shared/themeMenu'
 import { useSession } from '@app/stores/session'
 import { knowledgeBaseDraft } from '@helpdesk/shared/settings/knowledgeBaseDraft.ts'
 import { createSettingsCore, createSettingsDialog } from './core'
@@ -32,6 +33,7 @@ const theme = computed({
 
 export const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
 export const toggleTheme = toggleColorScheme
+const themeMenuItem = useThemeMenuItem()
 
 const themeOptions = computed(() => [
   { label: __('Light'), value: 'light' },
@@ -85,11 +87,17 @@ const knowledgeBase = {
   },
 }
 
+const homeMenuItem = computed(() => ({
+  icon: 'lucide-home',
+  label: __('Home'),
+  onClick: () => navigateTo(ROUTES.home),
+}))
+
 export const accountMenuOptions = computed(() =>
   session.isGuest.value
-    ? []
+    ? [homeMenuItem.value]
     : [
-        { icon: 'lucide-home', label: __('Home'), onClick: () => navigateTo(ROUTES.home) },
+        homeMenuItem.value,
         { icon: 'lucide-ticket', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
         {
           icon: 'lucide-headphones',
@@ -104,7 +112,7 @@ export const accountMenuOptions = computed(() =>
           condition: () => !session.isPhone.value,
           onClick: () => dialog.openSettings('profile'),
         },
-        { icon: themeIcon.value, label: __('Toggle theme'), onClick: toggleTheme },
+        themeMenuItem.value,
         {
           group: __('Log out'),
           hideLabel: true,
