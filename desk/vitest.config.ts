@@ -10,10 +10,6 @@ export default defineConfig({
         replacement: path.resolve(__dirname, "src/test/translation.ts"),
       },
       { find: "@", replacement: path.resolve(__dirname, "src") },
-      {
-        find: "@helpdesk/shared",
-        replacement: path.resolve(__dirname, "../shared/src"),
-      },
     ],
   },
   test: {
