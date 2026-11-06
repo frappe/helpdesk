@@ -32,9 +32,9 @@ def search(
 
     from frappe.search.sqlite_search import SQLiteSearchIndexMissingError
 
-    from helpdesk.search_sqlite import HelpdeskSearch
+    from helpdesk.ticket_search import get_search_backend
 
-    search = HelpdeskSearch()
+    search = get_search_backend()
 
     try:
         result = search.search(query, filters=_filters, title_only=title_only)
@@ -43,7 +43,7 @@ def search(
         if "System Manager" in frappe.get_roles():
             frappe.throw(
                 _(
-                    "Search index not available. Build it by running helpdesk.search_sqlite.build_index."
+                    "Search index not available. Build it by running helpdesk.ticket_search.build_index."
                 )
             )
         frappe.throw(_("Search is temporarily unavailable. Please try again later."))
@@ -52,9 +52,9 @@ def search(
 @frappe.whitelist()
 def get_filter_options():
     """Get available filter options for search interface"""
-    from helpdesk.search_sqlite import HelpdeskSearch
+    from helpdesk.ticket_search import get_search_backend
 
-    search = HelpdeskSearch()
+    search = get_search_backend()
 
     if not search.index_exists():
         return {
