@@ -95,7 +95,9 @@ const homeMenuItem = computed(() => ({
 
 export const accountMenuOptions = computed(() =>
   session.isGuest.value
-    ? [homeMenuItem.value]
+    ? session.isPhone.value
+      ? [homeMenuItem.value]
+      : []
     : [
         homeMenuItem.value,
         { icon: 'lucide-ticket', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },

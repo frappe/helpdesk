@@ -131,13 +131,11 @@ test.describe("header", () => {
   test.describe("guest", () => {
     test.use(GUEST);
 
-    test("H1 H8 logo menu goes home, Log in returns to the page", async ({ page, kb }) => {
+    test("H1 H8 logo links home, Log in returns to the page", async ({ page, kb }) => {
       await kb({ public_knowledge_base: 1 });
       await page.goto("/help/categories?a=1");
-      await accountMenu(page).click();
-      await page.getByRole("menuitem", { name: "Home" }).click();
-      await expect(page).toHaveURL(/\/help\/?$/);
-      await page.goBack();
+      await expect(page.getByRole("link", { name: "Helpdesk" })).toHaveAttribute("href", "/help/");
+      await expect(accountMenu(page)).toHaveCount(0);
       await page.getByRole("button", { name: "Log in" }).click();
       await expect(page).toHaveURL(/\/login\?redirect-to=%2Fhelp%2Fcategories%3Fa%3D1/);
     });
