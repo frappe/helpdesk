@@ -16,7 +16,6 @@ from helpdesk.test_utils import (
     add_message,
     create_agent,
     create_user,
-    fill_system_settings_defaults,
     make_email_account,
     make_ticket,
     unique_email,
@@ -138,7 +137,6 @@ class TestSetupStatus(IntegrationTestCase):
         self.assertFalse(get_setup_status()["ticket_arrived"])
 
     def test_telemetry_flag_follows_system_settings(self) -> None:
-        fill_system_settings_defaults()
         set_telemetry_enabled(False)
         self.assertFalse(get_setup_status()["telemetry_enabled"])
 

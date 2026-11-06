@@ -68,10 +68,10 @@
       <div v-if="invitees.length" class="flex items-center gap-3">
         <div class="flex -space-x-2">
           <Avatar
-            v-for="invitee in shown"
-            :key="invitee.email"
-            :label="invitee.email"
-            :image="avatarFor(invitee.email)"
+            v-for="email in shown"
+            :key="email"
+            :label="email"
+            :image="avatarFor(email)"
             size="md"
             class="ring-2 ring-surface-gray-1"
           />
@@ -99,7 +99,7 @@ import LucideMail from "~icons/lucide/mail";
 const props = defineProps<{
   mailbox: string | null;
   arrived: boolean;
-  invitees: { email: string }[];
+  invitees: string[];
 }>();
 
 const shown = computed(() => props.invitees.slice(0, 5));

@@ -75,14 +75,7 @@ export function groupUnsentByRole(
 }
 
 /** The valid, unique addresses typed so far, for the preview. */
-export function previewInvitees(rows: InviteRow[]) {
-  const seen = new Set<string>();
-  const invitees: { email: string; role: Role; sent: boolean }[] = [];
-  for (const row of rows) {
-    const email = normalizeEmail(row.email);
-    if (!isEmail(email) || seen.has(email)) continue;
-    seen.add(email);
-    invitees.push({ email, role: row.role, sent: row.sent });
-  }
-  return invitees;
+export function previewInvitees(rows: InviteRow[]): string[] {
+  const emails = rows.map((row) => normalizeEmail(row.email));
+  return [...new Set(emails.filter(isEmail))];
 }

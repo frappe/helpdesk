@@ -1220,12 +1220,3 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     cards = HelpdeskDashboard(filters).get_number_card_data()
     return {card["title"]: card for card in cards}
 
-
-def fill_system_settings_defaults() -> None:
-    """Give System Settings the language and time zone a setup wizard would have set.
-
-    A restored site may lack them, and System Settings will not save without them.
-    """
-    for field, value in (("language", "en"), ("time_zone", "Asia/Kolkata")):
-        if not frappe.db.get_single_value("System Settings", field):
-            frappe.db.set_single_value("System Settings", field, value)
