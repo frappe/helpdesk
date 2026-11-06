@@ -38,12 +38,6 @@ export default function setup(context) {
     return date ? dayjsLocal(date).format(DATE_FORMATS.short) : ''
   })
 
-  const updatedOn = computed(() => {
-    const date = article.data?.modified
-    const updated = date ? dayjsLocal(date).format(DATE_FORMATS.short) : ''
-    return updated === publishedOn.value ? '' : __('Updated {0}', [updated])
-  })
-
   const isPublicArticle = computed(
     () => article.data?.visibility === 'Public' && settings.isPublicKnowledgeBase.value,
   )
@@ -139,7 +133,6 @@ export default function setup(context) {
     parsed,
     readingTime,
     publishedOn,
-    updatedOn,
     relatedArticles,
     submitFeedback,
     copyPageLink,
