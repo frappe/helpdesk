@@ -114,8 +114,8 @@ function createSessionStore() {
   }
 }
 
-// The desk keeps agents and sends everyone else back to this page.
+// Frappe's login sends website users to `last_visited`; agents go to their role's home.
 function loginUrl() {
-  const page = encodeURIComponent(location.pathname + location.search)
-  return `/login?redirect-to=${encodeURIComponent(`${ROUTES.agentRoot}?redirect-to=${page}`)}`
+  localStorage.setItem('last_visited', location.pathname + location.search)
+  return '/login'
 }

@@ -4,7 +4,6 @@ from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
 from frappe.utils import cint, get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
-from frappe.www.login import sanitize_redirect
 
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
 from helpdesk.integrations import frappe_cloud
@@ -26,8 +25,7 @@ def get_context(context):
 
 def redirect_customer_home():
     """Customer roles keep `/helpdesk` as their home, so a user who is also an
-    agent lands on the desk. Everyone else goes on to the portal from here, to
-    the `redirect-to` page if the portal's login sent one."""
+    agent lands on the desk. Everyone else goes on to the portal from here."""
     # as `has_desk_access` in api/auth.py
     if (
         frappe.session.user == "Guest"
@@ -38,10 +36,7 @@ def redirect_customer_home():
     # Deep links stay with the desk router, which sends customers to the same page on the portal
     if frappe.request.path.rstrip("/") not in ("", "/helpdesk"):
         return
-    frappe.local.flags.redirect_location = (
-        sanitize_redirect(frappe.request.args.get("redirect-to"))
-        or get_customer_home_page()
-    )
+    frappe.local.flags.redirect_location = get_customer_home_page()
     # 302: the target follows HD Settings and the user's roles, so browsers must not cache it
     raise frappe.Redirect(302)
 
