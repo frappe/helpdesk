@@ -15,6 +15,11 @@ def plain_title(title: str) -> str:
     return unescape(strip_html_tags(title)).replace("\\", "").strip()
 
 
+def text_title(title: str) -> str:
+    """plain_title for a title that is not HTML, so `Vec<T>` keeps its `<T>`."""
+    return plain_title(title.replace("<", "&lt;"))
+
+
 NO_TAGS = (
     "form",
     "input",

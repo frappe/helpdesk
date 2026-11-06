@@ -25,7 +25,7 @@ from helpdesk.docs_source.convert import (
     run_bulk,
 )
 from helpdesk.docs_source.fetch import DOWN_KEY, DocsFetchError, log_failure
-from helpdesk.docs_source.index import DocsIndex
+from helpdesk.docs_source.index import DocsIndex, no_redisearch_message
 from helpdesk.docs_source.indexed import IndexedSource
 from helpdesk.docs_source.llms import LlmsSource
 from helpdesk.docs_source.sitemap import SitemapSource
@@ -88,6 +88,8 @@ def connect_docs_source(url: str) -> dict:
         frappe.throw(_("Disconnect the current docs source first."))
     url = _normalize_url(url)
     source_type, label = _detect(url)
+    if source_type != WIKI and not DocsIndex().has_redisearch():
+        frappe.throw(no_redisearch_message())
     _save(
         {
             **CLEARED,
@@ -291,9 +293,9 @@ def _related_articles(title: str) -> list[dict]:
 
 
 def _related_docs(source, route: str, title: str, articles: list[dict]) -> list[dict]:
-    section = route.partition("/")[0]
     try:
         hits = source.search(title)
+        section = source.section_of(route)
     except DocsFetchError as e:
         log_failure(e)
         return []
@@ -308,7 +310,7 @@ def _related_docs(source, route: str, title: str, articles: list[dict]) -> list[
         if (
             hit["route"] == route
             or hit["route"] in converted_routes
-            or hit["route"].partition("/")[0] != section
+            or source.section_of(hit["route"]) != section
             or hit_title in seen
             or hit_title in article_titles
         ):

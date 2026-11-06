@@ -203,8 +203,8 @@ class TestLlmsSource(IndexCase):
         cached = frappe.cache.get_value(
             f"helpdesk_docs_llms:{self.url}/guides/domain.md"
         )
-        self.assertNotIn("script", cached)
-        self.assertNotIn("/help/articles", cached)
+        self.assertNotIn("script", cached["html"])
+        self.assertNotIn("/help/articles", cached["html"])
 
     def test_words_after_a_line_break_are_searchable(self):
         self.site[f"{self.url}/llms-full.txt"] = (
@@ -290,6 +290,20 @@ class TestLlmsSource(IndexCase):
         self.assertNotIn("*", excerpt)
         self.assertNotIn("x20", excerpt)
 
+    def test_titles_keep_angle_brackets_and_stay_escaped_in_hits(self):
+        self.site[f"{self.url}/llms.txt"] = (
+            f"# Rust \\<3 docs\n- [Vec\\<T\\> &amp; co]({self.url}/guides/vec.md): Lists.\n"
+        )
+        self.site[f"{self.url}/llms-full.txt"] = (
+            "# Vec\\<T\\> &amp; co\n\nHeap lists.\n"
+        )
+        self.sync()
+        title = frappe.cache.hget("helpdesk_docs_pages", "guides/vec")["title"]
+        self.assertEqual(title, "Vec<T> & co")
+        hit = DocsIndex().find("heap")[0]
+        self.assertEqual(hit["category_label"], "Rust <3 docs")
+        self.assertIn("Vec&lt;T&gt;", hit["title"])
+
     def test_list_pages_groups_by_first_segment(self):
         self.sync()
         source = get_source()
@@ -301,6 +315,58 @@ class TestLlmsSource(IndexCase):
         self.assertEqual(len(source.list_pages(None)), 3)
 
 
+class TestLostIndex(IndexCase):
+    def read(self, route):
+        with patch.object(DocsIndex, "index_exists", return_value=False):
+            return get_source().get_page(route)
+
+    def test_reads_the_page_live_with_the_site_as_label(self):
+        page = self.read("guides/domain")
+        self.assertEqual(page["title"], "Custom domain")
+        self.assertEqual(page["label"], self.host)
+        self.assertEqual(page["source_url"], f"{self.url}/guides/domain")
+        self.assertIn("CNAME", page["content"])
+        self.assertNotIn("Agent Instructions", page["content"])
+        self.assertNotIn("<h1", page["content"])
+        self.site[f"{self.url}/guides/domain.md"] = 500  # the read is cached
+        self.assertEqual(self.read("guides/domain")["title"], "Custom domain")
+
+    def test_page_with_no_heading_is_titled_from_its_route(self):
+        self.site[f"{self.url}/guides/plain.md"] = "Just text."
+        self.assertEqual(self.read("guides/plain")["title"], "plain")
+
+    def test_missing_page_is_not_found(self):
+        with self.assertRaises(frappe.DoesNotExistError):
+            self.read("guides/nope")
+
+    def test_routes_cannot_leave_the_connected_path(self):
+        base = f"{self.url}/docs"
+        self.site[f"{self.url}/blog/x.md"] = "# Secret"
+        self.site[f"{base}/blog/x.md"] = "# Inside"
+        self.site[f"{base}/x.md"] = "# Inside"
+        frappe.db.set_single_value("HD Settings", "docs_source_url", base)
+        frappe.clear_cache(doctype="HD Settings")
+        self.assertEqual(self.read("docs/blog/x")["title"], "Inside")
+        for route in (
+            "blog/x",
+            "docs/../blog/x",
+            "docs/%2e%2e/blog/x",
+            "docs/x?y=1",
+            "docs/x#y",
+            "docs\\x",
+            "docsx",
+            "",
+        ):
+            with self.assertRaises(frappe.DoesNotExistError, msg=route):
+                self.read(route)
+
+    def test_a_healthy_index_keeps_unknown_pages_not_found(self):
+        self.sync()
+        self.site[f"{self.url}/guides/new.md"] = "# New"
+        with self.assertRaises(frappe.DoesNotExistError):
+            get_source().get_page("guides/new")
+
+
 class TestLlmsParsing(IntegrationTestCase):
     def source(self, site):
         url = "https://docs.example.com"
@@ -310,6 +376,17 @@ class TestLlmsParsing(IntegrationTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
         return LlmsSource(url)
+
+    def test_redisearch_probe_tells_no_module_from_no_index(self):
+        index = DocsIndex()
+        with patch.object(index, "redis") as redis:
+            info = redis.ft.return_value.info
+            info.side_effect = ResponseError("unknown command 'FT.INFO'")
+            self.assertFalse(index.has_redisearch())
+            info.side_effect = ResponseError("Unknown index name")
+            self.assertTrue(index.has_redisearch())
+            info.side_effect = None
+            self.assertTrue(index.has_redisearch())
 
     def test_is_available_for_flat_nested_and_missing(self):
         root = "https://docs.example.com/llms.txt"
@@ -370,6 +447,7 @@ class TestSync(IntegrationTestCase):
                 },
             )
         )
+        self.enterContext(patch.object(DocsIndex, "has_redisearch", return_value=True))
         frappe.cache.delete_value(REBUILD_KEY)
         self.addCleanup(frappe.cache.delete_value, REBUILD_KEY)
         self.enqueue = self.enterContext(
@@ -393,6 +471,15 @@ class TestSync(IntegrationTestCase):
             run_sync("https://docs.example.com")
         error = frappe.db.get_single_value("HD Settings", "docs_source_sync_error")
         self.assertIn("RediSearch", error)
+
+    def test_no_rebuild_without_redisearch(self):
+        with (
+            patch.object(DocsIndex, "has_redisearch", return_value=False),
+            patch.object(DocsIndex, "index_exists", return_value=False),
+        ):
+            rebuild_if_missing()
+        self.enqueue.assert_not_called()
+        self.assertIsNone(frappe.cache.get_value(REBUILD_KEY))
 
     def test_rebuild_only_when_missing(self):
         with patch.object(DocsIndex, "index_exists", return_value=True):

@@ -1324,6 +1324,7 @@ class DocsCase(IntegrationTestCase):
             )
         )
         self.sync = self.enterContext(patch("helpdesk.api.docs_source.enqueue_sync"))
+        self.enterContext(patch.object(DocsIndex, "has_redisearch", return_value=True))
         self.addCleanup(DocsIndex().clear)
 
     def connect_as_llms(self, url="https://docs.example.com"):

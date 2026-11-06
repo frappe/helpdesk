@@ -21,6 +21,9 @@ class DocsSource:
     def sections(self) -> list[dict]:
         raise NotImplementedError
 
+    def section_of(self, route: str) -> str | None:
+        return route.partition("/")[0]
+
 
 def get_source() -> DocsSource | None:
     settings = frappe.get_cached_doc("HD Settings")

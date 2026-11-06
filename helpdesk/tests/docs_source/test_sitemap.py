@@ -7,6 +7,7 @@ from frappe.tests.utils import change_settings
 
 from helpdesk.docs_source import get_source
 from helpdesk.docs_source.fetch import DocsFetchError
+from helpdesk.docs_source.index import DocsIndex
 from helpdesk.docs_source.sitemap import MAX_PAGES, MIN_TEXT, SitemapSource, _locs
 from helpdesk.test_utils import fake_docs_fetch
 from helpdesk.test_utils import make_docs_page as page
@@ -187,14 +188,14 @@ class TestSitemap(IntegrationTestCase):
     def test_page_is_read_live_and_sanitized(self):
         self._add("/docs/intro", DOCUSAURUS)
         page_ = {"url": f"https://{self.host}/docs/intro", "title": "Custom domain"}
-        html = self.source._read_html(page_)
+        html = self.source._read(page_)["html"]
         self.assertIn("verify the record", html)
         self.assertNotIn("<script", html)
         self.site.clear()  # second read comes from the cache
-        self.assertEqual(self.source._read_html(page_), html)
+        self.assertEqual(self.source._read(page_)["html"], html)
         gone = {"url": f"https://{self.host}/docs/gone", "title": "x"}
         with self.assertRaises(frappe.DoesNotExistError):
-            self.source._read_html(gone)
+            self.source._read(gone)
 
     def test_get_source_returns_sitemap_source(self):
         with change_settings(
@@ -275,6 +276,56 @@ class TestSitemap(IntegrationTestCase):
         self._add("/docs/p0", page("P0"))
         with self.assertRaises(DocsFetchError):  # 2 of 3 failed
             self.source.read_pages()
+
+    def test_pages_with_no_main_text_are_not_an_outage(self):
+        self.site[f"https://{self.host}/sitemap.xml"] = "<urlset>%s</urlset>" % "".join(
+            f"<url><loc>https://{self.host}/docs/p{i}</loc></url>" for i in range(4)
+        )
+        self._add("/docs/p0", page("P0"))
+        for i in (1, 2, 3):
+            self._add(f"/docs/p{i}", "<html><body><div>Landing</div></body></html>")
+        _, pages = self.source.read_pages()
+        self.assertEqual([p["route"] for p in pages], ["docs/p0"])
+
+    def test_cdata_locs_are_read(self):
+        self.assertEqual(
+            _locs(
+                "<urlset><url><loc><![CDATA[https://a.example.com/x?y=1]]></loc></url>"
+                "<url><loc>\n  <![CDATA[ https://a.example.com/z ]]>\n</loc></url></urlset>"
+            ),
+            ["https://a.example.com/x?y=1", "https://a.example.com/z"],
+        )
+
+    def test_tab_labels_stay_and_copy_buttons_go(self):
+        _, html = self.source.extract_main(
+            '<main><div role="tablist"><button role="tab">npm</button>'
+            '<button role="tab">yarn</button></div><pre><code>npm start</code></pre>'
+            '<button class="clean-btn" aria-label="Copy code to clipboard">Clipboard</button>'
+            '<button class="copyButton_x1">Grab</button><button title="Copy">Take</button>'
+            "<button>Copy</button></main>"
+        )
+        for kept in ("npm", "yarn"):
+            self.assertIn(kept, html)
+        for gone in ("Clipboard", "Grab", "Take", "Copy"):
+            self.assertNotIn(gone, html)
+
+    def test_title_keeps_angle_brackets(self):
+        title, _ = self.source.extract_main(
+            "<main><h1>Vec&lt;T&gt; &amp; co</h1><p>x</p></main>"
+        )
+        self.assertEqual(title, "Vec<T> & co")
+
+    def test_lost_index_reads_the_page_live(self):
+        self._add("/docs/intro", DOCUSAURUS)
+        with patch.object(DocsIndex, "index_exists", return_value=False):
+            found = self.source.get_page("docs/intro")
+            for route in ("blog/news", "docs/../blog/news", "docs/intro?a=1"):
+                with self.assertRaises(frappe.DoesNotExistError, msg=route):
+                    self.source.get_page(route)
+        self.assertEqual(found["title"], "Custom domain")
+        self.assertEqual(found["label"], self.host)
+        self.assertEqual(found["source_url"], f"https://{self.host}/docs/intro")
+        self.assertIn("verify the record", found["content"])
 
     def test_is_available_stops_at_first_sitemap_with_urls(self):
         self.site[f"https://{self.host}/sitemap.xml"] = INDEX.format(host=self.host)

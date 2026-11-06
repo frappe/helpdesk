@@ -117,13 +117,13 @@ def _read_body(response, deadline):
 
 def _read_capped(response, deadline):
     # One recv per loop so the deadline is checked between recvs.
-    body = b""
+    body = bytearray()
     while chunk := response.raw.read1(CHUNK_SIZE, decode_content=True):
         body += chunk
         if len(body) > MAX_BYTES:
             raise DocsFetchError("Response too large")
         _remaining(deadline)
-    response._content = body
+    response._content = bytes(body)
     response._content_consumed = True
 
 

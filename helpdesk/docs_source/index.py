@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from redis.exceptions import ResponseError
 
 from helpdesk.api.article import _as_mark
@@ -9,6 +10,14 @@ INDEX = "helpdesk_docs_idx"
 PREFIX = "docs_page"
 PAGES_KEY = "helpdesk_docs_pages"
 PAGE_LENGTH = 20
+
+
+def is_no_redisearch(error: Exception) -> bool:
+    return isinstance(error, ResponseError) and "unknown command" in str(error).lower()
+
+
+def no_redisearch_message() -> str:
+    return _("Redis has no RediSearch module, so docs cannot be indexed.")
 
 
 class DocsIndex(Search):
@@ -64,6 +73,13 @@ class DocsIndex(Search):
         except ResponseError:
             return []
         return list(hits.values())
+
+    def has_redisearch(self) -> bool:
+        try:
+            self.redis.ft(self.index_name).info()
+        except ResponseError as e:
+            return not is_no_redisearch(e)
+        return True
 
     def index_exists(self) -> bool:
         if not hasattr(self, "_index_exists"):

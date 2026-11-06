@@ -1,3 +1,4 @@
+import re
 from urllib.parse import urlsplit
 
 import frappe
@@ -12,6 +13,7 @@ from helpdesk.docs_source.text import (
     clean_markdown,
     has_dot_segment,
     rewrite_links,
+    text_title,
 )
 
 PAGE_SECONDS = 600
@@ -28,6 +30,7 @@ class IndexedSource(DocsSource):
     def __init__(self, url: str) -> None:
         self.url = url.rstrip("/")
         self.host = urlsplit(self.url).hostname
+        self.base_path = urlsplit(self.url).path
 
     def read_pages(self) -> tuple[str, list[dict]]:
         """The label and pages, each `{"route", "title", "url", "body"}`."""
@@ -38,15 +41,16 @@ class IndexedSource(DocsSource):
 
     def get_page(self, route: str, live: bool = True) -> dict:
         route = route.strip("/")
-        page = None if has_dot_segment(route) else frappe.cache.hget(PAGES_KEY, route)
+        if has_dot_segment(route):
+            raise frappe.DoesNotExistError(_("Docs page not found"))
+        page = frappe.cache.hget(PAGES_KEY, route) or self._unindexed_page(route)
         if not page:
             raise frappe.DoesNotExistError(_("Docs page not found"))
+        read = self._read(page, live)
         return {
             "route": route,
-            "title": page["title"],
-            "content": rewrite_links(
-                self._read_html(page, live), page["url"], self._is_page
-            ),
+            "title": page["title"] or read["title"] or route.rpartition("/")[2],
+            "content": rewrite_links(read["html"], page["url"], self._is_page),
             "label": page["label"],
             "last_updated": None,
             "source_url": page["url"].removesuffix(".md"),
@@ -55,10 +59,9 @@ class IndexedSource(DocsSource):
 
     def list_pages(self, section: str | None = None) -> list[dict]:
         pages = []
-        base = f"{urlsplit(self.url).path.strip('/')}/"
         for route, page in (frappe.cache.hgetall(PAGES_KEY) or {}).items():
             route = route if isinstance(route, str) else route.decode()
-            key = route.removeprefix(base).partition("/")[0]
+            key = self.section_of(route)
             if section in (None, key):
                 pages.append({"route": route, "title": page["title"], "section": key})
         return pages
@@ -66,22 +69,54 @@ class IndexedSource(DocsSource):
     def sections(self) -> list[dict]:
         return []
 
-    def _read_html(self, page: dict, live: bool = True) -> str:
+    def section_of(self, route: str) -> str:
+        """The first path segment below the connected path."""
+        base = f"{self.base_path.strip('/')}/"
+        return route.removeprefix(base).partition("/")[0]
+
+    def _unindexed_page(self, route: str) -> dict | None:
+        """A page to read live with no index, as after a build flushes Redis."""
+        if DocsIndex().index_exists() or not self._can_read_unindexed(route):
+            return None
+        return {"title": "", "url": self._page_url(route), "label": self.host}
+
+    def _can_read_unindexed(self, route: str) -> bool:
+        # The route is reader input, with no index entry to vouch for it.
+        return (
+            bool(route)
+            and not set(route) & set("?#\\")
+            and self._is_in_scope(f"/{route}")
+        )
+
+    def _is_in_scope(self, path: str) -> bool:
+        return path == self.base_path or path.startswith(f"{self.base_path}/")
+
+    def _page_url(self, route: str) -> str:
+        return f"https://{self.host}/{route}.md"
+
+    def _read(self, page: dict, live: bool = True) -> dict:
+        """The page's cached `{"title", "html"}`, with the title found in its body."""
         key = f"{CACHE}:{page['url']}"
-        if (html := frappe.cache.get_value(key)) is None:
+        if (read := frappe.cache.get_value(key)) is None:
             try:
                 text = (fetch_live if live else fetch)(page["url"], self.host).text
             except DocsFetchError as e:
                 if e.status in GONE_STATUSES:
                     raise frappe.DoesNotExistError(_("Docs page not found")) from None
                 raise
-            html = self._to_html(text, page)
-            frappe.cache.set_value(key, html, expires_in_sec=PAGE_SECONDS)
-        return html
+            title = page["title"] or self._title_of(text)
+            read = {"title": title, "html": self._to_html(text, title)}
+            frappe.cache.set_value(key, read, expires_in_sec=PAGE_SECONDS)
+        return read
 
-    def _to_html(self, text: str, page: dict) -> str:
+    def _title_of(self, text: str) -> str:
+        """The title in a fetched page body; Markdown by default."""
+        heading = re.search(r"^# (.+)$", text, re.M)
+        return text_title(heading[1]) if heading else ""
+
+    def _to_html(self, text: str, title: str) -> str:
         """Safe HTML for a fetched page body; Markdown by default."""
-        return clean_html(md_to_html(clean_markdown(text, page["title"])))
+        return clean_html(md_to_html(clean_markdown(text, title)))
 
     def _is_page(self, route: str) -> bool:
         return not has_dot_segment(route) and frappe.cache.hexists(PAGES_KEY, route)

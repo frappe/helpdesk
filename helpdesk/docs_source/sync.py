@@ -1,13 +1,15 @@
 import hashlib
 
 import frappe
-from frappe import _
 from frappe.utils import now
 from frappe.utils.background_jobs import is_job_enqueued
-from redis.exceptions import ResponseError
 
 from helpdesk.docs_source import get_source
-from helpdesk.docs_source.index import DocsIndex
+from helpdesk.docs_source.index import (
+    DocsIndex,
+    is_no_redisearch,
+    no_redisearch_message,
+)
 from helpdesk.docs_source.indexed import IndexedSource
 
 JOB_PREFIX = "docs_source_sync"
@@ -55,9 +57,11 @@ def run_sync(url: str) -> None:
 
 def rebuild_if_missing() -> None:
     """Scheduler hook: rebuild a lost index, at most once an hour. Never refreshes a healthy one."""
+    index = DocsIndex()
     if (
         not isinstance(get_source(), IndexedSource)
-        or DocsIndex().index_exists()
+        or not index.has_redisearch()
+        or index.index_exists()
         or is_syncing()
     ):
         return
@@ -90,8 +94,8 @@ def _current_url() -> str | None:
 
 
 def _error_message(e: Exception) -> str:
-    if isinstance(e, ResponseError) and "unknown command" in str(e).lower():
-        return _("Redis has no RediSearch module, so docs cannot be indexed.")
+    if is_no_redisearch(e):
+        return no_redisearch_message()
     frappe.log_error("Docs source sync failed")
     return str(e)[:140] or type(e).__name__
 

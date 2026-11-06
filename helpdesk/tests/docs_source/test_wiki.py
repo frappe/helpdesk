@@ -222,6 +222,20 @@ class TestWikiSource(IntegrationTestCase):
         site = {SEARCH: {"message": {"results": []}}}
         self.assertTrue(self.run_with(lambda s: s.is_available(), site))
 
+    def test_is_available_needs_a_section(self):
+        search = {SEARCH: {"message": {"results": []}}}
+        for root in (404, "# Docs with no sections\n"):
+            frappe.cache.delete_keys("helpdesk_docs_wiki")
+            site = {**search, f"{URL}/llms.txt": root}
+            self.assertFalse(self.run_with(lambda s: s.is_available(), site))
+
+    def test_titles_from_llms_keep_angle_brackets(self):
+        self.site[f"{URL}/llms.txt"] = "- [Vec\\<T\\> guide](/rust/llms.txt)\n"
+        self.assertEqual(
+            self.run_with(lambda s: s.sections()),
+            [{"key": "rust", "title": "Vec<T> guide"}],
+        )
+
     def test_links_in_code_text_are_not_rewritten(self):
         html = '<code>&lt;a href="/helpdesk/setup"&gt;</code><p data-href="/helpdesk/x">p</p>'
         content = self.page(html)["content"]

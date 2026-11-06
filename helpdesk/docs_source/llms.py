@@ -8,7 +8,7 @@ from helpdesk.docs_source.indexed import IndexedSource
 from helpdesk.docs_source.text import (
     clean_markdown,
     has_dot_segment,
-    plain_title,
+    text_title,
     to_plain,
 )
 
@@ -21,10 +21,6 @@ CHILD_INDEX = re.compile(r"/llms\.txt$|/_llms/.+\.txt$")
 
 class LlmsSource(IndexedSource):
     """Any site with llms.txt: indexed here, pages read as Markdown."""
-
-    def __init__(self, url: str) -> None:
-        super().__init__(url)
-        self.base_path = urlsplit(self.url).path
 
     def is_available(self) -> bool:
         try:
@@ -54,8 +50,7 @@ class LlmsSource(IndexedSource):
     def _parse(self, url: str) -> tuple[str, list[dict], list[str]]:
         """The label, the pages and the child index URLs of one llms.txt."""
         text = fetch(url, self.host).text
-        title = re.search(r"^# (.+)$", text, re.M)
-        label = plain_title(title[1]) if title else self.host
+        label = self._title_of(text) or self.host
         pages, children = {}, []
         for name, link, summary in LINE.findall(text):
             try:
@@ -75,7 +70,7 @@ class LlmsSource(IndexedSource):
                         route,
                         {
                             "route": route,
-                            "title": plain_title(name),
+                            "title": text_title(name),
                             "url": link,
                             "summary": summary,
                         },
@@ -95,7 +90,7 @@ class LlmsSource(IndexedSource):
             if line.startswith("```"):
                 in_code = not in_code
             title = (
-                plain_title(line[2:]) if line.startswith("# ") and not in_code else None
+                text_title(line[2:]) if line.startswith("# ") and not in_code else None
             )
             if title is not None:
                 current = waiting[title].popleft() if waiting[title] else None
@@ -120,7 +115,3 @@ class LlmsSource(IndexedSource):
                 following = NEXT_PART.search(text)
                 url = urljoin(url, following[1]) if following else None
         return "\n".join(parts)
-
-    def _is_in_scope(self, path: str) -> bool:
-        base = self.base_path.rstrip("/")
-        return path == base or path.startswith(f"{base}/")

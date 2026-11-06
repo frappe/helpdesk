@@ -12,6 +12,7 @@ from helpdesk.docs_source.text import (
     has_dot_segment,
     plain_title,
     rewrite_links,
+    text_title,
 )
 
 API = "api/method/wiki.frappe_wiki.doctype.wiki_document"
@@ -34,7 +35,9 @@ class WikiSource(DocsSource):
 
     def is_available(self) -> bool:
         try:
-            return "results" in self._call("search.search", query="docs")
+            return "results" in self._call("search.search", query="docs") and any(
+                not _is_old_version(key) for key in self._read_sections(live=False)
+            )
         except DocsFetchError:
             return False
 
@@ -71,9 +74,9 @@ class WikiSource(DocsSource):
                 continue
             for title, link in LLMS_LINK.findall(self._read_llms(f"{key}/llms.txt")):
                 route = urlsplit(link).path.strip("/").removesuffix(".md")
-                if self._is_visible(route) and self._section_of(route) == key:
+                if self._is_visible(route) and self.section_of(route) == key:
                     pages.append(
-                        {"route": route, "title": plain_title(title), "section": key}
+                        {"route": route, "title": text_title(title), "section": key}
                     )
         return pages
 
@@ -97,7 +100,7 @@ class WikiSource(DocsSource):
             "label": f"{self._title_of(route)} docs",
             "last_updated": data.get("last_updated"),
             "source_url": base,
-            "site_url": f"{self.url}/{self._section_of(route)}",
+            "site_url": f"{self.url}/{self.section_of(route)}",
         }
 
     def _follow_redirect(self, route: str, live: bool = True) -> str:
@@ -145,11 +148,11 @@ class WikiSource(DocsSource):
         return (
             not _is_old_version(route)
             and not has_dot_segment(route)
-            and (key := self._section_of(route)) is not None
+            and (key := self.section_of(route)) is not None
             and key not in self.hidden
         )
 
-    def _section_of(self, route: str) -> str | None:
+    def section_of(self, route: str) -> str | None:
         """The longest section key the route sits under."""
         keys = [
             k for k in self._all_sections() if route == k or route.startswith(f"{k}/")
@@ -157,7 +160,7 @@ class WikiSource(DocsSource):
         return max(keys, key=len, default=None)
 
     def _title_of(self, route: str) -> str:
-        return self._all_sections()[self._section_of(route)]
+        return self._all_sections()[self.section_of(route)]
 
     def _all_sections(self, live: bool = True) -> dict[str, str]:
         return self._cached(
@@ -172,7 +175,7 @@ class WikiSource(DocsSource):
         ):
             path = urlsplit(link).path
             if path.endswith("/llms.txt"):
-                sections[path.removesuffix("/llms.txt").strip("/")] = plain_title(title)
+                sections[path.removesuffix("/llms.txt").strip("/")] = text_title(title)
         return sections
 
     def _read_llms(self, path: str) -> str:

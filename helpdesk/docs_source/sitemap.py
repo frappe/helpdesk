@@ -10,7 +10,7 @@ from frappe import _
 
 from helpdesk.docs_source.fetch import DocsFetchError, fetch
 from helpdesk.docs_source.indexed import IndexedSource
-from helpdesk.docs_source.text import clean_html, has_dot_segment, plain_title
+from helpdesk.docs_source.text import clean_html, has_dot_segment, text_title
 
 MAX_PAGES = 1000
 MAX_SITEMAPS = 50
@@ -20,16 +20,16 @@ MIN_TEXT = 200
 LOC = re.compile(r"<loc>([^<]*)</loc>")
 VERSION = re.compile(r"^(v?\d+(\.(\d+|x))*|next)$")
 MAIN = ("article", "[role=main]", "main")
-NOISE = "nav, header, footer, script, style, button, .theme-doc-toc-mobile, .theme-doc-version-badge"
+COPY_BUTTONS = (
+    'button[aria-label*="copy" i], button[title*="copy" i], button[class*="copy" i], '
+    'button.clean-btn, button:-soup-contains("Copy")'
+)
+NOISE = f"nav, header, footer, script, style, {COPY_BUTTONS}, .theme-doc-toc-mobile, .theme-doc-version-badge"
 PERMALINKS = "a.headerlink, a.hash-link"
 
 
 class SitemapSource(IndexedSource):
     """A docs site with only a sitemap.xml: indexed here, pages read as HTML."""
-
-    def __init__(self, url: str) -> None:
-        super().__init__(url)
-        self.base_path = urlsplit(self.url).path.rstrip("/")
 
     def is_available(self) -> bool:
         try:
@@ -51,14 +51,17 @@ class SitemapSource(IndexedSource):
         urls = self._page_urls()
         self.truncated = len(urls) > MAX_PAGES
         urls = urls[:MAX_PAGES]
-        pages = []
+        pages, failed = [], 0
         for i, url in enumerate(urls):
-            if page := self._read_page(url):
-                pages.append(page)
+            try:
+                if page := self._read_page(url):
+                    pages.append(page)
+            except DocsFetchError:
+                failed += 1  # ponytail: one bad page never fails the sync
             if i < len(urls) - 1:
                 time.sleep(PAGE_DELAY)
         # A mostly failed read is an outage: keep the old index.
-        if not pages or (len(urls) - len(pages)) * 2 > len(urls):
+        if not pages or failed * 2 > len(urls):
             raise DocsFetchError("Most pages in the sitemap could not be read")
         return self.host, pages
 
@@ -77,22 +80,25 @@ class SitemapSource(IndexedSource):
             if tag.parent is not None and not (tag.name == "header" and tag.find("h1")):
                 tag.decompose()
         heading = main.find("h1") or soup.find("title")
-        title = plain_title(heading.get_text()) if heading else ""
+        title = text_title(heading.get_text()) if heading else ""
         if heading is not None and heading.name == "h1":
             heading.decompose()
         return title, clean_html(str(main))
 
-    def _to_html(self, text: str, page: dict) -> str:
+    def _page_url(self, route: str) -> str:
+        return f"https://{self.host}/{route}"
+
+    def _title_of(self, text: str) -> str:
+        return self.extract_main(text)[0]
+
+    def _to_html(self, text: str, title: str) -> str:
         html = self.extract_main(text)[1]
         if not _text(html):
             raise frappe.DoesNotExistError(_("Docs page not found"))
         return html
 
     def _read_page(self, url: str) -> dict | None:
-        try:
-            title, html = self.extract_main(fetch(url, self.host).text)
-        except DocsFetchError:
-            return None  # ponytail: one bad page never fails the sync
+        title, html = self.extract_main(fetch(url, self.host).text)
         body = _text(html)
         if not body or not title:
             return None
@@ -147,10 +153,7 @@ class SitemapSource(IndexedSource):
             if parts is None:
                 continue
             route = parts.path.strip("/")
-            in_path = parts.path == self.base_path or parts.path.startswith(
-                f"{self.base_path}/"
-            )
-            if in_path and route and not has_dot_segment(route):
+            if self._is_in_scope(parts.path) and route and not has_dot_segment(route):
                 urls.append(loc)
         return urls
 
@@ -164,6 +167,7 @@ class SitemapSource(IndexedSource):
 
 
 def _locs(text: str) -> list[str]:
+    text = text.replace("<![CDATA[", "").replace("]]>", "")
     return [unescape(loc.strip()) for loc in LOC.findall(text)]
 
 

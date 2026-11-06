@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import frappe
+from frappe.exceptions import FrappeTypeError
 from frappe.tests.utils import change_settings
 
 from helpdesk.api.docs_source import (
@@ -109,6 +110,17 @@ class TestConnect(DocsCase):
         self.connect_as_wiki()
         self.sync.assert_not_called()
 
+    def test_connect_refuses_indexed_site_without_redisearch(self):
+        with patch.object(DocsIndex, "has_redisearch", return_value=False):
+            with self.assertRaisesRegex(frappe.ValidationError, "RediSearch"):
+                self.connect_as_llms()
+            self.assertFalse(
+                frappe.db.get_single_value("HD Settings", "docs_source_url")
+            )
+            self.sync.assert_not_called()
+            self.connect_as_wiki()
+        self.assertTrue(frappe.db.get_single_value("HD Settings", "docs_source_url"))
+
     def test_connect_indexed_site_enqueues_sync(self):
         self.connect_as_llms()
         self.sync.assert_called_once()
@@ -211,6 +223,14 @@ class TestManage(DocsCase):
             '["b"]',
         )
         self.assertEqual(get_source().hidden, ["b"])
+
+    def test_set_hidden_sections_needs_a_list_of_keys(self):
+        self.connect_as_wiki()
+        sections = [{"key": "a", "title": "A"}]
+        with patch.object(WikiSource, "sections", return_value=sections):
+            for bad in ("a", {"a": 1}, [1], None):
+                with self.assertRaises(FrappeTypeError, msg=repr(bad)):
+                    set_hidden_sections(bad)
 
     def test_set_hidden_sections_refused_for_indexed_sites(self):
         self.connect_as_llms()
@@ -327,6 +347,19 @@ class TestRelated(DocsCase):
             [hit("a/page", "Page"), hit("a/one", "One"), hit("b/two", "Two")]
         )
         self.assertEqual(found["docs"], [{"route": "a/one", "title": "One"}])
+
+    def test_related_docs_use_sections_below_the_connected_path(self):
+        source = LlmsSource("https://docs.example.com/docs")
+        hits = [hit("docs/a/one", "One"), hit("docs/b/two", "Two")]
+        page = {"route": "docs/a/page", "title": "Page"}
+        with (
+            patch(f"{API}.get_source", return_value=source),
+            patch(f"{API}.get_related", return_value=[]),
+            patch.object(source, "search", return_value=hits),
+            patch.object(source, "get_page", return_value=page),
+        ):
+            docs = get_doc_page("docs/a/page")["related"]["docs"]
+        self.assertEqual(docs, [{"route": "docs/a/one", "title": "One"}])
 
     def test_related_docs_are_plain_deduped_and_capped(self):
         hits = [
