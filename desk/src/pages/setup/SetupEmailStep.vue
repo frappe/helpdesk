@@ -17,8 +17,11 @@
       aria-live="polite"
     >
       <div v-if="!arrived" class="flex items-start gap-3">
-        <LucideLoader class="mt-0.5 size-4 animate-spin text-ink-gray-5" />
-        <div class="space-y-0.5">
+        <LucideLoader
+          class="mt-0.5 size-4 shrink-0 text-ink-gray-5"
+          :class="{ 'animate-spin': !timedOut }"
+        />
+        <div class="min-w-0 flex-1 space-y-0.5">
           <p class="text-base-medium text-ink-gray-8">
             {{ __("Waiting for your first ticket") }}
           </p>
@@ -30,6 +33,13 @@
             }}
           </p>
         </div>
+        <Button
+          v-if="timedOut"
+          variant="outline"
+          size="sm"
+          :label="__('Check again')"
+          @click="checkAgain"
+        />
       </div>
       <div v-else class="flex items-start gap-3">
         <LucideCircleCheck class="mt-0.5 size-4 shrink-0 text-ink-gray-8" />
@@ -60,14 +70,13 @@
 import { createDialog } from "@/components/dialogs";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { useDocumentVisibility, useIntervalFn } from "@vueuse/core";
+import { useDocumentVisibility } from "@vueuse/core";
 import { EmailAccounts } from "@framework/ui/EmailAccounts";
 import { Button, call } from "frappe-ui";
-import { computed, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import LucideCircleCheck from "~icons/lucide/circle-check";
 import LucideLoader from "~icons/lucide/loader";
-
-const POLL_MS = 5000;
+import { pollDelay } from "./polling";
 
 const props = defineProps<{ status: any }>();
 const emit = defineEmits<{ next: [] }>();
@@ -76,15 +85,35 @@ const connected = computed(() => !!props.status.data?.email_connected);
 const arrived = computed(() => !!props.status.data?.ticket_arrived);
 
 // Polling covers the return from provider sign-in, where @created never fires.
+// It backs off and stops after a while; "Check again" starts it over.
 const visibility = useDocumentVisibility();
-const poll = useIntervalFn(() => props.status.reload(), POLL_MS, {
-  immediate: false,
-});
-watch(
-  () => !arrived.value && visibility.value !== "hidden",
-  (on) => (on ? poll.resume() : poll.pause()),
-  { immediate: true }
-);
+const visible = computed(() => visibility.value !== "hidden");
+const attempt = ref(0);
+const timedOut = computed(() => pollDelay(attempt.value) === null);
+let timer: ReturnType<typeof setTimeout> | undefined;
+
+function schedule() {
+  clearTimeout(timer);
+  const delay = pollDelay(attempt.value);
+  if (arrived.value || !visible.value || delay === null) return;
+  timer = setTimeout(async () => {
+    attempt.value++;
+    try {
+      await props.status.reload();
+    } finally {
+      schedule();
+    }
+  }, delay);
+}
+
+function checkAgain() {
+  attempt.value = 0;
+  props.status.reload();
+  schedule();
+}
+
+watch([arrived, visible], schedule, { immediate: true });
+onBeforeUnmount(() => clearTimeout(timer));
 
 let ticked = false;
 watch(
@@ -103,7 +132,7 @@ watch(
 
 function onCreated(service: string) {
   capture("email_account_created", { data: { service: service || "Custom" } });
-  props.status.reload();
+  checkAgain();
 }
 
 function confirmSetUpLater() {
