@@ -741,7 +741,7 @@
                  }
                 },
                 "componentId": "kb_settings-organization-back",
-                "componentName": "PortalSettingsBackButton",
+                "componentName": "SettingsBackButton",
                 "componentProps": {
                  "label": "{{ organizationScreenTitle }}"
                 },
@@ -1161,7 +1161,7 @@
                  }
                 },
                 "componentId": "kb_settings-invite-back",
-                "componentName": "PortalSettingsBackButton",
+                "componentName": "SettingsBackButton",
                 "componentProps": {
                  "label": "{{ t('Invite people') }}"
                 },
@@ -1796,7 +1796,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-11-06 16:00:00.000000",
+ "modified": "2026-11-06 18:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

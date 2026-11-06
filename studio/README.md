@@ -69,7 +69,7 @@ Under `components/`, by area: `ui`, `header`, `list`, `ticket`, `knowledge_base`
 
 - Portal-only components start with `Portal`.
 - The file name must be unique in `studio/helpdesk/` and must not match a Studio built-in component. Studio skips a clash and writes an Error Log.
-- The desk imports `NewTicketForm.vue` and `CustomActions.vue` from here by relative path. Test the desk when you change them.
+- The desk imports `NewTicketForm.vue`, `CustomActions.vue` and `SettingsBackButton.vue` from here by relative path. Test the desk when you change them.
 
 ### Stores
 

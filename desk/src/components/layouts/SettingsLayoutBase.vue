@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import UnsavedBadge from "@/components/UnsavedBadge.vue";
-import SettingsBackButton from "@helpdesk/shared/settings/SettingsBackButton.vue";
+import SettingsBackButton from "../../../../studio/helpdesk/components/settings/SettingsBackButton.vue";
 
 defineProps<{
   title?: string;
