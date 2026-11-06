@@ -47,7 +47,6 @@
         <div v-if="arrived" class="flex items-start gap-2.5 px-4 pb-4">
           <Avatar
             :label="__('Maya Fernandez')"
-            :image="avatarFor('maya-fernandez')"
             size="md"
           />
           <div class="min-w-0 flex-1">
@@ -71,7 +70,6 @@
             v-for="invitee in shown"
             :key="invitee.email"
             :label="invitee.email"
-            :image="avatarFor(invitee.email)"
             size="md"
             class="ring-2 ring-surface-gray-1"
           />
@@ -90,8 +88,6 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { createAvatar } from "@dicebear/core";
-import * as lorelei from "@dicebear/lorelei";
 import { Avatar, Badge } from "frappe-ui";
 import { computed } from "vue";
 import LucideMail from "~icons/lucide/mail";
@@ -103,7 +99,4 @@ const props = defineProps<{
 }>();
 
 const shown = computed(() => props.invitees.slice(0, 5));
-
-const avatarFor = (seed: string) =>
-  createAvatar(lorelei, { seed }).toDataUri();
 </script>
