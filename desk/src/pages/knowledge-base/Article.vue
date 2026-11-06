@@ -209,13 +209,16 @@
                 </span>
                 {{ article.data.author.name }}
               </p>
-              <div class="flex items-center gap-1">
-                <span class="text-p-xs text-ink-gray-6">
-                  {{
-                    __("Updated {0}", [
-                      dayjsLocal(article.data.modified).format("MMM D, h:mm A"),
-                    ])
-                  }}
+              <div class="flex flex-wrap items-center gap-1">
+                <span v-if="publishedOn" class="text-p-xs text-ink-gray-6">
+                  {{ publishedOn }}
+                </span>
+                <IconDot
+                  v-if="publishedOn && updatedOn"
+                  class="h-4 w-4 text-ink-gray-5"
+                />
+                <span v-if="updatedOn" class="text-p-xs text-ink-gray-6">
+                  {{ __("Updated on {0}", [updatedOn]) }}
                 </span>
                 <IconDot v-if="isMobileView" class="h-4 w-4 text-ink-gray-5" />
 
@@ -420,6 +423,22 @@ const access = computed(
 const viewsLabel = computed(() =>
   countLabel(views.value, __("1 view"), __("{0} views"))
 );
+const DATE_TIME_FORMAT = "MMM D, h:mm A";
+const publishedOn = computed(() => {
+  const date = article.data?.published_on;
+  return date ? dayjsLocal(date).format(DATE_TIME_FORMAT) : "";
+});
+// Empty when the edits fall on the published day.
+const updatedOn = computed(() => {
+  const { modified, published_on } = article.data ?? {};
+  const edited = modified && dayjsLocal(modified);
+  if (
+    !edited ||
+    (published_on && edited.isSame(dayjsLocal(published_on), "day"))
+  )
+    return "";
+  return edited.format(DATE_TIME_FORMAT);
+});
 const content = ref("");
 const title = ref("");
 
@@ -513,6 +532,7 @@ function save(values: Record<string, string | number>, message: string) {
     {
       onSuccess: (doc: Article) => {
         article.data.modified = doc.modified;
+        article.data.published_on = doc.published_on;
         // unpublishing unpins
         article.data.pinned = doc.pinned;
         toast.success(message);
