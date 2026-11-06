@@ -736,6 +736,42 @@ test.describe("search list", () => {
     await expect(rowsOf(page).nth(1)).toHaveAttribute("data-highlighted", "");
   });
 
+  docsTest("an arrow key before the new answer never hides its Docs rows", async ({ page, connected }) => {
+    await stubSearch(
+      page,
+      async (query) => (query === "gui" ? [articleHit("Alpha guide")] : []),
+      async (query) => [docHit("helpdesk/beta", query === "gui" ? "Beta guide" : "Zed doc")]
+    );
+    const box = await searchFor(page, "gui");
+    await expect(rowsOf(page)).toHaveCount(2);
+    await box.pressSequentially("d");
+    await box.press("ArrowDown");
+    await expect(page.getByRole("option", { name: "Zed doc" })).toBeVisible();
+    await expect(page.getByText("No articles match")).toHaveCount(0);
+  });
+
+  docsTest("an arrow key during the request never shows a false empty list", async ({ page, connected }) => {
+    const answerGate = gate();
+    await stubSearch(
+      page,
+      async (query) => {
+        if (query === "gui") return [articleHit("Alpha guide")];
+        await answerGate.held;
+        return [];
+      },
+      async (query) => [docHit("helpdesk/beta", query === "gui" ? "Beta guide" : "Zed doc")]
+    );
+    const box = await searchFor(page, "gui");
+    await expect(rowsOf(page)).toHaveCount(2);
+    const asked = page.waitForRequest((r) => r.url().includes("search_articles") && r.url().includes("guid"));
+    await box.pressSequentially("d");
+    await asked;
+    await box.press("ArrowDown");
+    answerGate.open();
+    await expect(page.getByRole("option", { name: "Zed doc" })).toBeVisible();
+    await expect(page.getByText("No articles match")).toHaveCount(0);
+  });
+
   docsTest("typing before the config loads still searches docs", async ({ page, connected }) => {
     const configGate = gate();
     await page.route("**/api/method/helpdesk.api.config.get_config*", async (route) => {

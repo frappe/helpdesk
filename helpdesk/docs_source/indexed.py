@@ -4,6 +4,7 @@ from urllib.parse import urlsplit
 import frappe
 from frappe import _
 from frappe.utils import md_to_html
+from redis.exceptions import RedisError
 
 from helpdesk.docs_source import DocsSource
 from helpdesk.docs_source.fetch import DocsFetchError, fetch, fetch_live
@@ -76,9 +77,19 @@ class IndexedSource(DocsSource):
 
     def _unindexed_page(self, route: str) -> dict | None:
         """A page to read live with no index, as after a build flushes Redis."""
-        if DocsIndex().index_exists() or not self._can_read_unindexed(route):
+        if not self._can_read_unindexed(route):
             return None
-        return {"title": "", "url": self._page_url(route), "label": self.host}
+        try:
+            if DocsIndex().index_exists():
+                return None
+        except RedisError:
+            return None
+        return {
+            "title": "",
+            "url": self._page_url(route),
+            "label": self.host,
+            "unindexed": True,
+        }
 
     def _can_read_unindexed(self, route: str) -> bool:
         # The route is reader input, with no index entry to vouch for it.
@@ -99,11 +110,16 @@ class IndexedSource(DocsSource):
         key = f"{CACHE}:{page['url']}"
         if (read := frappe.cache.get_value(key)) is None:
             try:
-                text = (fetch_live if live else fetch)(page["url"], self.host).text
+                response = (fetch_live if live else fetch)(page["url"], self.host)
             except DocsFetchError as e:
                 if e.status in GONE_STATUSES:
                     raise frappe.DoesNotExistError(_("Docs page not found")) from None
                 raise
+            # No index entry vouches for this page, so a redirect must stay in scope.
+            final_path = urlsplit(response.url).path
+            if page.get("unindexed") and not self._is_in_scope(final_path):
+                raise frappe.DoesNotExistError(_("Docs page not found"))
+            text = response.text
             title = page["title"] or self._title_of(text)
             read = {"title": title, "html": self._to_html(text, title)}
             frappe.cache.set_value(key, read, expires_in_sec=PAGE_SECONDS)

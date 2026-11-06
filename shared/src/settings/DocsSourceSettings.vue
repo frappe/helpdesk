@@ -90,6 +90,7 @@ const saving = ref(false);
 const loadFailed = ref(false);
 const error = ref("");
 let timer: ReturnType<typeof setTimeout> | undefined;
+let unmounted = false;
 
 const connected = computed(() => Boolean(source.value));
 const isIndexed = computed(
@@ -119,7 +120,10 @@ onMounted(async () => {
     );
   }
 });
-onBeforeUnmount(() => clearTimeout(timer));
+onBeforeUnmount(() => {
+  unmounted = true;
+  clearTimeout(timer);
+});
 
 async function connect() {
   await run(async () => {
@@ -192,6 +196,7 @@ function poll(
     } catch {
       // keep polling through a blip
     }
+    if (unmounted) return;
     const s = source.value;
     seen = seen || Boolean(s?.syncing);
     const changed =

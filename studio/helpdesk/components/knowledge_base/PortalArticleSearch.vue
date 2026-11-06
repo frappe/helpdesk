@@ -209,9 +209,9 @@ function onFocus() {
 }
 
 function onKeydown(event: KeyboardEvent) {
-  if (["ArrowUp", "ArrowDown"].includes(event.key) && rows.value.length) {
-    navigating.value = true;
-  }
+  const isArrow = ["ArrowUp", "ArrowDown"].includes(event.key);
+  // Stale rows must not hold back the next query's Docs rows.
+  if (isArrow && isCurrent.value && rows.value.length) navigating.value = true;
 }
 
 function createTicket() {

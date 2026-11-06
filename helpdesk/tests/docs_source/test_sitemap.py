@@ -4,6 +4,7 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import change_settings
+from redis import exceptions as redis_exceptions
 
 from helpdesk.docs_source import get_source
 from helpdesk.docs_source.fetch import DocsFetchError
@@ -326,6 +327,25 @@ class TestSitemap(IntegrationTestCase):
         self.assertEqual(found["label"], self.host)
         self.assertEqual(found["source_url"], f"https://{self.host}/docs/intro")
         self.assertIn("verify the record", found["content"])
+
+    def test_lost_index_refuses_a_redirect_out_of_scope(self):
+        out = page("Blog")
+        self.site[f"https://{self.host}/docs/moved"] = (
+            out,
+            f"https://{self.host}/blog/moved",
+        )
+        with patch.object(DocsIndex, "index_exists", return_value=False):
+            with self.assertRaises(frappe.DoesNotExistError):
+                self.source.get_page("docs/moved")
+
+    def test_redis_outage_on_a_missed_page_is_not_found(self):
+        with (
+            patch.object(
+                DocsIndex, "index_exists", side_effect=redis_exceptions.ConnectionError
+            ),
+            self.assertRaises(frappe.DoesNotExistError),
+        ):
+            self.source.get_page("docs/intro")
 
     def test_is_available_stops_at_first_sitemap_with_urls(self):
         self.site[f"https://{self.host}/sitemap.xml"] = INDEX.format(host=self.host)

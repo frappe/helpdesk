@@ -70,7 +70,7 @@ export function useArticle(name: MaybeRefOrGetter<string>) {
   watch(
     () => toValue(name),
     async (current) => {
-      article.error = null
+      Object.assign(article, { error: null, settled: '' })
       if (!current) return Object.assign(article, { data: null, loading: false, settled: '' })
       article.loading = true
       try {
