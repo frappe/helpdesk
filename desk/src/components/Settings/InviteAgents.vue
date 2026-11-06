@@ -104,6 +104,12 @@
 
 <script setup lang="ts">
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import {
+  getInviteByEmailRoles,
+  getInviteRoleOptions,
+  roleToLabel,
+  type Role,
+} from "@/components/Settings/inviteRoles";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -121,59 +127,13 @@ import { computed, ref } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 
 const authStore = useAuthStore();
-const { isAdmin, isManager } = authStore;
 
 // @ts-expect-error
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const emails = ref("");
 
-type Role = "Agent" | "Agent Manager" | "System Manager";
-type RoleOption = {
-  label: string;
-  value: Role;
-  description: string;
-};
-
-const roleToLabel = (role: Role) => {
-  switch (role) {
-    case "Agent":
-      return "Agent";
-    case "Agent Manager":
-      return "Manager";
-    case "System Manager":
-      return "Admin";
-    default:
-      const x: never = role;
-      throw new Error(`Invalid role: ${x}`);
-  }
-};
-
-const roleOptions: [RoleOption, ...RoleOption[]] = [
-  {
-    label: roleToLabel("Agent"),
-    value: "Agent",
-    description: __(
-      "Can work on tickets, create custom views and manage private views."
-    ),
-  },
-];
-const managerRoleOption: RoleOption = {
-  label: roleToLabel("Agent Manager"),
-  value: "Agent Manager",
-  description: __(
-    "Can invite new agents, manage tickets, create custom views and manage public views."
-  ),
-};
-if (isAdmin) {
-  roleOptions.push(managerRoleOption, {
-    label: roleToLabel("System Manager"),
-    value: "System Manager",
-    description: __("Can manage all aspects of Helpdesk."),
-  });
-} else if (isManager) {
-  roleOptions.push(managerRoleOption);
-}
+const roleOptions = getInviteRoleOptions(authStore);
 const role = ref(roleOptions[0].value);
 
 const roleDescription = computed(
@@ -260,25 +220,6 @@ const rolesToLabel = (roles: readonly Role[]) => {
     return roleToLabel("Agent");
   }
   throw new Error(`Invalid roles: ${roles.join(", ")}`);
-};
-
-const getInviteByEmailRoles = (selectedRole: Role) => {
-  const res: Role[] = [];
-  switch (selectedRole) {
-    case "System Manager":
-      res.push("Agent", "Agent Manager");
-      break;
-    case "Agent Manager":
-      res.push("Agent");
-      break;
-    case "Agent":
-      break;
-    default:
-      const x: never = selectedRole;
-      throw new Error(`Invalid selected role: ${x}`);
-  }
-  res.push(selectedRole);
-  return res;
 };
 </script>
 

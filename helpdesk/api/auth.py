@@ -66,6 +66,8 @@ def get_user():
     return {
         "has_desk_access": has_desk_access,
         "is_admin": is_admin,
+        "setup_pending": is_admin
+        and not frappe.db.get_single_value("HD Settings", "setup_complete"),
         "is_agent": is_agent,
         "has_agent_record": has_agent_record,
         "user_id": user_id,
