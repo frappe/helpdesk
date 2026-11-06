@@ -114,6 +114,8 @@ function createSessionStore() {
   }
 }
 
+// Frappe's login sends website users to `last_visited`; agents go to their role's home.
 function loginUrl() {
-  return `/login?redirect-to=${encodeURIComponent(location.pathname + location.search)}`
+  localStorage.setItem('last_visited', location.pathname + location.search)
+  return '/login'
 }
