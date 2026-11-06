@@ -8,7 +8,9 @@ usePersona("manager");
 const GET = "**/api/method/helpdesk.api.docs_source.get_docs_source*";
 const CONNECT = "**/api/method/helpdesk.api.docs_source.connect_docs_source*";
 const HIDE = "**/api/method/helpdesk.api.docs_source.set_hidden_sections*";
+const DISCONNECT = "**/api/method/helpdesk.api.docs_source.disconnect_docs_source*";
 const DOC_PAGE = "**/api/method/helpdesk.api.docs_source.get_doc_page*";
+const GET_ARTICLE = "**/api/method/helpdesk.api.knowledge_base.get_article*";
 const SOURCE = "https://docs.example.com";
 const PHONE = { width: 390, height: 844 };
 
@@ -116,6 +118,46 @@ test("connect on an indexed site polls until the sync ends", async ({ page }) =>
   release = true;
   await expect(dialog.getByText(/142 pages/)).toBeVisible({ timeout: 15_000 });
   await expect(dialog.getByRole("button", { name: "Resync" })).toBeVisible();
+});
+
+test("a first sync waiting in a busy queue keeps polling", async ({ page }) => {
+  let connected = false;
+  let polls = 0;
+  const queued = { ...INDEXED, synced_on: null, page_count: 0, syncing: false };
+  await page.route(GET, (route) => {
+    if (!connected) return route.fulfill(json(null));
+    return route.fulfill(json(++polls < 4 ? queued : INDEXED));
+  });
+  await page.route(CONNECT, (route) => {
+    connected = true;
+    return route.fulfill(json(queued));
+  });
+  await page.goto("/help/settings/knowledge-base");
+  const dialog = page.getByRole("dialog", { name: "Settings" });
+  await dialog.getByPlaceholder("https://docs.example.com").fill("https://docs.example.com");
+  await dialog.getByRole("button", { name: "Connect" }).click();
+  await expect(dialog.getByText(/142 pages/)).toBeVisible({ timeout: 20_000 });
+});
+
+test("disconnect asks first and says what it clears", async ({ page }) => {
+  const dialog = await open(page, WIKI);
+  let calls = 0;
+  await page.route(DISCONNECT, (route) => {
+    calls++;
+    return route.fulfill(json(null));
+  });
+  await dialog.getByRole("button", { name: "Disconnect" }).click();
+  const confirm = page.getByRole("dialog", { name: "Disconnect the docs source?" });
+  await expect(confirm.getByText(/Hidden sections are cleared/)).toBeVisible();
+  await expect(confirm.getByText(/indexed site must resync/)).toBeVisible();
+  await confirm.getByRole("button", { name: "Cancel" }).click();
+  await expect(confirm).toHaveCount(0);
+  expect(calls).toBe(0);
+  await expect(dialog.getByRole("checkbox", { name: "Legal" })).toBeVisible();
+  await dialog.getByRole("button", { name: "Disconnect" }).click();
+  await confirm.getByRole("button", { name: "Disconnect" }).click();
+  await expect(dialog.getByRole("button", { name: "Connect" })).toBeVisible();
+  expect(calls).toBe(1);
 });
 
 test("a failed load shows the error and offers no Connect", async ({ page }) => {
@@ -402,6 +444,81 @@ test.describe("docs pages", () => {
     expect(top).toBeGreaterThan(0);
   });
 
+  docsTest("flat to flat keeps the Docs page until the lookup ends", async ({ page, connected }) => {
+    const related = { docs: [{ route: "beta", title: "Beta doc" }], articles: [] };
+    const asked = await stubDocs(page, {
+      alpha: docPage("alpha", { related }),
+      beta: docPage("beta"),
+    });
+    await page.goto("/help/articles/alpha");
+    await expect(heading(page, "Doc alpha")).toBeVisible();
+    const lookup = gate();
+    await page.route(GET_ARTICLE, async (route) => {
+      await lookup.held;
+      await route.fulfill({ status: 404, json: { exc_type: "DoesNotExistError" } });
+    });
+    const looked = page.waitForRequest(/knowledge_base\.get_article/);
+    await page.getByRole("link", { name: "Beta doc" }).click();
+    await looked;
+    await page.waitForTimeout(200);
+    await expect(heading(page, "Doc alpha")).toBeVisible();
+    await expect(page.getByRole("link", { name: "All docs" })).toBeVisible();
+    expect(asked).toEqual(["alpha"]);
+    lookup.open();
+    await expect(heading(page, "Doc beta")).toBeVisible();
+  });
+
+  docsTest("a Docs page link to an Article never shows Page not found", async ({ page, api, connected }) => {
+    const article = await seedArticle(api);
+    const related = { docs: [], articles: [{ name: article.name, title: article.title, title_slug: "moved" }] };
+    const asked = await stubDocs(page, { "helpdesk/setup": docPage("helpdesk/setup", { related }) });
+    await page.goto("/help/articles/helpdesk/setup");
+    await expect(heading(page, "Doc helpdesk/setup")).toBeVisible();
+    const lookup = gate();
+    await page.route(GET_ARTICLE, async (route) => {
+      await lookup.held;
+      await route.continue();
+    });
+    await page.getByRole("link", { name: article.title }).click();
+    await page.waitForTimeout(200);
+    await expect(page.getByText("Page not found")).toHaveCount(0);
+    lookup.open();
+    await expect(heading(page, article.title)).toBeVisible();
+    expect(asked).toEqual(["helpdesk/setup"]);
+  });
+
+  docsTest("a refused redirect shows Page not found", async ({ page, connected }) => {
+    const answer = gate();
+    await page.route(DOC_PAGE, async (route) => {
+      await answer.held;
+      await route.fulfill(json({ article: { name: "art", title_slug: "one" } }));
+    });
+    await page.goto("/help/articles/helpdesk/moved");
+    await page.evaluate(() => {
+      const root = [...document.querySelectorAll("*")].find((el: any) => el.__vue_app__) as any;
+      root.__vue_app__.config.globalProperties.$router.beforeEach((to) => !to.path.endsWith("/art-one"));
+    });
+    answer.open();
+    await expect(page.getByText("Page not found")).toBeVisible();
+  });
+
+  docsTest("a redirect to the same URL does not show Page not found", async ({ page, connected }) => {
+    await page.route(DOC_PAGE, (route) => route.fulfill(json({ article: { name: "art", title_slug: "one" } })));
+    const answered = page.waitForResponse(/docs_source\.get_doc_page/);
+    await page.goto("/help/articles/art-one");
+    await answered;
+    await page.waitForTimeout(300);
+    await expect(page.getByText("Page not found")).toHaveCount(0);
+  });
+
+  docsTest("a failed read is noindex with no canonical", async ({ page, connected }) => {
+    await stubDocs(page, {});
+    await page.goto("/help/articles/helpdesk/missing");
+    await expect(page.getByText("Page not found")).toBeVisible();
+    await expect(robots(page)).toHaveAttribute("content", "noindex");
+    await expect(canonical(page)).toHaveCount(0);
+  });
+
   docsTest("a hash scrolls to its heading and a new page starts at the top", async ({ page, connected }) => {
     const long = `<h2>First part</h2>${"<p>Filler</p>".repeat(120)}<h2>Second part</h2><p>More of it</p>`;
     const related = { docs: [{ route: "helpdesk/sla", title: "SLA" }], articles: [] };
@@ -587,6 +704,36 @@ test.describe("search list", () => {
     expect(await page.getByText("No articles match").count()).toBe(0);
     docsGate.open();
     await expect(rowsOf(page)).toHaveCount(1);
+  });
+
+  docsTest("the keyboard cursor stays put when docs land", async ({ page, connected }) => {
+    const docsGate = gate();
+    await stubSearch(page, [articleHit("Alpha guide"), articleHit("Another guide")], async (query) => {
+      if (query === "guide") await docsGate.held;
+      return [docHit("helpdesk/beta", "Beta guide")];
+    });
+    const box = await searchFor(page, "guide");
+    await expect(rowsOf(page)).toHaveCount(2);
+    await box.press("ArrowDown");
+    const second = rowsOf(page).nth(1);
+    await expect(second).toHaveAttribute("data-highlighted", "");
+    const landed = page.waitForResponse(/docs_source\.search_docs/);
+    docsGate.open();
+    await landed;
+    await page.waitForTimeout(300);
+    await expect(second).toHaveAttribute("data-highlighted", "");
+    await expect(rowsOf(page)).toHaveCount(2);
+    await box.pressSequentially("s");
+    await expect(rowsOf(page)).toHaveCount(3);
+  });
+
+  docsTest("arrow keys keep the Docs rows already showing", async ({ page, connected }) => {
+    await stubSearch(page, [articleHit("Alpha guide")], [docHit("helpdesk/beta", "Beta guide")]);
+    const box = await searchFor(page, "guide");
+    await expect(rowsOf(page)).toHaveCount(2);
+    await box.press("ArrowDown");
+    await expect(rowsOf(page)).toHaveCount(2);
+    await expect(rowsOf(page).nth(1)).toHaveAttribute("data-highlighted", "");
   });
 
   docsTest("typing before the config loads still searches docs", async ({ page, connected }) => {

@@ -77,7 +77,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { __ } from "../translation";
 import DocsBulkConvert from "./DocsBulkConvert.vue";
 import { getDocs } from "./docsApi";
-import { getErrorMessage, timeAgo } from "../utils";
+import { askConfirm, getErrorMessage, timeAgo } from "../utils";
 
 const API = "helpdesk.api.docs_source";
 const POLL_MS = 3000;
@@ -141,12 +141,22 @@ async function resync() {
   });
 }
 
-async function disconnect() {
-  clearTimeout(timer);
-  await run(async () => {
-    await call(`${API}.disconnect_docs_source`);
-    source.value = null;
-    url.value = "";
+function disconnect() {
+  askConfirm({
+    title: __("Disconnect the docs source?"),
+    message: __(
+      "Hidden sections are cleared, and an indexed site must resync when you connect it again. Converted articles stay."
+    ),
+    label: __("Disconnect"),
+    theme: "red",
+    action: () => {
+      clearTimeout(timer);
+      return run(async () => {
+        await call(`${API}.disconnect_docs_source`);
+        source.value = null;
+        url.value = "";
+      });
+    },
   });
 }
 
@@ -169,6 +179,7 @@ async function setShown(section: Record<string, any>, shown: boolean) {
 }
 
 // Polls until the job ran (seen syncing, or state changed, or 3 polls) and stopped.
+// A first sync still in the queue has no result yet, so it keeps polling.
 function poll(
   before: { synced_on: unknown; error: string },
   seen = false,
@@ -185,7 +196,9 @@ function poll(
     seen = seen || Boolean(s?.syncing);
     const changed =
       s?.synced_on !== before.synced_on || s?.error !== before.error;
-    const done = !s || (!s.syncing && (seen || changed || count >= 2));
+    const hasResult = Boolean(s?.synced_on || s?.error);
+    const done =
+      !s || (!s.syncing && hasResult && (seen || changed || count >= 2));
     if (!done && count < MAX_POLLS) poll(before, seen, count + 1);
   }, POLL_MS);
 }
