@@ -30,8 +30,9 @@
             :aria-label="__('Email {0}', [i + 1])"
             placeholder="name@company.com"
             :disabled="row.sent"
-            :error="attempted || duplicates.has(row.id) ? errors[row.id] : undefined"
+            :error="showError(row.id) ? errors[row.id] : undefined"
             :title="row.email"
+            @blur="touched.add(row.id)"
             @keydown.enter.prevent="onEnter(i)"
           />
         </div>
@@ -115,7 +116,7 @@ import {
   call,
   toast,
 } from "frappe-ui";
-import { computed, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import LucidePlus from "~icons/lucide/plus";
 import LucideX from "~icons/lucide/x";
 import {
@@ -136,6 +137,7 @@ const authStore = useAuthStore();
 const roleOptions = getInviteRoleOptions(authStore);
 
 const attempted = ref(false);
+const touched = reactive(new Set<number>());
 const sending = ref(false);
 const inviteError = ref("");
 
@@ -157,6 +159,10 @@ const sendLabel = computed(() => {
     ? __("Send {0} invites", [sendableCount.value])
     : __("Send invite");
 });
+
+// Errors only exist for rows with text, so a blurred row explains itself before any send
+const showError = (id: number) =>
+  attempted.value || touched.has(id) || duplicates.value.has(id);
 
 function addRow() {
   if (rows.value.length < MAX_INVITE_ROWS) rows.value.push(createInviteRow());
