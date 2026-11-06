@@ -46,6 +46,16 @@ export function validateRows(rows: InviteRow[]): {
   return { errors, duplicates };
 }
 
+/** How many valid addresses a send would invite right now. */
+export function countSendable(rows: InviteRow[]): number {
+  const { errors } = validateRows(rows);
+  const valid = rows.filter((row) => !errors[row.id]);
+  return Object.values(groupUnsentByRole(valid)).reduce(
+    (total, emails) => total + (emails?.length ?? 0),
+    0
+  );
+}
+
 /** Addresses still to send, per role. Sent, blank and repeated rows are left out. */
 export function groupUnsentByRole(
   rows: InviteRow[]

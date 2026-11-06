@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  countSendable,
   groupUnsentByRole,
   normalizeEmail,
   validateRows,
@@ -38,6 +39,28 @@ describe("validateRows", () => {
     ]);
     expect([...duplicates]).toEqual([2]);
     expect(Object.keys(errors)).toEqual(["2"]);
+  });
+});
+
+describe("countSendable", () => {
+  it("is zero for blank rows", () => {
+    expect(countSendable([row(1, ""), row(2, " ")])).toBe(0);
+  });
+
+  it("is zero when the only address is invalid", () => {
+    expect(countSendable([row(1, "nope")])).toBe(0);
+  });
+
+  it("counts valid unsent addresses and skips invalid, repeated and sent ones", () => {
+    expect(
+      countSendable([
+        row(1, "a@x.com"),
+        row(2, "A@x.com"),
+        row(3, "nope"),
+        row(4, "b@x.com", "Agent", true),
+        row(5, "c@x.com"),
+      ])
+    ).toBe(2);
   });
 });
 

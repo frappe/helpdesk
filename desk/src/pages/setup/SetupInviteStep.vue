@@ -120,6 +120,7 @@ import LucidePlus from "~icons/lucide/plus";
 import LucideX from "~icons/lucide/x";
 import {
   MAX_INVITE_ROWS,
+  countSendable,
   createInviteRow,
   groupUnsentByRole,
   normalizeEmail,
@@ -148,11 +149,12 @@ const unsentCount = computed(
 const sentCount = computed(() => rows.value.filter((row) => row.sent).length);
 // Everything left is already sent, so the button finishes instead of sending
 const allSent = computed(() => unsentCount.value === 0 && sentCount.value > 0);
-const canSend = computed(() => unsentCount.value > 0 || allSent.value);
+const sendableCount = computed(() => countSendable(rows.value));
+const canSend = computed(() => sendableCount.value > 0 || allSent.value);
 const sendLabel = computed(() => {
   if (allSent.value) return __("Finish");
-  return unsentCount.value > 1
-    ? __("Send {0} invites", [unsentCount.value])
+  return sendableCount.value > 1
+    ? __("Send {0} invites", [sendableCount.value])
     : __("Send invite");
 });
 
