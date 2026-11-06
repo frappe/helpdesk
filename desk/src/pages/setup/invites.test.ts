@@ -97,7 +97,7 @@ describe("groupUnsentByRole", () => {
 });
 
 describe("previewInvitees", () => {
-  it("keeps valid unique addresses, lowercased", () => {
+  it("keeps valid unique addresses lowercased, with their sent state", () => {
     expect(
       previewInvitees([
         row(1, "A@x.com"),
@@ -106,6 +106,9 @@ describe("previewInvitees", () => {
         row(4, ""),
         row(5, "b@x.com", "Agent Manager", true),
       ])
-    ).toEqual(["a@x.com", "b@x.com"]);
+    ).toEqual([
+      { email: "a@x.com", sent: false },
+      { email: "b@x.com", sent: true },
+    ]);
   });
 });

@@ -44,7 +44,14 @@ test.describe("first-run setup", () => {
   }) => {
     const email = `${uid("setup")}@example.com`;
     await page.goto("/helpdesk/setup");
-    await page.getByRole("button", { name: "Continue" }).click();
+    // With no mailbox the step offers only "Set up later", which asks first.
+    const dialog = page.getByRole("dialog");
+    const connected = page.getByRole("button", { name: "Continue" });
+    if (await connected.isVisible()) await connected.click();
+    else {
+      await page.getByRole("button", { name: "Set up later" }).click();
+      await dialog.getByRole("button", { name: "Set up later" }).click();
+    }
     await expect(page.getByText("Step 2 of 2")).toBeVisible();
 
     await page.getByPlaceholder("name@company.com").first().fill(email.toUpperCase());

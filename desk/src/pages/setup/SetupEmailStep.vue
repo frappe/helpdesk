@@ -51,16 +51,17 @@
 
     <div class="flex items-center justify-end gap-2 pt-2">
       <Button
-        v-if="!connected"
-        variant="outline"
-        :label="__('Set up later')"
-        @click="confirmSetUpLater"
-      />
-      <Button
+        v-if="connected"
         variant="solid"
         theme="gray"
         :label="__('Continue')"
         @click="emit('next')"
+      />
+      <Button
+        v-else
+        variant="outline"
+        :label="__('Set up later')"
+        @click="confirmSetUpLater"
       />
     </div>
   </section>

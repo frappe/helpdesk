@@ -78,6 +78,7 @@
       <SetupPreview
         :mailbox="status.data?.email_address || null"
         :arrived="!!status.data?.ticket_arrived"
+        :checking="status.loading && !status.data"
         :invitees="invitees"
       />
     </div>
