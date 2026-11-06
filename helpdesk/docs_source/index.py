@@ -57,7 +57,9 @@ class DocsIndex(Search):
         hits: dict[str, dict] = {}
         try:
             for search in (f"@subject:({terms})", terms):
-                for doc in self.search(search, page_length=PAGE_LENGTH, highlight=True).docs:
+                for doc in self.search(
+                    search, page_length=PAGE_LENGTH, highlight=True
+                ).docs:
                     hits.setdefault(doc.route, self._to_hit(doc))
         except ResponseError:
             return []

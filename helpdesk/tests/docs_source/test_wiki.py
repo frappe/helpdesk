@@ -57,7 +57,11 @@ class TestWikiSource(IntegrationTestCase):
         return [h["route"] for h in found]
 
     def page(self, content="<p>hi</p>", route="helpdesk/setup", extra=None, **kw):
-        data = {"title": "Setup", "rendered_content": content, "last_updated": "2026-01-01"}
+        data = {
+            "title": "Setup",
+            "rendered_content": content,
+            "last_updated": "2026-01-01",
+        }
         site = {f"{PAGE}": {"message": data}, **(extra or {})}
         return self.run_with(lambda s: s.get_page(route), site, **kw)
 
@@ -65,7 +69,9 @@ class TestWikiSource(IntegrationTestCase):
         self.assertEqual(self.search(["erpnext/v12/x", "erpnext/x"]), ["erpnext/x"])
 
     def test_hidden_section_never_shows(self):
-        self.assertEqual(self.search(["legal/x", "helpdesk/x"], hidden=["legal"]), ["helpdesk/x"])
+        self.assertEqual(
+            self.search(["legal/x", "helpdesk/x"], hidden=["legal"]), ["helpdesk/x"]
+        )
 
     def test_unlisted_section_never_shows(self):
         self.assertEqual(self.search(["jsdf/as", "helpdesk/x"]), ["helpdesk/x"])
@@ -74,9 +80,19 @@ class TestWikiSource(IntegrationTestCase):
         self.assertEqual(self.search(["wiki-v2/x"]), ["wiki-v2/x"])
 
     def test_hit_is_escaped_and_labelled(self):
-        site = {SEARCH: {"message": {"results": [
-            {"route": "helpdesk/x", "title": "<img src=x><mark>a</mark>", "content": "<script>"}
-        ]}}}
+        site = {
+            SEARCH: {
+                "message": {
+                    "results": [
+                        {
+                            "route": "helpdesk/x",
+                            "title": "<img src=x><mark>a</mark>",
+                            "content": "<script>",
+                        }
+                    ]
+                }
+            }
+        }
         found = self.run_with(lambda s: s.search("q"), site)[0]
         self.assertEqual(found["title"], "&lt;img src=x&gt;<mark>a</mark>")
         self.assertNotIn("<script>", found["excerpt"])
@@ -101,11 +117,23 @@ class TestWikiSource(IntegrationTestCase):
 
         def fake(url, host, *a, params=None):
             if url == PAGE and params["route"] == "erpnext/stock":
-                return fake_docs_fetch({PAGE: {"message": {
-                    "title": "Stock", "rendered_content": "<p>x</p>", "last_updated": None}}})(url, host)
+                return fake_docs_fetch(
+                    {
+                        PAGE: {
+                            "message": {
+                                "title": "Stock",
+                                "rendered_content": "<p>x</p>",
+                                "last_updated": None,
+                            }
+                        }
+                    }
+                )(url, host)
             return fake_docs_fetch({**self.site, **moved})(url, host)
 
-        with patch("helpdesk.docs_source.wiki.fetch", fake), patch("helpdesk.docs_source.wiki.fetch_live", fake):
+        with (
+            patch("helpdesk.docs_source.wiki.fetch", fake),
+            patch("helpdesk.docs_source.wiki.fetch_live", fake),
+        ):
             page = self.source().get_page("erpnext/old")
         self.assertEqual(page["source_url"], f"{URL}/erpnext/stock")
         self.assertEqual(page["label"], "ERPNext docs")
@@ -132,16 +160,31 @@ class TestWikiSource(IntegrationTestCase):
         self.assertEqual(
             pages,
             [
-                {"route": "helpdesk/setup", "title": "Setup - Guide", "section": "helpdesk"},
-                {"route": "helpdesk/install", "title": "Install", "section": "helpdesk"},
+                {
+                    "route": "helpdesk/setup",
+                    "title": "Setup - Guide",
+                    "section": "helpdesk",
+                },
+                {
+                    "route": "helpdesk/install",
+                    "title": "Install",
+                    "section": "helpdesk",
+                },
             ],
         )
 
     def test_hidden_section_not_in_list_pages(self):
         site = {f"{URL}/{key}/llms.txt": "" for key in ("erpnext", "legal", "wiki-v2")}
         site[f"{URL}/helpdesk/llms.txt"] = HELPDESK_INDEX
-        self.assertEqual(self.run_with(lambda s: s.list_pages("helpdesk"), site, hidden=["helpdesk"]), [])
-        self.assertEqual(self.run_with(lambda s: s.list_pages(None), site, hidden=["helpdesk"]), [])
+        self.assertEqual(
+            self.run_with(
+                lambda s: s.list_pages("helpdesk"), site, hidden=["helpdesk"]
+            ),
+            [],
+        )
+        self.assertEqual(
+            self.run_with(lambda s: s.list_pages(None), site, hidden=["helpdesk"]), []
+        )
 
     def test_unsafe_markup_is_removed(self):
         html = '<a href="javascript:alert(1)" onclick="x()">a</a><script>x</script>'
@@ -183,7 +226,7 @@ class TestWikiSource(IntegrationTestCase):
         html = '<code>&lt;a href="/helpdesk/setup"&gt;</code><p data-href="/helpdesk/x">p</p>'
         content = self.page(html)["content"]
         self.assertNotIn("/help/articles", content)
-        self.assertIn("&lt;a href=\"/helpdesk/setup\"&gt;", content)
+        self.assertIn('&lt;a href="/helpdesk/setup"&gt;', content)
 
     def test_dot_segments_are_not_pages(self):
         with self.assertRaises(frappe.DoesNotExistError):
@@ -193,11 +236,20 @@ class TestWikiSource(IntegrationTestCase):
 
     def test_md_links_point_at_articles_route(self):
         html = '<a href="/helpdesk/install.md#top">a</a>'
-        self.assertIn('href="/help/articles/helpdesk/install#top"', self.page(html)["content"])
+        self.assertIn(
+            'href="/help/articles/helpdesk/install#top"', self.page(html)["content"]
+        )
 
     def test_title_is_plain(self):
-        site = {PAGE: {"message": {"title": "A &amp; <b>B</b>", "rendered_content": "<p>x</p>"}}}
-        self.assertEqual(self.run_with(lambda s: s.get_page("helpdesk/setup"), site)["title"], "A & B")
+        site = {
+            PAGE: {
+                "message": {"title": "A &amp; <b>B</b>", "rendered_content": "<p>x</p>"}
+            }
+        }
+        self.assertEqual(
+            self.run_with(lambda s: s.get_page("helpdesk/setup"), site)["title"],
+            "A & B",
+        )
 
     def test_section_list_uses_the_live_fetch(self):
         def sync(*a, **k):
@@ -209,7 +261,10 @@ class TestWikiSource(IntegrationTestCase):
         ):
             self.assertTrue(self.source().sections())
         frappe.cache.delete_keys("helpdesk_docs_wiki")
-        with patch("helpdesk.docs_source.wiki.fetch_live", fake_docs_fetch({f"{URL}/llms.txt": 503})):
+        with patch(
+            "helpdesk.docs_source.wiki.fetch_live",
+            fake_docs_fetch({f"{URL}/llms.txt": 503}),
+        ):
             with self.assertRaises(DocsFetchError):
                 self.source().sections()
 

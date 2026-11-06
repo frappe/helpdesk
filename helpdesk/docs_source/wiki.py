@@ -7,7 +7,12 @@ from frappe import _
 from helpdesk.api.knowledge_base import escape_marked
 from helpdesk.docs_source import DocsSource
 from helpdesk.docs_source.fetch import DocsFetchError, fetch, fetch_live
-from helpdesk.docs_source.text import clean_html, has_dot_segment, plain_title, rewrite_links
+from helpdesk.docs_source.text import (
+    clean_html,
+    has_dot_segment,
+    plain_title,
+    rewrite_links,
+)
 
 API = "api/method/wiki.frappe_wiki.doctype.wiki_document"
 SEARCH_SECONDS = 300
@@ -67,7 +72,9 @@ class WikiSource(DocsSource):
             for title, link in LLMS_LINK.findall(self._read_llms(f"{key}/llms.txt")):
                 route = urlsplit(link).path.strip("/").removesuffix(".md")
                 if self._is_visible(route) and self._section_of(route) == key:
-                    pages.append({"route": route, "title": plain_title(title), "section": key})
+                    pages.append(
+                        {"route": route, "title": plain_title(title), "section": key}
+                    )
         return pages
 
     def sections(self) -> list[dict]:
@@ -79,7 +86,9 @@ class WikiSource(DocsSource):
         ]
 
     def _get_page(self, route: str, live: bool = True) -> dict:
-        data = self._cached(f"page:{route}", PAGE_SECONDS, lambda: self._read_page(route, live))
+        data = self._cached(
+            f"page:{route}", PAGE_SECONDS, lambda: self._read_page(route, live)
+        )
         base = f"{self.url}/{route}"
         return {
             "route": route,
@@ -94,7 +103,9 @@ class WikiSource(DocsSource):
     def _follow_redirect(self, route: str, live: bool = True) -> str:
         """Final route of a page the API refuses, if it stays on a visible page."""
         try:
-            final = urlsplit((fetch_live if live else fetch)(f"{self.url}/{route}", self.host).url).path.strip("/")
+            final = urlsplit(
+                (fetch_live if live else fetch)(f"{self.url}/{route}", self.host).url
+            ).path.strip("/")
         except DocsFetchError as e:
             if e.status not in MOVED_STATUSES:
                 raise
@@ -106,7 +117,10 @@ class WikiSource(DocsSource):
     def _read_hits(self, query: str) -> list[dict]:
         message = self._call("search.search", live=True, query=query)
         return _shaped(
-            lambda: [{k: r[k] for k in ("route", "title", "content")} for r in message["results"]]
+            lambda: [
+                {k: r[k] for k in ("route", "title", "content")}
+                for r in message["results"]
+            ]
         )
 
     def _read_page(self, route: str, live: bool = True) -> dict:
@@ -137,19 +151,25 @@ class WikiSource(DocsSource):
 
     def _section_of(self, route: str) -> str | None:
         """The longest section key the route sits under."""
-        keys = [k for k in self._all_sections() if route == k or route.startswith(f"{k}/")]
+        keys = [
+            k for k in self._all_sections() if route == k or route.startswith(f"{k}/")
+        ]
         return max(keys, key=len, default=None)
 
     def _title_of(self, route: str) -> str:
         return self._all_sections()[self._section_of(route)]
 
     def _all_sections(self, live: bool = True) -> dict[str, str]:
-        return self._cached("sections", SECTIONS_SECONDS, lambda: self._read_sections(live))
+        return self._cached(
+            "sections", SECTIONS_SECONDS, lambda: self._read_sections(live)
+        )
 
     def _read_sections(self, live: bool = True) -> dict[str, str]:
         sections = {}
         get = fetch_live if live else fetch
-        for title, link in LLMS_LINK.findall(get(f"{self.url}/llms.txt", self.host).text):
+        for title, link in LLMS_LINK.findall(
+            get(f"{self.url}/llms.txt", self.host).text
+        ):
             path = urlsplit(link).path
             if path.endswith("/llms.txt"):
                 sections[path.removesuffix("/llms.txt").strip("/")] = plain_title(title)

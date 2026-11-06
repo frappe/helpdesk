@@ -15,7 +15,18 @@ def plain_title(title: str) -> str:
     return unescape(strip_html_tags(title)).replace("\\", "").strip()
 
 
-NO_TAGS = ("form", "input", "button", "select", "textarea", "meta", "link", "html", "head", "body")
+NO_TAGS = (
+    "form",
+    "input",
+    "button",
+    "select",
+    "textarea",
+    "meta",
+    "link",
+    "html",
+    "head",
+    "body",
+)
 
 
 def clean_html(html: str) -> str:
@@ -36,7 +47,9 @@ def rewrite_links(html: str, base_url: str, is_page: Callable[[str], bool]) -> s
             value = tag.get(attr)
             if value is None or (attr == "href" and tag.name != "a"):
                 continue
-            if value.startswith("#") or re.match(r"[a-z][a-z0-9+.-]*:(?!//)", value, re.I):
+            if value.startswith("#") or re.match(
+                r"[a-z][a-z0-9+.-]*:(?!//)", value, re.I
+            ):
                 continue
             parts = urlsplit(urljoin(base_url, value))
             route = parts.path.strip("/").removesuffix(".md")

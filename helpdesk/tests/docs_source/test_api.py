@@ -18,18 +18,14 @@ from helpdesk.docs_source.index import DocsIndex
 from helpdesk.docs_source.llms import LlmsSource
 from helpdesk.docs_source.sitemap import SitemapSource
 from helpdesk.docs_source.wiki import WikiSource
-from helpdesk.test_utils import (
-    DocsCase,
-    FakeSource,
-    create_agent,
-    docs_hit as hit,
-    make_agent_manager,
-    make_article,
-    unique_email,
-)
+from helpdesk.test_utils import DocsCase, FakeSource, create_agent
+from helpdesk.test_utils import docs_hit as hit
+from helpdesk.test_utils import make_agent_manager, make_article, unique_email
 
 URL = "https://docs.example.com"
 API = "helpdesk.api.docs_source"
+
+
 class TestConnect(DocsCase):
     def test_connect_order_is_wiki_llms_sitemap(self):
         calls = []
@@ -54,7 +50,10 @@ class TestConnect(DocsCase):
             ):
                 connect_docs_source(URL)
             self.assertEqual(calls, expected_calls)
-            self.assertEqual(frappe.db.get_single_value("HD Settings", "docs_source_type"), expected_type)
+            self.assertEqual(
+                frappe.db.get_single_value("HD Settings", "docs_source_type"),
+                expected_type,
+            )
             disconnect_docs_source()
 
     def test_connect_refuses_http_and_unknown_sites(self):
@@ -75,7 +74,9 @@ class TestConnect(DocsCase):
             patch.object(LlmsSource, "is_available", return_value=False),
             patch.object(SitemapSource, "is_available", return_value=False),
         ):
-            with self.assertRaisesRegex(frappe.ValidationError, "no Frappe Wiki, llms.txt or sitemap"):
+            with self.assertRaisesRegex(
+                frappe.ValidationError, "no Frappe Wiki, llms.txt or sitemap"
+            ):
                 connect_docs_source(URL)
         self.assertFalse(frappe.db.get_single_value("HD Settings", "docs_source_url"))
 
@@ -88,9 +89,13 @@ class TestConnect(DocsCase):
 
     def test_connect_refuses_when_already_connected(self):
         self.connect_as_wiki()
-        with self.assertRaisesRegex(frappe.ValidationError, "Disconnect the current docs source first."):
+        with self.assertRaisesRegex(
+            frappe.ValidationError, "Disconnect the current docs source first."
+        ):
             self.connect_as_wiki("https://other.example.com")
-        self.assertEqual(frappe.db.get_single_value("HD Settings", "docs_source_url"), URL)
+        self.assertEqual(
+            frappe.db.get_single_value("HD Settings", "docs_source_url"), URL
+        )
 
     def test_connect_and_disconnect_end_the_outage_skip(self):
         frappe.cache.set_value(DOWN_KEY, 1, expires_in_sec=60)
@@ -111,7 +116,11 @@ class TestConnect(DocsCase):
     def test_connect_resets_other_docs_fields(self):
         frappe.db.set_single_value(
             "HD Settings",
-            {"docs_source_page_count": 9, "docs_source_sync_error": "old", "docs_source_hidden_sections": '["a"]'},
+            {
+                "docs_source_page_count": 9,
+                "docs_source_sync_error": "old",
+                "docs_source_hidden_sections": '["a"]',
+            },
         )
         self.connect_as_llms()
         get = lambda f: frappe.db.get_single_value("HD Settings", f)
@@ -144,7 +153,9 @@ class TestManage(DocsCase):
                 with self.assertRaises(frappe.PermissionError):
                     call()
             self.assertEqual(get_docs_source()["url"], URL)
-        self.assertEqual(frappe.db.get_single_value("HD Settings", "docs_source_url"), URL)
+        self.assertEqual(
+            frappe.db.get_single_value("HD Settings", "docs_source_url"), URL
+        )
 
     def test_agent_manager_can_write(self):
         with self.set_user(make_agent_manager()):
@@ -155,7 +166,11 @@ class TestManage(DocsCase):
     def test_disconnect_clears_fields_and_index(self):
         self.connect_as_llms()
         frappe.db.set_single_value(
-            "HD Settings", {"docs_source_page_count": 4, "docs_source_synced_on": "2026-01-01 10:00:00"}
+            "HD Settings",
+            {
+                "docs_source_page_count": 4,
+                "docs_source_synced_on": "2026-01-01 10:00:00",
+            },
         )
         with patch.object(DocsIndex, "clear") as clear:
             disconnect_docs_source()
@@ -191,7 +206,10 @@ class TestManage(DocsCase):
             with self.assertRaises(frappe.ValidationError):
                 set_hidden_sections(["zzz"])
             set_hidden_sections(["b", "b"])
-        self.assertEqual(frappe.db.get_single_value("HD Settings", "docs_source_hidden_sections"), '["b"]')
+        self.assertEqual(
+            frappe.db.get_single_value("HD Settings", "docs_source_hidden_sections"),
+            '["b"]',
+        )
         self.assertEqual(get_source().hidden, ["b"])
 
     def test_set_hidden_sections_refused_for_indexed_sites(self):
@@ -202,11 +220,15 @@ class TestManage(DocsCase):
     def test_get_docs_source(self):
         self.assertIsNone(get_docs_source())
         self.connect_as_wiki()
-        with patch.object(WikiSource, "sections", return_value=[{"key": "a", "title": "A"}]):
+        with patch.object(
+            WikiSource, "sections", return_value=[{"key": "a", "title": "A"}]
+        ):
             info = get_docs_source()
         self.assertEqual(info["url"], URL)
         self.assertEqual(info["type"], "Frappe Wiki")
-        self.assertEqual(info["sections"], [{"key": "a", "title": "A", "hidden": False}])
+        self.assertEqual(
+            info["sections"], [{"key": "a", "title": "A", "hidden": False}]
+        )
         self.assertFalse(info["sections_error"])
         with patch.object(WikiSource, "sections", side_effect=DocsFetchError("down")):
             info = get_docs_source()
@@ -269,7 +291,9 @@ class TestReaders(DocsCase):
 
     def test_failed_related_docs_read_is_logged(self):
         source = FakeSource([], {"a/page": {"title": "Page"}})
-        source.search = lambda q: (_ for _ in ()).throw(DocsFetchError("HTTP 500", status=500))
+        source.search = lambda q: (_ for _ in ()).throw(
+            DocsFetchError("HTTP 500", status=500)
+        )
         with (
             patch(f"{API}.get_source", return_value=source),
             patch(f"{API}.get_related", return_value=[]),
@@ -305,7 +329,10 @@ class TestRelated(DocsCase):
         self.assertEqual(found["docs"], [{"route": "a/one", "title": "One"}])
 
     def test_related_docs_are_plain_deduped_and_capped(self):
-        hits = [hit("a/x", "<mark>Same</mark> &amp; <b>co</b>"), hit("a/y", "Same & co")]
+        hits = [
+            hit("a/x", "<mark>Same</mark> &amp; <b>co</b>"),
+            hit("a/y", "Same & co"),
+        ]
         hits += [hit(f"a/{i}", f"T{i}") for i in range(9)]
         docs = self.related(hits)["docs"]
         self.assertEqual(docs[0], {"route": "a/x", "title": "Same & co"})
@@ -315,14 +342,18 @@ class TestRelated(DocsCase):
     def test_related_drops_docs_with_matching_article_title(self):
         article = make_article()
         title = frappe.db.get_value("HD Article", article, "title")
-        found = self.related([hit("a/one", title), hit("a/two", "Other")], [(article, title)])
+        found = self.related(
+            [hit("a/one", title), hit("a/two", "Other")], [(article, title)]
+        )
         self.assertEqual([d["route"] for d in found["docs"]], ["a/two"])
         self.assertEqual([a["name"] for a in found["articles"]], [article])
 
     def test_related_drops_the_converted_articles_own_docs_page(self):
         article = make_article(docs_page_route="a/one")
         title = frappe.db.get_value("HD Article", article, "title")
-        found = self.related([hit("a/one", title), hit("a/two", title)], [(article, title)])
+        found = self.related(
+            [hit("a/one", title), hit("a/two", title)], [(article, title)]
+        )
         self.assertEqual([d["route"] for d in found["docs"]], ["a/two"])
 
     def test_related_title_match_ignores_case(self):
@@ -336,7 +367,10 @@ class TestRelated(DocsCase):
             [hit("a/new", "New"), hit("a/other", "Other")],
             {"a/old": {"title": "New", "route": "a/new"}},
         )
-        with patch(f"{API}.get_source", return_value=source), patch(f"{API}.get_related", return_value=[]):
+        with (
+            patch(f"{API}.get_source", return_value=source),
+            patch(f"{API}.get_related", return_value=[]),
+        ):
             found = get_doc_page("a/old")["related"]
         self.assertEqual([d["route"] for d in found["docs"]], ["a/other"])
 

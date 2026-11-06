@@ -60,9 +60,7 @@ const busy = ref(false);
 const error = ref("");
 
 const title = computed(() =>
-  props.bulk
-    ? pagesLabel(props.routes.length)
-    : __("Convert to article")
+  props.bulk ? pagesLabel(props.routes.length) : __("Convert to article")
 );
 
 watch(open, async (shown) => {

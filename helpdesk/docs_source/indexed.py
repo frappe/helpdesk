@@ -7,7 +7,12 @@ from frappe.utils import md_to_html
 from helpdesk.docs_source import DocsSource
 from helpdesk.docs_source.fetch import DocsFetchError, fetch, fetch_live
 from helpdesk.docs_source.index import PAGES_KEY, DocsIndex
-from helpdesk.docs_source.text import clean_html, clean_markdown, has_dot_segment, rewrite_links
+from helpdesk.docs_source.text import (
+    clean_html,
+    clean_markdown,
+    has_dot_segment,
+    rewrite_links,
+)
 
 PAGE_SECONDS = 600
 CACHE = "helpdesk_docs_llms"
@@ -39,7 +44,9 @@ class IndexedSource(DocsSource):
         return {
             "route": route,
             "title": page["title"],
-            "content": rewrite_links(self._read_html(page, live), page["url"], self._is_page),
+            "content": rewrite_links(
+                self._read_html(page, live), page["url"], self._is_page
+            ),
             "label": page["label"],
             "last_updated": None,
             "source_url": page["url"].removesuffix(".md"),

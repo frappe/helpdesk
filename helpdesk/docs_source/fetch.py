@@ -100,7 +100,9 @@ def _redirect_url(url, response):
 def _read_body(response, deadline):
     try:
         if response.status_code >= 300:
-            raise DocsFetchError(f"HTTP {response.status_code}", status=response.status_code)
+            raise DocsFetchError(
+                f"HTTP {response.status_code}", status=response.status_code
+            )
         _read_capped(response, deadline)
     except (requests.RequestException, HTTPError) as e:
         response.close()
@@ -131,11 +133,12 @@ def _remaining(deadline):
 
 def _as_fetch_error(e):
     transient = isinstance(
-        e, (
+        e,
+        (
             requests.ConnectionError,
             requests.Timeout,
             requests.exceptions.ChunkedEncodingError,
             HTTPError,
-        )
+        ),
     )
     return DocsFetchError(str(e), transient=transient)

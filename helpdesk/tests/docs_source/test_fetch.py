@@ -13,8 +13,8 @@ from helpdesk.docs_source.fetch import (
     MAX_BYTES,
     MAX_REDIRECTS,
     DocsFetchError,
-    fetch,
     _read_capped,
+    fetch,
     fetch_live,
 )
 from helpdesk.test_utils import make_response
@@ -91,7 +91,10 @@ class TestFetch(IntegrationTestCase):
         chunk = b"x" * (MAX_BYTES // 2 + 1)
         response = make_response(URL, chunks=[chunk, chunk])
         get.return_value = response
-        with patch.object(response, "close") as close, self.assertRaises(DocsFetchError):
+        with (
+            patch.object(response, "close") as close,
+            self.assertRaises(DocsFetchError),
+        ):
             fetch(URL, HOST)
         close.assert_called()
 

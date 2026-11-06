@@ -226,7 +226,9 @@ const historyOptions = computed(() =>
 const isCurrent = computed(() => results.settledQuery === searchText.value);
 const isDocsCurrent = computed(() => docs.settledQuery === searchText.value);
 // "No results" waits for docs, so it never flashes before they answer.
-const isDocsSettled = computed(() => !hasDocsSource.value || isDocsCurrent.value);
+const isDocsSettled = computed(
+  () => !hasDocsSource.value || isDocsCurrent.value
+);
 
 // Article rows never change when docs arrive; Docs rows go after them.
 const rows = computed(() =>
@@ -268,7 +270,11 @@ const isSearching = computed(
     !(isCurrent.value && isDocsSettled.value)
 );
 const isEmpty = computed(
-  () => canSearch.value && isCurrent.value && isDocsSettled.value && !hasResults.value
+  () =>
+    canSearch.value &&
+    isCurrent.value &&
+    isDocsSettled.value &&
+    !hasResults.value
 );
 
 const resultOptions = computed(() =>
@@ -276,7 +282,11 @@ const resultOptions = computed(() =>
     ? [
         {
           key: "results",
-          group: countLabel(rows.value.length, __("1 result"), __("{0} results")),
+          group: countLabel(
+            rows.value.length,
+            __("1 result"),
+            __("{0} results")
+          ),
           options: rows.value,
         },
       ]

@@ -33,7 +33,9 @@ class SitemapSource(IndexedSource):
 
     def is_available(self) -> bool:
         try:
-            urls = next((chunk for chunk in self._sitemaps() if chunk), [])[:SAMPLE_PAGES]
+            urls = next((chunk for chunk in self._sitemaps() if chunk), [])[
+                :SAMPLE_PAGES
+            ]
         except DocsFetchError:
             return False
         for url in urls:
@@ -94,7 +96,12 @@ class SitemapSource(IndexedSource):
         body = _text(html)
         if not body or not title:
             return None
-        return {"route": urlsplit(url).path.strip("/"), "title": title, "url": url, "body": body}
+        return {
+            "route": urlsplit(url).path.strip("/"),
+            "title": title,
+            "url": url,
+            "body": body,
+        }
 
     def _page_urls(self) -> list[str]:
         """In-scope page URLs, unversioned first so the cap cuts old versions."""
@@ -102,7 +109,9 @@ class SitemapSource(IndexedSource):
         for chunk in self._sitemaps():
             for url in chunk:
                 routes.setdefault(urlsplit(url).path.strip("/"), url)
-        return sorted(routes.values(), key=lambda url: _is_versioned(urlsplit(url).path))
+        return sorted(
+            routes.values(), key=lambda url: _is_versioned(urlsplit(url).path)
+        )
 
     def _sitemaps(self) -> Iterator[list[str]]:
         """In-scope URLs of each sitemap, following a sitemap index one level."""
@@ -118,7 +127,9 @@ class SitemapSource(IndexedSource):
 
     def _read_root(self) -> str:
         error = None
-        for url in dict.fromkeys([f"{self.url}/sitemap.xml", f"https://{self.host}/sitemap.xml"]):
+        for url in dict.fromkeys(
+            [f"{self.url}/sitemap.xml", f"https://{self.host}/sitemap.xml"]
+        ):
             try:
                 text = fetch(url, self.host).text
             except DocsFetchError as e:
@@ -136,7 +147,9 @@ class SitemapSource(IndexedSource):
             if parts is None:
                 continue
             route = parts.path.strip("/")
-            in_path = parts.path == self.base_path or parts.path.startswith(f"{self.base_path}/")
+            in_path = parts.path == self.base_path or parts.path.startswith(
+                f"{self.base_path}/"
+            )
             if in_path and route and not has_dot_segment(route):
                 urls.append(loc)
         return urls

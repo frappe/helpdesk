@@ -25,12 +25,9 @@ from helpdesk.docs_source.convert import (
 )
 from helpdesk.docs_source.fetch import DOWN_KEY, DocsFetchError
 from helpdesk.docs_source.wiki import WikiSource
+from helpdesk.test_utils import DocsCase, FakeSource, article_index_jobs, create_agent
+from helpdesk.test_utils import docs_hit as hit
 from helpdesk.test_utils import (
-    article_index_jobs,
-    DocsCase,
-    FakeSource,
-    create_agent,
-    docs_hit as hit,
     make_agent_manager,
     make_article,
     make_article_category,
@@ -53,8 +50,16 @@ class ConvertCase(DocsCase):
         self.source_url = f"https://docs.example.com/{self.route}"
         self.category = make_article_category(unique_name("Convert")).name
         self.pages = {
-            self.route: {"title": self.title, "content": "<p>Body</p>", "source_url": self.source_url},
-            self.other: {"title": unique_name("Other"), "content": "<p>x</p>", "source_url": "u"},
+            self.route: {
+                "title": self.title,
+                "content": "<p>Body</p>",
+                "source_url": self.source_url,
+            },
+            self.other: {
+                "title": unique_name("Other"),
+                "content": "<p>x</p>",
+                "source_url": "u",
+            },
         }
         self.source = FakeSource([hit(self.route, self.title)], self.pages)
         for target in (f"{API}.get_source", f"{CONVERT}.get_source"):
@@ -75,7 +80,9 @@ class ConvertCase(DocsCase):
         rollback = frappe.db.rollback
         frappe.db.savepoint("job")
         with (
-            patch("frappe.db.commit", side_effect=lambda: frappe.db.savepoint("job")) as commit,
+            patch(
+                "frappe.db.commit", side_effect=lambda: frappe.db.savepoint("job")
+            ) as commit,
             patch("frappe.db.rollback", side_effect=lambda: rollback(save_point="job")),
         ):
             yield commit
@@ -91,7 +98,10 @@ class TestConvert(ConvertCase):
         article = frappe.get_doc("HD Article", name)
         self.assertEqual((article.status, article.category), ("Draft", self.category))
         self.assertEqual((article.title, article.content), (self.title, "<p>Body</p>"))
-        self.assertEqual((article.docs_page_route, article.docs_page_url), (self.route, self.source_url))
+        self.assertEqual(
+            (article.docs_page_route, article.docs_page_url),
+            (self.route, self.source_url),
+        )
         self.assertEqual(article.author, self.agent)
 
     def test_views_start_at_zero_and_stamp_is_set(self):
@@ -106,7 +116,10 @@ class TestConvert(ConvertCase):
 
     def test_a_long_route_and_url_are_stored(self):
         route = "helpdesk/" + "x" * 400
-        self.pages[route] = {**self.pages[self.route], "source_url": "https://docs.example.com/" + "y" * 900}
+        self.pages[route] = {
+            **self.pages[self.route],
+            "source_url": "https://docs.example.com/" + "y" * 900,
+        }
         article = self.convert(route)
         self.assertEqual(self.field(article, "docs_page_route"), route)
         self.assertEqual(len(self.field(article, "docs_page_url")), 925)
@@ -122,7 +135,9 @@ class TestConvert(ConvertCase):
             frappe.db.set_value("HD Article", article, "status", status)
             with self.assertRaises(frappe.ValidationError):
                 self.convert()
-        self.assertEqual(frappe.db.count("HD Article", {"docs_page_route": self.route}), 1)
+        self.assertEqual(
+            frappe.db.count("HD Article", {"docs_page_route": self.route}), 1
+        )
 
     def test_deleted_article_allows_convert_again(self):
         make_article(category=self.category)  # a category keeps one article
@@ -135,16 +150,23 @@ class TestConvert(ConvertCase):
 
     def test_same_title_pages_in_one_run_all_convert(self):
         for i in range(3):
-            self.pages[f"{self.route}-d{i}"] = {**self.pages[self.route], "source_url": f"u{i}"}
+            self.pages[f"{self.route}-d{i}"] = {
+                **self.pages[self.route],
+                "source_url": f"u{i}",
+            }
         routes = [f"{self.route}-d{i}" for i in range(3)]
         with self.job_db():
             run_bulk(routes, self.category, self.manager)
-        self.assertEqual(frappe.db.count("HD Article", {"docs_page_route": ["in", routes]}), 3)
+        self.assertEqual(
+            frappe.db.count("HD Article", {"docs_page_route": ["in", routes]}), 3
+        )
 
     def test_customer_cannot_convert(self):
         with self.set_user(self.customer), self.assertRaises(frappe.PermissionError):
             convert_docs_page(self.route, self.category)
-        self.assertFalse(frappe.db.exists("HD Article", {"docs_page_route": self.route}))
+        self.assertFalse(
+            frappe.db.exists("HD Article", {"docs_page_route": self.route})
+        )
 
     def test_convert_refuses_bad_category_hidden_page_and_no_source(self):
         with self.set_user(self.agent):
@@ -157,7 +179,9 @@ class TestConvert(ConvertCase):
                 self.convert()
 
     def test_fetch_error_becomes_a_clear_message(self):
-        self.source.get_page = lambda route, live=True: (_ for _ in ()).throw(DocsFetchError("HTTP 500"))
+        self.source.get_page = lambda route, live=True: (_ for _ in ()).throw(
+            DocsFetchError("HTTP 500")
+        )
         with self.assertRaisesRegex(frappe.ValidationError, "could not be read"):
             self.convert()
 
@@ -176,7 +200,9 @@ class TestBulk(ConvertCase):
         with self.set_user(self.manager), patch(f"{API}.frappe.enqueue") as enqueue:
             bulk_convert_docs_pages([self.route, self.route], self.category)
         kwargs = enqueue.call_args.kwargs
-        self.assertEqual((kwargs["queue"], kwargs["enqueue_after_commit"]), ("long", True))
+        self.assertEqual(
+            (kwargs["queue"], kwargs["enqueue_after_commit"]), ("long", True)
+        )
         self.assertEqual(kwargs["routes"], [self.route])
         self.assertEqual(kwargs["user"], self.manager)
         self.assertTrue(kwargs["deduplicate"])
@@ -184,13 +210,19 @@ class TestBulk(ConvertCase):
 
     def test_bulk_needs_create_permission_at_enqueue(self):
         with self.set_user(self.manager), patch(f"{API}.frappe.enqueue") as enqueue:
-            with patch(f"{API}.frappe.has_permission", side_effect=frappe.PermissionError):
+            with patch(
+                f"{API}.frappe.has_permission", side_effect=frappe.PermissionError
+            ):
                 with self.assertRaises(frappe.PermissionError):
                     bulk_convert_docs_pages([self.route], self.category)
         enqueue.assert_not_called()
 
     def test_bulk_queues_one_index_job_and_pauses_between_pages(self):
-        with self.job_db(), patch("frappe.enqueue") as enqueue, patch(f"{CONVERT}.time.sleep") as sleep:
+        with (
+            self.job_db(),
+            patch("frappe.enqueue") as enqueue,
+            patch(f"{CONVERT}.time.sleep") as sleep,
+        ):
             run_bulk([self.route, self.other], self.category, self.manager)
         self.assertEqual(len(article_index_jobs(enqueue)), 1)
         self.assertEqual(sleep.call_count, 2)
@@ -210,8 +242,12 @@ class TestBulk(ConvertCase):
             patch(f"{CONVERT}.frappe.log_error") as log,
         ):
             run_bulk([self.route, self.other], self.category, self.manager)
-            self.assertFalse(frappe.db.exists("HD Article", {"docs_page_route": self.route}))
-            self.assertTrue(frappe.db.exists("HD Article", {"docs_page_route": self.other}))
+            self.assertFalse(
+                frappe.db.exists("HD Article", {"docs_page_route": self.route})
+            )
+            self.assertTrue(
+                frappe.db.exists("HD Article", {"docs_page_route": self.other})
+            )
             log.assert_called_once()  # a ValidationError after insert is unexpected
             run_bulk([self.route], self.category, self.manager)
         self.assertTrue(frappe.db.exists("HD Article", {"docs_page_route": self.route}))
@@ -272,7 +308,9 @@ class TestBulk(ConvertCase):
             run_bulk(routes, self.category, self.manager)
         self.assertEqual(commit.call_count, 4)  # a page each, then the end
         log.assert_not_called()  # refusals are plain skips
-        self.assertEqual(self.source.live_calls[1:], [False] * 3)  # [0] is the setup convert
+        self.assertEqual(
+            self.source.live_calls[1:], [False] * 3
+        )  # [0] is the setup convert
         self.assertTrue(frappe.db.exists("HD Article", {"docs_page_route": self.route}))
         with self.set_user(self.manager):
             self.assertEqual(get_bulk_convert_result(), {"created": 1, "skipped": 2})
@@ -291,7 +329,9 @@ class TestBulk(ConvertCase):
         with self.job_db(), patch(f"{CONVERT}.frappe.log_error") as log:
             run_bulk([self.other, self.route], self.category, self.manager)
         log.assert_called_once()
-        self.assertFalse(frappe.db.exists("HD Article", {"docs_page_route": self.other}))
+        self.assertFalse(
+            frappe.db.exists("HD Article", {"docs_page_route": self.other})
+        )
         self.assertTrue(frappe.db.exists("HD Article", {"docs_page_route": self.route}))
 
 
@@ -315,8 +355,13 @@ class TestReaders(ConvertCase):
 
     def test_restricted_article_keeps_docs_page_for_those_who_cannot_read_it(self):
         article = self.convert()
-        frappe.db.set_value("HD Article", article, {"status": "Published", "visibility": "Customers"})
-        with change_settings("HD Settings", {"public_knowledge_base": 1}), self.set_user("Guest"):
+        frappe.db.set_value(
+            "HD Article", article, {"status": "Published", "visibility": "Customers"}
+        )
+        with (
+            change_settings("HD Settings", {"public_knowledge_base": 1}),
+            self.set_user("Guest"),
+        ):
             self.assertEqual(self.search_routes(), [self.route])
             self.assertEqual(get_doc_page(self.route)["title"], self.title)
         with self.set_user(self.customer):
@@ -336,7 +381,10 @@ class TestReaders(ConvertCase):
             page = get_doc_page(self.route)
         self.assertEqual(set(page), {"article"})
         self.assertEqual(page["article"]["name"], article)
-        self.assertEqual(page["article"]["title_slug"], frappe.website.utils.cleanup_page_name(self.title))
+        self.assertEqual(
+            page["article"]["title_slug"],
+            frappe.website.utils.cleanup_page_name(self.title),
+        )
         frappe.db.set_value("HD Article", article, "visibility", "Private")
         with self.set_user(self.customer):
             self.assertIn("content", get_doc_page(self.route))
@@ -351,8 +399,13 @@ class TestReaders(ConvertCase):
     def test_redirect_needs_no_live_source(self):
         article = self.convert()
         frappe.db.set_value("HD Article", article, "status", "Published")
-        self.source.get_page = lambda route, live=True: (_ for _ in ()).throw(DocsFetchError("down"))
-        with patch(f"{API}.get_source", return_value=None), self.set_user(self.customer):
+        self.source.get_page = lambda route, live=True: (_ for _ in ()).throw(
+            DocsFetchError("down")
+        )
+        with (
+            patch(f"{API}.get_source", return_value=None),
+            self.set_user(self.customer),
+        ):
             self.assertEqual(get_doc_page(self.route)["article"]["name"], article)
 
     def test_redirect_follows_the_final_route(self):
@@ -364,12 +417,20 @@ class TestReaders(ConvertCase):
 
     def test_renamed_article_keeps_the_link(self):
         article = self.convert()
-        frappe.db.set_value("HD Article", article, {"status": "Published", "title": unique_name("Renamed")})
+        frappe.db.set_value(
+            "HD Article",
+            article,
+            {"status": "Published", "title": unique_name("Renamed")},
+        )
         with self.set_user(self.customer):
             self.assertEqual(get_doc_page(self.route)["article"]["name"], article)
 
     def test_related_hides_a_converted_page_outside_related_articles(self):
-        self.pages[f"{self.route}-two"] = {"title": "Two", "content": "<p>x</p>", "source_url": "u"}
+        self.pages[f"{self.route}-two"] = {
+            "title": "Two",
+            "content": "<p>x</p>",
+            "source_url": "u",
+        }
         self.source.hits = [hit(self.route, "Gone"), hit(self.other, "Other")]
         article = self.convert()
         frappe.db.set_value("HD Article", article, "status", "Published")
@@ -385,7 +446,10 @@ class TestReaders(ConvertCase):
         self.assertEqual(page["converted"], {"name": article, "title": self.title})
         self.assertEqual(page["matching"], {"name": match, "title": self.title})
         for user in (self.customer, "Guest"):
-            with change_settings("HD Settings", {"public_knowledge_base": 1}), self.set_user(user):
+            with (
+                change_settings("HD Settings", {"public_knowledge_base": 1}),
+                self.set_user(user),
+            ):
                 page = get_doc_page(self.route)
             self.assertNotIn("converted", page)
             self.assertNotIn("matching", page)
@@ -410,8 +474,12 @@ class TestListPages(ConvertCase):
         article = self.convert()
         with self.set_user(self.agent):
             pages = {p["route"]: p for p in list_docs_pages("helpdesk")}
-        self.assertEqual(pages[self.route]["converted"], {"name": article, "title": self.title})
-        self.assertEqual(pages[self.route]["matching"], {"name": match, "title": self.title})
+        self.assertEqual(
+            pages[self.route]["converted"], {"name": article, "title": self.title}
+        )
+        self.assertEqual(
+            pages[self.route]["matching"], {"name": match, "title": self.title}
+        )
         other = pages[self.other]
         self.assertEqual((other["converted"], other["matching"]), (None, None))
 
@@ -421,7 +489,14 @@ class TestListPages(ConvertCase):
 
     def test_listing_uses_a_fixed_number_of_queries(self):
         for i in range(10):
-            self.pages[f"helpdesk/p{i}"] = {"title": f"P{i}", "content": "x", "source_url": "u"}
-        with self.set_user(self.agent), patch(f"{CONVERT}.frappe.get_all", wraps=frappe.get_all) as get_all:
+            self.pages[f"helpdesk/p{i}"] = {
+                "title": f"P{i}",
+                "content": "x",
+                "source_url": "u",
+            }
+        with (
+            self.set_user(self.agent),
+            patch(f"{CONVERT}.frappe.get_all", wraps=frappe.get_all) as get_all,
+        ):
             list_docs_pages()
         self.assertEqual(get_all.call_count, 2)

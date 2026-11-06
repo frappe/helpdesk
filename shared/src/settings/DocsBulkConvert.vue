@@ -1,8 +1,12 @@
 <template>
   <div class="mt-6">
-    <h3 class="text-base-medium text-ink-gray-8">{{ __("Convert to articles") }}</h3>
+    <h3 class="text-base-medium text-ink-gray-8">
+      {{ __("Convert to articles") }}
+    </h3>
     <p class="mt-1 text-p-sm text-ink-gray-5">
-      {{ __("Copy docs pages into draft articles, up to {0} at a time.", [MAX]) }}
+      {{
+        __("Copy docs pages into draft articles, up to {0} at a time.", [MAX])
+      }}
     </p>
     <TextInput
       v-model="query"
@@ -11,7 +15,9 @@
       :aria-label="__('Search pages')"
     />
     <p v-if="error" class="mt-2 text-p-sm text-ink-red-3">{{ error }}</p>
-    <p v-if="searching" class="mt-2 text-p-sm text-ink-gray-5">{{ __("Loading all sections") }}</p>
+    <p v-if="searching" class="mt-2 text-p-sm text-ink-gray-5">
+      {{ __("Loading all sections") }}
+    </p>
     <div v-for="group in groups" :key="group.key" class="mt-2">
       <button
         type="button"
@@ -20,13 +26,17 @@
         @click="toggle(group.key)"
       >
         <span
-          :class="isOpen(group.key) ? 'lucide-chevron-down' : 'lucide-chevron-right'"
+          :class="
+            isOpen(group.key) ? 'lucide-chevron-down' : 'lucide-chevron-right'
+          "
           class="size-4"
         />
         {{ group.title }}
       </button>
       <div v-if="isOpen(group.key)" class="ms-5 mt-1 space-y-1.5">
-        <p v-if="loading[group.key]" class="text-p-sm text-ink-gray-5">{{ __("Loading") }}</p>
+        <p v-if="loading[group.key]" class="text-p-sm text-ink-gray-5">
+          {{ __("Loading") }}
+        </p>
         <div v-for="p in visible(group.key)" :key="p.route">
           <a
             v-if="p.converted"
@@ -80,7 +90,14 @@
 
 <script setup lang="ts">
 import { Button, Checkbox, TextInput } from "frappe-ui";
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 import { __ } from "../translation";
 import { getErrorMessage } from "../utils";
 import DocsConvertDialog from "./DocsConvertDialog.vue";
@@ -110,7 +127,9 @@ let searched = false;
 
 const isWiki = computed(() => props.source.type === "Frappe Wiki");
 const full = computed(() => picked.value.size >= MAX);
-const sections = computed(() => (props.source.sections || []).filter((s) => !s.hidden));
+const sections = computed(() =>
+  (props.source.sections || []).filter((s) => !s.hidden)
+);
 const groups = computed(() =>
   isWiki.value
     ? sections.value.map((s) => ({ key: s.key, title: s.title }))

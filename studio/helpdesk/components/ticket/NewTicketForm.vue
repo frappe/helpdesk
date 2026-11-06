@@ -21,10 +21,7 @@
           :label="__('Subject')"
           :placeholder="__('A short description')"
         />
-        <PortalRelatedArticles
-          v-if="suggestArticles"
-          :articles="suggestions"
-        />
+        <PortalRelatedArticles v-if="suggestArticles" :articles="suggestions" />
       </div>
       <div class="flex w-full flex-col">
         <span class="mb-1.5 block text-p-sm text-ink-gray-5">
@@ -381,18 +378,25 @@ const ready = computed(() => {
   const articlesIn = articleSearch.settledQuery === text;
   const docsIn = Boolean(props.docsSource) && docsSearch.settledQuery === text;
   // Unloaded config counts as no docs only after the deadline.
-  const docsDone = props.docsSource == null ? false : !props.docsSource || docsIn;
+  const docsDone =
+    props.docsSource == null ? false : !props.docsSource || docsIn;
   if (!late && !(articlesIn && docsDone)) return null;
   return {
     text,
     late,
-    articles: articlesIn && !articleSearch.error ? articleSearch.data || [] : [],
+    articles:
+      articlesIn && !articleSearch.error ? articleSearch.data || [] : [],
     docs: docsIn && !docsSearch.error ? docsSearch.data || [] : [],
   };
 });
 watch(ready, (now) => {
   if (!now) return;
-  suggestions.value = pickSuggestions(now.articles, now.docs, now.text, SUGGESTION_LIMIT);
+  suggestions.value = pickSuggestions(
+    now.articles,
+    now.docs,
+    now.text,
+    SUGGESTION_LIMIT
+  );
   // An empty deadline stays open, so a late answer still shows.
   if (!now.late || suggestions.value.length) shownFor.value = now.text;
 });

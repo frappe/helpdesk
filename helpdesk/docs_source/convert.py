@@ -38,7 +38,11 @@ def converted_article(route: str) -> dict | None:
         fields=["name", "title"],
         limit=1,
     )
-    return {"name": rows[0].name, "title_slug": cleanup_page_name(rows[0].title)} if rows else None
+    return (
+        {"name": rows[0].name, "title_slug": cleanup_page_name(rows[0].title)}
+        if rows
+        else None
+    )
 
 
 def readable_converted_routes(routes: list[str]) -> set[str]:
@@ -99,7 +103,9 @@ def run_bulk(routes: list[str], category: str, user: str) -> None:
                     pass  # a refusal made before the insert
                 elif isinstance(e, DocsFetchError):
                     if not outage_logged:
-                        frappe.log_error("Docs bulk convert could not read pages", str(e))
+                        frappe.log_error(
+                            "Docs bulk convert could not read pages", str(e)
+                        )
                         outage_logged = True
                 else:
                     frappe.log_error(f"Docs bulk convert failed: {route}")
@@ -107,7 +113,9 @@ def run_bulk(routes: list[str], category: str, user: str) -> None:
             frappe.db.commit()
     frappe.db.commit()  # sends the index job
     frappe.cache.set_value(
-        result_key(user), {"created": created, "skipped": skipped}, expires_in_sec=RESULT_SECONDS
+        result_key(user),
+        {"created": created, "skipped": skipped},
+        expires_in_sec=RESULT_SECONDS,
     )
 
 

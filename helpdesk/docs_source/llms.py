@@ -4,7 +4,12 @@ from urllib.parse import urljoin, urlsplit
 
 from helpdesk.docs_source.fetch import DocsFetchError, fetch
 from helpdesk.docs_source.indexed import IndexedSource
-from helpdesk.docs_source.text import clean_markdown, has_dot_segment, plain_title, to_plain
+from helpdesk.docs_source.text import (
+    clean_markdown,
+    has_dot_segment,
+    plain_title,
+    to_plain,
+)
 
 MAX_PARTS = 20
 LINE = re.compile(r"^\s*[-*] \[(.+?)\]\((\S+?)\)(?:: (.*))?$", re.M)
@@ -88,7 +93,9 @@ class LlmsSource(IndexedSource):
         for line in self._read_full().splitlines():
             if line.startswith("```"):
                 in_code = not in_code
-            title = plain_title(line[2:]) if line.startswith("# ") and not in_code else None
+            title = (
+                plain_title(line[2:]) if line.startswith("# ") and not in_code else None
+            )
             if title is not None:
                 current = waiting[title].popleft() if waiting[title] else None
                 if current:
@@ -96,7 +103,9 @@ class LlmsSource(IndexedSource):
             elif current:
                 bodies[current].append(line)
         return {
-            route: " ".join(to_plain(clean_markdown("\n".join(body), titles[route])).split())
+            route: " ".join(
+                to_plain(clean_markdown("\n".join(body), titles[route])).split()
+            )
             for route, body in bodies.items()
         }
 

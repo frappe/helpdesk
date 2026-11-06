@@ -49,7 +49,9 @@
           <div
             class="flex w-full flex-col gap-3 border-b border-outline-gray-1 pb-3.5"
           >
-            <h1 class="min-w-0 text-4xl-semibold text-ink-gray-9 max-sm:!text-[24px]">
+            <h1
+              class="min-w-0 text-4xl-semibold text-ink-gray-9 max-sm:!text-[24px]"
+            >
               {{ page.title }}
             </h1>
             <div
@@ -70,7 +72,10 @@
                 {{ __("View on {0}", [host]) }}
               </a>
             </div>
-            <div v-if="session.isAgent.value" class="flex flex-wrap items-center gap-2">
+            <div
+              v-if="session.isAgent.value"
+              class="flex flex-wrap items-center gap-2"
+            >
               <a
                 v-if="page.converted"
                 :href="articleHref(page.converted.name)"
@@ -140,7 +145,7 @@ const showConvert = ref(false);
 const docsUrl = computed<string>(() => session.config.value.docs_source_url);
 const siteUrl = computed(() => page.value?.site_url || docsUrl.value);
 const sourceUrl = computed(
-  () => page.value?.source_url || `${docsUrl.value}/${props.route}`,
+  () => page.value?.source_url || `${docsUrl.value}/${props.route}`
 );
 const host = computed(() => new URL(sourceUrl.value).host);
 
@@ -174,7 +179,8 @@ async function load(route: string) {
 
 // Same as the Article's `tab_title`.
 watchEffect(() => {
-  if (page.value) document.title = `${page.value.title} | ${session.brandName.value}`;
+  if (page.value)
+    document.title = `${page.value.title} | ${session.brandName.value}`;
 });
 
 // Each run replaces the last page's tags; unmount removes them.

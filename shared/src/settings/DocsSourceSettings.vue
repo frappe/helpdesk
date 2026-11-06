@@ -23,11 +23,7 @@
           :disabled="busy"
           @click="resync"
         />
-        <Button
-          :label="__('Disconnect')"
-          :loading="busy"
-          @click="disconnect"
-        />
+        <Button :label="__('Disconnect')" :loading="busy" @click="disconnect" />
       </template>
       <Button
         v-else-if="!loadFailed"
@@ -49,7 +45,10 @@
       <p v-if="statusLine" class="mt-2 text-p-sm text-ink-gray-5">
         {{ statusLine }}
       </p>
-      <p v-if="isIndexed && source?.truncated" class="mt-1 text-p-sm text-ink-amber-6">
+      <p
+        v-if="isIndexed && source?.truncated"
+        class="mt-1 text-p-sm text-ink-amber-6"
+      >
         {{ __("Not all pages were indexed.") }}
       </p>
       <div v-if="!isIndexed" class="mt-3">
@@ -114,7 +113,10 @@ onMounted(async () => {
   }
   url.value = source.value?.url || "";
   if (isIndexed.value && syncing.value) {
-    poll({ synced_on: source.value?.synced_on, error: source.value?.error || "" }, true);
+    poll(
+      { synced_on: source.value?.synced_on, error: source.value?.error || "" },
+      true
+    );
   }
 });
 onBeforeUnmount(() => clearTimeout(timer));
@@ -128,7 +130,10 @@ async function connect() {
 }
 
 async function resync() {
-  const before = { synced_on: source.value?.synced_on, error: source.value?.error };
+  const before = {
+    synced_on: source.value?.synced_on,
+    error: source.value?.error,
+  };
   await run(async () => {
     await call(`${API}.resync_docs_source`);
     source.value = { ...source.value, syncing: true };
@@ -149,7 +154,9 @@ async function setShown(section: Record<string, any>, shown: boolean) {
   const hiddenBefore = section.hidden;
   section.hidden = !shown;
   error.value = "";
-  const hidden = source.value!.sections.filter((s) => s.hidden).map((s) => s.key);
+  const hidden = source
+    .value!.sections.filter((s) => s.hidden)
+    .map((s) => s.key);
   saving.value = true;
   try {
     await call(`${API}.set_hidden_sections`, { sections: hidden });
@@ -162,7 +169,11 @@ async function setShown(section: Record<string, any>, shown: boolean) {
 }
 
 // Polls until the job ran (seen syncing, or state changed, or 3 polls) and stopped.
-function poll(before: { synced_on: unknown; error: string }, seen = false, count = 0) {
+function poll(
+  before: { synced_on: unknown; error: string },
+  seen = false,
+  count = 0
+) {
   clearTimeout(timer);
   timer = setTimeout(async () => {
     try {
@@ -172,7 +183,8 @@ function poll(before: { synced_on: unknown; error: string }, seen = false, count
     }
     const s = source.value;
     seen = seen || Boolean(s?.syncing);
-    const changed = s?.synced_on !== before.synced_on || s?.error !== before.error;
+    const changed =
+      s?.synced_on !== before.synced_on || s?.error !== before.error;
     const done = !s || (!s.syncing && (seen || changed || count >= 2));
     if (!done && count < MAX_POLLS) poll(before, seen, count + 1);
   }, POLL_MS);

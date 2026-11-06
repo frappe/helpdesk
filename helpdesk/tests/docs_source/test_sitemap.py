@@ -8,7 +8,8 @@ from frappe.tests.utils import change_settings
 from helpdesk.docs_source import get_source
 from helpdesk.docs_source.fetch import DocsFetchError
 from helpdesk.docs_source.sitemap import MAX_PAGES, MIN_TEXT, SitemapSource, _locs
-from helpdesk.test_utils import fake_docs_fetch, make_docs_page as page
+from helpdesk.test_utils import fake_docs_fetch
+from helpdesk.test_utils import make_docs_page as page
 
 SITEMAP = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -88,7 +89,9 @@ class TestSitemap(IntegrationTestCase):
             [(p["route"], p["title"]) for p in pages],
             [("docs/intro", "Intro"), ("docs/guides/domain", "Domain")],
         )
-        self.assertEqual(pages[1]["url"], f"https://{self.host}/docs/guides/domain?a=1&b=2")
+        self.assertEqual(
+            pages[1]["url"], f"https://{self.host}/docs/guides/domain?a=1&b=2"
+        )
         self.assertNotIn("<", pages[0]["body"])
         self.assertNotIn("  ", pages[0]["body"])
         self.assertFalse(self.source.truncated)
@@ -113,10 +116,13 @@ class TestSitemap(IntegrationTestCase):
 
     def test_stops_at_1000_and_flags_truncated(self):
         locs = "".join(
-            f"<url><loc>https://{self.host}/docs/p{i}</loc></url>" for i in range(MAX_PAGES + 5)
+            f"<url><loc>https://{self.host}/docs/p{i}</loc></url>"
+            for i in range(MAX_PAGES + 5)
         )
         self.site[f"https://{self.host}/sitemap.xml"] = f"<urlset>{locs}</urlset>"
-        with patch("helpdesk.docs_source.sitemap.fetch", side_effect=self._page_for_any):
+        with patch(
+            "helpdesk.docs_source.sitemap.fetch", side_effect=self._page_for_any
+        ):
             _, pages = self.source.read_pages()
         self.assertEqual(len(pages), MAX_PAGES)
         self.assertTrue(self.source.truncated)
@@ -131,7 +137,18 @@ class TestSitemap(IntegrationTestCase):
     def test_main_drops_nav_and_footer(self):
         title, html = self.source.extract_main(DOCUSAURUS)
         self.assertEqual(title, "Custom domain")
-        for gone in ("Menu", "Sidebar", "Breadcrumb", "On this page", "Mobile TOC", "Version 3", "Copy", "alert", "<h1", "<script"):
+        for gone in (
+            "Menu",
+            "Sidebar",
+            "Breadcrumb",
+            "On this page",
+            "Mobile TOC",
+            "Version 3",
+            "Copy",
+            "alert",
+            "<h1",
+            "<script",
+        ):
             self.assertNotIn(gone, html)
         self.assertIn("verify the record", html)
 
@@ -193,10 +210,18 @@ class TestSitemap(IntegrationTestCase):
 
     def test_index_cap_counts_only_in_scope_urls(self):
         self.site[f"https://{self.host}/sitemap.xml"] = INDEX.format(host=self.host)
-        blog = "".join(f"<url><loc>https://{self.host}/blog/{i}</loc></url>" for i in range(2500))
+        blog = "".join(
+            f"<url><loc>https://{self.host}/blog/{i}</loc></url>" for i in range(2500)
+        )
         self._add("/sitemap-a.xml", f"<urlset>{blog}</urlset>")
-        self._add("/sitemap-b.xml", "<urlset>%s</urlset>" % "".join(
-            f"<url><loc>https://{self.host}/docs/d{i}</loc></url>" for i in range(50)))
+        self._add(
+            "/sitemap-b.xml",
+            "<urlset>%s</urlset>"
+            % "".join(
+                f"<url><loc>https://{self.host}/docs/d{i}</loc></url>"
+                for i in range(50)
+            ),
+        )
         self.assertEqual(len(self.source._page_urls()), 50)
 
     def test_sphinx_permalink_and_nav_h1_stay_out(self):
@@ -218,7 +243,9 @@ class TestSitemap(IntegrationTestCase):
         self.assertNotIn("Wrapper", html)
 
     def test_aside_dropped_except_inside_article(self):
-        _, html = self.source.extract_main("<main><aside>Side</aside><p>Text</p></main>")
+        _, html = self.source.extract_main(
+            "<main><aside>Side</aside><p>Text</p></main>"
+        )
         self.assertNotIn("Side", html)
         _, html = self.source.extract_main(
             "<article><aside>Callout</aside><p>Text</p></article>"
@@ -226,8 +253,13 @@ class TestSitemap(IntegrationTestCase):
         self.assertIn("Callout", html)
 
     def test_versioned_urls_sort_last_before_cap(self):
-        locs = [f"https://{self.host}/docs/{v}/x" for v in ("2.x", "v3", "3.10.2", "next")]
-        locs += [f"https://{self.host}/docs/installation", f"https://{self.host}/docs/guide/a"]
+        locs = [
+            f"https://{self.host}/docs/{v}/x" for v in ("2.x", "v3", "3.10.2", "next")
+        ]
+        locs += [
+            f"https://{self.host}/docs/installation",
+            f"https://{self.host}/docs/guide/a",
+        ]
         self.site[f"https://{self.host}/sitemap.xml"] = "<urlset>%s</urlset>" % "".join(
             f"<url><loc>{u}</loc></url>" for u in locs
         )

@@ -55,7 +55,11 @@ def run_sync(url: str) -> None:
 
 def rebuild_if_missing() -> None:
     """Scheduler hook: rebuild a lost index, at most once an hour. Never refreshes a healthy one."""
-    if not isinstance(get_source(), IndexedSource) or DocsIndex().index_exists() or is_syncing():
+    if (
+        not isinstance(get_source(), IndexedSource)
+        or DocsIndex().index_exists()
+        or is_syncing()
+    ):
         return
     if frappe.cache.get_value(REBUILD_KEY):
         return

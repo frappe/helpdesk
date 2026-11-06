@@ -52,7 +52,8 @@ CLEARED = {
 @frappe.whitelist(methods=["GET"])
 def get_docs_source() -> dict | None:
     """The connected Docs source with its sync state, or None. Needs read on HD Settings.
-    A failed live read of the sections gives `sections: []` and `sections_error: true`."""
+    A failed live read of the sections gives `sections: []` and `sections_error: true`.
+    """
     frappe.has_permission("HD Settings", "read", throw=True)
     settings = frappe.get_cached_doc("HD Settings")
     source = get_source()
@@ -188,7 +189,9 @@ def list_docs_pages(section: str | None = None) -> list[dict]:
     """Agents: Docs pages as route, title, section, `converted` and `matching`
     ({name, title} or None). Empty with no source."""
     if not is_agent():
-        frappe.throw(_("You are not permitted to access this resource."), frappe.PermissionError)
+        frappe.throw(
+            _("You are not permitted to access this resource."), frappe.PermissionError
+        )
     source = get_source()
     if not source:
         return []
@@ -320,8 +323,15 @@ def _article_titles(articles: list[dict]) -> set[str]:
     converted = set(
         frappe.get_all(
             "HD Article",
-            filters={"name": ["in", [a["name"] for a in articles]], "docs_page_route": ["is", "set"]},
+            filters={
+                "name": ["in", [a["name"] for a in articles]],
+                "docs_page_route": ["is", "set"],
+            },
             pluck="name",
         )
     )
-    return {plain_title(a["title"]).casefold() for a in articles if a["name"] not in converted}
+    return {
+        plain_title(a["title"]).casefold()
+        for a in articles
+        if a["name"] not in converted
+    }

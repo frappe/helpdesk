@@ -10,8 +10,8 @@ from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
 from frappe.permissions import rights
 from frappe.tests import IntegrationTestCase
-from frappe.tests.utils import change_settings
 from frappe.tests.classes.context_managers import freeze_time
+from frappe.tests.utils import change_settings
 from frappe.utils import add_to_date, getdate, now_datetime
 
 from helpdesk.api.banners import BANNERS, dismiss_banner
@@ -1252,7 +1252,9 @@ def fake_docs_fetch(site: dict):
     return fake
 
 
-def make_docs_page(name: str = "Page", text: str = "Point your own domain at the site. " * 6) -> str:
+def make_docs_page(
+    name: str = "Page", text: str = "Point your own domain at the site. " * 6
+) -> str:
     """A minimal docs page with a main element, a title and an h1."""
     return f"<html><head><title>{name}</title></head><body><main><h1>{name}</h1><p>{text}</p></main></body></html>"
 
