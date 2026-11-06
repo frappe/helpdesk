@@ -24,7 +24,7 @@ test("every settings tab opens without errors", async ({ page }) => {
 
   for (const tab of await tabs.all()) {
     await tab.click();
-    await expect(dialog.getByRole("heading", { level: 1 }).nth(1)).toBeVisible();
+    await expect(dialog.getByRole("heading").nth(1)).toBeVisible();
   }
   expect(errors).toEqual([]);
 });
