@@ -137,6 +137,10 @@ class TestSetupStatus(IntegrationTestCase):
         self.assertFalse(get_setup_status()["ticket_arrived"])
 
     def test_telemetry_flag_follows_system_settings(self) -> None:
+        # Restored sites can lack these mandatory fields, which blocks saving.
+        frappe.db.set_single_value(
+            "System Settings", {"language": "en", "time_zone": "UTC"}
+        )
         set_telemetry_enabled(False)
         self.assertFalse(get_setup_status()["telemetry_enabled"])
 
