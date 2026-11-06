@@ -50,14 +50,15 @@
           :class="i === 0 ? 'sm:mt-[22px]' : ''"
         >
           <Badge v-if="row.sent" :label="__('Sent')" theme="gray" variant="subtle" />
-          <Button
-            v-else
-            variant="ghost"
-            :aria-label="__('Remove row')"
-            @click="removeRow(row.id)"
-          >
-            <template #icon><LucideX class="size-4" /></template>
-          </Button>
+          <Tooltip v-else :text="__('Remove row')">
+            <Button
+              variant="ghost"
+              :aria-label="__('Remove row')"
+              @click="removeRow(row.id)"
+            >
+              <template #icon><LucideX class="size-4" /></template>
+            </Button>
+          </Tooltip>
         </div>
       </div>
 
@@ -105,7 +106,15 @@ import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { getErrorMessage, handleInviteUserSuccess } from "@/utils";
-import { Alert, Badge, Button, FormControl, call, toast } from "frappe-ui";
+import {
+  Alert,
+  Badge,
+  Button,
+  FormControl,
+  Tooltip,
+  call,
+  toast,
+} from "frappe-ui";
 import { computed, ref } from "vue";
 import LucidePlus from "~icons/lucide/plus";
 import LucideX from "~icons/lucide/x";
