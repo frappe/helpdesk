@@ -18,7 +18,8 @@
 		"./ShortcutKey.vue": "./src/ShortcutKey.vue",
 		"./FilterIcon.vue": "./src/FilterIcon.vue",
 		"./ChangePasswordModal.vue": "./src/ChangePasswordModal.vue",
-		"./ListViewSkeleton.vue": "./src/ListViewSkeleton.vue"
+		"./ListViewSkeleton.vue": "./src/ListViewSkeleton.vue",
+		"./SettingsBackButton.vue": "./src/SettingsBackButton.vue"
 	},
 	"peerDependencies": {
 		"@vueuse/core": "*",

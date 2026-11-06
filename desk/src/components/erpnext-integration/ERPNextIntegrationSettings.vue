@@ -4,7 +4,7 @@
   >
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-md-semibold text-ink-gray-8">
+        <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("ERPNext") }}
         </h1>
         <Badge
