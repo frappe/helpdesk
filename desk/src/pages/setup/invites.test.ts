@@ -3,6 +3,7 @@ import {
   countSendable,
   groupUnsentByRole,
   normalizeEmail,
+  previewInvitees,
   validateRows,
   type InviteRow,
 } from "./invites";
@@ -92,5 +93,22 @@ describe("groupUnsentByRole", () => {
         row(2, "A@x.com", "Agent Manager"),
       ])
     ).toEqual({});
+  });
+});
+
+describe("previewInvitees", () => {
+  it("keeps valid unique addresses lowercased, with their sent state", () => {
+    expect(
+      previewInvitees([
+        row(1, "A@x.com"),
+        row(2, "a@x.com"),
+        row(3, "nope"),
+        row(4, ""),
+        row(5, "b@x.com", "Agent Manager", true),
+      ])
+    ).toEqual([
+      { email: "a@x.com", role: "Agent", sent: false },
+      { email: "b@x.com", role: "Agent Manager", sent: true },
+    ]);
   });
 });

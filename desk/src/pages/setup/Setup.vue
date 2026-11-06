@@ -80,7 +80,12 @@
         </footer>
       </main>
 
-      <SetupPreview />
+      <SetupPreview
+        :mailbox="status.data?.email_address || null"
+        :arrived="!!status.data?.ticket_arrived"
+        :checking="status.loading && !status.data"
+        :invitees="invitees"
+      />
     </div>
   </div>
 
@@ -96,14 +101,14 @@ import { __ } from "@/translation";
 import { getErrorMessage } from "@/utils";
 import { useTelemetry } from "@framework/ui";
 import { Button, Checkbox, Progress, call, createResource, toast } from "frappe-ui";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import LucideArrowLeft from "~icons/lucide/arrow-left";
 import SetupEmailStep from "./SetupEmailStep.vue";
 import SetupFeedbackDialog from "./SetupFeedbackDialog.vue";
 import SetupInviteStep from "./SetupInviteStep.vue";
 import SetupPreview from "./SetupPreview.vue";
-import { createInviteRow, type InviteRow } from "./invites";
+import { createInviteRow, previewInvitees, type InviteRow } from "./invites";
 
 const TOTAL_STEPS = 2;
 
@@ -113,6 +118,7 @@ const telemetryClient = useTelemetry();
 
 const step = ref<1 | 2>(1);
 const rows = ref<InviteRow[]>([createInviteRow()]);
+const invitees = computed(() => previewInvitees(rows.value));
 const finishing = ref(false);
 const showFeedback = ref(false);
 
