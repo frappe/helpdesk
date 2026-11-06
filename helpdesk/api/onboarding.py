@@ -78,7 +78,7 @@ def complete_setup(skipped: bool = False) -> None:
     Safe to call again. System Managers only."""
     frappe.only_for("System Manager")
     frappe.db.set_single_value("HD Settings", "setup_complete", 1)
-    capture_event("setup_skipped" if frappe.parse_json(skipped) else "setup_completed")
+    capture_event("setup_skipped" if skipped else "setup_completed")
 
 
 @frappe.whitelist(methods=["POST"])
@@ -86,7 +86,7 @@ def set_telemetry_enabled(enabled: bool) -> None:
     """Turn usage data sharing on or off for the site. System Managers only."""
     frappe.only_for("System Manager")
     settings = frappe.get_doc("System Settings")
-    settings.enable_telemetry = int(bool(frappe.parse_json(enabled)))
+    settings.enable_telemetry = int(enabled)
     settings.save()
 
 
@@ -95,7 +95,6 @@ def mark_checklist_steps(steps: list[str]) -> None:
     """Tick sidebar "Getting started" steps for the current admin.
     Rebuilds the stored list in the sidebar's order, so dropped steps cannot block it."""
     frappe.only_for("System Manager")
-    steps = frappe.parse_json(steps)
     unknown = [step for step in steps if step not in SETUP_CHECKLIST_STEPS]
     if unknown:
         frappe.throw(_("Unknown setup step: {0}").format(", ".join(unknown)))

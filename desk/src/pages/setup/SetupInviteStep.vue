@@ -136,12 +136,16 @@ const duplicates = computed(() => validation.value.duplicates);
 const unsentCount = computed(
   () => rows.value.filter((row) => !row.sent && normalizeEmail(row.email)).length
 );
-const canSend = computed(() => unsentCount.value > 0);
-const sendLabel = computed(() =>
-  unsentCount.value > 1
+const sentCount = computed(() => rows.value.filter((row) => row.sent).length);
+// Everything left is already sent, so the button finishes instead of sending
+const allSent = computed(() => unsentCount.value === 0 && sentCount.value > 0);
+const canSend = computed(() => unsentCount.value > 0 || allSent.value);
+const sendLabel = computed(() => {
+  if (allSent.value) return __("Finish");
+  return unsentCount.value > 1
     ? __("Send {0} invites", [unsentCount.value])
-    : __("Send invite")
-);
+    : __("Send invite");
+});
 
 function addRow() {
   if (rows.value.length < MAX_INVITE_ROWS) rows.value.push(createInviteRow());
@@ -164,7 +168,20 @@ function markSent(role: Role, emails: string[]) {
   });
 }
 
+async function recordInvites(count: number) {
+  if (!count) return;
+  capture("agents_invited", { data: { count } });
+  try {
+    await call("helpdesk.api.onboarding.mark_checklist_steps", {
+      steps: ["invite_agents"],
+    });
+  } catch {
+    // best effort: the sidebar checklist can still be ticked by hand
+  }
+}
+
 async function send() {
+  if (allSent.value) return emit("done");
   attempted.value = true;
   if (Object.keys(errors.value).length) return;
   const groups = Object.entries(groupUnsentByRole(rows.value)) as [Role, string[]][];
@@ -172,6 +189,7 @@ async function send() {
 
   sending.value = true;
   inviteError.value = "";
+  let sentNow = 0;
   try {
     for (const [role, emails] of groups) {
       const data = await call("frappe.core.api.user_invitation.invite_by_email", {
@@ -181,25 +199,18 @@ async function send() {
         app_name: "helpdesk",
       });
       markSent(role, emails);
+      sentNow += emails.length;
       handleInviteUserSuccess(data);
     }
   } catch (error) {
     inviteError.value = getErrorMessage(error);
     toast.error(inviteError.value);
+    await recordInvites(sentNow);
     sending.value = false;
     return;
   }
 
-  capture("agents_invited", {
-    data: { count: rows.value.filter((row) => row.sent).length },
-  });
-  try {
-    await call("helpdesk.api.onboarding.mark_checklist_steps", {
-      steps: ["invite_agents"],
-    });
-  } catch {
-    // best effort: the sidebar checklist can still be ticked by hand
-  }
+  await recordInvites(sentNow);
   sending.value = false;
   emit("done");
 }
