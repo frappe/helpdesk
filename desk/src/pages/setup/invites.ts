@@ -12,10 +12,10 @@ export type InviteRow = {
 export const MAX_INVITE_ROWS = 20;
 
 let nextRowId = 1;
-export const createInviteRow = (role: Role = "Agent"): InviteRow => ({
+export const createInviteRow = (): InviteRow => ({
   id: nextRowId++,
   email: "",
-  role,
+  role: "Agent",
   sent: false,
 });
 

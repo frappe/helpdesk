@@ -16,7 +16,7 @@
         <Badge :label="__('Open')" variant="subtle" theme="gray" />
       </div>
       <div class="flex items-start gap-3">
-        <Avatar :label="__('Customer')" :image="customerAvatar" size="lg" />
+        <Avatar :label="__('Customer')" size="lg" />
         <div class="rounded-lg bg-surface-gray-2 px-3 py-2 text-p-sm text-ink-gray-7">
           {{ __("Hi, I reset my password but the link keeps expiring. Can you help?") }}
         </div>
@@ -27,10 +27,6 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { createAvatar } from "@dicebear/core";
-import * as lorelei from "@dicebear/lorelei";
 import { Avatar, Badge } from "frappe-ui";
 import LucideTicket from "~icons/lucide/ticket";
-
-const customerAvatar = createAvatar(lorelei, { seed: "helpdesk-customer" }).toDataUri();
 </script>
