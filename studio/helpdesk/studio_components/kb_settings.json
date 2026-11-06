@@ -237,8 +237,7 @@
              },
              {
               "classes": [
-               "text-ink-gray-6",
-               "max-w-[28rem]"
+               "text-ink-gray-6"
               ],
               "componentId": "kb_settings-profile-header-description",
               "componentName": "TextBlock",
@@ -266,9 +265,11 @@
           "classes": [
            "shrink-0",
            "px-4",
-           "sm:px-10",
-           "py-5",
-           "sm:py-8"
+           "sm:px-[4.4rem]",
+           "pt-5",
+           "pb-5",
+           "sm:pt-10",
+           "sm:pb-6"
           ],
           "componentId": "kb_settings-profile-header",
           "componentName": "container",
@@ -593,9 +594,9 @@
            "overflow-y-auto",
            "pt-0",
            "px-4",
-           "sm:px-10",
+           "sm:px-[4.4rem]",
            "pb-5",
-           "sm:pb-8"
+           "sm:pb-16"
           ],
           "componentId": "kb_settings-profile-body",
           "componentName": "container",
@@ -623,7 +624,7 @@
           "isCustomVueComponent": true,
           "componentProps": {
            "variant": "organization",
-           "count": "{{ organizationCountHint }}"
+           "count": "{{ selectedOrganization ? 1 : organizationCountHint }}"
           },
           "classes": [
            "flex",
@@ -653,8 +654,7 @@
              },
              {
               "classes": [
-               "text-ink-gray-6",
-               "max-w-[28rem]"
+               "text-ink-gray-6"
               ],
               "componentId": "kb_settings-organization-list-header-description",
               "componentName": "TextBlock",
@@ -682,9 +682,11 @@
           "classes": [
            "shrink-0",
            "px-4",
-           "sm:px-10",
-           "py-5",
-           "sm:py-8"
+           "sm:px-[4.4rem]",
+           "pt-5",
+           "pb-5",
+           "sm:pt-10",
+           "sm:pb-6"
           ],
           "componentId": "kb_settings-organization-list-header",
           "componentName": "container",
@@ -713,9 +715,9 @@
            "overflow-y-auto",
            "pt-0",
            "px-4",
-           "sm:px-10",
+           "sm:px-[4.4rem]",
            "pb-5",
-           "sm:pb-8"
+           "sm:pb-16"
           ],
           "componentId": "kb_settings-organization-list-body",
           "componentName": "container",
@@ -731,52 +733,24 @@
              {
               "children": [
                {
-                "children": [
-                 {
-                  "componentEvents": {
-                   "click": {
-                    "action": "Run Script",
-                    "event": "click",
-                    "script": "closeOrganization()"
-                   }
-                  },
-                  "componentId": "kb_settings-organization-back",
-                  "componentName": "Button",
-                  "componentProps": {
-                   "aria-label": "{{ t('Back to organizations') }}",
-                   "icon": "lucide-chevron-left",
-                   "variant": "ghost"
-                  },
-                  "componentSlots": {}
-                 },
-                 {
-                  "classes": [
-                   "font-semibold"
-                  ],
-                  "componentId": "kb_settings-organization-back-label",
-                  "componentName": "TextBlock",
-                  "componentProps": {
-                   "fontSize": "text-lg",
-                   "tag": "h2",
-                   "text": "{{ organizationScreenTitle }}"
-                  },
-                  "componentSlots": {}
+                "componentEvents": {
+                 "click": {
+                  "action": "Run Script",
+                  "event": "click",
+                  "script": "closeOrganization()"
                  }
-                ],
-                "classes": [
-                 "items-center",
-                 "text-ink-gray-8",
-                 "flex",
-                 "gap-1",
-                 "-ml-1.5",
-                 "pr-2"
-                ],
-                "componentId": "kb_settings-organization-back-row",
-                "componentName": "container",
-                "componentProps": {},
+                },
+                "componentId": "kb_settings-organization-back",
+                "componentName": "SettingsBackButton",
+                "componentProps": {
+                 "label": "{{ organizationScreenTitle }}"
+                },
                 "componentSlots": {},
-                "originalElement": "div",
-                "visibilityCondition": "{{ canLeaveOrganization }}"
+                "isCustomVueComponent": true,
+                "visibilityCondition": "{{ canLeaveOrganization }}",
+                "classes": [
+                 "self-start"
+                ]
                },
                {
                 "classes": [
@@ -795,8 +769,7 @@
                },
                {
                 "classes": [
-                 "text-ink-gray-6",
-                 "max-w-[28rem]"
+                 "text-ink-gray-6"
                 ],
                 "componentId": "kb_settings-organization-detail-description",
                 "componentName": "TextBlock",
@@ -855,16 +828,18 @@
           "classes": [
            "shrink-0",
            "px-4",
-           "sm:px-10",
-           "py-5",
-           "sm:py-8"
+           "sm:px-[4.4rem]",
+           "pt-5",
+           "pb-5",
+           "sm:pt-10",
+           "sm:pb-6"
           ],
           "componentId": "kb_settings-organization-detail-header",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ selectedOrganization && !inviteOpen }}"
+          "visibilityCondition": "{{ settingsLoaded && selectedOrganization && !inviteOpen }}"
          },
          {
           "children": [
@@ -1159,16 +1134,16 @@
            "min-h-0",
            "pt-0",
            "px-4",
-           "sm:px-10",
+           "sm:px-[4.4rem]",
            "pb-5",
-           "sm:pb-8"
+           "sm:pb-16"
           ],
           "componentId": "kb_settings-organization-detail-body",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ selectedOrganization && !inviteOpen }}"
+          "visibilityCondition": "{{ settingsLoaded && selectedOrganization && !inviteOpen }}"
          },
          {
           "blockName": "Invite header",
@@ -1178,57 +1153,27 @@
              {
               "children": [
                {
-                "children": [
-                 {
-                  "componentEvents": {
-                   "click": {
-                    "action": "Run Script",
-                    "event": "click",
-                    "script": "closeInvite()"
-                   }
-                  },
-                  "componentId": "kb_settings-invite-back",
-                  "componentName": "Button",
-                  "componentProps": {
-                   "aria-label": "{{ t('Back') }}",
-                   "icon": "lucide-chevron-left",
-                   "variant": "ghost"
-                  },
-                  "componentSlots": {}
-                 },
-                 {
-                  "classes": [
-                   "font-semibold"
-                  ],
-                  "componentId": "kb_settings-invite-back-label",
-                  "componentName": "TextBlock",
-                  "componentProps": {
-                   "fontSize": "text-lg",
-                   "tag": "h1",
-                   "text": "{{ t('Invite people') }}"
-                  },
-                  "componentSlots": {}
+                "componentEvents": {
+                 "click": {
+                  "action": "Run Script",
+                  "event": "click",
+                  "script": "closeInvite()"
                  }
-                ],
-                "classes": [
-                 "items-center",
-                 "text-ink-gray-8",
-                 "flex",
-                 "gap-1",
-                 "-ml-1.5",
-                 "min-h-8",
-                 "pr-2"
-                ],
-                "componentId": "kb_settings-invite-back-row",
-                "componentName": "container",
-                "componentProps": {},
+                },
+                "componentId": "kb_settings-invite-back",
+                "componentName": "SettingsBackButton",
+                "componentProps": {
+                 "label": "{{ t('Invite people') }}"
+                },
                 "componentSlots": {},
-                "originalElement": "div"
+                "isCustomVueComponent": true,
+                "classes": [
+                 "self-start"
+                ]
                },
                {
                 "classes": [
-                 "text-ink-gray-6",
-                 "max-w-[28rem]"
+                 "text-ink-gray-6"
                 ],
                 "componentId": "kb_settings-invite-description",
                 "componentName": "TextBlock",
@@ -1269,16 +1214,18 @@
           "classes": [
            "shrink-0",
            "px-4",
-           "sm:px-10",
-           "py-5",
-           "sm:py-8"
+           "sm:px-[4.4rem]",
+           "pt-5",
+           "pb-5",
+           "sm:pt-10",
+           "sm:pb-6"
           ],
           "componentId": "kb_settings-invite-header",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ inviteOpen }}"
+          "visibilityCondition": "{{ settingsLoaded && inviteOpen }}"
          },
          {
           "blockName": "Invite body",
@@ -1489,16 +1436,16 @@
            "overflow-y-auto",
            "pt-0",
            "px-4",
-           "sm:px-10",
+           "sm:px-[4.4rem]",
            "pb-5",
-           "sm:pb-8"
+           "sm:pb-16"
           ],
           "componentId": "kb_settings-invite-body",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ inviteOpen }}"
+          "visibilityCondition": "{{ settingsLoaded && inviteOpen }}"
          }
         ],
         "componentId": "kb_settings-organization-panel",
@@ -1560,8 +1507,7 @@
              },
              {
               "classes": [
-               "text-ink-gray-6",
-               "max-w-[28rem]"
+               "text-ink-gray-6"
               ],
               "componentId": "kb_settings-knowledge-base-header-description",
               "componentName": "TextBlock",
@@ -1643,9 +1589,11 @@
            "gap-4",
            "shrink-0",
            "px-4",
-           "sm:px-10",
-           "py-5",
-           "sm:py-8"
+           "sm:px-[4.4rem]",
+           "pt-5",
+           "pb-5",
+           "sm:pt-10",
+           "sm:pb-6"
           ],
           "componentId": "kb_settings-knowledge-base-header",
           "componentName": "container",
@@ -1669,9 +1617,9 @@
            "overflow-y-auto",
            "pt-0",
            "px-4",
-           "sm:px-10",
+           "sm:px-[4.4rem]",
            "pb-5",
-           "sm:pb-8"
+           "sm:pb-16"
           ],
           "componentId": "kb_settings-knowledge-base-body",
           "componentName": "container",
@@ -1714,8 +1662,7 @@
              },
              {
               "classes": [
-               "text-ink-gray-6",
-               "max-w-[28rem]"
+               "text-ink-gray-6"
               ],
               "componentId": "kb_settings-portal-settings-header-description",
               "componentName": "TextBlock",
@@ -1743,9 +1690,11 @@
           "classes": [
            "shrink-0",
            "px-4",
-           "sm:px-10",
-           "py-5",
-           "sm:py-8"
+           "sm:px-[4.4rem]",
+           "pt-5",
+           "pb-5",
+           "sm:pt-10",
+           "sm:pb-6"
           ],
           "componentId": "kb_settings-portal-settings-header",
           "componentName": "container",
@@ -1769,9 +1718,9 @@
            "overflow-y-auto",
            "pt-0",
            "px-4",
-           "sm:px-10",
+           "sm:px-[4.4rem]",
            "pb-5",
-           "sm:pb-8"
+           "sm:pb-16"
           ],
           "componentId": "kb_settings-portal-settings-body",
           "componentName": "container",
@@ -1847,7 +1796,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-24 01:30:00.000000",
+ "modified": "2026-11-06 18:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

@@ -137,6 +137,10 @@ def get_portal_account() -> dict:
 
 @frappe.whitelist()
 def get_organization(customer: str) -> dict:
+    """An organization's name, logo, domain, email, country and members, for anyone who
+    may read it.
+    Its managers and agent managers also get members' last active time and, if customer
+    managers may invite, the pending invitations."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     customer_doc.check_permission("read")
     can_manage = _has_manager_permission(customer_doc)
@@ -144,6 +148,9 @@ def get_organization(customer: str) -> dict:
         "HD Settings", "allow_customer_managers_to_invite"
     )
     return {
+        "customer_name": customer_doc.customer_name,
+        "image": customer_doc.image,
+        "domain": customer_doc.domain,
         "email": customer_doc.email_id,
         "country": customer_doc.country,
         "members": _get_members(customer_doc, include_last_active=can_manage),

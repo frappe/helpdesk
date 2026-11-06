@@ -1,25 +1,9 @@
 <template>
-  <SettingsLayoutBase>
-    <template #title>
-      <div class="flex items-center">
-        <div
-          class="ps-5 pe-2 relative text-ink-gray-7 hover:opacity-70 min-h-8 flex items-center"
-        >
-          <button
-            type="button"
-            @click="internalOnBack"
-            class="absolute top-0 -start-[0.375rem] w-full h-full"
-          >
-            <span class="sr-only">{{ __("back to email event list") }}</span>
-            <LucideChevronLeft class="w-4.5 h-4.5 rtl:rotate-180" />
-          </button>
-          <h1 class="text-xl-semibold">
-            {{ props.title }}
-          </h1>
-        </div>
-        <UnsavedBadge :show="unsavedChanges" />
-      </div>
-    </template>
+  <SettingsLayoutBase
+    :back-label="props.title"
+    :on-back="internalOnBack"
+    :dirty="unsavedChanges"
+  >
     <template #header-actions>
       <div
         :inert="notificationDataResource.loading"
@@ -135,7 +119,6 @@ import { createResource, Switch, LoadingIndicator, Button } from "frappe-ui";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const props = defineProps<{
   title: string;

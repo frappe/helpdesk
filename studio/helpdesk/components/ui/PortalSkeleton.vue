@@ -334,11 +334,13 @@
       v-else-if="variant === 'organization'"
       class="flex min-h-0 flex-1 flex-col"
     >
-      <div class="flex shrink-0 flex-col gap-1 px-4 py-5 sm:px-10 sm:py-8">
+      <div
+        class="flex shrink-0 flex-col gap-1 px-4 py-5 sm:px-[4.4rem] sm:pb-6 sm:pt-10"
+      >
         <Line text="text-lg" width="11rem" />
         <Line text="text-base" width="min(17rem, 80%)" />
       </div>
-      <div class="min-h-0 flex-1 overflow-hidden px-4 pb-5 sm:px-10">
+      <div class="min-h-0 flex-1 overflow-hidden px-4 pb-5 sm:px-[4.4rem]">
         <template v-if="count === 1">
           <div class="flex items-center gap-4 pt-1.5">
             <Skeleton :class="[BLOCK, 'size-16 shrink-0 rounded-[12px]']" />
