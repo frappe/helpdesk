@@ -1219,3 +1219,14 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
     cards = HelpdeskDashboard(filters).get_number_card_data()
     return {card["title"]: card for card in cards}
+
+
+def get_setup_complete() -> int:
+    """Return the site-wide first-run setup flag from HD Settings."""
+    return frappe.db.get_single_value("HD Settings", "setup_complete")
+
+
+def get_stored_onboarding_steps(user: str) -> list[dict]:
+    """Return the sidebar checklist steps stored on the user's onboarding_status."""
+    raw = frappe.db.get_value("User", user, "onboarding_status")
+    return frappe.parse_json(raw)["helpdesk_onboarding_status"]
