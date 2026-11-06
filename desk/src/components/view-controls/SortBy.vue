@@ -18,51 +18,54 @@
   </Combobox>
   <Popover v-else bare :offset="8">
     <template #trigger="{ open }">
-      <Button v-if="sortValues.size > 1" :label="__('Sort')">
-        <template v-if="hideLabel" #icon>
-          <SortIcon class="h-4" />
-        </template>
-        <template v-else #prefix><SortIcon class="h-4" /></template>
-        <template v-if="sortValues?.size" #suffix>
-          <div
-            class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
-          >
-            {{ sortValues.size }}
-          </div>
-        </template>
-      </Button>
-      <div v-else class="flex items-center justify-center">
-        <Button
-          v-if="sortValues.size"
-          class="rounded-e-none border-e"
-          @click.stop="
-            () => {
-              Array.from(sortValues)[0].direction =
-                Array.from(sortValues)[0].direction == 'asc' ? 'desc' : 'asc';
-              apply();
-            }
-          "
-        >
-          <AscendingIcon
-            v-if="Array.from(sortValues)[0].direction == 'asc'"
-            class="h-4"
-          />
-          <DescendingIcon v-else class="h-4" />
-        </Button>
-        <Button
-          :label="getSortLabel()"
-          :class="sortValues.size ? 'rounded-s-none' : ''"
-        >
-          <template v-if="!hideLabel && !sortValues?.size" #prefix>
+      <!-- One root across sort counts: a swapped root strands the popover at 0,0. -->
+      <div class="flex items-center justify-center">
+        <Button v-if="sortValues.size > 1" :label="__('Sort')">
+          <template v-if="hideLabel" #icon>
             <SortIcon class="h-4" />
           </template>
+          <template v-else #prefix><SortIcon class="h-4" /></template>
           <template v-if="sortValues?.size" #suffix>
-            <component
-              :is="open ? LucideChevronUp : LucideChevronDown"
-              class="h-4 text-ink-gray-5"
-            />
+            <div
+              class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
+            >
+              {{ sortValues.size }}
+            </div>
           </template>
         </Button>
+        <template v-else>
+          <Button
+            v-if="sortValues.size"
+            class="rounded-e-none border-e"
+            @click.stop="
+              () => {
+                Array.from(sortValues)[0].direction =
+                  Array.from(sortValues)[0].direction == 'asc' ? 'desc' : 'asc';
+                apply();
+              }
+            "
+          >
+            <AscendingIcon
+              v-if="Array.from(sortValues)[0].direction == 'asc'"
+              class="h-4"
+            />
+            <DescendingIcon v-else class="h-4" />
+          </Button>
+          <Button
+            :label="getSortLabel()"
+            :class="sortValues.size ? 'rounded-s-none' : ''"
+          >
+            <template v-if="!hideLabel && !sortValues?.size" #prefix>
+              <SortIcon class="h-4" />
+            </template>
+            <template v-if="sortValues?.size" #suffix>
+              <component
+                :is="open ? LucideChevronUp : LucideChevronDown"
+                class="h-4 text-ink-gray-5"
+              />
+            </template>
+          </Button>
+        </template>
       </div>
     </template>
     <template #default="{ close }">
