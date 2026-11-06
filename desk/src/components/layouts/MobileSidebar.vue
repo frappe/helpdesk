@@ -42,9 +42,7 @@ import { useRoute } from "vue-router";
 
 import { useAuthStore } from "@/stores/auth";
 import { CUSTOMER_PORTAL_ROOT } from "@/utils";
-import { useColorScheme } from "frappe-ui";
-import LucideMoon from "~icons/lucide/moon";
-import LucideSun from "~icons/lucide/sun";
+import { useThemeMenuItem } from "@helpdesk/shared/themeMenu";
 
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { useApps } from "@/composables/useApps";
@@ -53,7 +51,6 @@ import AppSidebar from "./AppSidebar.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import AvailabilityDialog from "../AvailabilityDialog.vue";
 
-const { colorScheme, toggleColorScheme } = useColorScheme();
 const { appsMenuOption } = useApps();
 const route = useRoute();
 const authStore = useAuthStore();
@@ -100,11 +97,7 @@ function onSidebarClosed() {
   availabilityDialogOpen.value = true;
 }
 
-const themeMenuItem = computed(() => ({
-  label: __("Toggle theme"),
-  icon: colorScheme.value === "dark" ? LucideSun : LucideMoon,
-  onClick: () => toggleColorScheme(),
-}));
+const themeMenuItem = useThemeMenuItem();
 
 const profileSettings = computed(() => [
   appsMenuOption.value,
