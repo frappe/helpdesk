@@ -52,8 +52,7 @@
     <div class="flex items-center justify-end gap-2 pt-2">
       <Button
         v-if="connected"
-        variant="solid"
-        theme="gray"
+        variant="outline"
         :label="__('Continue')"
         @click="emit('next')"
       />
