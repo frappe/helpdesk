@@ -11,6 +11,8 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@dicebear/core": "^9.4.2",
+    "@dicebear/lorelei": "^9.4.2",
     "@framework/ui": "link:../../frappe/ui",
     "@frappe/cloud-sdk": "0.6.0",
     "@headlessui/vue": "^1.7.22",
