@@ -89,12 +89,19 @@ class TestSetupStatus(IntegrationTestCase):
         status = get_setup_status()
 
         self.assertFalse(status["email_connected"])
+        self.assertIsNone(status["email_address"])
         self.assertFalse(status["ticket_arrived"])
 
     def test_an_enabled_incoming_account_counts_as_connected(self) -> None:
-        make_email_account(enable_incoming=1)
+        account = make_email_account(enable_incoming=1)
 
-        self.assertTrue(get_setup_status()["email_connected"])
+        status = get_setup_status()
+
+        self.assertTrue(status["email_connected"])
+        self.assertEqual(
+            status["email_address"],
+            frappe.db.get_value("Email Account", account, "email_id"),
+        )
 
     def test_a_ticket_fetched_by_the_mailbox_has_arrived(self) -> None:
         account = make_email_account()

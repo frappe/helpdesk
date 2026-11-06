@@ -45,12 +45,14 @@ def get_general_category_id():
 @frappe.whitelist()
 def get_setup_status() -> dict:
     """What the first-run setup page polls: is a mailbox connected, has it brought in
-    a ticket, and is usage data being shared. System Managers only."""
+    a ticket, and is usage data being shared. Includes the mailbox address. System Managers only."""
     frappe.only_for("System Manager")
+    email_address = frappe.db.get_value(
+        "Email Account", {"enable_incoming": 1}, "email_id"
+    )
     return {
-        "email_connected": bool(
-            frappe.db.exists("Email Account", {"enable_incoming": 1})
-        ),
+        "email_connected": bool(email_address),
+        "email_address": email_address,
         # the welcome and agent-made tickets have no email account, only the mailbox does
         "ticket_arrived": bool(
             frappe.get_list(
