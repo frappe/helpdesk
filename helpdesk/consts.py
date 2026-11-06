@@ -49,3 +49,20 @@ CUSTOMER_ALWAYS_WRITABLE_FIELDS = (
 
 # shown on the agent details tab from meta, whether or not the template lists them
 CORE_TICKET_FIELDS = ("priority", "ticket_type", "customer", "agent_group")
+
+# the sidebar's "Getting started" steps, in the order Sidebar.vue lists them
+ONBOARDING_STEPS = (
+    "setup_email_account",
+    "invite_agents",
+    "setup_sla",
+    "create_first_ticket",
+    "assign_to_agent",
+    "reply_on_ticket",
+    "comment_on_ticket",
+    "first_article",
+    "add_invite_contact",
+    "explore_customer_portal",
+)
+
+# the steps the first-run setup can tick for the admin
+SETUP_CHECKLIST_STEPS = ("setup_email_account", "invite_agents")
