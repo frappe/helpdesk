@@ -60,16 +60,18 @@ export function prefetchOnHover(name: string | undefined) {
 }
 
 export function useArticle(name: MaybeRefOrGetter<string>) {
-  const article = reactive<{ data: any; error: unknown; loading: boolean }>({
+  // `settled` names the Article that `data` or `error` answers.
+  const article = reactive<{ data: any; error: unknown; loading: boolean; settled: string }>({
     data: null,
     error: null,
     loading: false,
+    settled: '',
   })
   watch(
     () => toValue(name),
     async (current) => {
       article.error = null
-      if (!current) return Object.assign(article, { data: null, loading: false })
+      if (!current) return Object.assign(article, { data: null, loading: false, settled: '' })
       article.loading = true
       try {
         const data = await prefetchArticle(current)
@@ -77,7 +79,7 @@ export function useArticle(name: MaybeRefOrGetter<string>) {
       } catch (error) {
         if (toValue(name) === current) article.error = error
       } finally {
-        if (toValue(name) === current) article.loading = false
+        if (toValue(name) === current) Object.assign(article, { loading: false, settled: current })
       }
     },
     { immediate: true },

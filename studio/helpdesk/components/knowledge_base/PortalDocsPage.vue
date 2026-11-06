@@ -118,7 +118,12 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch, watchEffect } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import {
+  isNavigationFailure,
+  NavigationFailureType,
+  RouterLink,
+  useRouter,
+} from "vue-router";
 import { Button, frappeRequest } from "frappe-ui";
 import DocsConvertDialog from "@helpdesk/shared/settings/DocsConvertDialog.vue";
 import { articleHref } from "@helpdesk/shared/settings/docsLinks";
@@ -167,7 +172,14 @@ async function load(route: string) {
     });
     // `panel` is gone once the reader left the page.
     if (route !== props.route || !panel.value) return;
-    if (data.article) return router.replace(ROUTES.article(data.article));
+    if (data.article) {
+      const failure = await router.replace(ROUTES.article(data.article));
+      // Cancelled means the reader moved on; duplicated means already there.
+      if (isNavigationFailure(failure, NavigationFailureType.aborted)) {
+        failed.value = true;
+      }
+      return;
+    }
     page.value = data;
     await nextTick();
     if (location.hash) scrollToHash();
@@ -185,19 +197,22 @@ watchEffect(() => {
 
 // Each run replaces the last page's tags; unmount removes them.
 watchEffect((onCleanup) => {
-  if (!page.value) return;
-  const robots = Object.assign(document.createElement("meta"), {
-    name: "robots",
-    content: "noindex",
-  });
-  const canonical = Object.assign(document.createElement("link"), {
-    rel: "canonical",
-    href: page.value.source_url,
-  });
-  document.head.append(robots, canonical);
-  onCleanup(() => {
-    robots.remove();
-    canonical.remove();
-  });
+  if (!page.value && !failed.value) return;
+  const tags: HTMLElement[] = [
+    Object.assign(document.createElement("meta"), {
+      name: "robots",
+      content: "noindex",
+    }),
+  ];
+  if (page.value) {
+    tags.push(
+      Object.assign(document.createElement("link"), {
+        rel: "canonical",
+        href: page.value.source_url,
+      })
+    );
+  }
+  document.head.append(...tags);
+  onCleanup(() => tags.forEach((tag) => tag.remove()));
 });
 </script>

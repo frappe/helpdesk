@@ -10,6 +10,7 @@ import {
   DATE_FORMATS,
 } from '@helpdesk/shared/utils'
 import { useRecent } from '@app/stores/recent'
+import { holdDuring } from '@app/composables/docsResults'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { saveArticleFeedback } from '@app/components/knowledge_base/articleFeedback'
 import { useBottomSheet } from '@app/composables/useDrawer'
@@ -30,12 +31,18 @@ export default function setup(context) {
   const session = useSession()
   const hasDocsSource = computed(() => Boolean(session.config.value?.docs_source_url))
   const isMultiSegment = computed(() => String(route?.params?.name).includes('/'))
-  const article = useArticle(() =>
+  const lookupName = computed(() =>
     hasDocsSource.value && isMultiSegment.value ? '' : articleName(route?.params?.name),
   )
-  const isDocsPage = computed(() => hasDocsSource.value && (isMultiSegment.value || Boolean(article.error)))
+  const article = useArticle(lookupName)
+  // A flat route's lookup holds the last view, so only an Article ends a Docs page.
+  const isLookingUp = () => article.settled !== lookupName.value
+  const isDocsPage = holdDuring(
+    isLookingUp,
+    () => hasDocsSource.value && (isMultiSegment.value || Boolean(article.error)),
+  )
   // The alias cuts `name` short at `/settings`, so use the path.
-  const docsRoute = computed(() => decodePath(pagePath(route)).replace(/^\/articles\//, ''))
+  const docsRoute = holdDuring(isLookingUp, () => decodePath(pagePath(route)).replace(/^\/articles\//, ''))
   // Only the config tells a missing Article from a Docs page.
   const isConfigSettled = ref(false)
   session.loadSession().then(() => (isConfigSettled.value = true))

@@ -15,6 +15,7 @@
     :offset="8"
     @focus="onFocus"
     @blur="isFocused = false"
+    @keydown="onKeydown"
   >
     <template #prefix>
       <LucideSearch class="size-4.5 text-ink-gray-5" />
@@ -141,7 +142,7 @@ import {
   MIN_QUERY_LENGTH,
   useArticleSearch,
 } from "@app/composables/useArticleSearch";
-import { visibleDocs } from "@app/composables/docsResults";
+import { holdDuring, visibleDocs } from "@app/composables/docsResults";
 import { useRecent } from "@app/stores/recent";
 import { useSession } from "@app/stores/session";
 import { articleMeta, countLabel } from "@helpdesk/shared/utils";
@@ -164,6 +165,8 @@ const combobox = ref<InstanceType<typeof Combobox> | null>(null);
 const query = ref("");
 const isOpen = ref(false);
 const isFocused = ref(false);
+// New options send the Combobox to row 0, so docs wait while arrow keys move.
+const navigating = ref(false);
 const { recentArticles, forgetArticle } = useRecent();
 
 const hasHistory = computed(() => recentArticles.value.length > 0);
@@ -187,7 +190,13 @@ const docs = useArticleSearch(query, {
 const searchText = computed(() => query.value.trim());
 const canSearch = computed(() => searchText.value.length >= MIN_QUERY_LENGTH);
 
-watch(query, () => (isOpen.value = canSearch.value || hasHistory.value));
+watch(query, () => {
+  isOpen.value = canSearch.value || hasHistory.value;
+  navigating.value = false;
+});
+watch(isOpen, (open) => {
+  if (!open) navigating.value = false;
+});
 
 // Last history row removed: close rather than show nothing.
 watch(hasHistory, (value) => {
@@ -197,6 +206,12 @@ watch(hasHistory, (value) => {
 function onFocus() {
   isFocused.value = true;
   isOpen.value = hasHistory.value;
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (["ArrowUp", "ArrowDown"].includes(event.key) && rows.value.length) {
+    navigating.value = true;
+  }
 }
 
 function createTicket() {
@@ -232,7 +247,7 @@ const isDocsSettled = computed(
 
 // Article rows never change when docs arrive; Docs rows go after them.
 const rows = computed(() =>
-  [...articleRows.value, ...docRows.value].slice(0, MAX_ROWS)
+  [...articleRows.value, ...shownDocRows.value].slice(0, MAX_ROWS)
 );
 const articleRows = computed(() =>
   (results.data || []).map((article) => ({
@@ -261,6 +276,11 @@ const docRows = computed(() => {
       onClick: () => router.push(ROUTES.docsPage(doc.route)),
     }));
 });
+
+const shownDocRows = holdDuring(
+  () => navigating.value,
+  () => docRows.value
+);
 
 const hasResults = computed(() => rows.value.length > 0);
 const isSearching = computed(

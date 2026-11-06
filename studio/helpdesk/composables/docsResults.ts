@@ -1,3 +1,5 @@
+import { computed } from 'vue'
+
 export type Hit = { title: string; is_converted?: boolean; [key: string]: any }
 
 // Marked, escaped server text to plain lowercase text.
@@ -28,4 +30,10 @@ export function pickSuggestions(articles: Hit[], docs: Hit[], query: string, lim
   const top = [...full, ...pool.filter((hit) => !full.includes(hit))].slice(0, limit)
   if (docsLeft.length && !top.some((hit) => hit.route)) top[limit - 1] = docsLeft[0]
   return top
+}
+
+// Keeps the last value read outside `isHeld`, so a late answer changes nothing on screen.
+export function holdDuring<T>(isHeld: () => boolean, read: () => T) {
+  let last: T | undefined
+  return computed(() => (isHeld() && last !== undefined ? last : (last = read())))
 }
