@@ -842,6 +842,23 @@ class TestHDTicket(IntegrationTestCase):
             len(comments), 3
         )  # 2 original comments + 1 merge comment (Ticket 1 merged into Ticket 2)
 
+    def test_merge_keeps_source_closed_with_auto_update_status(self):
+        auto_update = frappe.db.get_single_value("HD Settings", "auto_update_status")
+        update_to = frappe.db.get_single_value("HD Settings", "update_status_to")
+        frappe.db.set_single_value("HD Settings", "auto_update_status", 1)
+        frappe.db.set_single_value("HD Settings", "update_status_to", "Replied")
+        try:
+            source = make_ticket(description="Merge source")
+            target = make_ticket(description="Merge target")
+            merge_ticket(source=source.name, target=target.name)
+        finally:
+            # rollback is per test class, so restore or later tests inherit this
+            frappe.db.set_single_value("HD Settings", "auto_update_status", auto_update)
+            frappe.db.set_single_value("HD Settings", "update_status_to", update_to)
+
+        source.reload()
+        self.assertEqual(source.status, "Closed")
+
     def test_agent_merge_moves_emails_and_every_attachment(self):
         source = make_ticket(description="Agent merge source")
         target = make_ticket(description="Agent merge target")
