@@ -21,9 +21,12 @@ CHUNK_SIZE = 8 * 1024
 
 class DocsFetchError(Exception):
     def __init__(self, message, status: int | None = None, transient: bool = False):
-        super().__init__(message)
+        super().__init__(message, status, transient)
         self.status = status
         self.transient = transient
+
+    def __str__(self) -> str:
+        return self.args[0]
 
 
 def fetch(

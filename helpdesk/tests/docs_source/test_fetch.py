@@ -1,4 +1,5 @@
 import gzip
+import pickle
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -25,6 +26,11 @@ URL = f"https://{HOST}/x"
 
 @patch("helpdesk.docs_source.fetch.requests.get")
 class TestEgress(IntegrationTestCase):
+    def test_error_survives_pickle(self, get):
+        error = pickle.loads(pickle.dumps(DocsFetchError("boom", 503, True)))
+        self.assertEqual(str(error), "boom")
+        self.assertEqual((error.status, error.transient), (503, True))
+
     def test_refuses_internal_address(self, get):
         with self.assertRaises(DocsFetchError):
             fetch("https://127.0.0.1/llms.txt", "127.0.0.1")

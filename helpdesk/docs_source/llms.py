@@ -1,3 +1,4 @@
+import contextlib
 import re
 from collections import defaultdict, deque
 from urllib.parse import urljoin, urlsplit
@@ -111,14 +112,13 @@ class LlmsSource(IndexedSource):
 
     def _read_full(self) -> str:
         parts, url = [], f"{self.url}/llms-full.txt"
-        try:
+        # ponytail: titles and summaries still index
+        with contextlib.suppress(DocsFetchError, ValueError):
             while url and len(parts) < MAX_PARTS:
                 text = fetch(url, self.host).text
                 parts.append(text)
                 following = NEXT_PART.search(text)
                 url = urljoin(url, following[1]) if following else None
-        except (DocsFetchError, ValueError):
-            pass  # ponytail: titles and summaries still index
         return "\n".join(parts)
 
     def _is_in_scope(self, path: str) -> bool:
