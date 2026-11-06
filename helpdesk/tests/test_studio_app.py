@@ -1,9 +1,11 @@
 import frappe
 from frappe.tests import IntegrationTestCase, UnitTestCase
-from frappe.utils import get_system_timezone
+from frappe.utils import get_system_timezone, set_request
 
+from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
 from helpdesk.helpdesk.hooks.studio_app import escape_for_shell, get_boot
-from helpdesk.test_utils import make_contact
+from helpdesk.test_utils import make_agent, make_contact
+from helpdesk.www.helpdesk.index import redirect_customer_home
 
 
 class TestPageShell(UnitTestCase):
@@ -34,3 +36,40 @@ class TestBoot(IntegrationTestCase):
         for user in (customer, "Guest"):
             frappe.set_user(user)
             self.assertEqual(get_boot()["user_timezone"], get_system_timezone())
+
+
+class TestDeskRedirect(IntegrationTestCase):
+    def tearDown(self) -> None:
+        frappe.local.request = None
+        frappe.set_user("Administrator")
+
+    def redirect_for(self, user: str, page: str | None = None) -> str | None:
+        frappe.set_user(user)
+        query = {"redirect-to": page} if page else {}
+        set_request(method="GET", path="/helpdesk", query_string=query)
+        try:
+            redirect_customer_home()
+        except frappe.Redirect:
+            return frappe.local.flags.redirect_location
+
+    def test_a_customer_goes_back_to_the_login_page(self) -> None:
+        customer = make_contact("redirect_customer")["user"]
+        location = self.redirect_for(customer, "/help/articles/abc?a=1")
+        self.assertTrue(location.endswith("/help/articles/abc?a=1"), location)
+
+    def test_a_customer_with_no_page_goes_to_the_customer_home(self) -> None:
+        customer = make_contact("redirect_customer_home")["user"]
+        self.assertEqual(self.redirect_for(customer), get_customer_home_page())
+
+    def test_a_customer_stays_on_this_site(self) -> None:
+        customer = make_contact("redirect_customer_host")["user"]
+        location = self.redirect_for(customer, "https://example.org/help")
+        self.assertNotIn("example.org", location)
+
+    def test_an_agent_stays_on_the_desk(self) -> None:
+        agent = "redirect_agent@example.com"
+        make_agent(agent)
+        self.assertIsNone(self.redirect_for(agent, "/help/articles/abc"))
+
+    def test_a_system_manager_stays_on_the_desk(self) -> None:
+        self.assertIsNone(self.redirect_for("Administrator", "/help/articles/abc"))

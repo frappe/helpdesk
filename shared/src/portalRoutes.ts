@@ -12,6 +12,7 @@ export const ROUTES = {
   newTicket: (origin?: TicketOrigin) => ({ path: '/my-tickets/new', query: originQuery(origin) }),
   ticket: (name: string) => `/my-tickets/${name}`,
   appRoot: CUSTOMER_PORTAL_ROOT,
+  agentRoot: '/helpdesk',
 }
 
 // Stored as the ticket's entry point.

@@ -11,7 +11,6 @@ import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
 import { conversationLayout } from '@app/stores/conversationLayout'
 
-const AGENT_PORTAL_ROOT = '/helpdesk'
 
 fetchTranslations()
 
@@ -95,7 +94,7 @@ export const accountMenuOptions = computed(() =>
           icon: 'lucide-headphones',
           label: __('Agent portal'),
           condition: () => session.isAgent.value,
-          onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
+          onClick: () => (window.location.href = ROUTES.agentRoot),
         },
         {
           icon: 'lucide-settings',

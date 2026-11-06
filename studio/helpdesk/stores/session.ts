@@ -114,6 +114,8 @@ function createSessionStore() {
   }
 }
 
+// The desk keeps agents and sends everyone else back to this page.
 function loginUrl() {
-  return `/login?redirect-to=${encodeURIComponent(location.pathname + location.search)}`
+  const page = encodeURIComponent(location.pathname + location.search)
+  return `/login?redirect-to=${encodeURIComponent(`${ROUTES.agentRoot}?redirect-to=${page}`)}`
 }
