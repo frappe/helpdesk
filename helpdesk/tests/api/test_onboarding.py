@@ -118,6 +118,17 @@ class TestSetupStatus(IntegrationTestCase):
 
         self.assertTrue(get_setup_status()["ticket_arrived"])
 
+    def test_a_message_from_a_mailbox_that_is_no_longer_connected_does_not_count(
+        self,
+    ) -> None:
+        account = make_email_account(enable_incoming=0)
+        sender = unique_email("customer")
+        ticket = make_ticket(subject="Old mailbox ticket", raised_by=sender)
+
+        add_message(ticket.name, "Received", sender, email_account=account)
+
+        self.assertFalse(get_setup_status()["ticket_arrived"])
+
     def test_a_message_without_a_mailbox_does_not_count(self) -> None:
         sender = unique_email("customer")
         ticket = make_ticket(subject="Agent-made ticket", raised_by=sender)

@@ -47,29 +47,36 @@ def get_setup_status() -> dict:
     """What the first-run setup page polls: is a mailbox connected, has it brought in
     a ticket, and is usage data being shared. Includes the mailbox address. System Managers only."""
     frappe.only_for("System Manager")
-    email_address = frappe.db.get_value(
-        "Email Account", {"enable_incoming": 1}, "email_id"
+    mailboxes = frappe.get_all(
+        "Email Account", filters={"enable_incoming": 1}, fields=["name", "email_id"]
     )
     return {
-        "email_connected": bool(email_address),
-        "email_address": email_address,
-        # the welcome and agent-made tickets have no email account, only the mailbox does
-        "ticket_arrived": bool(
-            frappe.get_list(
-                "Communication",
-                filters={
-                    "reference_doctype": "HD Ticket",
-                    "sent_or_received": "Received",
-                    "email_account": ["is", "set"],
-                },
-                limit=1,
-                pluck="name",
-            )
-        ),
+        "email_connected": bool(mailboxes),
+        "email_address": mailboxes[0].email_id if mailboxes else None,
+        "ticket_arrived": has_mailbox_ticket([m.name for m in mailboxes]),
         "telemetry_enabled": bool(
             frappe.db.get_single_value("System Settings", "enable_telemetry")
         ),
     }
+
+
+def has_mailbox_ticket(mailboxes: list[str]) -> bool:
+    """Whether a connected mailbox has brought in a ticket. The welcome and agent-made
+    tickets have no email account, and the poll skips the scan when nothing is connected."""
+    if not mailboxes:
+        return False
+    return bool(
+        frappe.get_list(
+            "Communication",
+            filters={
+                "reference_doctype": "HD Ticket",
+                "sent_or_received": "Received",
+                "email_account": ["in", mailboxes],
+            },
+            limit=1,
+            pluck="name",
+        )
+    )
 
 
 @frappe.whitelist(methods=["POST"])
