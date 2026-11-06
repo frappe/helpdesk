@@ -42,7 +42,7 @@ def get_general_category_id():
     return category[0] if category else None
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["GET"])
 def get_setup_status() -> dict:
     """What the first-run setup page polls: is a mailbox connected, has it brought in
     a ticket, and is usage data being shared. Includes the mailbox address. System Managers only."""

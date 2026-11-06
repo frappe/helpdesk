@@ -85,6 +85,12 @@ class TestSetupStatus(IntegrationTestCase):
             {"reference_doctype": "HD Ticket", "email_account": ["is", "set"]},
         )
 
+    def test_status_is_a_read_only_endpoint(self) -> None:
+        methods = frappe.allowed_http_methods_for_whitelisted_func[get_setup_status]
+
+        self.assertIn("GET", methods)
+        self.assertNotIn("POST", methods)
+
     def test_a_clean_site_has_nothing_connected(self) -> None:
         status = get_setup_status()
 

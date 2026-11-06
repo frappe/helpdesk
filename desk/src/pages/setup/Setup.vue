@@ -103,6 +103,7 @@ import SetupEmailStep from "./SetupEmailStep.vue";
 import SetupFeedbackDialog from "./SetupFeedbackDialog.vue";
 import SetupInviteStep from "./SetupInviteStep.vue";
 import SetupPreview from "./SetupPreview.vue";
+import { canAskForFeedback } from "./feedback";
 import { createInviteRow, type InviteRow } from "./invites";
 
 const TOTAL_STEPS = 2;
@@ -118,6 +119,7 @@ const showFeedback = ref(false);
 
 const status = createResource({
   url: "helpdesk.api.onboarding.get_setup_status",
+  method: "GET",
   auto: true,
 });
 
@@ -159,7 +161,7 @@ async function finish(skipped: boolean) {
   authStore.markSetupDone();
   finishing.value = false;
   // capture does nothing while telemetry is off, so there is nobody to ask
-  if (telemetryClient.isEnabled.value) showFeedback.value = true;
+  if (canAskForFeedback(telemetryClient)) showFeedback.value = true;
   else goHome();
 }
 
