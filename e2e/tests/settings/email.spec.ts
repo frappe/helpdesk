@@ -34,7 +34,7 @@ test("a new custom account goes back to the tiles from its form, submits with En
   await dialog.getByRole("textbox", { name: "Outgoing server (SMTP)" }).fill("smtp.e2e.invalid");
   await dialog.getByRole("spinbutton", { name: "Outgoing port" }).fill("587");
   await create.click();
-  await expect(dialog.getByRole("alert")).toBeVisible();
+  await expect(errorToast(page)).toBeVisible();
   expect(await api.exists(ACCOUNT, { email_account_name: name })).toBeFalsy();
 
   await back.click();
@@ -146,7 +146,7 @@ test("an email account is edited and renamed, keeps sending off when the server 
     await accountRow(dialog, renamed).click();
     await dialog.getByRole("switch", { name: "Send email" }).click();
     await save.click();
-    await expect(dialog.getByRole("alert")).toBeVisible();
+    await expect(errorToast(page)).toBeVisible();
     await expect.poll(async () => (await api.get(ACCOUNT, renamed)).enable_outgoing).toBe(0);
 
     await dialog.getByRole("button", { name: `Back: ${renamed}` }).click();
@@ -167,7 +167,9 @@ test("the default outgoing account is picked once for the whole list, and a chan
   try {
     await page.goto("/helpdesk/tickets");
     const dialog = await openSettings(page, "Email Accounts");
-    await expect(accountRow(dialog, seeded).getByText("Outgoing only", { exact: true })).toBeVisible();
+    const toggles = dialog.getByRole("group", { name: seeded, exact: true });
+    await expect(toggles.getByRole("switch", { name: "Receive" })).not.toBeChecked();
+    await expect(toggles.getByRole("switch", { name: "Send" })).toBeChecked();
     const outgoing = dialog.getByRole("combobox", { name: "Default outgoing" });
     await outgoing.click();
     await page.getByRole("option", { name: "None" }).click();
@@ -285,6 +287,10 @@ async function confirmUnsaved(page: Page) {
   const confirm = unsavedDialog(page);
   await confirm.getByRole("button", { name: "Confirm" }).click();
   await expect(confirm).toBeHidden();
+}
+
+function errorToast(page: Page) {
+  return page.locator('[data-sonner-toast][data-type="error"]');
 }
 
 function accountRow(dialog: Locator, name: string) {
