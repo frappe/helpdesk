@@ -1,5 +1,7 @@
 import frappe
 
+from helpdesk.consts import WELCOME_TICKET_SUBJECT
+
 
 @frappe.whitelist()
 def get_first_ticket(ticket: str | None = None):
@@ -11,7 +13,7 @@ def get_first_ticket(ticket: str | None = None):
     result = frappe.get_all(
         "HD Ticket",
         filters={
-            "subject": ["!=", "Welcome to Helpdesk"],
+            "subject": ["!=", WELCOME_TICKET_SUBJECT],
             "owner": ["=", frappe.session.user],
         },
         fields=["name"],

@@ -4,6 +4,9 @@ DEFAULT_TICKET_TEMPLATE = "Default"
 DEFAULT_SLA = "Standard"
 DEFAULT_ARTICLE_CATEGORY = "General"
 
+# the ticket every install creates; it is not a sign the site is in use
+WELCOME_TICKET_SUBJECT = "Welcome to Helpdesk"
+
 # 7 is set as customer-readable, 8 is agent reserved
 TICKET_VISIBLE_FIELD_PERMLEVEL = 7
 TICKET_INTERNAL_FIELD_PERMLEVEL = 8
