@@ -9,26 +9,19 @@
       >
         {{ icon }}
       </div>
-      <IconPicker v-model="pickerIcon">
-        <Button
-          :icon-left="PickedIcon"
-          :label="
-            isEmojiIcon
-              ? __('Replace with an icon...')
-              : pickerIcon
-              ? __('Change icon')
-              : __('Select an icon...')
-          "
-        />
-      </IconPicker>
+      <IconPicker
+        v-model="pickerIcon"
+        field
+        :placeholder="
+          isEmojiIcon ? __('Replace with an icon...') : __('Select an icon...')
+        "
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, h } from "vue";
-import { Button } from "frappe-ui";
-import Icon from "./Icon.vue";
+import { computed } from "vue";
 import IconPicker from "./IconPicker.vue";
 import { __ } from "./translation";
 import { isEmoji } from "./utils";
@@ -47,6 +40,4 @@ const pickerIcon = computed({
   },
   set: (value) => (icon.value = value || ""),
 });
-const PickedIcon = (attrs: Record<string, unknown>) =>
-  h(Icon, { ...attrs, icon: pickerIcon.value || "lucide-plus" });
 </script>
