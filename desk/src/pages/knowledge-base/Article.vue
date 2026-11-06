@@ -212,7 +212,9 @@
               <div class="flex items-center gap-1">
                 <span class="text-p-xs text-ink-gray-6">
                   {{
-                    dayjsLocal(article.data.modified).format("MMM D, h:mm A")
+                    __("Updated {0}", [
+                      dayjsLocal(article.data.modified).format("MMM D, h:mm A"),
+                    ])
                   }}
                 </span>
                 <IconDot v-if="isMobileView" class="h-4 w-4 text-ink-gray-5" />
