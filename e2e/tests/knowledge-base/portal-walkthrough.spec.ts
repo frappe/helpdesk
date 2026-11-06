@@ -45,11 +45,20 @@ test.describe("routing", () => {
     test("R1 sends a guest to login and back", async ({ page, kb }) => {
       await kb({ public_knowledge_base: 0 });
       await page.goto("/help/categories?a=1");
-      await expect(page).toHaveURL(/\/login\?redirect-to=%2Fhelp%2Fcategories%3Fa%3D1/);
+      await expect(page).toHaveURL(/\/login$/);
       await page.locator("#login_email").fill(personas.customer.email);
       await page.locator("#login_password").fill(PASSWORD);
       await page.getByRole("button", { name: "Continue", exact: true }).click();
       await expect(page).toHaveURL(/\/help\/categories\?a=1$/);
+    });
+
+    test("R1b sends an agent to the desk after login", async ({ page, kb }) => {
+      await kb({ public_knowledge_base: 0 });
+      await page.goto("/help/categories?a=1");
+      await page.locator("#login_email").fill(personas.agent.email);
+      await page.locator("#login_password").fill(PASSWORD);
+      await page.getByRole("button", { name: "Continue", exact: true }).click();
+      await expect(page).toHaveURL(/\/helpdesk(\/home)?(\?.*)?$/);
     });
   });
 
@@ -137,20 +146,20 @@ test.describe("header", () => {
       await expect(page.getByRole("link", { name: "Helpdesk" })).toHaveAttribute("href", "/help/");
       await expect(accountMenu(page)).toHaveCount(0);
       await page.getByRole("button", { name: "Log in" }).click();
-      await expect(page).toHaveURL(/\/login\?redirect-to=%2Fhelp%2Fcategories%3Fa%3D1/);
+      await expect(page).toHaveURL(/\/login$/);
     });
   });
 
   test.describe("guest on a phone", () => {
     test.use({ ...GUEST, viewport: PHONE });
 
-    test("H10 a guest's logo menu holds only the text links", async ({ page, api, kb }) => {
+    test("H10 a guest's logo menu holds the text links and Home", async ({ page, api, kb }) => {
       await kb({ public_knowledge_base: 1 });
       await saveQuickLinks(api, [{ label: "E2E Guest link", url: "https://example.com/guest", open_in_new_tab: 0 }]);
       try {
         await page.goto("/help");
         await accountMenu(page).click();
-        await expect(page.getByRole("menuitem")).toHaveText(["E2E Guest link"]);
+        await expect(page.getByRole("menuitem")).toHaveText(["E2E Guest link", "Home"]);
       } finally {
         await api.delete("HD Form Script", QUICK_LINKS);
       }

@@ -4,7 +4,7 @@ Python tests for the Helpdesk server code, run with Frappe's test runner against
 
 ## Layout
 
-- `helpdesk/tests/api/` mirrors `helpdesk/api/`. `helpdesk/api/contact.py` is tested in `helpdesk/tests/api/test_contact.py`, and `helpdesk/api/settings/email.py` in `helpdesk/tests/api/settings/test_email.py`.
+- `helpdesk/tests/api/` mirrors `helpdesk/api/`. `helpdesk/api/contact.py` is tested in `helpdesk/tests/api/test_contact.py`, and `helpdesk/api/settings/email_notifications.py` in `helpdesk/tests/api/settings/test_email_notifications.py`.
 - DocType tests stay next to their DocType (`helpdesk/helpdesk/doctype/<name>/test_<name>.py`), as Frappe expects.
 - All backend test helpers (factories, toggles, fixture builders) live in `helpdesk/test_utils.py` and are imported from there, never defined inline in a test file. Check it before writing one (`make_ticket`, `create_agent`, `create_contact`, `create_customer`, `make_sla`, `make_team` and more); if it is missing, add it there with a docstring.
 - Keep a folder under 15 files. Fold a small API module into the test file of its closest neighbour rather than giving it its own file.
