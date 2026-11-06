@@ -243,6 +243,10 @@ export interface HDServiceDay extends ChildDocType {
   start_time: any;
   /** End Time: Time */
   end_time: any;
+  /** Break Start: Time */
+  break_start?: any;
+  /** Break End: Time */
+  break_end?: any;
 }
 
 // Last updated: 2023-03-26 22:41:29.978960

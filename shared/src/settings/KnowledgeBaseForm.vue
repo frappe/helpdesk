@@ -35,10 +35,18 @@
           {{ __("Customize home page") }}
         </h2>
         <div class="mt-2 divide-y divide-outline-gray-1 [&>*]:py-3.5">
-          <PinnedCategories
+          <PinnedList
             v-model:pinned="draft.pinned"
-            :categories="categoryOptions"
-            :save="savePinsAndNotify"
+            kind="categories"
+            :items="categoryOptions"
+            :save="(pinned) => savePinsAndNotify('categories', pinned)"
+          />
+          <PinnedList
+            v-model:pinned="draft.pinned_articles"
+            kind="articles"
+            :items="articleOptions"
+            :search="searchArticles"
+            :save="(pinned) => savePinsAndNotify('articles', pinned)"
           />
           <BannerPicker
             :image="draft.banner_image"
@@ -76,7 +84,7 @@
       v-else
       :sections="[
         { title: __('Access'), rows: accessToggles.length },
-        { title: __('Customize home page'), panels: [50, 180] },
+        { title: __('Customize home page'), panels: [50, 50, 180] },
         { title: __('Header'), rows: 1, panels: [96] },
       ]"
     />
@@ -89,18 +97,25 @@ import { SettingsRow, Switch } from "frappe-ui";
 import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
 import HeaderLinks from "./HeaderLinks.vue";
-import PinnedCategories from "./PinnedCategories.vue";
+import PinnedList from "./PinnedList.vue";
 import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
-import { useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
+import { type PinKind, useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
 
 // Switches and the pin dialog save at once; the rest waits for Save.
-const { draft, settings, setToggle, savePins, categoryOptions } =
-  useKnowledgeBaseDraft();
+const {
+  draft,
+  settings,
+  setToggle,
+  savePins,
+  categoryOptions,
+  articleOptions,
+  searchArticles,
+} = useKnowledgeBaseDraft();
 
 const emit = defineEmits<{ pinsSaved: [] }>();
 
-async function savePinsAndNotify(pinned: string[]) {
-  const saved = await savePins(pinned);
+async function savePinsAndNotify(kind: PinKind, pinned: string[]) {
+  const saved = await savePins(kind, pinned);
   if (saved) emit("pinsSaved");
   return saved;
 }

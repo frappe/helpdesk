@@ -187,6 +187,9 @@ class HDCustomer(Document):
     @frappe.whitelist()
     @agent_only
     def get_contacts(self):
+        """The customer's contacts with their details; primary first, then managers.
+        Each has email, phone, image, last active, manager and primary flags, and open
+        or paused ticket count. Agents only."""
         contact_names = [contact.contact_name for contact in self.contacts]
         details = self.get_contact_details(contact_names)
         ticket_counts = self.get_pending_ticket_counts(contact_names)
@@ -260,11 +263,14 @@ class HDCustomer(Document):
         return {row.name: row.last_active for row in rows}
 
     @frappe.whitelist()
-    def add_contacts(self, contacts: str | list, role: str = "HD Customer") -> dict:
+    def add_contacts(
+        self, contacts: str | list, role: str = "HD Customer", invite: bool = True
+    ) -> dict:
         """Add contacts that already have a linked user; invite the rest by email.
 
         Each entry can be a Contact name or an email address. Returns the
         contact names added directly and the result of the sent invitations.
+        With `invite` off, contacts without a user are added too, and nobody is emailed.
         """
         self.validate_contact_update_permission(role)
         entries = frappe.parse_json(contacts) if isinstance(contacts, str) else contacts
@@ -274,7 +280,11 @@ class HDCustomer(Document):
         added, to_invite = [], []
         for entry in entries:
             contact_name, email = self.resolve_contact_entry(entry)
-            if contact_name and self.get_user(contact_name, throw_error=False):
+            if not invite and not contact_name:
+                frappe.throw(_("No contact has the email {0}").format(email))
+            if contact_name and (
+                not invite or self.get_user(contact_name, throw_error=False)
+            ):
                 if self.add_contact(contact_name, role):
                     added.append(contact_name)
             else:
@@ -359,6 +369,8 @@ class HDCustomer(Document):
     @frappe.whitelist()
     @agent_manager_only
     def get_pending_invites(self):
+        """Pending helpdesk invitations to this customer: email, inviter, date, roles.
+        Agent managers only."""
         return self.list_pending_invitations()
 
     def list_pending_invitations(self) -> list[dict]:

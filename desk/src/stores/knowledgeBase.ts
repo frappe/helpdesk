@@ -43,10 +43,12 @@ export const deleteArticles = createResource({
 // Category
 export const newCategory = createResource({
   url: "helpdesk.api.knowledge_base.create_category",
-  makeParams({ title, icon }) {
+  makeParams({ title, description, icon, parent }) {
     return {
       title,
+      description,
       icon,
+      parent,
     };
   },
   validate({ title }) {
@@ -59,6 +61,18 @@ export const updateCategory = createResource({
   validate({ fieldname }) {
     if (!fieldname.category_name) throw "Title is required";
   },
+});
+
+export const categoryOptions = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_options",
+});
+
+export const categoryDeleteSummary = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_delete_summary",
+});
+
+export const deleteCategory = createResource({
+  url: "helpdesk.api.knowledge_base.delete_category",
 });
 
 export const moveToCategory = createResource({
@@ -104,4 +118,3 @@ export function useCategoryVisibility(
   );
   return visibility;
 }
-

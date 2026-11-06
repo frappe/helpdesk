@@ -13,7 +13,9 @@ BANNERS = {
 
 @frappe.whitelist()
 def get_banners() -> list[dict]:
-    """Sidebar notices as `{"name": ...}`; one that needs data carries it under its own key."""
+    """Sidebar notices as `{"name": ...}`; one that needs data carries it under its own key.
+    "customer_portal_permission", "ticket_field_permission" or "trial" (with `trial`).
+    Always empty for anyone but agent managers and admins."""
     if not is_agent_manager():
         return []
 
@@ -31,6 +33,9 @@ def get_banners() -> list[dict]:
 @frappe.whitelist(methods=["POST"])
 @agent_manager_only
 def dismiss_banner(banner: str) -> None:
+    """Hide a sidebar notice. Agent managers only.
+    "trial" hides the trial card for this user for a day; "customer_portal_permission"
+    or "ticket_field_permission" turns that notice off for everyone."""
     if banner == "trial":
         dismiss_trial()
         # Only this user's other tabs need to hide the card

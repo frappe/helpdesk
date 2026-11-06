@@ -510,6 +510,8 @@ class HDTicket(Document, CustomerEditController):
     @frappe.whitelist()
     @agent_only
     def assign_agent(self, agent: str):
+        """Assign the ticket to `agent` (a user ID), alongside any current assignees.
+        The agent is notified and emailed. Agents only."""
         # core assign_to notifies and emails the agent (self-assign suppressed);
         # its Notification Log row derives app="helpdesk" from the ticket
         assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
@@ -575,6 +577,7 @@ class HDTicket(Document, CustomerEditController):
 
     @frappe.whitelist()
     def get_last_communication(self):
+        """The ticket's newest Communication (email or reply) as a document, or None."""
         filters = {
             "reference_doctype": "HD Ticket",
             "reference_name": ["=", str(self.name)],
@@ -643,6 +646,10 @@ class HDTicket(Document, CustomerEditController):
 
     @frappe.whitelist()
     def new_comment(self, content: str, attachments: list[str] = []):
+        """Add an internal comment (HTML `content`) to the ticket; return its name.
+        Agents only. The caller's own uploads among `attachments` (dicts with
+        `file_url`) and embedded images move onto the comment, so customers can't
+        read them."""
         if not is_agent():
             frappe.throw(
                 _("You are not permitted to add a comment"), frappe.PermissionError
@@ -703,6 +710,11 @@ class HDTicket(Document, CustomerEditController):
         bcc: str | None = None,
         attachments: list[str] = [],
     ):
+        """Reply on the ticket as an agent and return the Communication name.
+        Agents only. Emails `to`/`cc`/`bcc` from `from_email` (`email_id`,
+        `email_account`) or the default account, unless HD Settings skips email or
+        has agent reply emails off. With no recipient given, `to` is the ticket's
+        `raised_by`. `attachments` are File names."""
         if not is_agent():
             frappe.throw(
                 _("You are not permitted to reply as an agent"), frappe.PermissionError
@@ -713,6 +725,9 @@ class HDTicket(Document, CustomerEditController):
         from_email_id = from_email.get("email_id") if from_email else None
         email_account_name = from_email.get("email_account") if from_email else None
         sender = from_email_id or frappe.session.user
+        # the UI always sends `to`; a caller that names nobody means the customer
+        if to is None and not cc and not bcc:
+            to = self.raised_by
         recipients = to
 
         sender_email = None
@@ -841,6 +856,10 @@ class HDTicket(Document, CustomerEditController):
         attachments: list[dict] | None = None,
         new_ticket: bool = False,
     ):
+        """Post a customer reply on the ticket from the session user.
+        Unless `new_ticket`, reopens the ticket and, if HD Settings says so, emails
+        the assigned agents. `attachments` are File records (`name`) the caller
+        uploaded; they move onto the reply."""
         if not new_ticket and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_to_agent"
         ):
@@ -985,6 +1004,8 @@ class HDTicket(Document, CustomerEditController):
 
     @frappe.whitelist()
     def mark_seen(self) -> int:
+        """Mark the ticket seen and its notifications read; return the count cleared.
+        Seen and viewed by the session user, and only their helpdesk notifications."""
         self.add_viewed(
             unique_views=True, force=True
         )  # Document class method, no way to add unique_views via document settings, hence used force and unique_views=True

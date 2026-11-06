@@ -21,6 +21,8 @@ class HDServiceHolidayList(Document):
 
     @frappe.whitelist()
     def get_weekly_off_dates(self):
+        """Add each `weekly_off` day in the list's date range to its holidays table.
+        Skips dates already in it. Does not save; throws if no weekly off day is set."""
         self.validate_values()
         date_list = self.get_weekly_off_date_list(self.from_date, self.to_date)
         last_idx = max(
@@ -105,6 +107,7 @@ class HDServiceHolidayList(Document):
 
     @frappe.whitelist()
     def clear_table(self):
+        """Empty the holidays table. Does not save."""
         self.set("holidays", [])
 
 

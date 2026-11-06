@@ -7,6 +7,9 @@ const sidebar = createResource({
   method: 'GET',
 })
 
+// Two or four cards only fill their rows in two columns.
+export const homeCategoryColumns = (count: number) => (count === 2 || count === 4 ? 2 : 3)
+
 export function useKnowledgeBase() {
   if (!sidebar.data && !sidebar.loading) sidebar.fetch()
   return { sidebar }
@@ -16,6 +19,7 @@ export function useKnowledgeBase() {
 export const sidebarState = {
   query: ref(''),
   openName: ref<string | null>(null),
+  openSubName: ref<string | null>(null),
   shown: reactive<Record<string, number>>({}),
   scrollTop: 0,
 }

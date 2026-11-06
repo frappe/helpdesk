@@ -220,9 +220,11 @@ The customer portal, a Studio app:
 
 | Helpdesk Branch | Compatible Frappe Framework Version |
 |-----------------|-------------------------------------|
-| main            | version-15                          |
-| main            | version-16                          |
+| version-15      | version-15                          |
+| version-16      | version-16                          |
 | develop         | develop branch                      |
+
+`main` stopped at 1.32 and gets no more updates. Move to `version-15` or `version-16`, the one that matches your Frappe version.
 
 
 ## Learn and connect

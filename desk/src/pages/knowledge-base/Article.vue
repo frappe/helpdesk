@@ -7,9 +7,12 @@
           <Badge
             v-if="article.data"
             variant="subtle"
-            :theme="article.data?.status === 'Draft' ? 'amber' : 'green'"
+            :theme="
+              { Draft: 'amber', Archived: 'gray' }[article.data?.status] ||
+              'green'
+            "
             size="md"
-            >{{ article.data?.status }}</Badge
+            >{{ __(article.data?.status) }}</Badge
           >
         </div>
       </template>
@@ -17,6 +20,13 @@
         <!-- Default Buttons -->
         <div class="flex gap-2" v-if="!editable && article.data">
           <Button
+            v-if="isArchived"
+            :label="__('Restore')"
+            iconLeft="lucide-archive-restore"
+            @click="restoreModal = true"
+          />
+          <Button
+            v-else
             :label="isPublished ? __('Unpublish') : __('Publish')"
             :iconLeft="isPublished ? undefined : 'lucide-globe'"
             @click="togglePublished()"
@@ -63,6 +73,30 @@
                     <Icon :icon="access.icon" class="size-4 shrink-0" />
                     {{ access.label }}
                   </span>
+                </template>
+                <template v-if="article.data.pinned">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
+                  />
+                  <span class="flex items-center gap-1.5">
+                    <Icon icon="lucide-pin" class="size-4 shrink-0" />
+                    {{ __("Pinned article") }}
+                  </span>
+                </template>
+                <template v-if="article.data.weight">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
+                  />
+                  <button
+                    class="flex items-center gap-1.5 hover:text-ink-gray-7"
+                    @click="showWeightModal = true"
+                  >
+                    <Icon
+                      icon="lucide-arrow-up-narrow-wide"
+                      class="size-4 shrink-0"
+                    />
+                    {{ __("Weight {0}", [article.data.weight]) }}
+                  </button>
                 </template>
               </div>
             </div>
@@ -207,10 +241,19 @@
       @move="handleMoveToCategory"
       :exclude-category="article.data?.category"
     />
+    <MoveToCategoryModal
+      v-model="restoreModal"
+      :title="__('Restore article')"
+      :action-label="__('Restore')"
+      :default-category="generalCategory.data"
+      @move="handleMoveToCategory"
+    />
     <CategoryModal
       :edit="editTitle"
       v-model:title="category.title"
+      v-model:description="category.description"
       v-model:icon="category.icon"
+      v-model:parent="category.parent"
       v-model="showCategoryModal"
       @create="handleCategoryCreate"
     />
@@ -230,6 +273,13 @@
         </p>
       </template>
     </ArticleAccessModal>
+    <ArticleWeightModal
+      v-if="article.data"
+      v-model="showWeightModal"
+      :count="1"
+      :initial-weight="article.data.weight"
+      @save="saveWeight"
+    />
   </div>
 </template>
 
@@ -240,11 +290,14 @@ import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { ARTICLE_IMAGE_CLASSES } from "@helpdesk/shared/tiptap";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@/components/icons";
 import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
+import ArticleWeightModal from "@/components/knowledge-base/ArticleWeightModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
+import { globalStore } from "@/stores/globalStore";
 import {
-  deleteRes as deleteArticle,
+  categoryOptions,
+  deleteArticles,
   moveToCategory,
   newCategory,
   updateRes as updateArticle,
@@ -252,7 +305,12 @@ import {
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Article, Breadcrumb, Error, Resource } from "@/types";
-import { ConfirmDelete, CUSTOMER_PORTAL_ROOT, uploadFunction } from "@/utils";
+import {
+  ConfirmDelete,
+  CUSTOMER_PORTAL_ROOT,
+  getErrorMessage,
+  uploadFunction,
+} from "@/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import Icon from "@helpdesk/shared/Icon.vue";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
@@ -266,6 +324,7 @@ import {
   Badge,
   Breadcrumbs,
   Button,
+  call,
   createResource,
   dayjsLocal,
   debounce,
@@ -286,6 +345,7 @@ import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 
 const extensions = buildEditorExtensions();
+const { $dialog } = globalStore();
 const { isMobileView } = useScreenSize();
 
 const props = defineProps({
@@ -302,7 +362,9 @@ function handleCategoryCreate() {
   newCategory.submit(
     {
       title: category.title,
+      description: category.description,
       icon: category.icon,
+      parent: category.parent || null,
     },
     {
       onSuccess: (data: any) => {
@@ -320,6 +382,11 @@ function handleCategoryCreate() {
         });
         //update category name in breadcrumb
         article.data.category_name = category.title;
+        article.data.parent_category_name = category.parent
+          ? categoryOptions.data?.find(
+              (option) => option.value === category.parent
+            )?.label ?? null
+          : null;
         toast.success(__("Category created successfully."));
       },
       onError: (error: string) => {
@@ -331,8 +398,10 @@ function handleCategoryCreate() {
 
 const category = reactive({
   title: "",
+  description: "",
   id: "",
   icon: "lucide-folder",
+  parent: "",
 });
 
 const router = useRouter();
@@ -404,6 +473,7 @@ const articleStats = createResource({
 });
 
 const isPublished = computed(() => article.data?.status === "Published");
+const isArchived = computed(() => article.data?.status === "Archived");
 
 const togglePublished = debounce(
   () =>
@@ -434,13 +504,15 @@ function publishArticle(visibility: string) {
 
 // Show the new status at once. A reload would wait a second round trip and
 // swap the page for the loading state.
-function save(values: Record<string, string>, message: string) {
+function save(values: Record<string, string | number>, message: string) {
   Object.assign(article.data, values);
   updateArticle.submit(
     { doctype: "HD Article", name: article.data.name, fieldname: values },
     {
       onSuccess: (doc: Article) => {
         article.data.modified = doc.modified;
+        // unpublishing unpins
+        article.data.pinned = doc.pinned;
         toast.success(message);
       },
       onError: (error: Error) => {
@@ -452,9 +524,23 @@ function save(values: Record<string, string>, message: string) {
 }
 const isDirty = ref(false);
 
+const showWeightModal = ref(false);
+
+function saveWeight(weight: number) {
+  if (weight === (article.data.weight || 0)) return;
+  save({ weight }, __("Weight updated."));
+}
+
 const moveToModal = ref(false);
+const restoreModal = ref(false);
+// restores pick General unless the agent changes it
+const generalCategory = createResource({
+  url: "helpdesk.api.knowledge_base.get_general_category",
+  auto: true,
+});
 
 function handleMoveToCategory(category: string) {
+  const restoring = isArchived.value;
   moveToCategory.submit(
     {
       category,
@@ -463,13 +549,17 @@ function handleMoveToCategory(category: string) {
     {
       onSuccess: () => {
         article.reload();
-        moveToModal.value = false;
-        toast.success(__(`Article has been successfully moved.`));
+        moveToModal.value = restoreModal.value = false;
+        toast.success(
+          restoring
+            ? __("Article restored as a draft.")
+            : __(`Article has been successfully moved.`)
+        );
       },
       onError: (error: Error) => {
         let msg = error?.messages?.[0] || error.message;
         toast.error(msg);
-        moveToModal.value = false;
+        moveToModal.value = restoreModal.value = false;
       },
     }
   );
@@ -546,16 +636,111 @@ function handleArticleUpdate() {
   );
 }
 
-function handleDelete() {
-  deleteArticle.submit(
-    { doctype: "HD Article", name: article.data.name },
+// A ticket links it: ask whether to archive it or delete it from the ticket too.
+async function handleDelete() {
+  let cited: string[] = [];
+  try {
+    cited = await call("helpdesk.api.knowledge_base.get_cited_articles", {
+      articles: [article.data.name],
+    });
+  } catch (error) {
+    getErrorMessage(error, true);
+    return;
+  }
+  if (!cited.length) return deleteArticle();
+  // archived already, so deleting is the only way out
+  if (isArchived.value) {
+    return $dialog({
+      title: __("Delete archived article"),
+      message: __(
+        "This archived article is linked to tickets. Deleting it removes it from those tickets."
+      ),
+      actions: [
+        {
+          label: __("Delete"),
+          theme: "red",
+          iconLeft: "lucide-trash-2",
+          variant: "solid",
+          onClick({ close }) {
+            close();
+            deleteArticle();
+          },
+        },
+      ],
+    });
+  }
+  $dialog({
+    title: __("This article is linked to tickets"),
+    message: __(
+      "Archive it to keep the link, or delete it and remove it from those tickets."
+    ),
+    actions: [
+      {
+        label: __("Archive"),
+        variant: "subtle",
+        onClick({ close }) {
+          close();
+          archiveArticle();
+        },
+      },
+      {
+        label: __("Delete"),
+        theme: "red",
+        iconLeft: "lucide-trash-2",
+        variant: "solid",
+        onClick({ close }) {
+          close();
+          deleteArticle();
+        },
+      },
+    ],
+  });
+}
+
+function deleteArticle() {
+  deleteArticles.submit(
+    { articles: [article.data.name] },
     {
       onSuccess: () => {
         toast.success(__("Article deleted successfully."));
         router.push({ name: "AgentKnowledgeBase" });
       },
+      onError: (error: Error) => getErrorMessage(error, true),
     }
   );
+}
+
+function confirmArchive() {
+  $dialog({
+    title: __("Archive article"),
+    message: __(
+      "The article leaves its category and readers can't open it. Restore it later as a Draft."
+    ),
+    actions: [
+      {
+        label: __("Archive"),
+        iconLeft: "lucide-archive",
+        variant: "solid",
+        onClick({ close }) {
+          close();
+          archiveArticle();
+        },
+      },
+    ],
+  });
+}
+
+async function archiveArticle() {
+  try {
+    await call("helpdesk.api.knowledge_base.archive_articles", {
+      articles: [article.data.name],
+    });
+  } catch (error) {
+    getErrorMessage(error, true);
+    return;
+  }
+  toast.success(__("Article archived."));
+  router.push({ name: "AgentKnowledgeBase" });
 }
 const textEditorContentWithIDs = ref(null);
 watch(
@@ -607,59 +792,99 @@ const editorScrollClass = computed(
 
 const isConfirmingDeleteArticle = ref(false);
 
-const articleActions = computed(() => [
-  {
-    label: __("Edit"),
-    icon: "lucide-edit",
-    onClick: () => {
-      handleEditMode();
-    },
+const editAction = {
+  label: __("Edit"),
+  icon: "lucide-edit",
+  onClick: () => {
+    handleEditMode();
   },
-
-  ...(categories.data && categories.data > 1
-    ? [
-        {
-          label: __("Move To"),
-          icon: "lucide-corner-up-right",
-          onClick: () => (moveToModal.value = true),
-        },
-      ]
-    : [
-        {
-          label: __("Add Category"),
-          icon: "lucide-folder-plus",
-          onClick: () => (showCategoryModal.value = true),
-        },
-      ]),
-  // Drafts pick their access when published; the modal publishes them.
-  ...(isPublished.value
-    ? [
-        {
-          label: __("Change access"),
-          icon: "lucide-lock",
-          onClick: () => (showAccessModal.value = true),
-        },
-      ]
-    : []),
-  {
-    label: __("Copy link"),
-    icon: "lucide-link",
-    onClick: () =>
-      copyToClipboard(
-        window.location.origin +
-          CUSTOMER_PORTAL_ROOT +
-          ROUTES.article({
-            name: props.articleId,
-            title_slug: article.data?.title_slug,
-          }),
-        __("Article link copied to clipboard.")
-      ),
-  },
-  ...ConfirmDelete({
+};
+const deleteActions = computed(() =>
+  ConfirmDelete({
     onConfirmDelete: handleDelete,
     isConfirmingDelete: isConfirmingDeleteArticle,
-  }),
-]);
+  })
+);
+
+// an archived article has no category or readers, so it's only edited or deleted
+const articleActions = computed(() =>
+  isArchived.value
+    ? [editAction, ...deleteActions.value]
+    : [
+        editAction,
+        {
+          label: __("Copy link"),
+          icon: "lucide-link",
+          onClick: () =>
+            copyToClipboard(
+              window.location.origin +
+                CUSTOMER_PORTAL_ROOT +
+                ROUTES.article({
+                  name: props.articleId,
+                  title_slug: article.data?.title_slug,
+                }),
+              __("Article link copied to clipboard.")
+            ),
+        },
+        // Drafts pick their access when published; the modal publishes them.
+        ...(isPublished.value
+          ? [
+              {
+                label: __("Change access"),
+                icon: "lucide-lock",
+                onClick: () => (showAccessModal.value = true),
+              },
+            ]
+          : []),
+        ...(categories.data && categories.data > 1
+          ? [
+              {
+                label: __("Move To"),
+                icon: "lucide-corner-up-right",
+                onClick: () => (moveToModal.value = true),
+              },
+            ]
+          : [
+              {
+                label: __("Add Category"),
+                icon: "lucide-folder-plus",
+                onClick: () => (showCategoryModal.value = true),
+              },
+            ]),
+        // Customers never see Private articles, so they are never pinned.
+        ...(isPublished.value && article.data?.visibility !== "Private"
+          ? [
+              {
+                label: article.data?.pinned
+                  ? __("Unpin from home page")
+                  : __("Pin to home page"),
+                icon: article.data?.pinned ? "lucide-pin-off" : "lucide-pin",
+                onClick: () =>
+                  article.data.pinned
+                    ? save(
+                        { pinned: 0 },
+                        __("Article unpinned from the home page.")
+                      )
+                    : save(
+                        { pinned: 1 },
+                        __("Article pinned to the home page.")
+                      ),
+              },
+            ]
+          : []),
+        {
+          label: __("Set weight"),
+          icon: "lucide-arrow-up-narrow-wide",
+          onClick: () => (showWeightModal.value = true),
+        },
+        {
+          label: __("Archive"),
+          icon: "lucide-archive",
+          onClick: confirmArchive,
+        },
+        ...deleteActions.value,
+      ]
+);
 
 const breadcrumbs = computed(() => {
   const items: Breadcrumb[] = [
@@ -668,10 +893,21 @@ const breadcrumbs = computed(() => {
       route: { name: "AgentKnowledgeBase" },
     },
   ];
+  // the list opens the category it's sent to
+  const inList = (category: string) => ({
+    name: "AgentKnowledgeBase",
+    query: { category },
+  });
+  if (article.data?.parent_category_name) {
+    items.push({
+      label: article.data.parent_category_name,
+      route: inList(article.data.parent_article_category),
+    });
+  }
   if (article.data?.category_name) {
     items.push({
       label: article.data?.category_name,
-      route: { name: "AgentKnowledgeBase" },
+      route: inList(article.data.category),
     });
   }
   if (article.data?.title) {

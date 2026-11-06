@@ -7,6 +7,10 @@ from helpdesk.utils import agent_only, is_admin
 @frappe.whitelist()
 @agent_only
 def bulk_reply(ticket_ids: list, message: str, attachments: list | None = None):
+    """Send the same agent reply by email to each of the given tickets.
+    Goes to each ticket's raised_by, attachments (File names) copied onto every
+    ticket. Checks write access on all tickets first; a failed send is logged, not
+    raised. Agents only."""
 
     if not ticket_ids:
         return
@@ -77,6 +81,8 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 
 @frappe.whitelist()
 def delete_ticket(name: str):
+    """Delete a ticket even if other documents link to it.
+    Administrator user only."""
     if not is_admin():
         frappe.throw(
             msg=_("Only administrators can delete tickets."),

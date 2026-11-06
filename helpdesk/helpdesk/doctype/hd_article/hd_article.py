@@ -11,8 +11,9 @@ from frappe.utils import cint, evaluate_filters
 from frappe.website.utils import cleanup_page_name
 
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
-    check_category_length,
-    get_category_visibility,
+    get_joining_visibility,
+    index_articles,
+    validate_keeps_content,
 )
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
 from helpdesk.utils import capture_event, is_agent
@@ -21,16 +22,48 @@ PUBLIC = "Public"
 CUSTOMERS = "Customers"
 PRIVATE = "Private"
 EXCERPT_LENGTH = 140
+# the home page features this many; PIN_LIMITS in knowledgeBaseDraft.ts mirrors it
+MAX_PINNED_ARTICLES = 5
 
 
 class HDArticle(Document):
     def validate(self):
+        # archived articles leave their category, so the length check sees it
+        if self.status == "Archived":
+            self.category = None
         self.validate_article_category()
         self.validate_published_content()
+        self.validate_pin()
+
+    def validate_pin(self):
+        """Order is 1-based; 0 means unpinned. Only Published articles customers can read stay pinned."""
+        if self.status != "Published" or self.visibility == PRIVATE:
+            self.pinned = 0
+        if not self.pinned:
+            self.pinned_order = 0
+            return
+        before = self.get_doc_before_save()
+        if not (before and before.pinned):
+            # ponytail: count-then-pin races, a row lock if concurrent pins matter
+            pins = frappe.db.count(
+                "HD Article", {"pinned": 1, "name": ["!=", self.name]}
+            )
+            if pins >= MAX_PINNED_ARTICLES:
+                throw_pin_limit()
+        if cint(self.pinned_order) < 1:
+            # pinned from the article itself: it goes last
+            last = frappe.get_all(
+                "HD Article",
+                filters={"pinned": 1, "name": ["!=", self.name]},
+                fields=[{"MAX": "pinned_order", "as": "last"}],
+            )[0].last
+            self.pinned_order = cint(last) + 1
 
     def validate_article_category(self):
         if self.has_value_changed("category") and not self.is_new():
-            check_category_length(self.get_doc_before_save().get("category"))
+            validate_keeps_content(
+                self.get_doc_before_save().get("category"), leaving_article=self.name
+            )
 
     def validate_published_content(self):
         if self.status == "Published" and not self.content:
@@ -49,9 +82,6 @@ class HDArticle(Document):
         elif self.status == "Draft" and self.published_on:
             self.published_on = None
 
-        if self.status == "Archived" and self.category != None:
-            self.category = None
-
         # index is only set if its not set already, this allows defining index
         # at the time of creation itself if not set the index is set to the
         # last index + 1, i.e. the hd_article is added at the end
@@ -67,7 +97,7 @@ class HDArticle(Document):
         if (
             self.visibility == CUSTOMERS
             and self.category
-            and get_category_visibility(self.category) == PRIVATE
+            and get_joining_visibility(self.category) == PRIVATE
         ):
             self.visibility = PRIVATE
 
@@ -81,16 +111,11 @@ class HDArticle(Document):
         self.update_search_index()
 
     def on_trash(self):
-        check_category_length(self.category)
+        validate_keeps_content(self.category, leaving_article=self.name)
         self.update_search_index()
 
     def update_search_index(self):
-        frappe.enqueue(
-            "helpdesk.search.update_article_index",
-            article=self.name,
-            queue="short",
-            enqueue_after_commit=True,
-        )
+        index_articles([self.name], queue="short")
 
     @staticmethod
     def default_list_data():
@@ -220,3 +245,10 @@ def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bo
     if ptype in ("write", "create", "delete"):
         return True
     return can_view_article(user or frappe.session.user, doc)
+
+
+def throw_pin_limit():
+    frappe.throw(
+        _("You can pin up to {0} articles").format(MAX_PINNED_ARTICLES),
+        title=_("Too many pinned articles"),
+    )

@@ -1,0 +1,165 @@
+{
+ "block": {
+  "blockName": "home-article-list",
+  "children": [
+   {
+    "baseStyles": {
+     "borderColor": "var(--outline-gray-1, oklch(0.946 0 0))",
+     "borderRadius": "12px",
+     "borderStyle": "solid",
+     "borderWidth": "1px",
+     "display": "flex",
+     "flexDirection": "column",
+     "gap": "0px"
+    },
+    "children": [
+     {
+      "blockName": "article-row",
+      "children": [
+       {
+        "blockName": "container",
+        "children": [
+         {
+          "blockName": "container",
+          "children": [
+           {
+            "baseStyles": {
+             "flexShrink": 0,
+             "marginRight": "8px"
+            },
+            "classes": [
+             "size-4",
+             "text-ink-gray-6",
+             "mt-px"
+            ],
+            "componentId": "home-article-list-icon",
+            "componentName": "PortalArticleIcon",
+            "isCustomVueComponent": true
+           },
+           {
+            "classes": [
+             "text-ink-gray-8",
+             "flex-1"
+            ],
+            "componentId": "home-article-list-title",
+            "componentName": "TextBlock",
+            "componentProps": {
+             "fontSize": "text-p-sm",
+             "tag": "span",
+             "text": "{{ dataItem.title }}"
+            }
+           }
+          ],
+          "classes": [
+           "flex",
+           "flex-row",
+           "shrink",
+           "h-fit",
+           "w-fit",
+           "min-w-0"
+          ],
+          "componentId": "home-article-list-label",
+          "componentName": "container",
+          "originalElement": "div"
+         },
+         {
+          "classes": [
+           "size-3.5",
+           "shrink-0",
+           "text-ink-gray-4"
+          ],
+          "componentId": "home-article-list-chevron",
+          "componentName": "Icon",
+          "componentProps": {
+           "icon": "lucide-chevron-right"
+          }
+         }
+        ],
+        "classes": [
+         "items-center",
+         "flex",
+         "flex-row",
+         "shrink",
+         "h-fit",
+         "justify-between",
+         "w-full"
+        ],
+        "componentId": "home-article-list-row-inner",
+        "componentName": "container",
+        "originalElement": "div"
+       }
+      ],
+      "classes": [
+       "transition",
+       "hover:bg-surface-gray-1",
+       "items-center",
+       "rounded-none",
+       "cursor-pointer",
+       "flex",
+       "flex-row",
+       "py-3",
+       "px-4",
+       "sm:px-5",
+       "w-full",
+       "border-t",
+       "border-outline-gray-2",
+       "-mt-px",
+       "focus-visible:focus-ring",
+       "focus-visible:-outline-offset-2"
+      ],
+      "componentEvents": {
+       "mouseenter": {
+        "action": "Run Script",
+        "event": "mouseenter",
+        "script": "prefetchOnHover(dataItem.name)"
+       }
+      },
+      "componentId": "home-article-list-row",
+      "componentName": "PortalLink",
+      "componentProps": {
+       "to": "{{ routes.article(dataItem) }}"
+      },
+      "isCustomVueComponent": true
+     }
+    ],
+    "componentId": "home-article-list-repeater",
+    "componentName": "Repeater",
+    "componentProps": {
+     "data": "{{ inputs.articles || [] }}",
+     "dataKey": "name"
+    },
+    "visibilityCondition": "{{ inputs.articles && inputs.articles.length }}",
+    "rawStyles": {
+     "overflow": "hidden"
+    },
+    "classes": [
+     "portal-reveal"
+    ]
+   }
+  ],
+  "classes": [
+   "w-full"
+  ],
+  "componentId": "home-article-list",
+  "componentName": "container",
+  "originalElement": "div"
+ },
+ "component_id": "home_article_list",
+ "component_name": "Home Article List",
+ "creation": "2026-10-30 14:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Studio Component",
+ "idx": 0,
+ "inputs": [
+  {
+   "input_name": "articles",
+   "required": 0,
+   "type": "Data"
+  }
+ ],
+ "is_disabled": 0,
+ "modified": "2026-10-30 14:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "home_article_list",
+ "owner": "Administrator"
+}

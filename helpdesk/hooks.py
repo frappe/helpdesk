@@ -9,6 +9,8 @@ app_license = "AGPLv3"
 # As org/app, so `bench get-app helpdesk` fetches whichever is missing.
 required_apps = ["frappe/telephony"]
 require_type_annotated_api_methods = True
+# Open source, so API clients may read a method's code with `frappectl method show`.
+expose_discovery_source = True
 
 add_to_apps_screen = [
     {
@@ -158,6 +160,10 @@ doc_events = {
     "ToDo": {
         "on_update": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.publish_assignment_update",
     },
+}
+
+standard_queries = {
+    "HD Article Category": "helpdesk.api.knowledge_base.search_categories",
 }
 
 # For List View

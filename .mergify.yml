@@ -4,10 +4,13 @@ pull_request_rules:
       - and:
           - author != RitvikSardana
           - author != frappe-pr-bot
+          - author != frappe-release-bot[bot]
           - author != mergify[bot]
           - author != aerodeval
       - or:
           - base = main
+          - base = version-15
+          - base = version-16
     actions:
       close:
       comment:
@@ -22,21 +25,39 @@ pull_request_rules:
           - develop
         assignees:
           - "{{ author }}"
-  - name: backport to main-hotfix
+  - name: backport to version-15-hotfix
     conditions:
-      - label = "backport main-hotfix"
+      - label = "backport version-15-hotfix"
     actions:
       backport:
         branches:
-          - main-hotfix
+          - version-15-hotfix
         assignees:
           - "{{ author }}"
-  - name: backport to main
+  - name: backport to version-16-hotfix
     conditions:
-      - label = "backport main"
+      - label = "backport version-16-hotfix"
     actions:
       backport:
         branches:
-          - main
+          - version-16-hotfix
+        assignees:
+          - "{{ author }}"
+  - name: backport to version-15
+    conditions:
+      - label = "backport version-15"
+    actions:
+      backport:
+        branches:
+          - version-15
+        assignees:
+          - "{{ author }}"
+  - name: backport to version-16
+    conditions:
+      - label = "backport version-16"
+    actions:
+      backport:
+        branches:
+          - version-16
         assignees:
           - "{{ author }}"

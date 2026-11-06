@@ -4,6 +4,8 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import change_settings
 
+from helpdesk.test_utils import make_article, make_article_category, unique_name
+
 
 class TestHDArticleFeedback(IntegrationTestCase):
     def setUp(self):
@@ -143,3 +145,16 @@ class TestHDArticleFeedback(IntegrationTestCase):
     def test_feedback_goes_through_vote_on_article_only(self):
         # a whitelisted doc method would skip the read check and rate limit
         self.assertNotIn(type(self.article).set_feedback, frappe.whitelisted)
+
+
+class TestHDArticle(IntegrationTestCase):
+    def test_archiving_the_last_article_is_refused(self):
+        category = make_article_category(unique_name("Solo")).name
+        article = frappe.get_doc("HD Article", make_article(category=category))
+
+        with self.assertRaises(frappe.ValidationError):
+            article.update({"status": "Archived"}).save()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Article", article.name, "category"), category
+        )

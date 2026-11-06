@@ -67,6 +67,8 @@ def sanitize_query(query: str) -> str:
 
 @frappe.whitelist()
 def get_article_stats(article_name: str):
+    """A knowledge base article's views, likes and dislikes.
+    For anyone who may read the article."""
     if not frappe.db.exists("HD Article", article_name):
         raise frappe.PermissionError
     frappe.has_permission("HD Article", "read", article_name, throw=True)
@@ -97,6 +99,9 @@ def get_article_stats(article_name: str):
 
 @frappe.whitelist()
 def search(query: str) -> list:
+    """Search published articles the user may read; returns up to 5 raw index hits.
+    Retries with the query's noun phrases, then nouns, when there are fewer. Hits carry
+    <b> highlights. Errors when RediSearch or its index is missing."""
     query = sanitize_query(query)
     ret, enough = search_with_enough_results([], query)
     if enough:
@@ -121,6 +126,8 @@ def search(query: str) -> list:
 
 @frappe.whitelist()
 def get_related(query: str) -> list[dict]:
+    """Up to 3 readable articles related to `query`, as {name, title, title_slug}.
+    A query of only stopwords matches titles. Empty without the search index."""
     return [
         {
             "name": row["name"],
