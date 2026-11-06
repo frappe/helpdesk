@@ -94,6 +94,16 @@ class TestOrganizationMembers(IntegrationTestCase):
         ):
             get_organization(self.customer.name)
 
+    def test_an_agent_outside_the_organization_sees_its_name_and_logo(self) -> None:
+        self.customer.db_set({"image": "/files/org-logo.png", "domain": "org.test"})
+        agent = unique_email("org-agent")
+        create_agent(agent)
+        with self.set_user(agent):
+            organization = get_organization(self.customer.name)
+        self.assertEqual(organization["customer_name"], self.customer.customer_name)
+        self.assertEqual(organization["image"], "/files/org-logo.png")
+        self.assertEqual(organization["domain"], "org.test")
+
     def test_a_manager_can_switch_a_member_to_manager(self) -> None:
         with self.set_user(self.manager["user"]):
             update_member_role(self.customer.name, self.member["contact"], True)
