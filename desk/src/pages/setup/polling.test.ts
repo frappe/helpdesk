@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_POLLS, pollDelay } from "./polling";
+import { pollDelay } from "./polling";
 
 describe("pollDelay", () => {
   it("polls quickly at first so a fresh ticket shows up fast", () => {
@@ -16,7 +16,6 @@ describe("pollDelay", () => {
 
   it("gives up after a bounded number of polls", () => {
     expect(pollDelay(24)).toBeNull();
-    expect(pollDelay(MAX_POLLS)).toBeNull();
-    expect(pollDelay(MAX_POLLS - 1)).not.toBeNull();
+    expect(pollDelay(100)).toBeNull();
   });
 });

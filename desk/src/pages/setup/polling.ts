@@ -5,8 +5,6 @@ const SCHEDULE: [count: number, delayMs: number][] = [
   [10, 30000],
 ];
 
-export const MAX_POLLS = SCHEDULE.reduce((total, [count]) => total + count, 0);
-
 /** Wait before poll number `attempt` (from 0), or null once polling should stop. */
 export function pollDelay(attempt: number): number | null {
   let remaining = attempt;
