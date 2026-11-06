@@ -121,6 +121,7 @@ function revealActiveGroup(nav) {
 }
 
 function onTabChange(tab) {
+  if (tab.label === activeTab.value?.label) return;
   if (!disableSettingModalOutsideClick.value) {
     activeTab.value = tab;
     return;
