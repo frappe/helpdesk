@@ -186,7 +186,10 @@ class TestMarkChecklistSteps(IntegrationTestCase):
 
         mark_checklist_steps(["setup_email_account"])
 
-        stored = {step["name"]: step["completed"] for step in get_stored_onboarding_steps("Administrator")}
+        stored = {
+            step["name"]: step["completed"]
+            for step in get_stored_onboarding_steps("Administrator")
+        }
         self.assertNotIn("old_step", stored)
         self.assertTrue(stored["setup_sla"])
         self.assertTrue(stored["setup_email_account"])
