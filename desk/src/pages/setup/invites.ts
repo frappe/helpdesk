@@ -11,6 +11,14 @@ export type InviteRow = {
 
 export const MAX_INVITE_ROWS = 20;
 
+let nextRowId = 1;
+export const createInviteRow = (role: Role = "Agent"): InviteRow => ({
+  id: nextRowId++,
+  email: "",
+  role,
+  sent: false,
+});
+
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 const isEmail = (email: string) => zod.string().email().safeParse(email).success;
@@ -54,4 +62,17 @@ export function groupUnsentByRole(
     (groups[row.role] ??= []).push(email);
   }
   return groups;
+}
+
+/** The valid, unique addresses typed so far, for the preview. */
+export function previewInvitees(rows: InviteRow[]) {
+  const seen = new Set<string>();
+  const invitees: { email: string; role: Role; sent: boolean }[] = [];
+  for (const row of rows) {
+    const email = normalizeEmail(row.email);
+    if (!isEmail(email) || seen.has(email)) continue;
+    seen.add(email);
+    invitees.push({ email, role: row.role, sent: row.sent });
+  }
+  return invitees;
 }

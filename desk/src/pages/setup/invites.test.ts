@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   groupUnsentByRole,
   normalizeEmail,
+  previewInvitees,
   validateRows,
   type InviteRow,
 } from "./invites";
@@ -69,5 +70,21 @@ describe("groupUnsentByRole", () => {
         row(2, "A@x.com", "Agent Manager"),
       ])
     ).toEqual({});
+  });
+});
+
+describe("previewInvitees", () => {
+  it("lists each valid address once, keeping the sent state", () => {
+    expect(
+      previewInvitees([
+        row(1, "a@x.com", "Agent", true),
+        row(2, "A@x.com"),
+        row(3, "nope"),
+        row(4, "b@x.com", "Agent Manager"),
+      ])
+    ).toEqual([
+      { email: "a@x.com", role: "Agent", sent: true },
+      { email: "b@x.com", role: "Agent Manager", sent: false },
+    ]);
   });
 });

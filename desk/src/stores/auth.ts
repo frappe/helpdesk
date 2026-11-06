@@ -26,6 +26,9 @@ export const useAuthStore = defineStore("auth", () => {
     () => user__.value.has_desk_access
   );
   const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
+  const setupPending: ComputedRef<boolean> = computed(
+    () => !!user__.value.setup_pending
+  );
   const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
   const hasAgentRecord: ComputedRef<boolean> = computed(
     () => user__.value.has_agent_record
@@ -64,6 +67,11 @@ export const useAuthStore = defineStore("auth", () => {
   );
   const language: ComputedRef<string> = computed(() => user__.value.language);
 
+  /** The server flag is set by complete_setup; this keeps the cached profile in step. */
+  function markSetupDone() {
+    userInfo.setData({ ...userInfo.data, setup_pending: false });
+  }
+
   function sessionUser() {
     const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
     let _sessionUser = cookies.get("user_id");
@@ -93,6 +101,8 @@ export const useAuthStore = defineStore("auth", () => {
     isManager,
     isLoggedIn,
     reloadUser,
+    setupPending,
+    markSetupDone,
     userFirstName,
     userId,
     userImage,
