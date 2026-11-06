@@ -662,6 +662,19 @@ test.describe("article page", () => {
     await expect(heading, "the page should scroll to the linked heading").toBeInViewport({ timeout: 2000 });
   });
 
+  test("AR28 the meta line shows the updated date once it differs from the published date", async ({ page, api }) => {
+    const category = await createCategory(api);
+    const article = await createArticle(api, category.name);
+    await page.goto(`/help/articles/${article.name}`);
+    await expect(page.getByText("1 minute to read")).toBeVisible();
+    await expect(page.getByText(/^Updated /)).toHaveCount(0);
+
+    await api.update("HD Article", article.name, { published_on: "2026-01-02 10:00:00" });
+    await page.reload();
+    await expect(page.getByText("2 Jan 2026")).toBeVisible();
+    await expect(page.getByText(/^Updated /)).toBeVisible();
+  });
+
   test("AR6 AR7 AR9–AR12 meta line, view count and copy actions", async ({ page, api, context }) => {
     const category = await createCategory(api);
     const article = await createArticle(api, category.name, { title: `Copy me ${uid()}`, visibility: "Customers" });
