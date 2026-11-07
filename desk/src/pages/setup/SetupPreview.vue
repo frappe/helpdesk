@@ -376,7 +376,7 @@ const INK = [0.85, 0.5, 0.3];
 const strands = [-2, -1, 0, 1, 2].map((i) => ({
   i,
   d: strandPath(i),
-  opacity: INK[Math.abs(i)] ?? 0.3,
+  opacity: INK[Math.abs(i)],
   delay: Math.abs(i) * 180,
 }));
 const strandOn = (i: number) => {
