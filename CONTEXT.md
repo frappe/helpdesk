@@ -2,6 +2,12 @@
 
 Agents answer customer tickets and publish a knowledge base that customers and guests read on the portal.
 
+## Tickets
+
+**Source**:
+The channel a ticket came in through: Email or Portal. A ticket an agent raises from the desk counts as Portal.
+_Avoid_: channel, via portal
+
 ## Knowledge base
 
 **Article**:

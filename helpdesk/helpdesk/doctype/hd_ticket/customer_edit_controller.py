@@ -26,7 +26,7 @@ class CustomerEditController:
         self.reset_read_only_fields()
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
-        self.via_customer_portal = 1
+        self.source = "Portal"
         self.flags.ignore_permlevel_for_fields = [
             *PORTAL_INSERT_EXEMPT_FIELDS,
             *(row.fieldname for row in self.customer_writable_rows()),
@@ -50,7 +50,7 @@ class CustomerEditController:
                 self.set(df.fieldname, defaults.get(df.fieldname))
 
     def check_update_perms(self):
-        # not gated on via_customer_portal: agent-raised tickets are still the customer's
+        # not gated on source: agent-raised tickets are still the customer's
         old_doc = self.get_doc_before_save()
         if not old_doc or is_agent():
             return

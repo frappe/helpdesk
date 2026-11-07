@@ -207,7 +207,7 @@ export interface Ticket {
   status: string;
   subject: string;
   ticket_type: string;
-  via_customer_portal: string;
+  source: string;
   agreement_status: string;
   creation: string;
   feedback_rating?: number;

@@ -146,16 +146,23 @@ const cases: FilterCase[] = [
     hidden: ["a"],
   },
   {
-    field: "Via Customer Portal",
-    setup: each({ a: 1, b: 0, c: 1 }, "via_customer_portal"),
+    field: "Ticket Merged",
+    setup: each({ a: 1, b: 0, c: 1 }, "is_merged"),
     enter: pick("Yes"),
     shown: ["a", "c"],
     hidden: ["b"],
   },
   {
-    field: "Via Customer Portal",
-    setup: each({ a: 1, b: 0, c: 1 }, "via_customer_portal"),
+    field: "Ticket Merged",
+    setup: each({ a: 1, b: 0, c: 1 }, "is_merged"),
     enter: pick("No"),
+    shown: ["b"],
+    hidden: ["a", "c"],
+  },
+  {
+    field: "Source",
+    setup: emailTicketAsB,
+    enter: pick("Email"),
     shown: ["b"],
     hidden: ["a", "c"],
   },
@@ -256,4 +263,14 @@ async function tagB({ api, id, names }: Context) {
     dt: "HD Ticket",
     dn: names.b,
   });
+}
+
+// The source is fixed once a ticket exists, so b is swapped for one that came in by email.
+async function emailTicketAsB({ api, id, names }: Context) {
+  await api.update("HD Ticket", names.b, { subject: `${id} retired` });
+  const emailed = await api.insert("HD Ticket", {
+    subject: `${id} ${SUBJECTS.b}`,
+    raised_by: personas.customer.email,
+  });
+  names.b = String(emailed.name);
 }
