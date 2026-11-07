@@ -611,14 +611,22 @@ def get_latest_ticket_communication(ticket_name: str):
 
 
 def add_message(
-    ticket: str, direction: str, sender: str, subject: str = "Test message"
+    ticket: str,
+    direction: str,
+    sender: str,
+    subject: str = "Test message",
+    email_account: str | None = None,
 ) -> None:
-    """Insert a Communication on a ticket at the current (possibly frozen) time."""
+    """Insert a Communication on a ticket at the current (possibly frozen) time.
+
+    Pass `email_account` to make it look like the mailbox fetched it.
+    """
     frappe.get_doc(
         {
             "doctype": "Communication",
             "communication_type": "Communication",
             "communication_medium": "Email",
+            "email_account": email_account,
             "sent_or_received": direction,
             "sender": sender,
             "subject": subject,
@@ -1211,3 +1219,14 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
     cards = HelpdeskDashboard(filters).get_number_card_data()
     return {card["title"]: card for card in cards}
+
+
+def get_setup_complete() -> int:
+    """Return the site-wide first-run setup flag from HD Settings."""
+    return frappe.db.get_single_value("HD Settings", "setup_complete")
+
+
+def get_stored_onboarding_steps(user: str) -> list[dict]:
+    """Return the sidebar checklist steps stored on the user's onboarding_status."""
+    raw = frappe.db.get_value("User", user, "onboarding_status")
+    return frappe.parse_json(raw)["helpdesk_onboarding_status"]

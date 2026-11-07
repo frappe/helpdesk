@@ -1,0 +1,36 @@
+name: Desk Unit Tests
+
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - "desk/**"
+      - ".github/workflows/desk-unit-tests.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: desk-unit-tests-helpdesk-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Vitest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          check-latest: true
+
+      - name: Install
+        run: cd desk && yarn install --ignore-scripts --frozen-lockfile
+
+      - name: Run unit tests
+        run: cd desk && yarn test

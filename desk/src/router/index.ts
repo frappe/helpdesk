@@ -1,4 +1,5 @@
 import { useScreenSize } from "@/composables/screen";
+import { canViewSetup, setupRedirect } from "@/pages/setup/guard";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { CUSTOMER_PORTAL_ROOT } from "@/utils";
@@ -145,6 +146,13 @@ const routes = [
     component: () => import("@/roots/AgentRoot.vue"),
     children: portalRoutes,
   },
+  // Full screen, outside the desk layout.
+  {
+    path: "/setup",
+    name: "Setup",
+    component: () => import("@/pages/setup/Setup.vue"),
+    beforeEnter: () => canViewSetup(useAuthStore()) || { name: "Home" },
+  },
 ];
 
 const handleMobileView = (componentName: string) => {
@@ -175,6 +183,8 @@ router.beforeEach(async (to, _, next) => {
   } else if (!authStore.hasDeskAccess) {
     window.location.replace(window.customer_home_page);
   } else {
+    const redirect = setupRedirect(to, authStore);
+    if (redirect) return next(redirect);
     next();
   }
 });

@@ -6,6 +6,7 @@ from frappe.tests.utils import change_settings
 
 from helpdesk.api.auth import (
     get_current_user_email_info,
+    get_user,
     set_user_email_accounts,
     update_profile,
 )
@@ -166,3 +167,17 @@ class TestSetUserEmailAccounts(IntegrationTestCase):
 
         with self.set_user(user), self.assertRaises(frappe.PermissionError):
             set_user_email_accounts([self.support])
+
+
+class TestSetupPending(IntegrationTestCase):
+    def test_only_an_admin_on_a_fresh_site_is_pending(self) -> None:
+        agent = "setup-pending-agent@example.com"
+        create_agent(agent)
+
+        with change_settings("HD Settings", {"setup_complete": 0}):
+            self.assertTrue(get_user()["setup_pending"])
+            with self.set_user(agent):
+                self.assertFalse(get_user()["setup_pending"])
+
+        with change_settings("HD Settings", {"setup_complete": 1}):
+            self.assertFalse(get_user()["setup_pending"])
