@@ -308,15 +308,15 @@
             :class="agent.sent ? 'opacity-100' : 'opacity-70'"
           >
             <Avatar
-              :label="agent.label"
-              :image="avatarFor(agent.label)"
+              :label="agent.key"
+              :image="avatarFor(agent.key)"
               size="xl"
             />
           </span>
           <span
             v-if="!agent.more"
             class="max-w-full truncate text-xs text-ink-gray-6"
-            >{{ agent.name }}</span
+            >{{ agent.key.split("@")[0] }}</span
           >
         </div>
       </TransitionGroup>
@@ -394,8 +394,6 @@ const agents = computed(() => {
     const [x, y] = AGENT_SLOTS[n]!;
     return {
       key: invitee.email,
-      label: invitee.email,
-      name: invitee.email.split("@")[0],
       sent: invitee.sent,
       x,
       y,
@@ -408,8 +406,6 @@ const agents = computed(() => {
     const [x, y] = AGENT_SLOTS[AGENT_SLOTS.length - 1]!;
     out.push({
       key: "more",
-      label: "",
-      name: "more",
       sent: rest.every((invitee) => invitee.sent),
       x,
       y,
