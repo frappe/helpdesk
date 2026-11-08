@@ -69,7 +69,7 @@ async function fillForm(page: Page, dialog: ReturnType<Page["getByRole"]>, categ
 }
 
 const solidButtons = (scope: ReturnType<Page["getByRole"]>) =>
-  scope.locator("button.bg-surface-gray-10");
+  scope.locator("button.bg-surface-gray-10, a.bg-surface-gray-10");
 
 test("importing shows progress, then the three counts and a link to the drafts", async ({
   page,

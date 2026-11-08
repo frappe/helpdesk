@@ -33,8 +33,8 @@
               class="flex items-start gap-2 text-p-sm text-ink-red-5"
               role="alert"
             >
-              <span
-                class="lucide-circle-alert mt-0.5 size-4 shrink-0"
+              <LucideCircleAlert
+                class="mt-0.5 size-4 shrink-0"
                 aria-hidden="true"
               />
               {{
@@ -78,8 +78,8 @@
               v-if="run.stage !== 'reading'"
               class="flex items-center gap-2 text-base text-ink-gray-8"
             >
-              <span
-                class="lucide-loader-circle size-4 shrink-0 animate-spin text-ink-gray-6 motion-reduce:animate-none"
+              <LucideLoaderCircle
+                class="size-4 shrink-0 animate-spin text-ink-gray-6 motion-reduce:animate-none"
                 aria-hidden="true"
               />
               <span class="min-w-0 truncate" :title="run.host">{{
@@ -114,8 +114,8 @@
             v-if="nothingNew"
             class="flex items-start gap-3 text-p-base text-ink-gray-8"
           >
-            <span
-              class="lucide-circle-check mt-0.5 size-5 shrink-0 text-ink-gray-6"
+            <LucideCircleCheck
+              class="mt-0.5 size-5 shrink-0 text-ink-gray-6"
               aria-hidden="true"
             />
             {{ __("Everything on {0} is already imported.", [run.host]) }}
@@ -153,12 +153,15 @@
               :label="__('Close')"
               @click="open = false"
             />
-            <Button
+            <a
               v-else
-              variant="solid"
-              :link="viewDraftsHref(run.category)"
-              :label="__('View drafts')"
-            />
+              :href="viewDraftsHref(run.category)"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex h-7 items-center rounded px-2 text-base font-medium text-ink-base bg-surface-gray-10 hover:bg-surface-gray-9 active:bg-surface-gray-8 focus-visible:ring focus-visible:ring-outline-gray-3"
+            >
+              {{ __("View drafts") }}
+            </a>
           </div>
         </template>
       </div>
@@ -178,6 +181,9 @@ import {
   createResource,
 } from "frappe-ui";
 import { computed, ref, watch } from "vue";
+import LucideCircleAlert from "~icons/lucide/circle-alert";
+import LucideCircleCheck from "~icons/lucide/circle-check";
+import LucideLoaderCircle from "~icons/lucide/loader-circle";
 import { __ } from "../translation";
 import {
   notAllowed,

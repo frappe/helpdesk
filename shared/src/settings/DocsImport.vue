@@ -28,8 +28,8 @@
       class="flex min-h-11 w-full items-center gap-2.5 rounded-5 border border-outline-gray-2 px-3 text-left text-p-base text-ink-gray-7 hover:bg-surface-gray-1 sm:min-h-10"
       @click="open = true"
     >
-      <span
-        class="lucide-loader-circle size-4 shrink-0 animate-spin text-ink-gray-6 motion-reduce:animate-none"
+      <LucideLoaderCircle
+        class="size-4 shrink-0 animate-spin text-ink-gray-6 motion-reduce:animate-none"
         aria-hidden="true"
       />
       <span
@@ -45,16 +45,15 @@
       v-else-if="result?.state === 'done'"
       class="flex min-h-11 items-center gap-2.5 rounded-5 border border-outline-gray-2 px-3 text-p-base text-ink-gray-7 sm:min-h-10"
     >
-      <span
-        class="lucide-check size-4 shrink-0 text-ink-gray-6"
-        aria-hidden="true"
-      />
+      <LucideCheck class="size-4 shrink-0 text-ink-gray-6" aria-hidden="true" />
       <span class="min-w-0 flex-1 truncate" :title="doneLine">
         {{ doneLine }}
       </span>
       <a
         v-if="result.created"
         :href="viewDraftsHref(result.category)"
+        target="_blank"
+        rel="noopener"
         class="shrink-0 text-ink-gray-8 underline underline-offset-2"
       >
         {{ __("View drafts") }}
@@ -68,6 +67,8 @@
 <script setup lang="ts">
 import { Button } from "frappe-ui";
 import { computed, onMounted, ref, watch } from "vue";
+import LucideCheck from "~icons/lucide/check";
+import LucideLoaderCircle from "~icons/lucide/loader-circle";
 import { __ } from "../translation";
 import DocsImportDialog from "./DocsImportDialog.vue";
 import { useImportResult, viewDraftsHref } from "./docsImport";
