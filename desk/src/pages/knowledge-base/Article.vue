@@ -227,12 +227,9 @@
             </div>
           </div>
         </div>
-        <p
-          v-if="article.data?.docs_page_url"
-          class="mt-3 text-p-sm text-ink-gray-6"
-        >
+        <p v-if="docsPageUrl" class="mt-3 text-p-sm text-ink-gray-6">
           <a
-            :href="article.data.docs_page_url"
+            :href="docsPageUrl"
             target="_blank"
             rel="noopener"
             class="underline"
@@ -491,6 +488,12 @@ const articleStats = createResource({
     views.value = data.views;
   },
   auto: true,
+});
+
+// The field is writable through the API, so only an https link is ever rendered.
+const docsPageUrl = computed(() => {
+  const url = article.data?.docs_page_url;
+  return /^https:\/\//i.test(url || "") ? url : "";
 });
 
 const isPublished = computed(() => article.data?.status === "Published");

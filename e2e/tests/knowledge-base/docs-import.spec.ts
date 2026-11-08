@@ -171,7 +171,11 @@ test("the dialog fits the narrowest settings width and keeps the three counts in
 });
 
 test.describe("edited since the copy", () => {
-  async function docsArticle(api: Parameters<typeof createArticle>[0], edited: boolean) {
+  async function docsArticle(
+    api: Parameters<typeof createArticle>[0],
+    edited: boolean,
+    pageUrl = `${DOCS_URL}/e2e/${uid()}`,
+  ) {
     const category = await createCategory(api);
     const article = await createArticle(api, category.name, {
       title: `E2E Docs copy ${uid()}`,
@@ -180,7 +184,7 @@ test.describe("edited since the copy", () => {
     const saved = (await api.get("HD Article", article.name)).content as string;
     const hash = (text: string) => createHash("sha1").update(text).digest("hex");
     await api.update("HD Article", article.name, {
-      docs_page_url: `${DOCS_URL}/e2e/${uid()}`,
+      docs_page_url: pageUrl,
       docs_copied_on: "2026-01-02 10:00:00",
       docs_content_hash: hash(edited ? `${saved} older` : saved),
     });
@@ -197,5 +201,13 @@ test.describe("edited since the copy", () => {
     await page.goto(`/helpdesk/kb/articles/${untouched.name}`);
     await expect(page.getByText(/Copied from docs on/)).toBeVisible();
     await expect(page.getByText("Edited since")).toHaveCount(0);
+  });
+
+  test("a stored link that is not https is never rendered as a link", async ({ page, api }) => {
+    const article = await docsArticle(api, false, "javascript:alert(1)");
+    await page.goto(`/helpdesk/kb/articles/${article.name}`);
+    await expect(page.getByRole("heading").first()).toBeVisible();
+    await expect(page.getByText(/Copied from docs on/)).toHaveCount(0);
+    await expect(page.locator('a[href^="javascript:"]')).toHaveCount(0);
   });
 });
