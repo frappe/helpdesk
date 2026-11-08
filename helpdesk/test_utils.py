@@ -1275,13 +1275,28 @@ def make_docs_site(
                 f"# {title}\n\n{title} explains how this part of the product works.\n"
             )
     if sitemap:
-        locs = "".join(f"<url><loc>https://{host}/{path}</loc></url>" for path in pages)
-        site[f"https://{host}/sitemap.xml"] = (
-            f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{locs}</urlset>'
+        site[f"https://{host}/sitemap.xml"] = make_sitemap(
+            *(f"https://{host}/{path}" for path in pages)
         )
         for path, title in pages.items():
             site[f"https://{host}/{path}"] = make_docs_page(title)
     return site
+
+
+def make_sitemap(*urls: str) -> str:
+    """A sitemap.xml body listing each full URL."""
+    locs = "".join(f"<url><loc>{url}</loc></url>" for url in urls)
+    return f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{locs}</urlset>'
+
+
+def get_category_articles(category: str) -> list:
+    """The HD Articles in `category` with the import fields, ordered by title."""
+    return frappe.get_list(
+        "HD Article",
+        filters={"category": category},
+        fields=["name", "title", "status", "docs_page_url", "docs_copied_on"],
+        order_by="title",
+    )
 
 
 def patch_docs_site(case, site: dict) -> MagicMock:

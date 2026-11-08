@@ -14,10 +14,12 @@ from helpdesk.docs_source.importer import (
 )
 from helpdesk.test_utils import (
     article_index_jobs,
+    get_category_articles,
     make_article,
     make_article_category,
     make_docs_page,
     make_docs_site,
+    make_sitemap,
     patch_docs_site,
     unique_name,
 )
@@ -34,14 +36,6 @@ class DocsImportCase(IntegrationTestCase):
 
     def run_import(self, url=BASE):
         return DocsImport(url, self.category).run()
-
-    def articles(self):
-        return frappe.get_list(
-            "HD Article",
-            filters={"category": self.category},
-            fields=["name", "title", "status", "docs_page_url", "docs_copied_on"],
-            order_by="title",
-        )
 
 
 class TestSources(DocsImportCase):
@@ -63,11 +57,11 @@ class TestSources(DocsImportCase):
         site = {
             f"{BASE}/llms.txt": f"- [Guide]({BASE}/guide): about\n",
             f"{BASE}/guide": make_docs_page("Guide"),
-            f"{BASE}/sitemap.xml": "<urlset><url><loc>https://docs.example.com/other</loc></url></urlset>",
+            f"{BASE}/sitemap.xml": make_sitemap(f"{BASE}/other"),
         }
         fetch = patch_docs_site(self, site)
         self.assertEqual(self.run_import()["created"], 1)
-        self.assertEqual([a.title for a in self.articles()], ["Guide"])
+        self.assertEqual([a.title for a in get_category_articles(self.category)], ["Guide"])
         self.assertNotIn(
             f"{BASE}/sitemap.xml", [c.args[0] for c in fetch.call_args_list]
         )
@@ -88,7 +82,7 @@ class TestCreate(DocsImportCase):
             result = self.run_import()
         self.assertEqual(result, {"created": 3, "skipped": 0, "failed": 0})
         self.assertEqual(len(article_index_jobs(enqueue)), 1)
-        rows = {row.docs_page_url: row for row in self.articles()}
+        rows = {row.docs_page_url: row for row in get_category_articles(self.category)}
         self.assertEqual(set(rows), {f"{BASE}/a", f"{BASE}/b/c", f"{BASE}/d"})
         for row in rows.values():
             self.assertEqual(row.status, "Draft")
@@ -113,7 +107,7 @@ class TestCreate(DocsImportCase):
         result = self.run_import()
 
         self.assertEqual(result, {"created": 1, "skipped": 2, "failed": 0})
-        self.assertEqual([a.title for a in self.articles()], ["Alpha", "Beta", "Gamma"])
+        self.assertEqual([a.title for a in get_category_articles(self.category)], ["Alpha", "Beta", "Gamma"])
         self.assertEqual(self.run_import(), {"created": 0, "skipped": 3, "failed": 0})
 
     def test_url_variants_are_one_page(self):
@@ -136,7 +130,7 @@ class TestCreate(DocsImportCase):
         with patch.object(importer, "MAX_PAGES", 20):
             created = [self.run_import()["created"] for _ in range(4)]
         self.assertEqual(created, [20, 20, 5, 0])
-        self.assertEqual(len(self.articles()), 45)
+        self.assertEqual(len(get_category_articles(self.category)), 45)
 
     def test_unreadable_page_counts_failed_and_rest_import(self):
         site = make_docs_site(
@@ -147,12 +141,12 @@ class TestCreate(DocsImportCase):
         site[f"{BASE}/d.md"] = "# Delta\n\n"
         patch_docs_site(self, site)
         self.assertEqual(self.run_import(), {"created": 1, "skipped": 0, "failed": 3})
-        self.assertEqual([a.title for a in self.articles()], ["Alpha"])
+        self.assertEqual([a.title for a in get_category_articles(self.category)], ["Alpha"])
 
     def test_content_hash_stored_and_edit_detected(self):
         patch_docs_site(self, make_docs_site(HOST, {"a": "Alpha"}))
         self.run_import()
-        name = self.articles()[0].name
+        name = get_category_articles(self.category)[0].name
         self.assertFalse(get_article(name).docs_edited)
         self.assertNotIn("docs_content_hash", get_article(name))
 
