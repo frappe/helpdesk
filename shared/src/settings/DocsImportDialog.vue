@@ -4,147 +4,136 @@
     :title="__('Import pages from a docs site')"
     size="md"
   >
-    <template #default>
-      <div class="space-y-5">
-        <!-- Form and error share the fields; the error adds its message above them -->
-        <template v-if="screen === 'form' || screen === 'error'">
+    <div class="space-y-5">
+      <!-- Form and error share the fields; the error adds its message above them -->
+      <template v-if="screen === 'form' || screen === 'error'">
+        <p
+          v-if="errorText"
+          class="flex items-start gap-2 text-p-sm text-ink-red-3"
+          role="alert"
+        >
+          <LucideCircleAlert
+            class="mt-0.5 size-4 shrink-0"
+            aria-hidden="true"
+          />
+          {{ errorText }}
+        </p>
+        <div class="space-y-4" @keydown.enter="onEnter">
+          <TextInput
+            v-model="url"
+            :label="__('Docs site address')"
+            :description="
+              __('We look for an llms.txt first, then a sitemap.xml.')
+            "
+            placeholder="https://docs.example.com"
+            type="url"
+            maxlength="500"
+            required
+            autofocus
+          />
+          <Combobox
+            v-model="category"
+            :label="__('Add the drafts to')"
+            :placeholder="__('Pick a category')"
+            :options="options"
+            :loading="categories.loading"
+            :description="
+              noCategories
+                ? __('No categories yet. Create one first.')
+                : undefined
+            "
+            required
+          />
+        </div>
+        <p class="text-p-sm text-ink-gray-5">
+          {{ __("Pages you have already imported are skipped.") }}
+        </p>
+        <div class="flex justify-end">
+          <Button
+            variant="solid"
+            :label="screen === 'error' ? __('Try again') : __('Import')"
+            :disabled="screen !== 'error' && !canImport"
+            :loading="start.loading"
+            @click="screen === 'error' ? (showForm = true) : submit()"
+          />
+        </div>
+      </template>
+
+      <template v-else-if="screen === 'working' && run?.state === 'running'">
+        <div class="space-y-3" aria-live="polite">
           <p
-            v-if="errorText"
-            class="flex items-start gap-2 text-p-sm text-ink-red-3"
-            role="alert"
+            v-if="run.stage !== 'reading'"
+            class="flex items-center gap-2 text-base text-ink-gray-8"
           >
-            <LucideCircleAlert
-              class="mt-0.5 size-4 shrink-0"
+            <LucideLoaderCircle
+              class="size-4 shrink-0 animate-spin text-ink-gray-6 motion-reduce:animate-none"
               aria-hidden="true"
             />
-            {{ errorText }}
+            <span class="min-w-0 truncate" :title="run.host">{{
+              stepText
+            }}</span>
           </p>
-          <div class="space-y-4" @keydown.enter="onEnter">
-            <TextInput
-              v-model="url"
-              :label="__('Docs site address')"
-              :description="
-                __('We look for an llms.txt first, then a sitemap.xml.')
-              "
-              :placeholder="'https://docs.example.com'"
-              type="url"
-              maxlength="500"
-              required
-              autofocus
-            />
-            <Combobox
-              v-model="category"
-              :label="__('Add the drafts to')"
-              :placeholder="__('Pick a category')"
-              :options="options"
-              :loading="categories.loading"
-              :description="
-                noCategories
-                  ? __('No categories yet. Create one first.')
-                  : undefined
-              "
-              required
-            />
-          </div>
-          <p class="text-p-sm text-ink-gray-5">
-            {{ __("Pages you have already imported are skipped.") }}
-          </p>
-          <div class="flex justify-end">
-            <Button
-              variant="solid"
-              :label="screen === 'error' ? __('Try again') : __('Import')"
-              :disabled="screen !== 'error' && !canImport"
-              :loading="start.loading"
-              @click="screen === 'error' ? (showForm = true) : submit()"
-            />
-          </div>
-        </template>
+          <Progress v-else :value="percent" :label="stepText" hint />
+        </div>
+        <p class="text-p-sm text-ink-gray-5">
+          {{
+            timedOut
+              ? __(
+                  "This is taking longer than expected. Check back in a few minutes.",
+                )
+              : __("You can close this window. The import keeps running.")
+          }}
+        </p>
+        <div class="flex justify-end">
+          <Button variant="ghost" :label="__('Close')" @click="open = false" />
+        </div>
+      </template>
 
-        <template v-else-if="screen === 'working' && run?.state === 'running'">
-          <div class="space-y-3" aria-live="polite">
-            <p
-              v-if="run.stage !== 'reading'"
-              class="flex items-center gap-2 text-base text-ink-gray-8"
-            >
-              <LucideLoaderCircle
-                class="size-4 shrink-0 animate-spin text-ink-gray-6 motion-reduce:animate-none"
-                aria-hidden="true"
-              />
-              <span class="min-w-0 truncate" :title="run.host">{{
-                stepText
-              }}</span>
-            </p>
-            <Progress v-else :value="percent" :label="stepText" hint />
+      <template v-else-if="screen === 'done' && run?.state === 'done'">
+        <p
+          v-if="nothingNew"
+          class="flex items-start gap-3 text-p-base text-ink-gray-8"
+        >
+          <LucideCircleCheck
+            class="mt-0.5 size-5 shrink-0 text-ink-gray-6"
+            aria-hidden="true"
+          />
+          {{ __("Everything on {0} is already imported.", [run.host]) }}
+        </p>
+        <dl
+          v-else
+          class="grid grid-cols-3 divide-x divide-outline-gray-2 rounded-5 border border-outline-gray-2"
+        >
+          <div v-for="figure in figures" :key="figure.label" class="px-3 py-4">
+            <dd class="text-3xl tabular-nums text-ink-gray-9">
+              {{ figure.value }}
+            </dd>
+            <dt class="mt-1 text-p-sm text-ink-gray-5">
+              {{ figure.label }}
+            </dt>
           </div>
-          <p class="text-p-sm text-ink-gray-5">
-            {{
-              timedOut
-                ? __(
-                    "This is taking longer than expected. Check back in a few minutes."
-                  )
-                : __("You can close this window. The import keeps running.")
-            }}
-          </p>
-          <div class="flex justify-end">
-            <Button
-              variant="ghost"
-              :label="__('Close')"
-              @click="open = false"
-            />
-          </div>
-        </template>
-
-        <template v-else-if="screen === 'done' && run?.state === 'done'">
-          <p
+        </dl>
+        <div class="flex justify-end gap-2">
+          <Button
+            variant="ghost"
+            :label="__('Import another')"
+            @click="anotherImport"
+          />
+          <Button
             v-if="nothingNew"
-            class="flex items-start gap-3 text-p-base text-ink-gray-8"
-          >
-            <LucideCircleCheck
-              class="mt-0.5 size-5 shrink-0 text-ink-gray-6"
-              aria-hidden="true"
-            />
-            {{ __("Everything on {0} is already imported.", [run.host]) }}
-          </p>
-          <template v-else>
-            <dl
-              class="grid grid-cols-3 divide-x divide-outline-gray-2 rounded-5 border border-outline-gray-2"
-            >
-              <div
-                v-for="figure in figures"
-                :key="figure.label"
-                class="px-3 py-4"
-              >
-                <dd class="text-3xl tabular-nums text-ink-gray-9">
-                  {{ figure.value }}
-                </dd>
-                <dt class="mt-1 text-p-sm text-ink-gray-5">
-                  {{ figure.label }}
-                </dt>
-              </div>
-            </dl>
-          </template>
-          <div class="flex justify-end gap-2">
-            <Button
-              variant="ghost"
-              :label="__('Import another')"
-              @click="anotherImport"
-            />
-            <Button
-              v-if="nothingNew"
-              variant="solid"
-              :label="__('Close')"
-              @click="open = false"
-            />
-            <Button
-              v-else
-              variant="solid"
-              :label="__('View drafts')"
-              :href="viewDraftsHref(run.category)"
-            />
-          </div>
-        </template>
-      </div>
-    </template>
+            variant="solid"
+            :label="__('Close')"
+            @click="open = false"
+          />
+          <Button
+            v-else
+            variant="solid"
+            :label="__('View drafts')"
+            :href="viewDraftsHref(run.category)"
+          />
+        </div>
+      </template>
+    </div>
   </Dialog>
 </template>
 
@@ -197,7 +186,7 @@ const start = createResource({
       error?.exc_type === "PermissionError"
         ? __("Only Agent Managers can import pages.")
         : __(
-            "We couldn't start the import. Check your connection and try again."
+            "We couldn't start the import. Check your connection and try again.",
           );
     run.value = { state: "error", message, host: "" };
     showForm.value = false;
@@ -205,13 +194,13 @@ const start = createResource({
 });
 
 const options = computed(() =>
-  (categories.data || []).map(({ value, label }) => ({ value, label }))
+  (categories.data || []).map(({ value, label }) => ({ value, label })),
 );
 const noCategories = computed(
-  () => categories.data && !categories.data.length && !categories.loading
+  () => categories.data && !categories.data.length && !categories.loading,
 );
 const canImport = computed(
-  () => Boolean(url.value.trim() && category.value) && !start.loading
+  () => Boolean(url.value.trim() && category.value) && !start.loading,
 );
 
 const screen = computed(() => {
@@ -244,7 +233,7 @@ const stepText = computed(() => {
 });
 
 const nothingNew = computed(
-  () => run.value?.state === "done" && !run.value.created && !run.value.failed
+  () => run.value?.state === "done" && !run.value.created && !run.value.failed,
 );
 
 const figures = computed(() => {

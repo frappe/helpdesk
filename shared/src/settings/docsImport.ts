@@ -21,14 +21,6 @@ export type ImportResult =
 
 const GIVE_UP = 5 * 60 * 1000;
 
-// The endpoint only answers GET, and `call` always sends POST.
-export function getImportResult(): Promise<ImportResult | null> {
-  return frappeRequest({
-    url: "/api/method/helpdesk.api.docs_source.get_import_result",
-    method: "GET",
-  });
-}
-
 export function viewDraftsHref(category: string) {
   return `/helpdesk/kb?category=${encodeURIComponent(category)}`;
 }
@@ -50,7 +42,11 @@ export function useImportResult(interval: number) {
   async function refresh() {
     clearTimeout(timer);
     try {
-      result.value = await getImportResult();
+      // The endpoint only answers GET, and `call` always sends POST.
+      result.value = await frappeRequest({
+        url: "/api/method/helpdesk.api.docs_source.get_import_result",
+        method: "GET",
+      });
     } catch {
       // keep what is shown; the next tick tries again
     }

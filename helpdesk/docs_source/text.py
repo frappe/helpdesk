@@ -7,14 +7,10 @@ from frappe.utils import strip_html_tags
 from frappe.utils.html_utils import sanitize_html
 
 
-def plain_title(title: str) -> str:
-    """A title without markup, entities or llms.txt backslash escapes."""
-    return unescape(strip_html_tags(title)).replace("\\", "").strip()
-
-
 def text_title(title: str) -> str:
-    """plain_title for a title that is not HTML, so `Vec<T>` keeps its `<T>`."""
-    return plain_title(title.replace("<", "&lt;"))
+    """A title without markup, entities or backslash escapes; `Vec<T>` keeps its `<T>`."""
+    plain = unescape(strip_html_tags(title.replace("<", "&lt;")))
+    return plain.replace("\\", "").strip()
 
 
 NO_TAGS = (
@@ -36,10 +32,6 @@ def clean_html(html: str) -> str:
     return sanitize_html(html, always_sanitize=True, disallowed_tags=NO_TAGS)
 
 
-def has_dot_segment(route: str) -> bool:
-    return any(part in (".", "..") for part in unquote(route).split("/"))
-
-
 def in_scope(link: str, base_url: str) -> bool:
     """True for an https link on the base URL's host, inside its path, with a real route."""
     try:
@@ -53,7 +45,7 @@ def in_scope(link: str, base_url: str) -> bool:
         and host == base.hostname
         and (path == base.path or path.startswith(f"{base.path}/"))
         and bool(path.strip("/"))
-        and not has_dot_segment(path)
+        and not any(part in (".", "..") for part in unquote(path).split("/"))
     )
 
 
