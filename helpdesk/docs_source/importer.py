@@ -125,7 +125,7 @@ class DocsImport:
         frappe.db.savepoint("docs_page")
         try:
             if page := self.read_one(url):
-                self.insert_draft(key, url, *page)
+                self.insert_draft(key, *page)
                 frappe.db.commit()  # keeps the pages already copied if the job is killed
                 return True
         except DocsFetchError:
@@ -143,7 +143,7 @@ class DocsImport:
             (title, absolute_links(html, url)) if title and visible_text(html) else None
         )
 
-    def insert_draft(self, key: str, url: str, title: str, html: str) -> None:
+    def insert_draft(self, key: str, title: str, html: str) -> None:
         article = frappe.get_doc(
             {
                 "doctype": "HD Article",
