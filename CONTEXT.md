@@ -39,21 +39,8 @@ _Avoid_: Visibility, audience
 **Category access**:
 The Access shared by every Article in a Category and its Subcategories; Mixed when they differ. It is derived from the Articles, never stored. A reader sees a Category when they can read any Article in it or its Subcategories.
 
-**Docs source**:
-The one outside documentation site connected to the help center. Readers search and read its pages on the portal, and it stays the owner of that content.
-_Avoid_: External docs, docs site, wiki
-
-**Docs page**:
-A page of the Docs source, read on the portal. It cannot be edited here and has no Access: anyone who can open the knowledge base can read it.
-_Avoid_: External doc, wiki page, doc article
-
-**Matching Article**:
-An Article, other than a Converted Article, with the same title as a Docs page. Readers who get the Article in search don't get the Docs page beside it.
-_Avoid_: Duplicate, twin
-
 **Converted Article**:
-A one-time copy of a Docs page, which agents then own, edit and publish, with its own views and votes. Later changes to the Docs page never reach it. Readers who can read it get it in place of its own Docs page only; everyone else still gets that Docs page.
-_Avoid_: Imported article, synced article
+An Article created by pasting a docs site address in knowledge base settings: a one-time copy of a page, which agents then own, edit and publish, with its own views and votes. Pasting the same address again skips pages already imported; later changes to the site never reach it.
 
 ## SLA
 

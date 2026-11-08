@@ -1,0 +1,79 @@
+import { call } from "frappe-ui";
+import { onBeforeUnmount, ref } from "vue";
+import { __ } from "../translation";
+
+export type ImportResult =
+  | {
+      state: "running";
+      stage: "waiting" | "finding" | "reading";
+      done: number;
+      total: number;
+      host: string;
+    }
+  | {
+      state: "done";
+      created: number;
+      skipped: number;
+      failed: number;
+      host: string;
+      category: string;
+    }
+  | { state: "error"; message: string; host: string };
+
+const GIVE_UP = 5 * 60 * 1000;
+
+// Fixed copy: a failed call must never show the server's own text.
+export const startFailed = () =>
+  __("We couldn't start the import. Check your connection and try again.");
+export const notAllowed = () => __("Only Agent Managers can import pages.");
+export const slowCopy = () =>
+  __("This is taking longer than expected. Check back in a few minutes.");
+
+export function startImport(url: string, category: string) {
+  return call("helpdesk.api.docs_source.import_docs", { url, category });
+}
+
+export function getImportResult(): Promise<ImportResult | null> {
+  return call("helpdesk.api.docs_source.get_import_result");
+}
+
+export function viewDraftsHref(category: string) {
+  return `/helpdesk/kb?category=${encodeURIComponent(category)}`;
+}
+
+// The last import, refreshed every `interval` ms while one is running.
+export function useImportResult(interval: number) {
+  const result = ref<ImportResult | null>(null);
+  const timedOut = ref(false);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let startedAt = 0;
+
+  function stop() {
+    clearTimeout(timer);
+    timer = undefined;
+  }
+
+  async function refresh() {
+    stop();
+    try {
+      result.value = await getImportResult();
+    } catch {
+      // keep what is shown; the next tick tries again
+    }
+    if (result.value?.state !== "running") return;
+    if (Date.now() - startedAt > GIVE_UP) {
+      timedOut.value = true;
+      return;
+    }
+    timer = setTimeout(refresh, interval);
+  }
+
+  function watchRun() {
+    startedAt = Date.now();
+    timedOut.value = false;
+    return refresh();
+  }
+
+  onBeforeUnmount(stop);
+  return { result, timedOut, refresh: watchRun, stop };
+}

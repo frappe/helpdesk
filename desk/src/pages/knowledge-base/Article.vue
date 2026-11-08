@@ -227,19 +227,26 @@
             </div>
           </div>
         </div>
-        <a
+        <p
           v-if="article.data?.docs_page_url"
-          :href="article.data.docs_page_url"
-          target="_blank"
-          rel="noopener"
-          class="mt-3 block text-p-sm text-ink-gray-6 underline"
+          class="mt-3 text-p-sm text-ink-gray-6"
         >
-          {{
-            __("Copied from docs on {0}", [
-              dateFormat(article.data.docs_copied_on, "MMM D, YYYY"),
-            ])
-          }}
-        </a>
+          <a
+            :href="article.data.docs_page_url"
+            target="_blank"
+            rel="noopener"
+            class="underline"
+          >
+            {{
+              __("Copied from docs on {0}", [
+                dateFormat(article.data.docs_copied_on, "MMM D, YYYY"),
+              ])
+            }}
+          </a>
+          <span v-if="article.data.docs_edited">
+            · {{ __("Edited since") }}</span
+          >
+        </p>
       </div>
     </div>
     <!-- First load only: reloads after a save or move keep the page shown. -->

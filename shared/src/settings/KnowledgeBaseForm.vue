@@ -79,6 +79,14 @@
           <HeaderLinks v-model="draft.links" />
         </div>
       </section>
+      <section>
+        <h2 class="text-md-semibold text-ink-gray-8">
+          {{ __("Import from a docs site") }}
+        </h2>
+        <div class="mt-2 [&>*]:py-3.5">
+          <DocsImport />
+        </div>
+      </section>
     </div>
     <SettingsFormSkeleton
       v-else
@@ -86,6 +94,7 @@
         { title: __('Access'), rows: accessToggles.length },
         { title: __('Customize home page'), panels: [50, 50, 180] },
         { title: __('Header'), rows: 1, panels: [96] },
+        { title: __('Import from a docs site'), rows: 1 },
       ]"
     />
   </Transition>
@@ -96,6 +105,7 @@ import { __ } from "../translation";
 import { SettingsRow, Switch } from "frappe-ui";
 import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
+import DocsImport from "./DocsImport.vue";
 import HeaderLinks from "./HeaderLinks.vue";
 import PinnedList from "./PinnedList.vue";
 import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
