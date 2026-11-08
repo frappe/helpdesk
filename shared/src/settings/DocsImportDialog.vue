@@ -5,19 +5,8 @@
     size="md"
   >
     <div class="space-y-5">
-      <!-- Form and error share the fields; the error adds its message above them -->
+      <!-- Form and error share the fields; the error adds its message above the button -->
       <template v-if="screen === 'form' || screen === 'error'">
-        <p
-          v-if="errorText"
-          class="flex items-start gap-2 text-p-sm text-ink-red-3"
-          role="alert"
-        >
-          <LucideCircleAlert
-            class="mt-0.5 size-4 shrink-0"
-            aria-hidden="true"
-          />
-          {{ errorText }}
-        </p>
         <div class="space-y-4" @keydown.enter="onEnter">
           <TextInput
             v-model="url"
@@ -47,6 +36,17 @@
         </div>
         <p class="text-p-sm text-ink-gray-5">
           {{ __("Pages you have already imported are skipped.") }}
+        </p>
+        <p
+          v-if="errorText"
+          class="flex items-start gap-2 text-p-sm text-ink-red-6"
+          role="alert"
+        >
+          <LucideCircleAlert
+            class="mt-0.5 size-4 shrink-0"
+            aria-hidden="true"
+          />
+          {{ errorText }}
         </p>
         <div class="flex justify-end">
           <Button
@@ -100,17 +100,16 @@
           />
           {{ __("Everything on {0} is already imported.", [run.host]) }}
         </p>
-        <dl
-          v-else
-          class="grid grid-cols-3 divide-x divide-outline-gray-2 rounded-5 border border-outline-gray-2"
-        >
-          <div v-for="figure in figures" :key="figure.label" class="px-3 py-4">
-            <dd class="text-3xl tabular-nums text-ink-gray-9">
+        <dl class="divide-y divide-outline-gray-2">
+          <div
+            v-for="figure in figures"
+            :key="figure.label"
+            class="flex items-baseline justify-between gap-4 py-3"
+          >
+            <dt class="text-p-base text-ink-gray-6">{{ figure.label }}</dt>
+            <dd class="text-xl tabular-nums text-ink-gray-9">
               {{ figure.value }}
             </dd>
-            <dt class="mt-1 text-p-sm text-ink-gray-5">
-              {{ figure.label }}
-            </dt>
           </div>
         </dl>
         <div class="flex justify-end gap-2">

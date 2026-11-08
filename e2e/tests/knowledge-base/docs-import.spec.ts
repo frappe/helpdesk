@@ -85,7 +85,7 @@ test("importing shows progress, then the three counts and a link to the drafts",
   await expect(solidButtons(dialog)).toHaveCount(0);
   await expect(dialog.getByRole("progressbar")).toBeVisible();
 
-  const figure = (label: string) => dialog.locator("dt", { hasText: label }).locator("xpath=preceding-sibling::dd");
+  const figure = (label: string) => dialog.locator("dt", { hasText: label }).locator("xpath=following-sibling::dd");
   await expect(figure("Added")).toHaveText("3");
   await expect(figure("Already imported")).toHaveText("0");
   await expect(figure("Couldn't read")).toHaveText("0");
@@ -162,7 +162,7 @@ test("Enter in the address field starts the import, Enter on a category does not
   expect(calls.import).toBe(1);
 });
 
-test("on a phone the dialog fits and the three counts stay in one row", async ({ page, api }) => {
+test("on a phone the dialog fits and the three counts stay inside it", async ({ page, api }) => {
   const category = await createCategory(api);
   await page.setViewportSize({ width: 390, height: 844 });
   await mockImport(page, [finished(category.name, 12, 3, 1)]);
@@ -170,10 +170,11 @@ test("on a phone the dialog fits and the three counts stay in one row", async ({
   await fillForm(page, dialog, category.category_name);
   await dialog.getByRole("button", { name: "Import", exact: true }).click();
 
-  const figures = dialog.locator("dd");
-  await expect(figures).toHaveCount(3);
-  const tops = await figures.evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().top)));
-  expect(new Set(tops).size).toBe(1);
+  await expect(dialog.locator("dd")).toHaveCount(3);
+  const box = await dialog.boundingBox();
+  const list = await dialog.locator("dl").boundingBox();
+  expect(list!.x).toBeGreaterThanOrEqual(box!.x);
+  expect(list!.x + list!.width).toBeLessThanOrEqual(box!.x + box!.width);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
