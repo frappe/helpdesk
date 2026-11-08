@@ -1,4 +1,4 @@
-import { frappeRequest } from "frappe-ui";
+import { createResource } from "frappe-ui";
 import { onBeforeUnmount, ref } from "vue";
 
 export type ImportResult =
@@ -39,17 +39,22 @@ export function useImportResult(interval: number) {
     timer = undefined;
   }
 
+  // A failed poll keeps what is shown; the next tick tries again. fetch()
+  // rethrows after onError, so it is caught below.
+  const poll = createResource({
+    url: "helpdesk.api.docs_source.get_import_result",
+    method: "GET",
+    onSuccess(data: ImportResult | null) {
+      result.value = data;
+    },
+    onError() {},
+  });
+
   async function refresh() {
     clearTimeout(timer);
     try {
-      // The endpoint only answers GET, and `call` always sends POST.
-      result.value = await frappeRequest({
-        url: "/api/method/helpdesk.api.docs_source.get_import_result",
-        method: "GET",
-      });
-    } catch {
-      // keep what is shown; the next tick tries again
-    }
+      await poll.fetch();
+    } catch {}
     if (!active || result.value?.state !== "running") return;
     if (Date.now() - startedAt > GIVE_UP) {
       timedOut.value = true;

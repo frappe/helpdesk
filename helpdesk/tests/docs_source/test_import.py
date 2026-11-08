@@ -61,7 +61,9 @@ class TestSources(DocsImportCase):
         }
         fetch = patch_docs_site(self, site)
         self.assertEqual(self.run_import()["created"], 1)
-        self.assertEqual([a.title for a in get_category_articles(self.category)], ["Guide"])
+        self.assertEqual(
+            [a.title for a in get_category_articles(self.category)], ["Guide"]
+        )
         self.assertNotIn(
             f"{BASE}/sitemap.xml", [c.args[0] for c in fetch.call_args_list]
         )
@@ -107,7 +109,10 @@ class TestCreate(DocsImportCase):
         result = self.run_import()
 
         self.assertEqual(result, {"created": 1, "skipped": 2, "failed": 0})
-        self.assertEqual([a.title for a in get_category_articles(self.category)], ["Alpha", "Beta", "Gamma"])
+        self.assertEqual(
+            [a.title for a in get_category_articles(self.category)],
+            ["Alpha", "Beta", "Gamma"],
+        )
         self.assertEqual(self.run_import(), {"created": 0, "skipped": 3, "failed": 0})
 
     def test_url_variants_are_one_page(self):
@@ -141,7 +146,9 @@ class TestCreate(DocsImportCase):
         site[f"{BASE}/d.md"] = "# Delta\n\n"
         patch_docs_site(self, site)
         self.assertEqual(self.run_import(), {"created": 1, "skipped": 0, "failed": 3})
-        self.assertEqual([a.title for a in get_category_articles(self.category)], ["Alpha"])
+        self.assertEqual(
+            [a.title for a in get_category_articles(self.category)], ["Alpha"]
+        )
 
     def test_content_hash_stored_and_edit_detected(self):
         patch_docs_site(self, make_docs_site(HOST, {"a": "Alpha"}))

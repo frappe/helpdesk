@@ -1286,7 +1286,9 @@ def make_docs_site(
 def make_sitemap(*urls: str) -> str:
     """A sitemap.xml body listing each full URL."""
     locs = "".join(f"<url><loc>{url}</loc></url>" for url in urls)
-    return f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{locs}</urlset>'
+    return (
+        f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{locs}</urlset>'
+    )
 
 
 def get_category_articles(category: str) -> list:
