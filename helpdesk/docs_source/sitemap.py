@@ -15,12 +15,7 @@ from helpdesk.docs_source.text import clean_html, in_scope, text_title
 LOC = re.compile(r"<loc>([^<]*)</loc>")
 VERSION = re.compile(r"^(v?\d+(\.(\d+|x))*|next)$")
 MAIN = ("article", "[role=main]", "main")
-COPY_BUTTONS = (
-    'button[aria-label*="copy" i], button[title*="copy" i], button[class*="copy" i], '
-    'button.clean-btn, button:-soup-contains("Copy")'
-)
-NOISE = f"nav, header, footer, script, style, {COPY_BUTTONS}, .theme-doc-toc-mobile, .theme-doc-version-badge"
-PERMALINKS = "a.headerlink, a.hash-link"
+NOISE = "nav, footer, aside, script, style"
 
 
 def find_pages(url: str) -> list[str]:
@@ -51,14 +46,8 @@ def extract_main(html: str) -> tuple[str, str]:
     main = next((m for sel in MAIN if (m := soup.select_one(sel))), None)
     if main is None:
         return "", ""
-    for tag in main.select(PERMALINKS):
+    for tag in main.select(NOISE):
         tag.decompose()
-    # Starlight callouts are asides, so an article keeps them.
-    noise = NOISE if main.name == "article" else f"{NOISE}, aside"
-    for tag in main.select(noise):
-        # Docusaurus puts the page h1 in a header.
-        if tag.parent is not None and not (tag.name == "header" and tag.find("h1")):
-            tag.decompose()
     heading = main.find("h1") or soup.find("title")
     title = text_title(heading.get_text()) if heading else ""
     if heading is not None and heading.name == "h1":

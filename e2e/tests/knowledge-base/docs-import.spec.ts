@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { Page, Route } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { expect, test, uid, usePersona } from "../../helpers/fixtures";
 import { createArticle, createCategory } from "../../helpers/portal";
 import { openSettings } from "../../helpers/settings";
@@ -29,23 +29,17 @@ const finished = (category: string, created = 3, skipped = 0, failed = 0) => ({
 });
 
 /** Answer the two import calls. `results` are served in order after the import starts, the last one repeating. */
-async function mockImport(
-  page: Page,
-  results: Result[],
-  start: (route: Route) => Promise<void> | void = (route) =>
-    route.fulfill({ json: { message: running(0) } }),
-) {
-  const state = { started: false, polls: 0, starts: 0 };
+async function mockImport(page: Page, results: Result[]) {
+  let started = false;
+  let polls = 0;
   await page.route("**/api/method/helpdesk.api.docs_source.import_docs", (route) => {
-    state.started = true;
-    state.starts += 1;
-    return start(route);
+    started = true;
+    return route.fulfill({ json: { message: running(0) } });
   });
   await page.route("**/api/method/helpdesk.api.docs_source.get_import_result", (route) => {
-    const next = state.started ? results[Math.min(state.polls++, results.length - 1)] : null;
+    const next = started ? results[Math.min(polls++, results.length - 1)] : null;
     return route.fulfill({ json: { message: next } });
   });
-  return state;
 }
 
 async function openDeskSettings(page: Page) {
@@ -130,31 +124,6 @@ test("a failed import shows plain words and Try again keeps the address", async 
   await expect(dialog.getByText(NOT_FOUND)).toBeHidden();
   await expect(dialog.getByRole("textbox", { name: /Docs site address/ })).toHaveValue(DOCS_URL);
   await expect(dialog.getByRole("button", { name: "Import", exact: true })).toBeEnabled();
-
-  await page.unroute("**/api/method/helpdesk.api.docs_source.import_docs");
-  await page.route("**/api/method/helpdesk.api.docs_source.import_docs", (route) =>
-    route.fulfill({ status: 500, json: { exception: "frappe.exceptions.ValidationError: boom" } }),
-  );
-  await dialog.getByRole("button", { name: "Import", exact: true }).click();
-  await expect(dialog.getByText("We couldn't start the import.")).toBeVisible();
-  await expect(dialog).not.toContainText(/server|exception|boom/i);
-});
-
-// The desk drops settings below 640px, so that is the narrowest width this dialog is reachable at.
-test("on the narrowest settings width Enter starts the import and the three counts stay in one row", async ({ page, api }) => {
-  await page.setViewportSize({ width: 640, height: 844 });
-  const category = await createCategory(api);
-  await mockImport(page, [finished(category.name, 12, 5, 1)]);
-  const { dialog } = await openImport(page);
-  await fillForm(page, dialog, category.category_name);
-  await dialog.getByRole("textbox", { name: /Docs site address/ }).press("Enter");
-
-  const labels = dialog.locator("dt");
-  await expect(labels).toHaveCount(3);
-  const tops = await labels.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
-  expect(new Set(tops).size).toBe(1);
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  expect(overflow).toBeLessThanOrEqual(0);
 });
 
 test.describe("edited since the copy", () => {

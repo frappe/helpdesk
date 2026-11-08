@@ -78,13 +78,5 @@ def absolute_links(html: str, base_url: str) -> str:
 
 
 def clean_markdown(text: str, title: str) -> str:
-    """A page for readers: no agent section, leading quote, GitBook tags or repeated title."""
-    text = text.split("\n# Agent Instructions")[0]
-    text = re.sub(r"\A(?:> .*\n)+", "", _strip_gitbook_tags(text).lstrip())
-    text = re.sub(r"^> \[!\w+\]$", ">", text, flags=re.M)  # GitHub alert markers
+    """A page for readers: the repeated leading title is dropped."""
     return re.sub(rf"\A\s*# {re.escape(title)}\s*\n", "", text)
-
-
-def _strip_gitbook_tags(text: str) -> str:
-    # GitBook's own block tags
-    return re.sub(r"^\s*\{%.*?%\}\s*$", "", text, flags=re.M)
