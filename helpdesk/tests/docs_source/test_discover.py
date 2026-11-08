@@ -2,15 +2,16 @@ from frappe.tests import IntegrationTestCase
 
 from helpdesk.docs_source import llms, sitemap
 from helpdesk.docs_source.fetch import DocsFetchError
-from helpdesk.test_utils import make_docs_page, make_docs_site, patch_docs_site
+from helpdesk.test_utils import (
+    make_docs_page,
+    make_docs_site,
+    make_sitemap_locs,
+    patch_docs_site,
+)
 
 HOST = "docs.example.com"
 BASE = f"https://{HOST}"
 URLSET = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{}</urlset>'
-
-
-def loc(*paths):
-    return "".join(f"<url><loc>{BASE}{p}</loc></url>" for p in paths)
 
 
 class TestLlms(IntegrationTestCase):
@@ -74,7 +75,9 @@ class TestSitemap(IntegrationTestCase):
     def test_lists_in_scope_pages_unversioned_first(self):
         site = {
             f"{BASE}/docs/sitemap.xml": URLSET.format(
-                loc("/docs/v1/old", "/docs/new", "/blog/x", "/docs/../secret")
+                make_sitemap_locs(
+                    BASE, "/docs/v1/old", "/docs/new", "/blog/x", "/docs/../secret"
+                )
                 + "<url><loc>https://other.example.org/docs/x</loc></url>"
             )
         }
@@ -89,14 +92,17 @@ class TestSitemap(IntegrationTestCase):
             f"{BASE}/sitemap.xml": '<sitemapindex xmlns="x">'
             f"<sitemap><loc>{BASE}/s1.xml</loc></sitemap>"
             f"<sitemap><loc>{BASE}/s2.xml</loc></sitemap></sitemapindex>",
-            f"{BASE}/s1.xml": URLSET.format(loc("/a")),
-            f"{BASE}/s2.xml": URLSET.format(loc("/b", "/a")),
+            f"{BASE}/s1.xml": URLSET.format(make_sitemap_locs(BASE, "/a")),
+            f"{BASE}/s2.xml": URLSET.format(make_sitemap_locs(BASE, "/b", "/a")),
         }
         patch_docs_site(self, site)
         self.assertEqual(sitemap.find_pages(BASE), [f"{BASE}/a", f"{BASE}/b"])
 
     def test_falls_back_to_the_sitemap_at_the_host_root(self):
-        patch_docs_site(self, {f"{BASE}/sitemap.xml": URLSET.format(loc("/docs/a"))})
+        patch_docs_site(
+            self,
+            {f"{BASE}/sitemap.xml": URLSET.format(make_sitemap_locs(BASE, "/docs/a"))},
+        )
         self.assertEqual(sitemap.find_pages(f"{BASE}/docs"), [f"{BASE}/docs/a"])
 
     def test_html_page_instead_of_sitemap_is_no_list(self):

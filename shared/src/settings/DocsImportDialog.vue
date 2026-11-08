@@ -65,7 +65,7 @@
             <Button
               variant="solid"
               :label="screen === 'error' ? __('Try again') : __('Import')"
-              :disabled="!canImport"
+              :disabled="screen !== 'error' && !canImport"
               :loading="starting"
               @click="screen === 'error' ? tryAgain() : submit()"
             />

@@ -15,6 +15,8 @@ from helpdesk.docs_source.importer import (
 from helpdesk.test_utils import (
     article_index_jobs,
     fake_docs_fetch,
+    get_category_articles,
+    make_article,
     make_article_category,
     make_docs_page,
     make_docs_site,
@@ -36,12 +38,7 @@ class DocsImportCase(IntegrationTestCase):
         return DocsImport(url, self.category).run()
 
     def articles(self):
-        return frappe.get_all(
-            "HD Article",
-            filters={"category": self.category},
-            fields=["name", "title", "status", "docs_page_url", "docs_copied_on"],
-            order_by="title",
-        )
+        return get_category_articles(self.category)
 
 
 class TestSources(DocsImportCase):
@@ -194,7 +191,13 @@ class TestCreate(DocsImportCase):
         self.assertTrue(get_article(name).docs_edited)
 
         copy = frappe.copy_doc(frappe.get_doc("HD Article", name), ignore_no_copy=False)
-        self.assertFalse(copy.docs_page_url or copy.docs_copied_on or copy.docs_content_hash)
+        self.assertFalse(
+            copy.docs_page_url or copy.docs_copied_on or copy.docs_content_hash
+        )
+
+        plain = make_article(category=self.category)
+        self.assertFalse(get_article(plain).docs_edited)
+
 
 class TestNormalize(IntegrationTestCase):
     def test_accepts_and_cleans_a_public_https_address(self):
