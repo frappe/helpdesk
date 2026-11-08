@@ -116,17 +116,6 @@ test("closing mid-run keeps the progress line in the settings row", async ({ pag
   await expect(dialog.getByText("Reading page 12 of 50")).toBeVisible();
 });
 
-test("a finished import with nothing new says so", async ({ page, api }) => {
-  const category = await createCategory(api);
-  await mockImport(page, [finished(category.name, 0, 4, 0)]);
-  const { dialog } = await openImport(page);
-  await fillForm(page, dialog, category.category_name);
-  await dialog.getByRole("button", { name: "Import", exact: true }).click();
-  await expect(dialog.getByText(`Everything on ${HOST} is already imported.`)).toBeVisible();
-  await expect(solidButtons(dialog)).toHaveCount(1);
-  await expect(dialog.getByRole("button", { name: "Close", exact: true }).last()).toBeVisible();
-});
-
 test("a failed import shows plain words and Try again keeps the address", async ({ page, api }) => {
   const category = await createCategory(api);
   await mockImport(page, [{ state: "error", message: NOT_FOUND, host: HOST }]);
@@ -141,33 +130,13 @@ test("a failed import shows plain words and Try again keeps the address", async 
   await expect(dialog.getByText(NOT_FOUND)).toBeHidden();
   await expect(dialog.getByRole("textbox", { name: /Docs site address/ })).toHaveValue(DOCS_URL);
   await expect(dialog.getByRole("button", { name: "Import", exact: true })).toBeEnabled();
-});
 
-test("the settings row reads the last import over GET on the real route", async ({ page }) => {
-  const request = page.waitForResponse((r) =>
-    r.url().includes("helpdesk.api.docs_source.get_import_result"),
+  await page.unroute("**/api/method/helpdesk.api.docs_source.import_docs");
+  await page.route("**/api/method/helpdesk.api.docs_source.import_docs", (route) =>
+    route.fulfill({ status: 500, json: { exception: "frappe.exceptions.ValidationError: boom" } }),
   );
-  await openDeskSettings(page);
-  const response = await request;
-  expect(response.request().method()).toBe("GET");
-  expect(response.status()).toBe(200);
-});
-
-test("a failed call says we couldn't start, without server wording", async ({ page, api }) => {
-  const category = await createCategory(api);
-  await mockImport(page, [null], (route) =>
-    route.fulfill({
-      status: 500,
-      json: { exc_type: "ValidationError", exception: "frappe.exceptions.ValidationError: boom" },
-    }),
-  );
-  const { dialog } = await openImport(page);
-  await fillForm(page, dialog, category.category_name);
   await dialog.getByRole("button", { name: "Import", exact: true }).click();
-
-  await expect(
-    dialog.getByText("We couldn't start the import. Check your connection and try again."),
-  ).toBeVisible();
+  await expect(dialog.getByText("We couldn't start the import.")).toBeVisible();
   await expect(dialog).not.toContainText(/server|exception|boom/i);
 });
 

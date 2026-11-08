@@ -108,6 +108,7 @@
    "fieldtype": "Data",
    "label": "Docs page URL",
    "length": 500,
+   "no_copy": 1,
    "read_only": 1,
    "search_index": 1
   },
@@ -115,6 +116,7 @@
    "fieldname": "docs_copied_on",
    "fieldtype": "Datetime",
    "label": "Docs copied on",
+   "no_copy": 1,
    "read_only": 1
   },
   {
@@ -123,6 +125,7 @@
    "hidden": 1,
    "label": "Docs content hash",
    "length": 40,
+   "no_copy": 1,
    "read_only": 1
   },
   {

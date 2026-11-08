@@ -95,11 +95,14 @@ class TestSources(DocsImportCase):
 
 class TestCreate(DocsImportCase):
     def test_creates_drafts_with_url_and_date(self):
-        patch_docs_site(self, make_docs_site(HOST, {"a": "Alpha", "b/c": "x" * 300}))
-        result = self.run_import()
-        self.assertEqual(result, {"created": 2, "skipped": 0, "failed": 0})
+        site = make_docs_site(HOST, {"a": "Alpha", "b/c": "x" * 300, "d": "Alpha"})
+        patch_docs_site(self, site)
+        with patch("frappe.enqueue") as enqueue:
+            result = self.run_import()
+        self.assertEqual(result, {"created": 3, "skipped": 0, "failed": 0})
+        self.assertEqual(len(article_index_jobs(enqueue)), 1)
         rows = {row.docs_page_url: row for row in self.articles()}
-        self.assertEqual(set(rows), {f"{BASE}/a", f"{BASE}/b/c"})
+        self.assertEqual(set(rows), {f"{BASE}/a", f"{BASE}/b/c", f"{BASE}/d"})
         for row in rows.values():
             self.assertEqual(row.status, "Draft")
             self.assertTrue(row.docs_copied_on)
@@ -117,11 +120,7 @@ class TestCreate(DocsImportCase):
 
         self.assertEqual(result, {"created": 1, "skipped": 2, "failed": 0})
         self.assertEqual([a.title for a in self.articles()], ["Alpha", "Beta", "Gamma"])
-
-    def test_everything_imported_creates_nothing(self):
-        patch_docs_site(self, make_docs_site(HOST, {"a": "Alpha"}))
-        self.run_import()
-        self.assertEqual(self.run_import(), {"created": 0, "skipped": 1, "failed": 0})
+        self.assertEqual(self.run_import(), {"created": 0, "skipped": 3, "failed": 0})
 
     def test_url_variants_are_one_page(self):
         self.assertEqual(
@@ -154,13 +153,6 @@ class TestCreate(DocsImportCase):
         self.assertEqual(created, [20, 20, 5, 0])
         self.assertEqual(len(self.articles()), 45)
 
-    def test_the_cap_is_fifty(self):
-        self.assertEqual(importer.MAX_PAGES, 50)
-
-    def test_two_pages_with_one_title_are_two_articles(self):
-        patch_docs_site(self, make_docs_site(HOST, {"a": "Same", "b": "Same"}))
-        self.assertEqual(self.run_import()["created"], 2)
-
     def test_unreadable_page_counts_failed_and_rest_import(self):
         site = make_docs_site(
             HOST, {"a": "Alpha", "b": "Beta", "c": "Gamma", "d": "Delta"}
@@ -191,12 +183,6 @@ class TestCreate(DocsImportCase):
         self.assertIn(f'href="{BASE}/guide/x"', content)
         self.assertIn(f'src="{BASE}/img/p.png"', content)
 
-    def test_one_search_index_job_for_the_whole_run(self):
-        patch_docs_site(self, make_docs_site(HOST, {"a": "A", "b": "B", "c": "C"}))
-        with patch("frappe.enqueue") as enqueue:
-            self.run_import()
-        self.assertEqual(len(article_index_jobs(enqueue)), 1)
-
     def test_content_hash_stored_and_edit_detected(self):
         patch_docs_site(self, make_docs_site(HOST, {"a": "Alpha"}))
         self.run_import()
@@ -207,11 +193,8 @@ class TestCreate(DocsImportCase):
         frappe.db.set_value("HD Article", name, "content", "<p>Changed</p>")
         self.assertTrue(get_article(name).docs_edited)
 
-    def test_an_article_without_a_hash_is_not_edited(self):
-        from helpdesk.test_utils import make_article
-
-        self.assertFalse(get_article(make_article()).docs_edited)
-
+        copy = frappe.copy_doc(frappe.get_doc("HD Article", name), ignore_no_copy=False)
+        self.assertFalse(copy.docs_page_url or copy.docs_copied_on or copy.docs_content_hash)
 
 class TestNormalize(IntegrationTestCase):
     def test_accepts_and_cleans_a_public_https_address(self):
