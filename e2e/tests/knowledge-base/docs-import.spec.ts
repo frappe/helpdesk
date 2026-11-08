@@ -68,6 +68,14 @@ async function fillForm(page: Page, dialog: ReturnType<Page["getByRole"]>, categ
 const solidButtons = (scope: ReturnType<Page["getByRole"]>) =>
   scope.locator("button.bg-surface-gray-10, a.bg-surface-gray-10");
 
+/** Labels of the solid buttons on the page that sit outside `dialog`. */
+async function solidBehind(page: Page, dialog: ReturnType<Page["getByRole"]>) {
+  const handle = await dialog.elementHandle();
+  return page
+    .locator("button.bg-surface-gray-10, a.bg-surface-gray-10")
+    .evaluateAll((els, root) => els.filter((el) => !root!.contains(el)).map((el) => el.textContent?.trim()), handle);
+}
+
 test("importing shows progress, then the three counts and a link to the drafts", async ({
   page,
   api,
@@ -79,6 +87,7 @@ test("importing shows progress, then the three counts and a link to the drafts",
   await expect(solidButtons(dialog)).toHaveCount(0);
   await fillForm(page, dialog, category.category_name);
   await expect(solidButtons(dialog)).toHaveCount(1);
+  expect(await solidBehind(page, dialog)).toEqual(["Save"]);
   await dialog.getByRole("button", { name: "Import", exact: true }).click();
 
   await expect(dialog.getByText("Reading page 2 of 3")).toBeVisible();
