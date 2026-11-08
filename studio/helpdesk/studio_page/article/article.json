@@ -33,8 +33,7 @@
       "label": "{{ article.data?.category_name }}",
       "open": "{{ drawer.open }}"
      },
-     "isCustomVueComponent": true,
-     "visibilityCondition": "{{ !isDocsPage }}"
+     "isCustomVueComponent": true
     },
     {
      "blockName": "page-wrapper",
@@ -68,7 +67,7 @@
          "componentProps": {
           "variant": "article"
          },
-         "visibilityCondition": "{{ !isCurrentArticle(route.params.name) && !isArticleMissing }}",
+         "visibilityCondition": "{{ !isCurrentArticle(route.params.name) && !article?.error }}",
          "classes": [
           "flex",
           "flex-col",
@@ -525,7 +524,7 @@
           "title": "{{ t('Article not found') }}"
          },
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ isArticleMissing }}"
+         "visibilityCondition": "{{ article?.error }}"
         },
         {
          "blockName": "toc-sidebar",
@@ -593,18 +592,7 @@
      ],
      "componentId": "container-cdpb9v85p",
      "componentName": "container",
-     "originalElement": "div",
-     "visibilityCondition": "{{ !isDocsPage }}"
-    },
-    {
-     "blockName": "docs-page",
-     "componentId": "PortalDocsPage-article",
-     "componentName": "PortalDocsPage",
-     "componentProps": {
-      "route": "{{ docsRoute }}"
-     },
-     "isCustomVueComponent": true,
-     "visibilityCondition": "{{ isDocsPage }}"
+     "originalElement": "div"
     },
     {
      "blockName": "KB Settings",
@@ -627,7 +615,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-11-05 23:50:00.000000",
+ "modified": "2026-10-31 22:00:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
@@ -635,7 +623,7 @@
  "page_title": "Article",
  "published": 1,
  "resources": [],
- "route": "/articles/:name(.*[^/])",
+ "route": "/articles/:name",
  "studio_app": "helpdesk",
- "tab_title": "{{ article.data && !isDocsPage ? article.data.title + ' | ' + brandName : document.title }}"
+ "tab_title": "{{ article.data ? article.data.title + ' | ' + brandName : document.title }}"
 }

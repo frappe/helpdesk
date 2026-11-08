@@ -15,7 +15,7 @@
       <ul class="contents">
         <li
           v-for="(article, i) in articles"
-          :key="article.name ?? article.route"
+          :key="article.name"
           class="flex min-w-0 items-center"
         >
           <!-- Hover delay stops cards flashing; below so it won't cover the next link. -->
@@ -56,10 +56,10 @@
               />
               <div class="flex flex-col gap-2 p-3">
                 <span
-                  v-if="article.category_name ?? article.category_label"
+                  v-if="article.category_name"
                   class="text-xs font-medium uppercase tracking-wide text-ink-gray-5"
                 >
-                  {{ article.category_name ?? article.category_label }}
+                  {{ article.category_name }}
                 </span>
                 <span
                   class="text-base font-semibold leading-snug text-ink-gray-9"
@@ -102,9 +102,7 @@ import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import LucideArrowUpRight from "~icons/lucide/arrow-up-right";
 
 type Article = {
-  name?: string;
-  route?: string;
-  category_label?: string;
+  name: string;
   title: string;
   excerpt?: string;
   image?: string;
@@ -117,9 +115,6 @@ defineProps<{ articles?: Article[] | null }>();
 const router = useRouter();
 
 function articleHref(article: Article) {
-  const to = article.route
-    ? ROUTES.docsPage(article.route)
-    : ROUTES.article(article as { name: string });
-  return router.resolve(to).href;
+  return router.resolve(ROUTES.article(article)).href;
 }
 </script>

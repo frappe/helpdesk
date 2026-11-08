@@ -21,7 +21,10 @@
           :label="__('Subject')"
           :placeholder="__('A short description')"
         />
-        <PortalRelatedArticles v-if="suggestArticles" :articles="suggestions" />
+        <PortalRelatedArticles
+          v-if="suggestArticles"
+          :articles="suggestions.data"
+        />
       </div>
       <div class="flex w-full flex-col">
         <span class="mb-1.5 block text-p-sm text-ink-gray-5">
@@ -88,7 +91,6 @@ import { applyFieldFilters } from "@helpdesk/shared/formScripts";
 import { __ } from "@helpdesk/shared/translation";
 import { HandleExcelPaste } from "@helpdesk/shared/tiptap";
 import {
-  SEARCH_DEBOUNCE_MS,
   isContentEmpty,
   parseLinkFilters,
   runAction,
@@ -100,18 +102,12 @@ import ApiOptionsField from "./ApiOptionsField.vue";
 import PortalSkeleton from "../ui/PortalSkeleton.vue";
 import PortalRelatedArticles from "../knowledge_base/PortalRelatedArticles.vue";
 import PortalAttachments from "./PortalAttachments.vue";
-import { pickSuggestions, type Hit } from "../../composables/docsResults";
-import {
-  MIN_QUERY_LENGTH,
-  useArticleSearch,
-} from "../../composables/useArticleSearch";
+import { useArticleSearch } from "../../composables/useArticleSearch";
 import { useRememberedCount } from "../../composables/useRememberedCount";
 import { getPriority, loadPriorities } from "../../stores/ticketMeta";
 
 const UPLOAD_FOLDER = "Home/Helpdesk";
 const SUGGESTION_LIMIT = 3;
-// Longest the Articles wait for the Docs pages.
-const DOCS_WAIT_MS = 2000;
 // Longer Select lists get a search box if there are more than 10 results
 const SEARCHABLE_FROM = 10;
 const editorExtensions = [HandleExcelPaste];
@@ -176,8 +172,6 @@ const props = withDefaults(
     origin?: Record<string, unknown>;
     isAgent?: boolean;
     suggestArticles?: boolean;
-    // The Docs source URL, empty with none; null until the config loads.
-    docsSource?: string | null;
     dateFormat?: string;
     timeFormat?: string;
     // The desk's `$dialog`, so its form scripts render as on the ticket page.
@@ -339,66 +333,8 @@ const about = computed(() => {
 const suggestionQuery = computed(() =>
   props.suggestArticles ? subject.value : ""
 );
-const articleSearch = useArticleSearch(suggestionQuery, {
+const suggestions = useArticleSearch(suggestionQuery, {
   limit: SUGGESTION_LIMIT,
-});
-const hasDocs = () => Boolean(props.docsSource);
-const docsSearch = useArticleSearch(suggestionQuery, {
-  limit: SUGGESTION_LIMIT,
-  url: "helpdesk.api.docs_source.search_docs",
-  enabled: hasDocs,
-});
-
-// Kept until the next subject is ready, so no link moves.
-const suggestions = ref<Hit[]>([]);
-// One deadline per subject, from the keystroke plus the search debounce.
-const subjectText = computed(() => suggestionQuery.value.trim());
-const deadlineFor = ref<string | null>(null);
-const shownFor = ref<string | null>(null);
-let deadlineTimer: ReturnType<typeof setTimeout>;
-watch(
-  subjectText,
-  (text) => {
-    clearTimeout(deadlineTimer);
-    deadlineFor.value = shownFor.value = null;
-    if (text.length < MIN_QUERY_LENGTH) return void (suggestions.value = []);
-    deadlineTimer = setTimeout(() => {
-      if (text === subjectText.value) deadlineFor.value = text;
-    }, SEARCH_DEBOUNCE_MS + DOCS_WAIT_MS);
-  },
-  { immediate: true }
-);
-onBeforeUnmount(() => clearTimeout(deadlineTimer));
-
-// Both lists for the current subject, or whichever settled once the deadline passed.
-const ready = computed(() => {
-  const text = subjectText.value;
-  if (text.length < MIN_QUERY_LENGTH || shownFor.value === text) return null;
-  const late = deadlineFor.value === text;
-  const articlesIn = articleSearch.settledQuery === text;
-  const docsIn = Boolean(props.docsSource) && docsSearch.settledQuery === text;
-  // Unloaded config counts as no docs only after the deadline.
-  const docsDone =
-    props.docsSource == null ? false : !props.docsSource || docsIn;
-  if (!late && !(articlesIn && docsDone)) return null;
-  return {
-    text,
-    late,
-    articles:
-      articlesIn && !articleSearch.error ? articleSearch.data || [] : [],
-    docs: docsIn && !docsSearch.error ? docsSearch.data || [] : [],
-  };
-});
-watch(ready, (now) => {
-  if (!now) return;
-  suggestions.value = pickSuggestions(
-    now.articles,
-    now.docs,
-    now.text,
-    SUGGESTION_LIMIT
-  );
-  // An empty deadline stays open, so a late answer still shows.
-  if (!now.late || suggestions.value.length) shownFor.value = now.text;
 });
 
 // Only priority shows its description, as on the ticket page.

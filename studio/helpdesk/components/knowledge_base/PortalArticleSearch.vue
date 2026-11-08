@@ -15,7 +15,6 @@
     :offset="8"
     @focus="onFocus"
     @blur="isFocused = false"
-    @keydown="onKeydown"
   >
     <template #prefix>
       <LucideSearch class="size-4.5 text-ink-gray-5" />
@@ -142,14 +141,10 @@ import {
   MIN_QUERY_LENGTH,
   useArticleSearch,
 } from "@app/composables/useArticleSearch";
-import { holdDuring, visibleDocs } from "@app/composables/docsResults";
 import { useRecent } from "@app/stores/recent";
-import { useSession } from "@app/stores/session";
 import { articleMeta, countLabel } from "@helpdesk/shared/utils";
 
 const MAX_RESULTS = 6;
-const MAX_DOCS = 4;
-const MAX_ROWS = 8;
 const KEY_HINTS = [
   { keys: "↑ ↓", label: __("Navigate") },
   { keys: "↵", label: __("Open") },
@@ -165,8 +160,6 @@ const combobox = ref<InstanceType<typeof Combobox> | null>(null);
 const query = ref("");
 const isOpen = ref(false);
 const isFocused = ref(false);
-// New options send the Combobox to row 0, so docs wait while arrow keys move.
-const navigating = ref(false);
 const { recentArticles, forgetArticle } = useRecent();
 
 const hasHistory = computed(() => recentArticles.value.length > 0);
@@ -177,26 +170,12 @@ useKeyboardShortcut({
   handler: () => combobox.value?.focus(),
 });
 
-const hasDocsSource = computed(() =>
-  Boolean(useSession().config.value?.docs_source_url)
-);
 const results = useArticleSearch(query, { limit: MAX_RESULTS });
-const docs = useArticleSearch(query, {
-  limit: MAX_DOCS,
-  url: "helpdesk.api.docs_source.search_docs",
-  enabled: () => hasDocsSource.value,
-});
 
 const searchText = computed(() => query.value.trim());
 const canSearch = computed(() => searchText.value.length >= MIN_QUERY_LENGTH);
 
-watch(query, () => {
-  isOpen.value = canSearch.value || hasHistory.value;
-  navigating.value = false;
-});
-watch(isOpen, (open) => {
-  if (!open) navigating.value = false;
-});
+watch(query, () => (isOpen.value = canSearch.value || hasHistory.value));
 
 // Last history row removed: close rather than show nothing.
 watch(hasHistory, (value) => {
@@ -206,12 +185,6 @@ watch(hasHistory, (value) => {
 function onFocus() {
   isFocused.value = true;
   isOpen.value = hasHistory.value;
-}
-
-function onKeydown(event: KeyboardEvent) {
-  const isArrow = ["ArrowUp", "ArrowDown"].includes(event.key);
-  // Stale rows must not hold back the next query's Docs rows.
-  if (isArrow && isCurrent.value && rows.value.length) navigating.value = true;
 }
 
 function createTicket() {
@@ -239,62 +212,12 @@ const historyOptions = computed(() =>
 
 // False until this query's answer lands.
 const isCurrent = computed(() => results.settledQuery === searchText.value);
-const isDocsCurrent = computed(() => docs.settledQuery === searchText.value);
-// "No results" waits for docs, so it never flashes before they answer.
-const isDocsSettled = computed(
-  () => !hasDocsSource.value || isDocsCurrent.value
-);
-
-// Article rows never change when docs arrive; Docs rows go after them.
-const rows = computed(() =>
-  [...articleRows.value, ...shownDocRows.value].slice(0, MAX_ROWS)
-);
-const articleRows = computed(() =>
-  (results.data || []).map((article) => ({
-    type: "custom",
-    key: article.name,
-    label: article.title,
-    article,
-    // Stale rows stay visible, but Enter must not open one.
-    disabled: !isCurrent.value,
-    onClick: () => router.push(ROUTES.article(article)),
-  }))
-);
-// Docs join only once they answer the same query as the Articles.
-const docRows = computed(() => {
-  const sameQuery =
-    docs.settledQuery && results.settledQuery === docs.settledQuery;
-  const hits = docs.error || !sameQuery ? [] : docs.data || [];
-  return visibleDocs(results.data || [], hits, docs.settledQuery)
-    .slice(0, MAX_DOCS)
-    .map((doc) => ({
-      type: "custom",
-      key: `doc:${doc.route}`,
-      label: doc.title,
-      article: doc,
-      disabled: !isDocsCurrent.value,
-      onClick: () => router.push(ROUTES.docsPage(doc.route)),
-    }));
-});
-
-const shownDocRows = holdDuring(
-  () => navigating.value,
-  () => docRows.value
-);
-
-const hasResults = computed(() => rows.value.length > 0);
+const hasResults = computed(() => Boolean(results.data?.length));
 const isSearching = computed(
-  () =>
-    canSearch.value &&
-    !hasResults.value &&
-    !(isCurrent.value && isDocsSettled.value)
+  () => canSearch.value && !isCurrent.value && !hasResults.value
 );
 const isEmpty = computed(
-  () =>
-    canSearch.value &&
-    isCurrent.value &&
-    isDocsSettled.value &&
-    !hasResults.value
+  () => canSearch.value && isCurrent.value && !hasResults.value
 );
 
 const resultOptions = computed(() =>
@@ -303,11 +226,19 @@ const resultOptions = computed(() =>
         {
           key: "results",
           group: countLabel(
-            rows.value.length,
-            __("1 result"),
-            __("{0} results")
+            results.data.length,
+            __("1 article"),
+            __("{0} articles")
           ),
-          options: rows.value,
+          options: results.data.map((article) => ({
+            type: "custom",
+            key: article.name,
+            label: article.title,
+            article,
+            // Stale rows stay visible, but Enter must not open one.
+            disabled: !isCurrent.value,
+            onClick: () => router.push(ROUTES.article(article)),
+          })),
         },
       ]
     : []

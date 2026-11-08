@@ -19,9 +19,9 @@
   "pinned_order",
   "author",
   "title_slug",
-  "docs_page_route",
   "docs_page_url",
   "docs_copied_on",
+  "docs_content_hash",
   "content_section",
   "content",
   "excerpt"
@@ -104,24 +104,25 @@
    "label": "Title Slug"
   },
   {
-   "fieldname": "docs_page_route",
+   "fieldname": "docs_page_url",
    "fieldtype": "Data",
-   "label": "Docs page route",
+   "label": "Docs page URL",
    "length": 500,
    "read_only": 1,
    "search_index": 1
   },
   {
-   "fieldname": "docs_page_url",
-   "fieldtype": "Data",
-   "label": "Docs page URL",
-   "length": 1000,
-   "read_only": 1
-  },
-  {
    "fieldname": "docs_copied_on",
    "fieldtype": "Datetime",
    "label": "Docs copied on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "docs_content_hash",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Docs content hash",
+   "length": 40,
    "read_only": 1
   },
   {

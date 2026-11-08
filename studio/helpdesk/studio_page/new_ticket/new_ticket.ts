@@ -14,11 +14,6 @@ export default function setup(context) {
   // Subject holds 140 chars; longer would block submit.
   const initialSubject = String(q || '').trim().slice(0, 140)
 
-  // null until the config loads, so suggestions wait for it.
-  const docsSource = computed(() => {
-    const config = settings.config.value
-    return config ? config.docs_source_url || '' : null
-  })
   const customActions = ref([])
   const timeFormat = computed(() => settings.config.value?.time_format)
 
@@ -27,7 +22,6 @@ export default function setup(context) {
     initialSubject,
     ticketOrigin,
     timeFormat,
-    docsSource,
     customActions,
     setActions: (actions) => (customActions.value = actions),
     // Replace: Back from the new ticket goes where the form was opened from.

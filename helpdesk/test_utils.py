@@ -9,16 +9,13 @@ import requests
 from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
 from frappe.permissions import rights
-from frappe.tests import IntegrationTestCase
 from frappe.tests.classes.context_managers import freeze_time
-from frappe.tests.utils import change_settings
 from frappe.utils import add_to_date, getdate, now_datetime
 
 from helpdesk.api.banners import BANNERS, dismiss_banner
 from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
-from helpdesk.docs_source import DocsSource
 from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.integrations.frappe_cloud import TRIAL_DISMISSED_KEY, forget_trial
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_frappe_version
@@ -1257,90 +1254,3 @@ def make_docs_page(
 ) -> str:
     """A minimal docs page with a main element, a title and an h1."""
     return f"<html><head><title>{name}</title></head><body><main><h1>{name}</h1><p>{text}</p></main></body></html>"
-
-
-def has_redisearch() -> bool:
-    """True when redis has the RediSearch module (CI's apt redis does not)."""
-    from redis.exceptions import ResponseError
-
-    try:
-        frappe.cache().ft("helpdesk_no_such_idx").info()
-    except ResponseError as e:
-        return "unknown command" not in str(e).lower()
-    return True
-
-
-def docs_hit(route: str, title: str) -> dict:
-    """A Docs search hit as a source returns it."""
-    return {"route": route, "title": title, "excerpt": "x", "category_label": "L"}
-
-
-class FakeSource(DocsSource):
-    """A Docs source with fixed hits, pages and sections."""
-
-    def __init__(self, hits=(), pages=None, sections=()):
-        self.hits, self.pages, self._sections = list(hits), pages or {}, list(sections)
-        self.live_calls = []
-
-    def search(self, query):
-        return self.hits
-
-    def get_page(self, route, live=True):
-        self.live_calls.append(live)
-        if route not in self.pages:
-            raise frappe.DoesNotExistError
-        return {"route": route, **self.pages[route]}
-
-    def list_pages(self, section=None):
-        return [
-            {"route": r, "title": p["title"], "section": r.partition("/")[0]}
-            for r, p in self.pages.items()
-            if section in (None, r.partition("/")[0])
-        ]
-
-    def sections(self):
-        return self._sections
-
-
-class DocsCase(IntegrationTestCase):
-    """Starts with no Docs source, enqueue_sync patched; connect_as_wiki/llms connect a fake."""
-
-    def setUp(self):
-        from helpdesk.docs_source.fetch import DOWN_KEY, LOG_KEY
-        from helpdesk.docs_source.index import DocsIndex
-
-        for key in (DOWN_KEY, LOG_KEY):
-            frappe.cache.delete_value(key)
-            self.addCleanup(frappe.cache.delete_value, key)
-        self.enterContext(
-            change_settings(
-                "HD Settings",
-                {
-                    "docs_source_url": "",
-                    "docs_source_type": "",
-                    "docs_source_label": "",
-                    "docs_source_hidden_sections": "",
-                },
-            )
-        )
-        self.sync = self.enterContext(patch("helpdesk.api.docs_source.enqueue_sync"))
-        self.enterContext(patch.object(DocsIndex, "has_redisearch", return_value=True))
-        self.addCleanup(DocsIndex().clear)
-
-    def connect_as_llms(self, url="https://docs.example.com"):
-        from helpdesk.api.docs_source import connect_docs_source
-        from helpdesk.docs_source.llms import LlmsSource
-        from helpdesk.docs_source.wiki import WikiSource
-
-        with (
-            patch.object(WikiSource, "is_available", return_value=False),
-            patch.object(LlmsSource, "is_available", return_value=True),
-        ):
-            return connect_docs_source(url)
-
-    def connect_as_wiki(self, url="https://docs.example.com"):
-        from helpdesk.api.docs_source import connect_docs_source
-        from helpdesk.docs_source.wiki import WikiSource
-
-        with patch.object(WikiSource, "is_available", return_value=True):
-            return connect_docs_source(url)

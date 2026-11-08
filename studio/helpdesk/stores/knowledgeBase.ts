@@ -1,6 +1,5 @@
 import { reactive, ref, toValue, watch, type MaybeRefOrGetter } from 'vue'
 import { createResource, frappeRequest } from 'frappe-ui'
-import { findArticleHeading } from '@helpdesk/shared/utils'
 
 // Module-level, not `cache`: what a reader sees depends on who they are.
 const sidebar = createResource({
@@ -60,18 +59,15 @@ export function prefetchOnHover(name: string | undefined) {
 }
 
 export function useArticle(name: MaybeRefOrGetter<string>) {
-  // `settled` names the Article that `data` or `error` answers.
-  const article = reactive<{ data: any; error: unknown; loading: boolean; settled: string }>({
+  const article = reactive<{ data: any; error: unknown; loading: boolean }>({
     data: null,
     error: null,
     loading: false,
-    settled: '',
   })
   watch(
     () => toValue(name),
     async (current) => {
-      Object.assign(article, { error: null, settled: '' })
-      if (!current) return Object.assign(article, { data: null, loading: false, settled: '' })
+      if (!current) return
       article.loading = true
       try {
         const data = await prefetchArticle(current)
@@ -79,35 +75,10 @@ export function useArticle(name: MaybeRefOrGetter<string>) {
       } catch (error) {
         if (toValue(name) === current) article.error = error
       } finally {
-        if (toValue(name) === current) Object.assign(article, { loading: false, settled: current })
+        if (toValue(name) === current) article.loading = false
       }
     },
     { immediate: true },
   )
   return article
-}
-
-export function scrollToHash(tries = 40) {
-  const heading = findHeading(decodeHash())
-  if (heading) heading.scrollIntoView()
-  else if (tries) setTimeout(() => scrollToHash(tries - 1), 50)
-}
-
-// A hand-typed `#100%` is not valid percent-encoding.
-function decodeHash() {
-  try {
-    return decodeURIComponent(location.hash.slice(1))
-  } catch {
-    return location.hash.slice(1)
-  }
-}
-
-// Old desk KB ids kept edge dashes: "What's new?" was `what-s-new-`.
-function findHeading(id: string) {
-  return (
-    findArticleHeading(id) ||
-    [...document.querySelectorAll('h2, h3, h4, h5, h6')].find(
-      (heading) => heading.textContent.trim().replace(/[^a-z0-9]+/gi, '-').toLowerCase() === id,
-    )
-  )
 }

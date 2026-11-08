@@ -8,7 +8,6 @@ GUEST_FIELDS = [
     "brand_name",
     "brand_logo",
     "public_knowledge_base",
-    "docs_source_url",
     "allow_anonymous_article_voting",
     "banner_image",
     "banner_preset",

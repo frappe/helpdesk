@@ -1,21 +1,15 @@
 import time
 from urllib.parse import urljoin
 
-import frappe
 import requests
 from frappe.utils.data import validate_egress_url
 from urllib3.exceptions import HTTPError
 from urllib3.util import parse_url
 
-LIVE_TIMEOUT = 2
-SYNC_TIMEOUT = 10
+PAGE_TIMEOUT = 10
 MAX_BYTES = 5 * 1024 * 1024
 MAX_REDIRECTS = 3
-SKIP_SECONDS = 60
-DOWN_KEY = "docs_source_down"
-LOG_KEY = "docs_source_failure_logged"
 HEADERS = {"User-Agent": "helpdesk-docs-source"}
-DOWN_STATUSES = (502, 503, 504)
 CHUNK_SIZE = 8 * 1024
 
 
@@ -30,7 +24,7 @@ class DocsFetchError(Exception):
 
 
 def fetch(
-    url: str, host: str, timeout: float = SYNC_TIMEOUT, params: dict | None = None
+    url: str, host: str, timeout: float = PAGE_TIMEOUT, params: dict | None = None
 ) -> requests.Response:
     """GET url over https, same host only, with `timeout` as a total deadline."""
     deadline = time.monotonic() + timeout
@@ -42,31 +36,6 @@ def fetch(
         url = _redirect_url(url, response)
         params = None
     raise DocsFetchError("Too many redirects")
-
-
-def fetch_live(url: str, host: str, params: dict | None = None) -> requests.Response:
-    """fetch for page loads: short timeout, skips the source for a while after an outage."""
-    if frappe.cache.get_value(DOWN_KEY):
-        raise DocsFetchError("Docs source is down", transient=True)
-    try:
-        return fetch(url, host, LIVE_TIMEOUT, params)
-    except DocsFetchError as e:
-        if _trips_breaker(e):
-            frappe.cache.set_value(DOWN_KEY, 1, expires_in_sec=SKIP_SECONDS)
-            frappe.log_error("Docs source is down", str(e))
-        raise
-
-
-def log_failure(error: DocsFetchError) -> None:
-    """Log a failure that did not trip the breaker, at most once per SKIP_SECONDS."""
-    if _trips_breaker(error) or frappe.cache.get_value(LOG_KEY):
-        return
-    frappe.cache.set_value(LOG_KEY, 1, expires_in_sec=SKIP_SECONDS)
-    frappe.log_error("Docs source failed", str(error))
-
-
-def _trips_breaker(error: DocsFetchError) -> bool:
-    return error.transient or error.status in DOWN_STATUSES
 
 
 def _get(url, host, deadline, params):

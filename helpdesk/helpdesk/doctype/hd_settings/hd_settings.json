@@ -21,14 +21,6 @@
   "base_support_rotation",
   "knowledge_base_tab",
   "public_knowledge_base",
-  "docs_source_url",
-  "docs_source_type",
-  "docs_source_label",
-  "docs_source_hidden_sections",
-  "docs_source_synced_on",
-  "docs_source_page_count",
-  "docs_source_truncated",
-  "docs_source_sync_error",
   "allow_anonymous_article_voting",
   "hide_raise_ticket_button",
   "banner_image",
@@ -255,56 +247,6 @@
    "fieldname": "public_knowledge_base",
    "fieldtype": "Check",
    "label": "Make knowledge base public"
-  },
-  {
-   "fieldname": "docs_source_url",
-   "fieldtype": "Data",
-   "label": "Docs source URL",
-   "read_only": 1
-  },
-  {
-   "fieldname": "docs_source_type",
-   "fieldtype": "Select",
-   "label": "Docs source type",
-   "read_only": 1,
-   "options": "\nFrappe Wiki\nllms.txt\nSitemap"
-  },
-  {
-   "fieldname": "docs_source_label",
-   "fieldtype": "Data",
-   "label": "Docs source label",
-   "read_only": 1
-  },
-  {
-   "fieldname": "docs_source_hidden_sections",
-   "fieldtype": "Small Text",
-   "label": "Docs source hidden sections",
-   "read_only": 1,
-   "description": "JSON list"
-  },
-  {
-   "fieldname": "docs_source_synced_on",
-   "fieldtype": "Datetime",
-   "label": "Docs source synced on",
-   "read_only": 1
-  },
-  {
-   "fieldname": "docs_source_page_count",
-   "fieldtype": "Int",
-   "label": "Docs source page count",
-   "read_only": 1
-  },
-  {
-   "fieldname": "docs_source_truncated",
-   "fieldtype": "Check",
-   "label": "Docs source truncated",
-   "read_only": 1
-  },
-  {
-   "fieldname": "docs_source_sync_error",
-   "fieldtype": "Small Text",
-   "label": "Docs source sync error",
-   "read_only": 1
   },
   {
    "default": "0",

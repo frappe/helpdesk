@@ -1,22 +1,18 @@
 import gzip
-import pickle
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from unittest.mock import patch
 
-import frappe
 import requests
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.docs_source.fetch import (
-    DOWN_KEY,
     MAX_BYTES,
     MAX_REDIRECTS,
     DocsFetchError,
     _read_capped,
     fetch,
-    fetch_live,
 )
 from helpdesk.test_utils import make_response
 
@@ -26,11 +22,6 @@ URL = f"https://{HOST}/x"
 
 @patch("helpdesk.docs_source.fetch.requests.get")
 class TestEgress(IntegrationTestCase):
-    def test_error_survives_pickle(self, get):
-        error = pickle.loads(pickle.dumps(DocsFetchError("boom", 503, True)))
-        self.assertEqual(str(error), "boom")
-        self.assertEqual((error.status, error.transient), (503, True))
-
     def test_refuses_internal_address(self, get):
         with self.assertRaises(DocsFetchError):
             fetch("https://127.0.0.1/llms.txt", "127.0.0.1")
@@ -40,10 +31,6 @@ class TestEgress(IntegrationTestCase):
 @patch("helpdesk.docs_source.fetch.validate_egress_url")
 @patch("helpdesk.docs_source.fetch.requests.get")
 class TestFetch(IntegrationTestCase):
-    def setUp(self):
-        frappe.cache.delete_value(DOWN_KEY)
-        self.addCleanup(frappe.cache.delete_value, DOWN_KEY)
-
     def test_refuses_other_host(self, get, validate):
         with self.assertRaises(DocsFetchError):
             fetch("https://evil.example/x", HOST)
@@ -110,35 +97,6 @@ class TestFetch(IntegrationTestCase):
             with self.assertRaises(DocsFetchError, msg=status) as ctx:
                 fetch(URL, HOST)
             self.assertEqual(ctx.exception.status, status)
-
-    def test_live_failure_skips_next_calls(self, get, validate):
-        get.side_effect = requests.ConnectionError("down")
-        for _ in range(2):
-            with self.assertRaises(DocsFetchError):
-                fetch_live(URL, HOST)
-        self.assertEqual(get.call_count, 1)
-
-    def test_outage_is_logged_once_when_the_breaker_trips(self, get, validate):
-        get.side_effect = requests.ConnectionError("down")
-        with patch("helpdesk.docs_source.fetch.frappe.log_error") as log:
-            for _ in range(3):
-                with self.assertRaises(DocsFetchError):
-                    fetch_live(URL, HOST)
-        log.assert_called_once()
-
-    def test_live_trips_only_on_gateway_statuses(self, get, validate):
-        for status in (404, 500):
-            get.return_value = make_response(URL, status)
-            with self.assertRaises(DocsFetchError):
-                fetch_live(URL, HOST)
-            self.assertFalse(frappe.cache.get_value(DOWN_KEY), status)
-        with self.assertRaises(DocsFetchError):
-            fetch_live("https://evil.example/x", HOST)
-        self.assertFalse(frappe.cache.get_value(DOWN_KEY))
-        get.return_value = make_response(URL, 503)
-        with self.assertRaises(DocsFetchError):
-            fetch_live(URL, HOST)
-        self.assertTrue(frappe.cache.get_value(DOWN_KEY))
 
 
 class _Handler(BaseHTTPRequestHandler):

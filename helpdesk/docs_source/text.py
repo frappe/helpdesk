@@ -1,13 +1,10 @@
 import re
-from collections.abc import Callable
 from html import unescape
-from urllib.parse import unquote, urljoin, urlsplit
+from urllib.parse import unquote, urljoin
 
 from bs4 import BeautifulSoup
 from frappe.utils import strip_html_tags
 from frappe.utils.html_utils import sanitize_html
-
-ARTICLES = "/help/articles"
 
 
 def plain_title(title: str) -> str:
@@ -43,9 +40,8 @@ def has_dot_segment(route: str) -> bool:
     return any(part in (".", "..") for part in unquote(route).split("/"))
 
 
-def rewrite_links(html: str, base_url: str, is_page: Callable[[str], bool]) -> str:
-    """Point links to docs pages at the help center, and make the rest absolute."""
-    host = urlsplit(base_url).netloc
+def absolute_links(html: str, base_url: str) -> str:
+    """Make links and image sources absolute, so a copied page still points at the docs site."""
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup.select("a[href], [src]"):
         for attr in ("href", "src"):
@@ -56,13 +52,7 @@ def rewrite_links(html: str, base_url: str, is_page: Callable[[str], bool]) -> s
                 r"[a-z][a-z0-9+.-]*:(?!//)", value, re.I
             ):
                 continue
-            parts = urlsplit(urljoin(base_url, value))
-            route = parts.path.strip("/").removesuffix(".md")
-            if attr == "href" and parts.netloc == host and is_page(route):
-                anchor = f"#{parts.fragment}" if parts.fragment else ""
-                tag[attr] = f"{ARTICLES}/{route}{anchor}"
-            else:
-                tag[attr] = parts.geturl()
+            tag[attr] = urljoin(base_url, value)
     return str(soup)
 
 
@@ -72,11 +62,6 @@ def clean_markdown(text: str, title: str) -> str:
     text = re.sub(r"\A(?:> .*\n)+", "", _strip_gitbook_tags(text).lstrip())
     text = re.sub(r"^> \[!\w+\]$", ">", text, flags=re.M)  # GitHub alert markers
     return re.sub(rf"\A\s*# {re.escape(title)}\s*\n", "", text)
-
-
-def to_plain(markdown: str) -> str:
-    text = unescape(strip_html_tags(_strip_gitbook_tags(markdown)))
-    return re.sub(r"[*`#>]+", "", re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text))
 
 
 def _strip_gitbook_tags(text: str) -> str:

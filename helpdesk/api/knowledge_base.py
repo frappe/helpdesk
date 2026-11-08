@@ -1,3 +1,4 @@
+import hashlib
 from contextlib import suppress
 
 import frappe
@@ -555,19 +556,26 @@ def get_kb_sidebar() -> list[dict]:
 def get_article(name: str) -> dict:
     """Get a readable article: content, author, category, reading time, caller's vote.
     `name` may be the URL path `<name>-<title slug>`. `feedback` is 0 none, 1 helpful,
-    2 not helpful. Agents also get `pinned`, `weight`,
-    `docs_page_url` and `docs_copied_on`. Doesn't count a view (see
+    2 not helpful. Agents also get `pinned`, `weight`, `docs_page_url`, `docs_copied_on`
+    and `docs_edited` (changed since it was copied from docs). Doesn't count a view (see
     increment_views). Guests only when the knowledge base is public."""
     name = _get_article_name(name)
     # the desk article page shows the pin and edits the weight
     desk_fields = (
-        ["pinned", "weight", "docs_page_url", "docs_copied_on"] if is_agent() else []
+        ["pinned", "weight", "docs_page_url", "docs_copied_on", "docs_content_hash"]
+        if is_agent()
+        else []
     )
     article = _get_viewable_article(
         name, [*PUBLIC_ARTICLE_FIELDS, "content", *desk_fields]
     )
     article.author = _get_byline(article.author)
     article.title_slug = cleanup_page_name(article.title)
+    if "docs_content_hash" in article:
+        saved_hash = article.pop("docs_content_hash")
+        article.docs_edited = bool(saved_hash) and saved_hash != content_hash(
+            article.content
+        )
     # archived articles have no category
     category = (
         frappe.db.get_value(
@@ -594,6 +602,10 @@ def get_article(name: str) -> dict:
         BeautifulSoup(article.content or "", "html.parser")
     )
     return article
+
+
+def content_hash(content: str | None) -> str:
+    return hashlib.sha1((content or "").encode()).hexdigest()
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
@@ -697,7 +709,7 @@ def _get_categories(with_creators: bool = False) -> list[dict]:
 def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
     """Search published articles the caller can read; returns at most 5 hits.
     Each hit: name, title and excerpt with matches in <mark> tags, title_slug, first
-    image, minutes to read, category_name, is_converted. Empty without RediSearch. Guests only when
+    image, minutes to read, category_name. Empty without RediSearch. Guests only when
     the knowledge base is public."""
     validate_public_access()
     query = query.strip()[:SEARCH_QUERY_LENGTH]
@@ -717,7 +729,6 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
                 "name",
                 "content",
                 "category",
-                "docs_page_route",
                 "category.category_name as category_name",
             ],
         )
@@ -742,7 +753,6 @@ def _get_search_hit(row: dict, article: frappe._dict, labels: dict) -> dict:
         "minutes": _get_reading_minutes(BeautifulSoup(content, "html.parser")),
         "category_name": article.category_name,
         "category_label": labels.get(article.category),
-        "is_converted": bool(article.docs_page_route),
     }
 
 

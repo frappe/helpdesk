@@ -79,7 +79,6 @@
           <HeaderLinks v-model="draft.links" />
         </div>
       </section>
-      <DocsSourceSettings />
     </div>
     <SettingsFormSkeleton
       v-else
@@ -97,7 +96,6 @@ import { __ } from "../translation";
 import { SettingsRow, Switch } from "frappe-ui";
 import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
-import DocsSourceSettings from "./DocsSourceSettings.vue";
 import HeaderLinks from "./HeaderLinks.vue";
 import PinnedList from "./PinnedList.vue";
 import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
