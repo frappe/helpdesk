@@ -32,14 +32,17 @@ const finished = (category: string, created = 3, skipped = 0, failed = 0) => ({
 async function mockImport(page: Page, results: Result[]) {
   let started = false;
   let polls = 0;
+  const calls = { import: 0 };
   await page.route("**/api/method/helpdesk.api.docs_source.import_docs", (route) => {
     started = true;
+    calls.import++;
     return route.fulfill({ json: { message: running(0) } });
   });
   await page.route("**/api/method/helpdesk.api.docs_source.get_import_result", (route) => {
     const next = started ? results[Math.min(polls++, results.length - 1)] : null;
     return route.fulfill({ json: { message: next } });
   });
+  return calls;
 }
 
 async function openDeskSettings(page: Page) {
@@ -124,6 +127,55 @@ test("a failed import shows plain words and Try again keeps the address", async 
   await expect(dialog.getByText(NOT_FOUND)).toBeHidden();
   await expect(dialog.getByRole("textbox", { name: /Docs site address/ })).toHaveValue(DOCS_URL);
   await expect(dialog.getByRole("button", { name: "Import", exact: true })).toBeEnabled();
+});
+
+test("a failed start call shows plain words, never server text", async ({ page, api }) => {
+  const category = await createCategory(api);
+  await page.route("**/api/method/helpdesk.api.docs_source.get_import_result", (route) =>
+    route.fulfill({ json: { message: null } }),
+  );
+  await page.route("**/api/method/helpdesk.api.docs_source.import_docs", (route) =>
+    route.fulfill({ status: 500, json: { exception: "Traceback: boom", exc_type: "ValueError" } }),
+  );
+  const { dialog } = await openImport(page);
+  await fillForm(page, dialog, category.category_name);
+  await dialog.getByRole("button", { name: "Import", exact: true }).click();
+
+  await expect(dialog.getByText("We couldn't start the import. Check your connection and try again.")).toBeVisible();
+  await expect(dialog).not.toContainText(/server|exception|traceback|boom/i);
+});
+
+test("Enter in the address field starts the import, Enter on a category does not", async ({ page, api }) => {
+  const category = await createCategory(api);
+  const calls = await mockImport(page, [running(0)]);
+  const { dialog } = await openImport(page);
+  const address = dialog.getByRole("textbox", { name: /Docs site address/ });
+  await address.fill(DOCS_URL);
+  await dialog.getByRole("combobox", { name: /Add the drafts to/ }).click();
+  await page.getByRole("combobox").last().fill(category.category_name);
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  expect(calls.import).toBe(0);
+
+  await address.press("Enter");
+  await expect(dialog.getByText("Reading page 1 of 3")).toBeVisible();
+  expect(calls.import).toBe(1);
+});
+
+test("on a phone the dialog fits and the three counts stay in one row", async ({ page, api }) => {
+  const category = await createCategory(api);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockImport(page, [finished(category.name, 12, 3, 1)]);
+  const { dialog } = await openImport(page);
+  await fillForm(page, dialog, category.category_name);
+  await dialog.getByRole("button", { name: "Import", exact: true }).click();
+
+  const figures = dialog.locator("dd");
+  await expect(figures).toHaveCount(3);
+  const tops = await figures.evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().top)));
+  expect(new Set(tops).size).toBe(1);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
 });
 
 test.describe("edited since the copy", () => {

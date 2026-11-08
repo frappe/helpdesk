@@ -14,7 +14,6 @@ from helpdesk.docs_source.importer import (
 )
 from helpdesk.test_utils import (
     article_index_jobs,
-    get_category_articles,
     make_article,
     make_article_category,
     make_docs_page,
@@ -37,7 +36,12 @@ class DocsImportCase(IntegrationTestCase):
         return DocsImport(url, self.category).run()
 
     def articles(self):
-        return get_category_articles(self.category)
+        return frappe.get_list(
+            "HD Article",
+            filters={"category": self.category},
+            fields=["name", "title", "status", "docs_page_url", "docs_copied_on"],
+            order_by="title",
+        )
 
 
 class TestSources(DocsImportCase):

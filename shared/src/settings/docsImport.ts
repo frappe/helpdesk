@@ -1,6 +1,5 @@
 import { frappeRequest } from "frappe-ui";
 import { onBeforeUnmount, ref } from "vue";
-import { __ } from "../translation";
 
 export type ImportResult =
   | {
@@ -21,13 +20,6 @@ export type ImportResult =
   | { state: "error"; message: string; host: string };
 
 const GIVE_UP = 5 * 60 * 1000;
-
-// Fixed copy: a failed call must never show the server's own text.
-export const startFailed = () =>
-  __("We couldn't start the import. Check your connection and try again.");
-export const notAllowed = () => __("Only Agent Managers can import pages.");
-export const slowCopy = () =>
-  __("This is taking longer than expected. Check back in a few minutes.");
 
 // The endpoint only answers GET, and `call` always sends POST.
 export function getImportResult(): Promise<ImportResult | null> {

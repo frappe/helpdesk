@@ -8,8 +8,18 @@
       <div class="space-y-5">
         <!-- Form and error share the fields; the error adds its message above them -->
         <template v-if="screen === 'form' || screen === 'error'">
-          <Alert v-if="message" theme="red" :title="message" role="alert" />
-          <div class="space-y-4" @keydown.enter="submit">
+          <p
+            v-if="errorText"
+            class="flex items-start gap-2 text-p-sm text-ink-red-3"
+            role="alert"
+          >
+            <LucideCircleAlert
+              class="mt-0.5 size-4 shrink-0"
+              aria-hidden="true"
+            />
+            {{ errorText }}
+          </p>
+          <div class="space-y-4" @keydown.enter="onEnter">
             <TextInput
               v-model="url"
               :label="__('Docs site address')"
@@ -22,23 +32,7 @@
               required
               autofocus
             />
-            <p
-              v-if="categories.error"
-              class="flex items-start gap-2 text-p-sm text-ink-red-5"
-              role="alert"
-            >
-              <LucideCircleAlert
-                class="mt-0.5 size-4 shrink-0"
-                aria-hidden="true"
-              />
-              {{
-                __(
-                  "Couldn't load the categories. Close this window and try again.",
-                )
-              }}
-            </p>
             <Combobox
-              v-else
               v-model="category"
               :label="__('Add the drafts to')"
               :placeholder="__('Pick a category')"
@@ -60,8 +54,8 @@
               variant="solid"
               :label="screen === 'error' ? __('Try again') : __('Import')"
               :disabled="screen !== 'error' && !canImport"
-              :loading="starting"
-              @click="screen === 'error' ? tryAgain() : submit()"
+              :loading="start.loading"
+              @click="screen === 'error' ? (showForm = true) : submit()"
             />
           </div>
         </template>
@@ -85,7 +79,9 @@
           <p class="text-p-sm text-ink-gray-5">
             {{
               timedOut
-                ? slowCopy()
+                ? __(
+                    "This is taking longer than expected. Check back in a few minutes."
+                  )
                 : __("You can close this window. The import keeps running.")
             }}
           </p>
@@ -154,13 +150,11 @@
 
 <script setup lang="ts">
 import {
-  Alert,
   Button,
   Combobox,
   Dialog,
   Progress,
   TextInput,
-  call,
   createResource,
 } from "frappe-ui";
 import { computed, ref, watch } from "vue";
@@ -169,9 +163,7 @@ import LucideCircleCheck from "~icons/lucide/circle-check";
 import LucideLoaderCircle from "~icons/lucide/loader-circle";
 import { __ } from "../translation";
 import {
-  notAllowed,
-  slowCopy,
-  startFailed,
+  type ImportResult,
   useImportResult,
   viewDraftsHref,
 } from "./docsImport";
@@ -181,43 +173,61 @@ const emit = defineEmits<{ started: [] }>();
 
 const url = ref("");
 const category = ref("");
-const starting = ref(false);
-const failure = ref("");
-// "Import another" and "Try again" go back to the form over the last result.
-const wantsForm = ref(false);
+// "Import another" and "Try again" show the form over the last result.
+const showForm = ref(false);
 const { result: run, timedOut, refresh, stop } = useImportResult(2000);
 
 const categories = createResource({
   url: "helpdesk.api.knowledge_base.get_category_options",
 });
 
+// Fixed copy: a failed call must never show the server's own text.
+const start = createResource({
+  url: "helpdesk.api.docs_source.import_docs",
+  onSuccess(state: ImportResult) {
+    run.value = state;
+    showForm.value = false;
+    if (state.state === "running") {
+      emit("started");
+      refresh();
+    }
+  },
+  onError(error: { exc_type?: string }) {
+    const message =
+      error?.exc_type === "PermissionError"
+        ? __("Only Agent Managers can import pages.")
+        : __(
+            "We couldn't start the import. Check your connection and try again."
+          );
+    run.value = { state: "error", message, host: "" };
+    showForm.value = false;
+  },
+});
+
 const options = computed(() =>
-  (categories.data || []).map(({ value, label }) => ({ value, label })),
+  (categories.data || []).map(({ value, label }) => ({ value, label }))
 );
 const noCategories = computed(
-  () => categories.data && !categories.data.length && !categories.loading,
+  () => categories.data && !categories.data.length && !categories.loading
 );
 const canImport = computed(
-  () => Boolean(url.value.trim() && category.value) && !starting.value,
+  () => Boolean(url.value.trim() && category.value) && !start.loading
 );
 
 const screen = computed(() => {
-  if (failure.value || wantsForm.value) return failure.value ? "error" : "form";
+  if (showForm.value) return "form";
   const state = run.value?.state;
-  if (state === "running") return "working";
-  if (state === "error") return "error";
-  if (state === "done") return "done";
-  return "form";
+  return state === "running" ? "working" : state || "form";
 });
 
-// The stored error is stale once the form is shown again for a new run.
-const message = computed(
-  () =>
-    failure.value ||
-    (screen.value === "error" && run.value?.state === "error"
-      ? run.value.message
-      : ""),
-);
+const errorText = computed(() => {
+  if (categories.error)
+    return __("Couldn't load the categories. Close this window and try again.");
+  const state = run.value;
+  return screen.value === "error" && state?.state === "error"
+    ? state.message
+    : "";
+});
 
 const percent = computed(() => {
   const state = run.value;
@@ -234,7 +244,7 @@ const stepText = computed(() => {
 });
 
 const nothingNew = computed(
-  () => run.value?.state === "done" && !run.value.created && !run.value.failed,
+  () => run.value?.state === "done" && !run.value.created && !run.value.failed
 );
 
 const figures = computed(() => {
@@ -249,47 +259,24 @@ const figures = computed(() => {
 
 watch(open, (isOpen) => {
   if (!isOpen) return stop();
-  wantsForm.value = false;
-  failure.value = "";
+  showForm.value = false;
   categories.submit();
   refresh();
 });
 
-function tryAgain() {
-  wantsForm.value = true;
-  failure.value = "";
-}
-
 function anotherImport() {
   category.value = "";
-  wantsForm.value = true;
+  showForm.value = true;
 }
 
-async function submit() {
-  if (!canImport.value) return;
-  starting.value = true;
-  failure.value = "";
-  try {
-    run.value = await call("helpdesk.api.docs_source.import_docs", {
-      url: url.value.trim(),
-      category: category.value,
-    });
-    wantsForm.value = false;
-    if (run.value?.state === "running") {
-      emit("started");
-      refresh();
-    } else {
-      // A refusal such as a bad address: shown, with the fields kept.
-      failure.value = run.value?.state === "error" ? run.value.message : "";
-    }
-  } catch (error) {
-    failure.value = isDenied(error) ? notAllowed() : startFailed();
-  } finally {
-    starting.value = false;
-  }
+// Enter on the category list picks an option; it must not start the import.
+function onEnter(event: KeyboardEvent) {
+  if ((event.target as HTMLElement).getAttribute("role") !== "combobox")
+    submit();
 }
 
-function isDenied(error: unknown) {
-  return (error as { exc_type?: string })?.exc_type === "PermissionError";
+function submit() {
+  if (canImport.value)
+    start.submit({ url: url.value.trim(), category: category.value });
 }
 </script>

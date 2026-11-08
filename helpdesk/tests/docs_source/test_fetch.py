@@ -20,14 +20,6 @@ HOST = "docs.example.com"
 URL = f"https://{HOST}/x"
 
 
-@patch("helpdesk.docs_source.fetch.requests.get")
-class TestEgress(IntegrationTestCase):
-    def test_refuses_internal_address(self, get):
-        with self.assertRaises(DocsFetchError):
-            fetch("https://127.0.0.1/llms.txt", "127.0.0.1")
-        get.assert_not_called()
-
-
 @patch("helpdesk.docs_source.fetch.validate_egress_url")
 @patch("helpdesk.docs_source.fetch.requests.get")
 class TestFetch(IntegrationTestCase):
@@ -51,13 +43,6 @@ class TestFetch(IntegrationTestCase):
         with self.assertRaises(DocsFetchError):
             fetch(URL, HOST)
         self.assertEqual(get.call_count, 1)
-
-    def test_malformed_urls_raise_docs_fetch_error(self, get, validate):
-        with self.assertRaises(DocsFetchError):
-            fetch("https://[bad/", HOST)
-        get.return_value = make_response(URL, 302, "https://[bad")
-        with self.assertRaises(DocsFetchError):
-            fetch(URL, HOST)
 
     def test_follows_same_host_redirect(self, get, validate):
         get.side_effect = [

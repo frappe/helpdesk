@@ -1284,21 +1284,6 @@ def make_docs_site(
     return site
 
 
-def make_sitemap_locs(base: str, *paths: str) -> str:
-    """The `<url><loc>` entries of a sitemap for each path on `base`."""
-    return "".join(f"<url><loc>{base}{path}</loc></url>" for path in paths)
-
-
-def get_category_articles(category: str) -> list[frappe._dict]:
-    """The Articles in `category` with their docs fields, ordered by title."""
-    return frappe.get_all(
-        "HD Article",
-        filters={"category": category},
-        fields=["name", "title", "status", "docs_page_url", "docs_copied_on"],
-        order_by="title",
-    )
-
-
 def patch_docs_site(case, site: dict) -> MagicMock:
     """Serve `site` to every docs fetch in this test and skip the pause between pages.
 

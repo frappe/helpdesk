@@ -4,13 +4,16 @@ from helpdesk.docs_source import llms, sitemap
 from helpdesk.test_utils import (
     make_docs_page,
     make_docs_site,
-    make_sitemap_locs,
     patch_docs_site,
 )
 
 HOST = "docs.example.com"
 BASE = f"https://{HOST}"
 URLSET = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{}</urlset>'
+
+
+def locs(*paths):
+    return "".join(f"<url><loc>{BASE}{path}</loc></url>" for path in paths)
 
 
 class TestLlms(IntegrationTestCase):
@@ -64,9 +67,7 @@ class TestSitemap(IntegrationTestCase):
     def test_lists_in_scope_pages_unversioned_first(self):
         site = {
             f"{BASE}/docs/sitemap.xml": URLSET.format(
-                make_sitemap_locs(
-                    BASE, "/docs/v1/old", "/docs/new", "/blog/x", "/docs/../secret"
-                )
+                locs("/docs/v1/old", "/docs/new", "/blog/x", "/docs/../secret")
                 + "<url><loc>https://other.example.org/docs/x</loc></url>"
             )
         }
@@ -81,8 +82,8 @@ class TestSitemap(IntegrationTestCase):
             f"{BASE}/sitemap.xml": '<sitemapindex xmlns="x">'
             f"<sitemap><loc>{BASE}/s1.xml</loc></sitemap>"
             f"<sitemap><loc>{BASE}/s2.xml</loc></sitemap></sitemapindex>",
-            f"{BASE}/s1.xml": URLSET.format(make_sitemap_locs(BASE, "/a")),
-            f"{BASE}/s2.xml": URLSET.format(make_sitemap_locs(BASE, "/b", "/a")),
+            f"{BASE}/s1.xml": URLSET.format(locs("/a")),
+            f"{BASE}/s2.xml": URLSET.format(locs("/b", "/a")),
         }
         patch_docs_site(self, site)
         self.assertEqual(sitemap.find_pages(BASE), [f"{BASE}/a", f"{BASE}/b"])
