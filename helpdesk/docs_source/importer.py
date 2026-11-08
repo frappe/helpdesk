@@ -23,6 +23,7 @@ JOB_ID = "docs_import"
 RESULT_KEY = "docs_import_result"
 RUNNING_SECONDS = 3600
 RESULT_SECONDS = 7 * 24 * 3600
+GENERIC_ERROR = "Something went wrong while importing. Try again, and if it keeps happening, ask your administrator to check the Error Log."
 
 
 class DocsImportError(Exception):
@@ -195,3 +196,23 @@ class DocsImport:
         return _(
             "We can't reach that address. Use the public address of your docs site."
         )
+
+
+def run_import(url: str, category: str) -> None:
+    """The background job: import, then store the counts or a plain error for the page."""
+    host = urlsplit(url).hostname or ""
+    try:
+        result = {
+            "state": "done",
+            **DocsImport(url, category).run(),
+            "host": host,
+            "category": category,
+        }
+    except DocsImportError as e:
+        result = {"state": "error", "message": str(e), "host": host}
+    except Exception:
+        frappe.db.rollback()
+        frappe.log_error("Docs import failed")
+        result = {"state": "error", "message": _(GENERIC_ERROR), "host": host}
+    frappe.cache.set_value(RESULT_KEY, result, expires_in_sec=RESULT_SECONDS)
+    frappe.db.commit()
