@@ -63,7 +63,6 @@ class DocsImport:
         self.url = normalize_url(url)
         self.category = category
         self.host = urlsplit(self.url).hostname
-        self.read_page = llms.read_page
 
     def run(self) -> dict:
         """Returns the number of pages `created`, `skipped` as already imported and `failed`."""
@@ -90,7 +89,7 @@ class DocsImport:
         return {"created": created, "skipped": skipped, "failed": failed}
 
     def find_pages(self) -> list[str]:
-        """Page URLs from llms.txt, else sitemap.xml. Sets the reader to match."""
+        """Page URLs from llms.txt, else sitemap.xml."""
         error = None
         for source in (llms, sitemap):
             try:
@@ -100,7 +99,6 @@ class DocsImport:
                     error = error or e
                 continue
             if urls:
-                self.read_page = source.read_page
                 return urls
         if error:
             raise DocsImportError(self.friendly(error))
@@ -140,7 +138,7 @@ class DocsImport:
 
     def read_one(self, url: str) -> tuple[str, str] | None:
         """The page's title and HTML, or None when it has no title or no text."""
-        title, html = self.read_page(url)
+        title, html = llms.read_page(url)
         title = plain_title(title)[:TITLE_LENGTH]
         return (
             (title, absolute_links(html, url)) if title and visible_text(html) else None

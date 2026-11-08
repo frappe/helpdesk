@@ -102,9 +102,3 @@ class TestSitemap(IntegrationTestCase):
     def test_html_page_instead_of_sitemap_is_no_list(self):
         patch_docs_site(self, {f"{BASE}/sitemap.xml": make_docs_page("Not found")})
         self.assertEqual(sitemap.find_pages(BASE), [])
-
-    def test_reads_the_main_content_and_title(self):
-        patch_docs_site(self, {f"{BASE}/a": make_docs_page("Alpha")})
-        title, html = sitemap.read_page(f"{BASE}/a")
-        self.assertEqual(title, "Alpha")
-        self.assertIn("<p>", html)

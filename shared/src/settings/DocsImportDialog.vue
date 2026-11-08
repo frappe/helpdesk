@@ -172,6 +172,7 @@ import {
   Dialog,
   Progress,
   TextInput,
+  call,
   createResource,
 } from "frappe-ui";
 import { computed, ref, watch } from "vue";
@@ -180,7 +181,6 @@ import {
   notAllowed,
   slowCopy,
   startFailed,
-  startImport,
   useImportResult,
   viewDraftsHref,
 } from "./docsImport";
@@ -276,7 +276,10 @@ async function submit() {
   starting.value = true;
   failure.value = "";
   try {
-    run.value = await startImport(url.value.trim(), category.value);
+    run.value = await call("helpdesk.api.docs_source.import_docs", {
+      url: url.value.trim(),
+      category: category.value,
+    });
     wantsForm.value = false;
     if (run.value?.state === "running") {
       emit("started");

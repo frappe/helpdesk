@@ -1235,16 +1235,14 @@ def make_response(url, status=200, location=None, chunks=(b"ok",)):
 
 
 def fake_docs_fetch(site: dict):
-    """side_effect for a patched docs fetch: URL -> body, int status (raised) or (body, final_url); else 404."""
+    """side_effect for a patched docs fetch: URL -> body, or an int status (raised); else 404."""
     from helpdesk.docs_source.fetch import DocsFetchError
 
     def fake(url, host):
-        entry = site.get(url, 404)
-        if isinstance(entry, int):
-            raise DocsFetchError(f"HTTP {entry}", status=entry)
-        body, final = entry if isinstance(entry, tuple) else (entry, url)
-        body = body if isinstance(body, str) else json.dumps(body)
-        return make_response(final, chunks=(body.encode(),))
+        body = site.get(url, 404)
+        if isinstance(body, int):
+            raise DocsFetchError(f"HTTP {body}", status=body)
+        return make_response(url, chunks=(body.encode(),))
 
     return fake
 

@@ -1,4 +1,4 @@
-import { call, frappeRequest } from "frappe-ui";
+import { frappeRequest } from "frappe-ui";
 import { onBeforeUnmount, ref } from "vue";
 import { __ } from "../translation";
 
@@ -28,10 +28,6 @@ export const startFailed = () =>
 export const notAllowed = () => __("Only Agent Managers can import pages.");
 export const slowCopy = () =>
   __("This is taking longer than expected. Check back in a few minutes.");
-
-export function startImport(url: string, category: string) {
-  return call("helpdesk.api.docs_source.import_docs", { url, category });
-}
 
 // The endpoint only answers GET, and `call` always sends POST.
 export function getImportResult(): Promise<ImportResult | null> {

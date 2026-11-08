@@ -45,11 +45,6 @@ def find_pages(url: str) -> list[str]:
     return pages[:MAX_CANDIDATES]
 
 
-def read_page(url: str) -> tuple[str, str]:
-    """The title and safe HTML of a page's main content."""
-    return extract_main(fetch(url, urlsplit(url).hostname).text)
-
-
 def extract_main(html: str) -> tuple[str, str]:
     """The title and sanitized main content of a page; empty when it has none."""
     soup = BeautifulSoup(html or "", "html.parser")
