@@ -119,7 +119,12 @@
               {{ __("Everything on {0} is already imported.", [run.host]) }}
             </p>
           </div>
-          <div class="flex justify-end">
+          <div class="flex justify-end gap-2">
+            <Button
+              variant="ghost"
+              :label="__('Import another')"
+              @click="anotherImport"
+            />
             <Button
               variant="solid"
               :label="__('Close')"
