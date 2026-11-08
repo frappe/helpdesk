@@ -162,24 +162,14 @@ test("a failed import shows plain words and Try again keeps the address", async 
   await expect(dialog).not.toContainText(/server|exception|boom/i);
 });
 
-test("Enter in the address field starts the import", async ({ page, api }) => {
-  const category = await createCategory(api);
-  const mock = await mockImport(page, [running(0)]);
-  const { dialog } = await openImport(page);
-  await fillForm(page, dialog, category.category_name);
-  await dialog.getByRole("textbox", { name: /Docs site address/ }).press("Enter");
-  await expect(dialog.getByText("Reading page 1 of 3")).toBeVisible();
-  expect(mock.starts).toBe(1);
-});
-
 // The desk drops settings below 640px, so that is the narrowest width this dialog is reachable at.
-test("the dialog fits the narrowest settings width and keeps the three counts in one row", async ({ page, api }) => {
+test("on the narrowest settings width Enter starts the import and the three counts stay in one row", async ({ page, api }) => {
   await page.setViewportSize({ width: 640, height: 844 });
   const category = await createCategory(api);
   await mockImport(page, [finished(category.name, 12, 5, 1)]);
   const { dialog } = await openImport(page);
   await fillForm(page, dialog, category.category_name);
-  await dialog.getByRole("button", { name: "Import", exact: true }).click();
+  await dialog.getByRole("textbox", { name: /Docs site address/ }).press("Enter");
 
   const labels = dialog.locator("dt");
   await expect(labels).toHaveCount(3);
@@ -204,7 +194,7 @@ test.describe("edited since the copy", () => {
       status: "Draft",
     });
     const saved = (await api.get("HD Article", article.name)).content as string;
-    const hash = (text: string) => createHash("sha1").update(text).digest("hex");
+    const hash = (text: string) => createHash("sha256").update(text).digest("hex");
     await api.update("HD Article", article.name, {
       docs_page_url: pageUrl,
       docs_copied_on: "2026-01-02 10:00:00",

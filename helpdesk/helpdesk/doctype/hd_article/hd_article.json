@@ -124,7 +124,7 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Docs content hash",
-   "length": 40,
+   "length": 64,
    "no_copy": 1,
    "read_only": 1
   },

@@ -1,4 +1,3 @@
-import hashlib
 from contextlib import suppress
 
 import frappe
@@ -12,6 +11,7 @@ from frappe.utils import (
     escape_html,
     expand_relative_urls,
     get_user_info_for_avatar,
+    sha256_hash,
 )
 from frappe.website.utils import cleanup_page_name, find_first_image
 
@@ -573,8 +573,8 @@ def get_article(name: str) -> dict:
     article.title_slug = cleanup_page_name(article.title)
     if "docs_content_hash" in article:
         saved_hash = article.pop("docs_content_hash")
-        article.docs_edited = bool(saved_hash) and saved_hash != content_hash(
-            article.content
+        article.docs_edited = bool(saved_hash) and saved_hash != sha256_hash(
+            article.content or ""
         )
     # archived articles have no category
     category = (
@@ -602,10 +602,6 @@ def get_article(name: str) -> dict:
         BeautifulSoup(article.content or "", "html.parser")
     )
     return article
-
-
-def content_hash(content: str | None) -> str:
-    return hashlib.sha1((content or "").encode()).hexdigest()
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep

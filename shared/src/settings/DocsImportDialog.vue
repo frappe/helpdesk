@@ -39,7 +39,7 @@
               />
               {{
                 __(
-                  "Couldn't load the categories. Close this window and try again."
+                  "Couldn't load the categories. Close this window and try again.",
                 )
               }}
             </p>
@@ -109,16 +109,38 @@
           </div>
         </template>
 
-        <template v-else-if="screen === 'nothing-new' && run?.state === 'done'">
-          <div class="flex items-start gap-3">
+        <template v-else-if="screen === 'done' && run?.state === 'done'">
+          <p
+            v-if="nothingNew"
+            class="flex items-start gap-3 text-p-base text-ink-gray-8"
+          >
             <span
               class="lucide-circle-check mt-0.5 size-5 shrink-0 text-ink-gray-6"
               aria-hidden="true"
             />
-            <p class="text-p-base text-ink-gray-8">
-              {{ __("Everything on {0} is already imported.", [run.host]) }}
+            {{ __("Everything on {0} is already imported.", [run.host]) }}
+          </p>
+          <template v-else>
+            <p class="truncate text-p-sm text-ink-gray-5" :title="run.host">
+              {{ __("Finished reading {0}", [run.host]) }}
             </p>
-          </div>
+            <dl
+              class="grid grid-cols-3 divide-x divide-outline-gray-2 rounded-5 border border-outline-gray-2"
+            >
+              <div
+                v-for="figure in figures"
+                :key="figure.label"
+                class="px-3 py-4"
+              >
+                <dd class="text-3xl tabular-nums text-ink-gray-9">
+                  {{ figure.value }}
+                </dd>
+                <dt class="mt-1 text-p-sm text-ink-gray-5">
+                  {{ figure.label }}
+                </dt>
+              </div>
+            </dl>
+          </template>
           <div class="flex justify-end gap-2">
             <Button
               variant="ghost"
@@ -126,38 +148,13 @@
               @click="anotherImport"
             />
             <Button
+              v-if="nothingNew"
               variant="solid"
               :label="__('Close')"
               @click="open = false"
             />
-          </div>
-        </template>
-
-        <template v-else-if="screen === 'done' && run?.state === 'done'">
-          <p class="truncate text-p-sm text-ink-gray-5" :title="run.host">
-            {{ __("Finished reading {0}", [run.host]) }}
-          </p>
-          <dl
-            class="grid grid-cols-3 divide-x divide-outline-gray-2 rounded-5 border border-outline-gray-2"
-          >
-            <div
-              v-for="figure in figures"
-              :key="figure.label"
-              class="px-3 py-4"
-            >
-              <dd class="text-3xl tabular-nums text-ink-gray-9">
-                {{ figure.value }}
-              </dd>
-              <dt class="mt-1 text-p-sm text-ink-gray-5">{{ figure.label }}</dt>
-            </div>
-          </dl>
-          <div class="flex justify-end gap-2">
             <Button
-              variant="ghost"
-              :label="__('Import another')"
-              @click="anotherImport"
-            />
-            <Button
+              v-else
               variant="solid"
               :link="viewDraftsHref(run.category)"
               :label="__('View drafts')"
@@ -206,13 +203,13 @@ const categories = createResource({
 });
 
 const options = computed(() =>
-  (categories.data || []).map(({ value, label }) => ({ value, label }))
+  (categories.data || []).map(({ value, label }) => ({ value, label })),
 );
 const noCategories = computed(
-  () => categories.data && !categories.data.length && !categories.loading
+  () => categories.data && !categories.data.length && !categories.loading,
 );
 const canImport = computed(
-  () => Boolean(url.value.trim() && category.value) && !starting.value
+  () => Boolean(url.value.trim() && category.value) && !starting.value,
 );
 
 const screen = computed(() => {
@@ -220,8 +217,7 @@ const screen = computed(() => {
   const state = run.value?.state;
   if (state === "running") return "working";
   if (state === "error") return "error";
-  if (state === "done")
-    return run.value.created || run.value.failed ? "done" : "nothing-new";
+  if (state === "done") return "done";
   return "form";
 });
 
@@ -231,7 +227,7 @@ const message = computed(
     failure.value ||
     (screen.value === "error" && run.value?.state === "error"
       ? run.value.message
-      : "")
+      : ""),
 );
 
 const percent = computed(() => {
@@ -247,6 +243,10 @@ const stepText = computed(() => {
     return __("Reading page {0} of {1}", [state.done + 1, state.total]);
   return __("Looking for pages on {0}…", [state.host]);
 });
+
+const nothingNew = computed(
+  () => run.value?.state === "done" && !run.value.created && !run.value.failed,
+);
 
 const figures = computed(() => {
   const state = run.value;

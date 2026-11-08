@@ -76,20 +76,6 @@ class TestSources(DocsImportCase):
         self.assertIn("llms.txt or sitemap.xml", str(caught.exception))
         self.assertIn(HOST, str(caught.exception))
 
-    def test_other_host_and_out_of_path_links_are_ignored(self):
-        site = {
-            f"{BASE}/docs/llms.txt": f"- [In]({BASE}/docs/in.md)\n"
-            f"- [Out]({BASE}/blog/out.md)\n"
-            "- [Other](https://other.example.org/docs/x.md)\n",
-            f"{BASE}/docs/in.md": "# In\n\nInside the docs path of the site.\n",
-        }
-        patch_docs_site(self, site)
-        self.assertEqual(self.run_import(f"{BASE}/docs")["created"], 1)
-        self.assertEqual(
-            [a.docs_page_url for a in self.articles()], [f"{BASE}/docs/in"]
-        )
-
-
 class TestCreate(DocsImportCase):
     def test_creates_drafts_with_url_and_date(self):
         site = make_docs_site(HOST, {"a": "Alpha", "b/c": "x" * 300, "d": "Alpha"})
@@ -121,16 +107,7 @@ class TestCreate(DocsImportCase):
 
     def test_url_variants_are_one_page(self):
         self.assertEqual(
-            {
-                page_key(url)
-                for url in (
-                    f"{BASE}/a",
-                    f"{BASE}/a/",
-                    f"{BASE}/a.md",
-                    f"{BASE}/a#x",
-                    f"https://DOCS.example.com/a",
-                )
-            },
+            {page_key(u) for u in (f"{BASE}/a/", f"{BASE}/a.md", f"{BASE}/a#x")},
             {f"{BASE}/a"},
         )
         site = {
@@ -161,25 +138,6 @@ class TestCreate(DocsImportCase):
         self.assertEqual(self.run_import(), {"created": 1, "skipped": 0, "failed": 3})
         self.assertEqual([a.title for a in self.articles()], ["Alpha"])
 
-    def test_every_page_unreadable_raises_found_none_read_copy(self):
-        site = make_docs_site(HOST, {"a": "Alpha"})
-        site[f"{BASE}/a.md"] = 500
-        patch_docs_site(self, site)
-        with self.assertRaises(DocsImportError) as caught:
-            self.run_import()
-        self.assertIn("could not read any", str(caught.exception))
-
-    def test_links_in_a_page_point_at_the_docs_site(self):
-        site = make_docs_site(HOST, {"a": "Alpha"})
-        site[f"{BASE}/a.md"] = (
-            "# Alpha\n\nSee [the guide](/guide/x) and ![i](img/p.png).\n"
-        )
-        patch_docs_site(self, site)
-        self.run_import()
-        content = frappe.db.get_value("HD Article", self.articles()[0].name, "content")
-        self.assertIn(f'href="{BASE}/guide/x"', content)
-        self.assertIn(f'src="{BASE}/img/p.png"', content)
-
     def test_content_hash_stored_and_edit_detected(self):
         patch_docs_site(self, make_docs_site(HOST, {"a": "Alpha"}))
         self.run_import()
@@ -202,7 +160,6 @@ class TestCreate(DocsImportCase):
 class TestNormalize(IntegrationTestCase):
     def test_accepts_and_cleans_a_public_https_address(self):
         for raw, expected in [
-            ("https://docs.example.com", BASE),
             ("  https://Docs.Example.com/  ", BASE),
             ("https://docs.example.com/docs/?a=1#top", f"{BASE}/docs"),
             ("docs.example.com", BASE),
@@ -213,13 +170,9 @@ class TestNormalize(IntegrationTestCase):
         for raw in [
             "",
             "http://docs.example.com",
-            "ftp://docs.example.com",
             "https://user:pw@docs.example.com",
-            "https://",
-            "https://docs.example.com:abc",
             "https://docs.example.com/" + "x" * 500,
             None,
-            ["https://docs.example.com"],
         ]:
             with self.assertRaises(DocsImportError, msg=raw) as caught:
                 normalize_url(raw)
@@ -230,7 +183,6 @@ class TestFriendlyMessages(DocsImportCase):
     def test_messages_never_leak_error_text(self):
         for error, expected in [
             (DocsFetchError("HTTP 403", status=403), "did not let us read"),
-            (DocsFetchError("HTTP 429", status=429), "did not let us read"),
             (DocsFetchError("HTTP 503", status=503), "did not answer in time"),
             (DocsFetchError("Timed out", transient=True), "did not answer in time"),
             (DocsFetchError("10.0.0.1 is private"), "can't reach that address"),

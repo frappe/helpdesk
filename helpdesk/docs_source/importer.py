@@ -3,9 +3,8 @@ from urllib.parse import urlsplit
 
 import frappe
 from frappe import _
-from frappe.utils import now
+from frappe.utils import now, sha256_hash
 
-from helpdesk.api.knowledge_base import content_hash
 from helpdesk.docs_source import llms, sitemap
 from helpdesk.docs_source.fetch import MAX_CANDIDATES, DocsFetchError
 from helpdesk.docs_source.text import absolute_links, plain_title, visible_text
@@ -156,7 +155,7 @@ class DocsImport:
                 "docs_copied_on": now(),
             }
         ).insert()
-        article.db_set("docs_content_hash", content_hash(article.content))
+        article.db_set("docs_content_hash", sha256_hash(article.content or ""))
 
     def report(self, stage: str, done: int = 0, total: int = 0) -> None:
         """Progress for the settings page: a cache write, no database."""

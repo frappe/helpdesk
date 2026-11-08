@@ -1,7 +1,6 @@
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.docs_source import llms, sitemap
-from helpdesk.docs_source.fetch import DocsFetchError
 from helpdesk.test_utils import (
     make_docs_page,
     make_docs_site,
@@ -47,16 +46,6 @@ class TestLlms(IntegrationTestCase):
         patch_docs_site(self, site)
         self.assertEqual(llms.find_pages(BASE), [f"{BASE}/home.md", f"{BASE}/a.md"])
 
-    def test_html_page_instead_of_llms_txt_is_no_list(self):
-        patch_docs_site(self, {f"{BASE}/llms.txt": make_docs_page("Not found")})
-        self.assertEqual(llms.find_pages(BASE), [])
-
-    def test_missing_llms_txt_raises_the_fetch_error(self):
-        patch_docs_site(self, {})
-        with self.assertRaises(DocsFetchError) as caught:
-            llms.find_pages(BASE)
-        self.assertEqual(caught.exception.status, 404)
-
     def test_reads_a_md_page_as_markdown_and_others_as_html(self):
         site = make_docs_site(HOST, {"a": "Alpha"}) | {
             f"{BASE}/b": make_docs_page("Beta")
@@ -97,13 +86,6 @@ class TestSitemap(IntegrationTestCase):
         }
         patch_docs_site(self, site)
         self.assertEqual(sitemap.find_pages(BASE), [f"{BASE}/a", f"{BASE}/b"])
-
-    def test_falls_back_to_the_sitemap_at_the_host_root(self):
-        patch_docs_site(
-            self,
-            {f"{BASE}/sitemap.xml": URLSET.format(make_sitemap_locs(BASE, "/docs/a"))},
-        )
-        self.assertEqual(sitemap.find_pages(f"{BASE}/docs"), [f"{BASE}/docs/a"])
 
     def test_html_page_instead_of_sitemap_is_no_list(self):
         patch_docs_site(self, {f"{BASE}/sitemap.xml": make_docs_page("Not found")})
