@@ -8,13 +8,7 @@
       <div class="space-y-5">
         <!-- Form and error share the fields; the error adds its message above them -->
         <template v-if="screen === 'form' || screen === 'error'">
-          <Alert
-            v-if="message"
-            theme="red"
-            :title="__('Couldn’t import pages')"
-            :description="message"
-            role="alert"
-          />
+          <Alert v-if="message" theme="red" :title="message" role="alert" />
           <div class="space-y-4" @keydown.enter="submit">
             <TextInput
               v-model="url"
@@ -86,12 +80,7 @@
                 stepText
               }}</span>
             </p>
-            <template v-else>
-              <Progress :value="percent" :label="stepText" hint />
-              <p class="truncate text-p-sm text-ink-gray-5" :title="run.host">
-                {{ __("From {0}", [run.host]) }}
-              </p>
-            </template>
+            <Progress v-else :value="percent" :label="stepText" hint />
           </div>
           <p class="text-p-sm text-ink-gray-5">
             {{
@@ -121,9 +110,6 @@
             {{ __("Everything on {0} is already imported.", [run.host]) }}
           </p>
           <template v-else>
-            <p class="truncate text-p-sm text-ink-gray-5" :title="run.host">
-              {{ __("Finished reading {0}", [run.host]) }}
-            </p>
             <dl
               class="grid grid-cols-3 divide-x divide-outline-gray-2 rounded-5 border border-outline-gray-2"
             >
@@ -153,15 +139,12 @@
               :label="__('Close')"
               @click="open = false"
             />
-            <a
+            <Button
               v-else
+              variant="solid"
+              :label="__('View drafts')"
               :href="viewDraftsHref(run.category)"
-              target="_blank"
-              rel="noopener"
-              class="inline-flex h-7 items-center rounded px-2 text-base font-medium text-ink-base bg-surface-gray-10 hover:bg-surface-gray-9 active:bg-surface-gray-8 focus-visible:ring focus-visible:ring-outline-gray-3"
-            >
-              {{ __("View drafts") }}
-            </a>
+            />
           </div>
         </template>
       </div>

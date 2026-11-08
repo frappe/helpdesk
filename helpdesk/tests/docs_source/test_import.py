@@ -91,6 +91,13 @@ class TestCreate(DocsImportCase):
             self.assertTrue(row.docs_copied_on)
         self.assertEqual(len(rows[f"{BASE}/b/c"].title), 140)
 
+    def test_title_is_cleaned_once(self):
+        site = make_docs_site(HOST, {"a": "Vec<T> basics", "b": "Fish &amp;amp; Chips"})
+        patch_docs_site(self, site)
+        importer_ = DocsImport(BASE, self.category)
+        self.assertEqual(importer_.read_one(f"{BASE}/a.md")[0], "Vec<T> basics")
+        self.assertEqual(importer_.read_one(f"{BASE}/b.md")[0], "Fish &amp; Chips")
+
     def test_second_run_skips_imported_and_adds_new(self):
         site = make_docs_site(HOST, {"a": "Alpha", "b": "Beta"})
         patch_docs_site(self, site)

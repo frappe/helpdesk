@@ -47,20 +47,22 @@ export function useImportResult(interval: number) {
   const timedOut = ref(false);
   let timer: ReturnType<typeof setTimeout> | undefined;
   let startedAt = 0;
+  let active = false;
 
   function stop() {
+    active = false;
     clearTimeout(timer);
     timer = undefined;
   }
 
   async function refresh() {
-    stop();
+    clearTimeout(timer);
     try {
       result.value = await getImportResult();
     } catch {
       // keep what is shown; the next tick tries again
     }
-    if (result.value?.state !== "running") return;
+    if (!active || result.value?.state !== "running") return;
     if (Date.now() - startedAt > GIVE_UP) {
       timedOut.value = true;
       return;
@@ -69,6 +71,7 @@ export function useImportResult(interval: number) {
   }
 
   function watchRun() {
+    active = true;
     startedAt = Date.now();
     timedOut.value = false;
     return refresh();

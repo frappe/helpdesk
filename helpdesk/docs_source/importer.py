@@ -7,7 +7,7 @@ from frappe.utils import now, sha256_hash
 
 from helpdesk.docs_source import llms, sitemap
 from helpdesk.docs_source.fetch import MAX_CANDIDATES, DocsFetchError
-from helpdesk.docs_source.text import absolute_links, plain_title, visible_text
+from helpdesk.docs_source.text import absolute_links, visible_text
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     batched_article_index,
 )
@@ -138,7 +138,7 @@ class DocsImport:
     def read_one(self, url: str) -> tuple[str, str] | None:
         """The page's title and HTML, or None when it has no title or no text."""
         title, html = llms.read_page(url)
-        title = plain_title(title)[:TITLE_LENGTH]
+        title = title[:TITLE_LENGTH]
         return (
             (title, absolute_links(html, url)) if title and visible_text(html) else None
         )

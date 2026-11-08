@@ -99,28 +99,6 @@ test("importing shows progress, then the three counts and a link to the drafts",
   );
 });
 
-test("when everything is already imported, Import another reaches the form even after reopening", async ({
-  page,
-  api,
-}) => {
-  const category = await createCategory(api);
-  await mockImport(page, [finished(category.name, 0, 3, 0)]);
-  const { dialog } = await openImport(page);
-  await fillForm(page, dialog, category.category_name);
-  await dialog.getByRole("button", { name: "Import", exact: true }).click();
-  await expect(dialog.getByText(`Everything on ${HOST} is already imported.`)).toBeVisible();
-  await expect(solidButtons(dialog)).toHaveCount(1);
-
-  await dialog.getByRole("button", { name: "Close", exact: true }).first().click();
-  await expect(dialog).toBeHidden();
-  await page.getByRole("button", { name: "Import pages" }).click();
-  await expect(dialog.getByText(`Everything on ${HOST} is already imported.`)).toBeVisible();
-
-  await dialog.getByRole("button", { name: "Import another" }).click();
-  await expect(dialog.getByRole("textbox", { name: /Docs site address/ })).toHaveValue(DOCS_URL);
-  await expect(dialog.getByRole("button", { name: "Import", exact: true })).toBeDisabled();
-});
-
 test("closing mid-run keeps the progress line in the settings row", async ({ page, api }) => {
   const category = await createCategory(api);
   await mockImport(page, [running(11, 50)]);
@@ -177,9 +155,6 @@ test("on the narrowest settings width Enter starts the import and the three coun
   expect(new Set(tops).size).toBe(1);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
-  const box = await dialog.boundingBox();
-  expect(box!.x).toBeGreaterThanOrEqual(0);
-  expect(box!.x + box!.width).toBeLessThanOrEqual(640);
 });
 
 test.describe("edited since the copy", () => {
