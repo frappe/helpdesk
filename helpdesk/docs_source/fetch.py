@@ -9,6 +9,9 @@ from urllib3.util import parse_url
 PAGE_TIMEOUT = 10
 MAX_BYTES = 5 * 1024 * 1024
 MAX_REDIRECTS = 3
+# What a docs site may offer: pages listed, and child indexes or sitemaps followed.
+MAX_CANDIDATES = 2000
+MAX_CHILDREN = 5
 HEADERS = {"User-Agent": "helpdesk-docs-source"}
 CHUNK_SIZE = 8 * 1024
 

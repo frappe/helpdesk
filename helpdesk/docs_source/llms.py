@@ -1,117 +1,55 @@
-import contextlib
 import re
-from collections import defaultdict, deque
 from urllib.parse import urljoin, urlsplit
 
-from helpdesk.docs_source.fetch import DocsFetchError, fetch
-from helpdesk.docs_source.indexed import IndexedSource
-from helpdesk.docs_source.text import (
-    clean_markdown,
-    has_dot_segment,
-    text_title,
-    to_plain,
-)
+from frappe.utils import md_to_html
 
-MAX_PARTS = 20
+from helpdesk.docs_source import sitemap
+from helpdesk.docs_source.fetch import (
+    MAX_CANDIDATES,
+    MAX_CHILDREN,
+    DocsFetchError,
+    fetch,
+)
+from helpdesk.docs_source.text import clean_html, clean_markdown, in_scope, text_title
+
 LINE = re.compile(r"^\s*[-*] \[(.+?)\]\((\S+?)\)(?:: (.*))?$", re.M)
-NEXT_PART = re.compile(r"^> Next part: (\S+)", re.M)
 # Mintlify lists big sites as /_llms/<section>.txt.
 CHILD_INDEX = re.compile(r"/llms\.txt$|/_llms/.+\.txt$")
 
 
-class LlmsSource(IndexedSource):
-    """Any site with llms.txt: indexed here, pages read as Markdown."""
-
-    def is_available(self) -> bool:
+def find_pages(url: str) -> list[str]:
+    """Page links of the site's llms.txt, as listed, following its child indexes.
+    Empty when the file has no links. Raises DocsFetchError when it can't be read."""
+    pages, children = _parse(f"{url}/llms.txt", url)
+    for child in children[:MAX_CHILDREN]:
         try:
-            _, pages, children = self._parse(f"{self.url}/llms.txt")
-            return bool(pages or children)
+            pages += _parse(child, url)[0]
         except DocsFetchError:
-            return False
+            continue
+    return list(dict.fromkeys(pages))[:MAX_CANDIDATES]
 
-    def read_pages(self) -> tuple[str, list[dict]]:
-        label, pages = self._read_index(f"{self.url}/llms.txt")
-        bodies = self._read_bodies(pages)
-        for page in pages:
-            summary = page.pop("summary")
-            page["body"] = bodies.get(page["route"]) or summary
-        return label, pages
 
-    def _read_index(self, url: str) -> tuple[str, list[dict]]:
-        label, pages, children = self._parse(url)
-        pages = {page["route"]: page for page in pages}
-        if url == f"{self.url}/llms.txt":
-            self.truncated = len(children) > MAX_PARTS
-            for child in children[:MAX_PARTS]:
-                for page in self._parse(child)[1]:
-                    pages.setdefault(page["route"], page)
-        return label, list(pages.values())
+def read_page(url: str) -> tuple[str, str]:
+    """The title and safe HTML of a page: a .md link is Markdown, any other is HTML."""
+    text = fetch(url, urlsplit(url).hostname).text
+    if not urlsplit(url).path.endswith(".md"):
+        return sitemap.extract_main(text)
+    heading = re.search(r"^# (.+)$", text, re.M)
+    title = text_title(heading[1]) if heading else ""
+    return title, clean_html(md_to_html(clean_markdown(text, title)))
 
-    def _parse(self, url: str) -> tuple[str, list[dict], list[str]]:
-        """The label, the pages and the child index URLs of one llms.txt."""
-        text = fetch(url, self.host).text
-        label = self._title_of(text) or self.host
-        pages, children = {}, []
-        for name, link, summary in LINE.findall(text):
-            try:
-                link = urljoin(url, link)
-                parts = urlsplit(link)
-                host = parts.hostname
-            except ValueError:
-                continue
-            if host != self.host or not self._is_in_scope(parts.path):
-                continue
-            if CHILD_INDEX.search(parts.path):
-                children.append(link)
-            elif parts.path.endswith(".md"):
-                route = parts.path.strip("/").removesuffix(".md")
-                if route and not has_dot_segment(route):
-                    pages.setdefault(
-                        route,
-                        {
-                            "route": route,
-                            "title": text_title(name),
-                            "url": link,
-                            "summary": summary,
-                        },
-                    )
-        return label, list(pages.values()), list(dict.fromkeys(children))
 
-    def _read_bodies(self, pages: list[dict]) -> dict[str, str]:
-        """Split llms-full.txt at each page title; any other H1 ends the page."""
-        waiting = defaultdict(deque)
-        titles = {}
-        for page in pages:
-            waiting[page["title"]].append(page["route"])
-            titles[page["route"]] = page["title"]
-        bodies: dict[str, list[str]] = {}
-        current, in_code = None, False
-        for line in self._read_full().splitlines():
-            if line.startswith("```"):
-                in_code = not in_code
-            title = (
-                text_title(line[2:]) if line.startswith("# ") and not in_code else None
-            )
-            if title is not None:
-                current = waiting[title].popleft() if waiting[title] else None
-                if current:
-                    bodies[current] = []
-            elif current:
-                bodies[current].append(line)
-        return {
-            route: " ".join(
-                to_plain(clean_markdown("\n".join(body), titles[route])).split()
-            )
-            for route, body in bodies.items()
-        }
-
-    def _read_full(self) -> str:
-        parts, url = [], f"{self.url}/llms-full.txt"
-        # ponytail: titles and summaries still index
-        with contextlib.suppress(DocsFetchError, ValueError):
-            while url and len(parts) < MAX_PARTS:
-                text = fetch(url, self.host).text
-                parts.append(text)
-                following = NEXT_PART.search(text)
-                url = urljoin(url, following[1]) if following else None
-        return "\n".join(parts)
+def _parse(url: str, base_url: str) -> tuple[list[str], list[str]]:
+    """The page links and child index links of one llms.txt, in scope."""
+    text = fetch(url, urlsplit(base_url).hostname).text
+    pages, children = [], []
+    for _name, link, _summary in LINE.findall(text):
+        try:
+            link = urljoin(url, link)
+        except ValueError:
+            continue
+        if not in_scope(link, base_url):
+            continue
+        is_index = CHILD_INDEX.search(urlsplit(link).path)
+        (children if is_index else pages).append(link)
+    return pages, list(dict.fromkeys(children))

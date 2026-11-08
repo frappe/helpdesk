@@ -1254,3 +1254,48 @@ def make_docs_page(
 ) -> str:
     """A minimal docs page with a main element, a title and an h1."""
     return f"<html><head><title>{name}</title></head><body><main><h1>{name}</h1><p>{text}</p></main></body></html>"
+
+
+def make_docs_site(
+    host: str, pages: dict[str, str], llms: bool = True, sitemap: bool = False
+) -> dict:
+    """The URL -> body map of a docs site for `fake_docs_fetch`.
+
+    `pages` maps a path (`guide/intro`) to its title. `llms` adds an llms.txt listing
+    each page as a `.md` link plus the Markdown bodies; `sitemap` adds a sitemap.xml
+    and the HTML pages.
+    """
+    site = {}
+    if llms:
+        lines = [
+            f"- [{title}](https://{host}/{path}.md): about"
+            for path, title in pages.items()
+        ]
+        site[f"https://{host}/llms.txt"] = "# Docs\n\n" + "\n".join(lines)
+        for path, title in pages.items():
+            site[f"https://{host}/{path}.md"] = (
+                f"# {title}\n\n{title} explains how this part of the product works.\n"
+            )
+    if sitemap:
+        locs = "".join(f"<url><loc>https://{host}/{path}</loc></url>" for path in pages)
+        site[f"https://{host}/sitemap.xml"] = (
+            f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{locs}</urlset>'
+        )
+        for path, title in pages.items():
+            site[f"https://{host}/{path}"] = make_docs_page(title)
+    return site
+
+
+def patch_docs_site(case, site: dict) -> MagicMock:
+    """Serve `site` to every docs fetch in this test and skip the pause between pages.
+
+    Returns the shared fetch mock, so a test can check which URLs were requested.
+    """
+    fetch = MagicMock(side_effect=fake_docs_fetch(site))
+    for target in (
+        "helpdesk.docs_source.llms.fetch",
+        "helpdesk.docs_source.sitemap.fetch",
+    ):
+        case.enterContext(patch(target, fetch))
+    case.enterContext(patch("helpdesk.docs_source.importer.time.sleep"))
+    return fetch

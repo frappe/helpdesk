@@ -1,6 +1,6 @@
 import re
 from html import unescape
-from urllib.parse import unquote, urljoin
+from urllib.parse import unquote, urljoin, urlsplit
 
 from bs4 import BeautifulSoup
 from frappe.utils import strip_html_tags
@@ -38,6 +38,27 @@ def clean_html(html: str) -> str:
 
 def has_dot_segment(route: str) -> bool:
     return any(part in (".", "..") for part in unquote(route).split("/"))
+
+
+def in_scope(link: str, base_url: str) -> bool:
+    """True for an https link on the base URL's host, inside its path, with a real route."""
+    try:
+        parts, base = urlsplit(link), urlsplit(base_url)
+        host = parts.hostname
+    except ValueError:
+        return False
+    path = parts.path
+    return (
+        parts.scheme == "https"
+        and host == base.hostname
+        and (path == base.path or path.startswith(f"{base.path}/"))
+        and bool(path.strip("/"))
+        and not has_dot_segment(path)
+    )
+
+
+def visible_text(html: str) -> str:
+    return " ".join(BeautifulSoup(html, "html.parser").get_text(" ").split())
 
 
 def absolute_links(html: str, base_url: str) -> str:
