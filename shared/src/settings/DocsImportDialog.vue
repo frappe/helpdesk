@@ -152,17 +152,11 @@
               :label="__('Import another')"
               @click="anotherImport"
             />
-            <a
-              :href="viewDraftsHref(run.category)"
-              target="_blank"
-              rel="noopener"
-            >
-              <Button
-                variant="solid"
-                :label="__('View drafts')"
-                tabindex="-1"
-              />
-            </a>
+            <Button
+              variant="solid"
+              :link="viewDraftsHref(run.category)"
+              :label="__('View drafts')"
+            />
           </div>
         </template>
       </div>
@@ -216,10 +210,6 @@ const canImport = computed(
   () => Boolean(url.value.trim() && category.value) && !starting.value
 );
 
-const message = computed(
-  () => failure.value || (run.value?.state === "error" ? run.value.message : "")
-);
-
 const screen = computed(() => {
   if (failure.value || wantsForm.value) return failure.value ? "error" : "form";
   const state = run.value?.state;
@@ -229,6 +219,15 @@ const screen = computed(() => {
     return run.value.created || run.value.failed ? "done" : "nothing-new";
   return "form";
 });
+
+// The stored error is stale once the form is shown again for a new run.
+const message = computed(
+  () =>
+    failure.value ||
+    (screen.value === "error" && run.value?.state === "error"
+      ? run.value.message
+      : "")
+);
 
 const percent = computed(() => {
   const state = run.value;
@@ -262,7 +261,6 @@ watch(open, (isOpen) => {
   refresh();
 });
 
-// An error from the last run is stale once the form is shown for a new one.
 function tryAgain() {
   wantsForm.value = true;
   failure.value = "";

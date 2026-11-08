@@ -1,4 +1,4 @@
-import { call } from "frappe-ui";
+import { call, frappeRequest } from "frappe-ui";
 import { onBeforeUnmount, ref } from "vue";
 import { __ } from "../translation";
 
@@ -33,8 +33,12 @@ export function startImport(url: string, category: string) {
   return call("helpdesk.api.docs_source.import_docs", { url, category });
 }
 
+// The endpoint only answers GET, and `call` always sends POST.
 export function getImportResult(): Promise<ImportResult | null> {
-  return call("helpdesk.api.docs_source.get_import_result");
+  return frappeRequest({
+    url: "/api/method/helpdesk.api.docs_source.get_import_result",
+    method: "GET",
+  });
 }
 
 export function viewDraftsHref(category: string) {

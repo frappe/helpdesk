@@ -26,26 +26,23 @@ class DocsFetchError(Exception):
         return self.args[0]
 
 
-def fetch(
-    url: str, host: str, timeout: float = PAGE_TIMEOUT, params: dict | None = None
-) -> requests.Response:
-    """GET url over https, same host only, with `timeout` as a total deadline."""
-    deadline = time.monotonic() + timeout
+def fetch(url: str, host: str) -> requests.Response:
+    """GET url over https, same host only, with PAGE_TIMEOUT as a total deadline."""
+    deadline = time.monotonic() + PAGE_TIMEOUT
     for _ in range(MAX_REDIRECTS + 1):
-        response = _get(url, host, deadline, params)
+        response = _get(url, host, deadline)
         if not response.is_redirect:
             _read_body(response, deadline)
             return response
         url = _redirect_url(url, response)
-        params = None
     raise DocsFetchError("Too many redirects")
 
 
-def _get(url, host, deadline, params):
+def _get(url, host, deadline):
     # ponytail: header drip and DNS lookup are not bounded here, the worker timeout caps them.
     try:
         # Validate and send the same prepared URL, so no parser can disagree about the host.
-        prepared = requests.Request("GET", url, params=params).prepare().url
+        prepared = requests.Request("GET", url).prepare().url
         parsed = parse_url(prepared)
         # https only with verify on: a DNS-rebound host fails the certificate check.
         if parsed.scheme != "https" or parsed.host != host:

@@ -1238,7 +1238,7 @@ def fake_docs_fetch(site: dict):
     """side_effect for a patched docs fetch: URL -> body, int status (raised) or (body, final_url); else 404."""
     from helpdesk.docs_source.fetch import DocsFetchError
 
-    def fake(url, host, *args, params=None):
+    def fake(url, host):
         entry = site.get(url, 404)
         if isinstance(entry, int):
             raise DocsFetchError(f"HTTP {entry}", status=entry)

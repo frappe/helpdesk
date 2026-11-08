@@ -83,6 +83,11 @@ class TestImportDocs(DocsApiCase):
         self.assertIn("already running", result["message"])
         self.enqueue.assert_not_called()
 
+    def test_started_state_names_the_host_without_its_port(self):
+        frappe.set_user(self.manager)
+        result = import_docs(f"{URL}:8443/docs", self.category)
+        self.assertEqual(result["host"], HOST)
+
     def test_starting_clears_the_last_result(self):
         frappe.cache.set_value(RESULT_KEY, {"state": "done", "created": 3})
         frappe.set_user(self.manager)

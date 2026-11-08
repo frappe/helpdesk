@@ -138,8 +138,19 @@ test("a failed import shows plain words and Try again keeps the address", async 
   await expect(dialog).not.toContainText(/server|exception/i);
   await expect(solidButtons(dialog)).toHaveCount(1);
   await dialog.getByRole("button", { name: "Try again" }).click();
+  await expect(dialog.getByText(NOT_FOUND)).toBeHidden();
   await expect(dialog.getByRole("textbox", { name: /Docs site address/ })).toHaveValue(DOCS_URL);
   await expect(dialog.getByRole("button", { name: "Import", exact: true })).toBeEnabled();
+});
+
+test("the settings row reads the last import over GET on the real route", async ({ page }) => {
+  const request = page.waitForResponse((r) =>
+    r.url().includes("helpdesk.api.docs_source.get_import_result"),
+  );
+  await openDeskSettings(page);
+  const response = await request;
+  expect(response.request().method()).toBe("GET");
+  expect(response.status()).toBe(200);
 });
 
 test("a failed call says we couldn't start, without server wording", async ({ page, api }) => {

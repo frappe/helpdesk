@@ -23,7 +23,6 @@ JOB_ID = "docs_import"
 RESULT_KEY = "docs_import_result"
 RUNNING_SECONDS = 3600
 RESULT_SECONDS = 7 * 24 * 3600
-GENERIC_ERROR = "Something went wrong while importing. Try again, and if it keeps happening, ask your administrator to check the Error Log."
 
 
 class DocsImportError(Exception):
@@ -105,11 +104,7 @@ class DocsImport:
                 return urls
         if error:
             raise DocsImportError(self.friendly(error))
-        raise DocsImportError(
-            _(
-                "We couldn't find an llms.txt or sitemap.xml on {0}. Check the address, or try the root of the docs site."
-            ).format(self.host)
-        )
+        raise DocsImportError(self.not_found())
 
     def drop_imported(self, urls: list[str]) -> tuple[dict[str, str], int]:
         """The new pages as `{key: url}`, and how many were already imported."""
@@ -190,12 +185,15 @@ class DocsImport:
                 self.host
             )
         if error.status:
-            return _(
-                "We couldn't find an llms.txt or sitemap.xml on {0}. Check the address, or try the root of the docs site."
-            ).format(self.host)
+            return self.not_found()
         return _(
             "We can't reach that address. Use the public address of your docs site."
         )
+
+    def not_found(self) -> str:
+        return _(
+            "We couldn't find an llms.txt or sitemap.xml on {0}. Check the address, or try the root of the docs site."
+        ).format(self.host)
 
 
 def run_import(url: str, category: str) -> None:
@@ -213,6 +211,9 @@ def run_import(url: str, category: str) -> None:
     except Exception:
         frappe.db.rollback()
         frappe.log_error("Docs import failed")
-        result = {"state": "error", "message": _(GENERIC_ERROR), "host": host}
+        message = _(
+            "Something went wrong while importing. Try again, and if it keeps happening, ask your administrator to check the Error Log."
+        )
+        result = {"state": "error", "message": message, "host": host}
     frappe.cache.set_value(RESULT_KEY, result, expires_in_sec=RESULT_SECONDS)
     frappe.db.commit()

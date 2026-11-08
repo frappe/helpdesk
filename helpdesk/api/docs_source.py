@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 import frappe
 from frappe import _
 from frappe.utils.background_jobs import is_job_enqueued
@@ -26,7 +28,7 @@ def import_docs(url: str, category: str) -> dict:
         url = normalize_url(url)
     except DocsImportError as e:
         return {"state": "error", "message": str(e), "host": ""}
-    host = url.split("/")[2]
+    host = urlsplit(url).hostname
     if is_job_enqueued(JOB_ID):
         message = _("An import is already running. It should finish in a few minutes.")
         return {"state": "error", "message": message, "host": host}
