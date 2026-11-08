@@ -14,7 +14,6 @@ from helpdesk.docs_source.importer import (
 )
 from helpdesk.test_utils import (
     article_index_jobs,
-    fake_docs_fetch,
     get_category_articles,
     make_article,
     make_article_category,
@@ -75,6 +74,7 @@ class TestSources(DocsImportCase):
             self.run_import()
         self.assertIn("llms.txt or sitemap.xml", str(caught.exception))
         self.assertIn(HOST, str(caught.exception))
+
 
 class TestCreate(DocsImportCase):
     def test_creates_drafts_with_url_and_date(self):
