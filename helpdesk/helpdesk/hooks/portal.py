@@ -1,4 +1,6 @@
 import frappe
+from frappe.model.document import Document
+from frappe.utils import has_common
 from frappe.utils.user import is_website_user
 
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
@@ -25,18 +27,14 @@ def grant_customer_role(user: str) -> None:
     if user == "Guest" or not is_website_user(user) or has_customer_role(user):
         return
     # lock the user, so a first visit from two tabs adds the role once
-    frappe.db.get_value("User", user, "name", for_update=True)
-    if frappe.db.exists(
-        "Has Role",
-        {"parenttype": "User", "parent": user, "role": ["in", CUSTOMER_ROLES]},
-    ):
+    user_doc = frappe.get_doc("User", user, for_update=True)
+    if has_common(CUSTOMER_ROLES, [row.role for row in user_doc.roles]):
         return
-    add_customer_role(user)
+    add_customer_role(user_doc)
 
 
-def add_customer_role(user: str) -> None:
+def add_customer_role(user_doc: Document) -> None:
     """A failed save must not take the portal down with it; the next visit tries again."""
-    user_doc = frappe.get_doc("User", user)
     user_doc.flags.ignore_permissions = True
     try:
         user_doc.add_roles("HD Customer")
