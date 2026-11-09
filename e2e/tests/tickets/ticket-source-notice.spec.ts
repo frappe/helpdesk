@@ -61,6 +61,15 @@ for (const [viewport, size] of [
       expect((await api.get("HD Settings", "HD Settings"))[NOTICE]).toBe(0);
     });
 
+    test("the collapsed sidebar names its notice button", async ({ page }) => {
+      await page.goto("/helpdesk/tickets");
+      await page.getByRole("button", { name: "Collapse" }).click();
+      await page.getByRole("button", { name: "Fieldname changed" }).click();
+      await expect(
+        page.getByRole("dialog", { name: "Via Customer Portal is now Source" })
+      ).toBeVisible();
+    });
+
     test("an agent never sees it", async ({ pageAs }) => {
       const agent = await pageAs("agent");
       await agent.setViewportSize(size);

@@ -77,13 +77,15 @@
         <template v-for="rule in RULES" :key="rule.language">
           <dt class="text-sm text-ink-gray-5">{{ rule.language }}</dt>
           <dd class="min-w-0 break-words text-ink-gray-8">
-            <code class="whitespace-nowrap rounded bg-surface-gray-2 px-1">{{
-              rule.from
-            }}</code>
+            <code
+              class="whitespace-nowrap rounded bg-surface-gray-2 px-1 font-mono text-xs"
+              >{{ rule.from }}</code
+            >
             →
-            <code class="whitespace-nowrap rounded bg-surface-gray-2 px-1">{{
-              rule.to
-            }}</code>
+            <code
+              class="whitespace-nowrap rounded bg-surface-gray-2 px-1 font-mono text-xs"
+              >{{ rule.to }}</code
+            >
           </dd>
         </template>
       </dl>

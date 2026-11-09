@@ -11,6 +11,7 @@ from helpdesk.test_utils import (
     dismiss_banner_as,
     fake_cloud_settings,
     make_agent_manager,
+    make_sla,
     show_only_banners,
     unique_email,
 )
@@ -67,19 +68,31 @@ class TestBanners(IntegrationTestCase):
 
     def test_source_banner_lists_scripts_using_the_old_field(self) -> None:
         old_check = "if doc.via_customer_portal: pass"
-        expected = [
-            make_script("HD Form Script", "Old Form Script", old_check),
+        form_script = make_script("HD Form Script", "Old Form Script", old_check)
+        sla = make_sla("Old Field SLA", condition="doc.via_customer_portal == 1")
+        sla_item = {"doctype": "HD Service Level Agreement", "name": sla.name}
+        desk_scripts = [
             make_script("Client Script", "Old Client Script", old_check),
             make_script("Server Script", "Old Server Script", old_check),
         ]
         make_script("Server Script", "Updated Server Script", "doc.source == 'Portal'")
+        # `_` is a LIKE wildcard, so the spaced words must not match
+        make_script("Server Script", "Comment Only", "# raised via customer portal")
         show_only_banners(SOURCE_BANNER)
-        manager = make_agent_manager("source-banner-manager")
 
+        self.assertEqual(
+            get_banners(),
+            [
+                {
+                    "name": SOURCE_BANNER,
+                    "scripts": [form_script, *desk_scripts, sla_item],
+                }
+            ],
+        )
+        # a plain manager only gets what they can open
+        manager = make_agent_manager("source-banner-manager")
         with self.set_user(manager):
-            self.assertEqual(
-                get_banners(), [{"name": SOURCE_BANNER, "scripts": expected}]
-            )
+            self.assertEqual(get_banners()[0]["scripts"], [form_script, sla_item])
         dismiss_banner_as(manager, SOURCE_BANNER)
         self.assertEqual(banner_names(), [])
 

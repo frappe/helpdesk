@@ -17,6 +17,7 @@
     variant="ghost"
     :icon="LucideShieldAlert"
     :tooltip="title"
+    :aria-label="title"
     @click="showDialog = true"
   />
   <Dialog v-model:open="showDialog" :title="dialogTitle">

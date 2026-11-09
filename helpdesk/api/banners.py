@@ -10,7 +10,19 @@ BANNERS = {
     "ticket_field_permission": "show_ticket_field_permission_notice",
     "ticket_source": "show_ticket_source_notice",
 }
-SCRIPT_DOCTYPES = ("HD Form Script", "Client Script", "Server Script")
+# doctype -> (code fields, filters) that can still mention the dropped field
+CODE_DOCTYPES = {
+    "HD Form Script": (["script"], {}),
+    "Client Script": (["script"], {}),
+    "Server Script": (["script"], {}),
+    "HD Service Level Agreement": (["condition"], {}),
+    "Assignment Rule": (
+        ["assign_condition", "unassign_condition", "close_condition"],
+        {"document_type": "HD Ticket"},
+    ),
+}
+# escaped, as `_` is a LIKE wildcard
+OLD_FIELD_LIKE = r"%via\_customer\_portal%"
 
 
 @frappe.whitelist()
@@ -36,14 +48,16 @@ def get_banners() -> list[dict]:
 
 
 def get_scripts_using_old_source_field() -> list[dict]:
-    """Scripts whose code still mentions the dropped `via_customer_portal` field."""
+    """Scripts and conditions the current user can read that still mention
+    the dropped `via_customer_portal` field."""
     return [
         {"doctype": doctype, "name": name}
-        for doctype in SCRIPT_DOCTYPES
-        if frappe.db.table_exists(doctype)
+        for doctype, (fields, filters) in CODE_DOCTYPES.items()
+        if frappe.db.table_exists(doctype) and frappe.has_permission(doctype, "read")
         for name in frappe.get_all(
             doctype,
-            filters={"script": ["like", "%via_customer_portal%"]},
+            filters=filters,
+            or_filters={field: ["like", OLD_FIELD_LIKE] for field in fields},
             pluck="name",
             order_by="name",
         )
