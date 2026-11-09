@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 import frappe
 from frappe.model.document import Document
 from frappe.utils import has_common
@@ -22,8 +24,20 @@ def get_website_user_home_page(user: str) -> str | None:
         return "/helpdesk"
 
 
+def grant_customer_role_on_signup(user_doc: Document, method=None) -> None:
+    """The portal sends signups to /login?redirect-to=/help, and Frappe's signup passes it on."""
+    redirect_to = frappe.form_dict.get("redirect_to")
+    if user_doc.user_type == "Website User" and is_portal_path(redirect_to):
+        user_doc.append_roles("HD Customer")
+
+
+def is_portal_path(path: str | None) -> bool:
+    path = urlparse(path or "").path
+    return path == CUSTOMER_PORTAL_ROOT or path.startswith(CUSTOMER_PORTAL_ROOT + "/")
+
+
 def grant_customer_role(user: str) -> None:
-    """Self-signups become customers on their first portal visit, not at signup on every portal."""
+    """For OAuth signups: their redirect-to never reaches the User hooks, so the first portal visit adds the role."""
     if user == "Guest" or not is_website_user(user) or has_customer_role(user):
         return
     # lock the user, so a first visit from two tabs adds the role once
