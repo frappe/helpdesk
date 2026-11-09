@@ -27,11 +27,23 @@ def grant_customer_role(user: str) -> None:
         {"parenttype": "User", "parent": user, "role": ["in", CUSTOMER_ROLES]},
     ):
         return
+    add_customer_role(user)
+
+
+def add_customer_role(user: str) -> None:
+    """A failed save must not take the portal down with it; the next visit tries again."""
     user_doc = frappe.get_doc("User", user)
     user_doc.flags.ignore_permissions = True
-    user_doc.add_roles("HD Customer")
-    # portal pages are GET requests, which Frappe rolls back
-    frappe.db.commit()
+    try:
+        user_doc.add_roles("HD Customer")
+    except Exception:
+        frappe.db.rollback()
+        frappe.log_error(
+            title="Could not grant the HD Customer role", defer_insert=True
+        )
+        return
+    # portal pages are GET requests, which Frappe rolls back unless asked to commit
+    frappe.local.flags.commit = True
 
 
 def is_helpdesk_only_app() -> bool:
