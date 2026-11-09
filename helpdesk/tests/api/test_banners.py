@@ -127,14 +127,16 @@ def make_script(
     """Insert a script of `doctype` on `dt` (an API script when None) and
     return it as the banner lists it."""
     doc = {"doctype": doctype, "script": script, "__newname": name}
+    # an enabled server script stays in the cached script map after rollback
     if doctype == "Server Script" and dt:
         doc.update(
+            disabled=1,
             script_type="DocType Event",
             reference_doctype=dt,
             doctype_event="Before Save",
         )
     elif doctype == "Server Script":
-        doc.update(script_type="API", api_method=frappe.scrub(name))
+        doc.update(disabled=1, script_type="API", api_method=frappe.scrub(name))
     else:
         doc.update(dt=dt, enabled=0)
     frappe.get_doc(doc).insert(set_name=name)
