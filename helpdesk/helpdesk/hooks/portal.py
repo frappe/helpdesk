@@ -20,6 +20,13 @@ def grant_customer_role(user: str) -> None:
     """Self-signups become customers on their first portal visit, not at signup on every portal."""
     if user == "Guest" or not is_website_user(user) or has_customer_role(user):
         return
+    # lock the user, so a first visit from two tabs adds the role once
+    frappe.db.get_value("User", user, "name", for_update=True)
+    if frappe.db.exists(
+        "Has Role",
+        {"parenttype": "User", "parent": user, "role": ["in", CUSTOMER_ROLES]},
+    ):
+        return
     user_doc = frappe.get_doc("User", user)
     user_doc.flags.ignore_permissions = True
     user_doc.add_roles("HD Customer")
@@ -33,7 +40,7 @@ def is_helpdesk_only_app() -> bool:
 
 
 def is_website_user(user: str) -> bool:
-    return frappe.db.get_value("User", user, "user_type") == "Website User"
+    return frappe.get_cached_value("User", user, "user_type") == "Website User"
 
 
 def has_customer_role(user: str) -> bool:
