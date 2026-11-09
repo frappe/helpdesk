@@ -18,6 +18,7 @@
 		"./portalRoutes": "./src/portalRoutes.ts",
 		"./categoryIcons": "./src/categoryIcons.ts",
 		"./Icon.vue": "./src/Icon.vue",
+		"./IconPicker.vue": "./src/IconPicker.vue",
 		"./ViewIconField.vue": "./src/ViewIconField.vue",
 		"./filter": "./src/filter/index.ts",
 		"./shortcuts": "./src/shortcuts.ts",
