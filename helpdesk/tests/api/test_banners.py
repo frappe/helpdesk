@@ -3,7 +3,12 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.api.banners import BANNERS, get_banners, refresh_trial
+from helpdesk.api.banners import (
+    BANNERS,
+    get_banners,
+    get_scripts_using_old_source_field,
+    refresh_trial,
+)
 from helpdesk.test_utils import (
     clear_trial_cache,
     create_agent,
@@ -67,27 +72,33 @@ class TestBanners(IntegrationTestCase):
         )
 
     def test_source_banner_lists_scripts_using_the_old_field(self) -> None:
+        # the test site may already hold leftovers of its own
+        existing = get_scripts_using_old_source_field()
         old_check = "if doc.via_customer_portal: pass"
         form_script = make_script("HD Form Script", "Old Form Script", old_check)
         sla = make_sla("Old Field SLA", condition="doc.via_customer_portal == 1")
         sla_item = {"doctype": "HD Service Level Agreement", "name": sla.name}
         desk_scripts = [
             make_script("Client Script", "Old Client Script", old_check),
+            make_script("Server Script", "Old API Script", old_check, dt=None),
             make_script("Server Script", "Old Server Script", old_check),
         ]
         make_script("Server Script", "Updated Server Script", "doc.source == 'Portal'")
         # `_` is a LIKE wildcard, so the spaced words must not match
         make_script("Server Script", "Comment Only", "# raised via customer portal")
+        has_issue = frappe.db.exists("DocType", "Issue")
+        if has_issue and frappe.get_meta("Issue").has_field("via_customer_portal"):
+            # ERPNext's Issue still has its own field, so these scripts work
+            make_script("Client Script", "Issue Client Script", old_check, dt="Issue")
+            make_script("Server Script", "Issue Server Script", old_check, dt="Issue")
+        alerts = [make_notification("Old Notification"), make_webhook("Old Webhook")]
         show_only_banners(SOURCE_BANNER)
 
-        self.assertEqual(
-            get_banners(),
-            [
-                {
-                    "name": SOURCE_BANNER,
-                    "scripts": [form_script, *desk_scripts, sla_item],
-                }
-            ],
+        banners = get_banners()
+        self.assertEqual([banner["name"] for banner in banners], [SOURCE_BANNER])
+        self.assertCountEqual(
+            banners[0]["scripts"],
+            [form_script, *desk_scripts, sla_item, *alerts, *existing],
         )
         # a plain manager only gets what they can open
         manager = make_agent_manager("source-banner-manager")
@@ -110,19 +121,51 @@ class TestBanners(IntegrationTestCase):
         self.assertEqual(banner_names(), [PORTAL_BANNER])
 
 
-def make_script(doctype: str, name: str, script: str) -> dict:
-    """Insert a script of `doctype` on HD Ticket and return it as the banner lists it."""
+def make_script(
+    doctype: str, name: str, script: str, dt: str | None = "HD Ticket"
+) -> dict:
+    """Insert a script of `doctype` on `dt` (an API script when None) and
+    return it as the banner lists it."""
     doc = {"doctype": doctype, "script": script, "__newname": name}
-    if doctype == "Server Script":
+    if doctype == "Server Script" and dt:
         doc.update(
             script_type="DocType Event",
-            reference_doctype="HD Ticket",
+            reference_doctype=dt,
             doctype_event="Before Save",
         )
+    elif doctype == "Server Script":
+        doc.update(script_type="API", api_method=frappe.scrub(name))
     else:
-        doc.update(dt="HD Ticket", enabled=0)
+        doc.update(dt=dt, enabled=0)
     frappe.get_doc(doc).insert(set_name=name)
     return {"doctype": doctype, "name": name}
+
+
+def make_notification(name: str) -> dict:
+    frappe.get_doc(
+        doctype="Notification",
+        subject=name,
+        document_type="HD Ticket",
+        event="New",
+        channel="System Notification",
+        condition="doc.via_customer_portal",
+        enabled=0,
+    ).insert(set_name=name)
+    return {"doctype": "Notification", "name": name}
+
+
+def make_webhook(name: str) -> dict:
+    # validate() evaluates the condition, so skip it as a pre-migration row would
+    frappe.get_doc(
+        doctype="Webhook",
+        name=name,
+        webhook_doctype="HD Ticket",
+        webhook_docevent="after_insert",
+        request_url="http://localhost",
+        condition="doc.via_customer_portal",
+        enabled=0,
+    ).db_insert()
+    return {"doctype": "Webhook", "name": name}
 
 
 ACTIVE_TRIAL = {"state": "Active", "days_left": 10}

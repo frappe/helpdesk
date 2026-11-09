@@ -45,6 +45,7 @@ for (const [viewport, size] of [
 
       await page.getByRole("button", { name: "Learn more" }).click();
       const dialog = page.getByRole("dialog", { name: "Via Customer Portal is now Source" });
+      await expect(dialog.getByText("To update", { exact: true })).toBeVisible();
       await expect(dialog.getByRole("link", { name: script })).toHaveAttribute(
         "href",
         `/app/hd-form-script/${encodeURIComponent(script)}`

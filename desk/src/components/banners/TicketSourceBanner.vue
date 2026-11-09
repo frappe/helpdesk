@@ -22,7 +22,7 @@
       <p>
         {{
           __(
-            "If your SLAs, assignment rules or saved views used Via Customer Portal, we have already switched them to Source. Every ticket has its Source filled in too."
+            "If your SLAs, assignment rules or saved views used Via Customer Portal, we have switched them to Source where we could. Every ticket has its Source filled in too."
           )
         }}
       </p>
@@ -36,7 +36,7 @@
         <p>
           {{
             __(
-              "You only need to update your own customizations. These scripts still use the old field:"
+              "You only need to update your own customizations. These still use the old field:"
             )
           }}
         </p>
@@ -48,7 +48,7 @@
           class="flex items-baseline justify-between gap-2 border-b border-outline-gray-2 bg-surface-gray-1 px-3 py-2"
         >
           <span class="font-medium text-ink-gray-9">
-            {{ __("Scripts to update") }}
+            {{ __("To update") }}
           </span>
           <span class="text-ink-gray-5">
             {{ __("{0} found", [scripts.length]) }}
@@ -101,7 +101,7 @@
       </div>
       <div class="flex gap-1.5 text-p-sm font-medium text-ink-gray-8">
         <LucideTriangleAlert class="mt-0.5 size-4 shrink-0" />
-        {{ __("These scripts stay broken until you fix them.") }}
+        {{ __("These stay broken until you fix them.") }}
       </div>
     </template>
   </SidebarBanner>
@@ -152,15 +152,15 @@ function fixPrompt(site: string): string {
   return `On my Frappe Helpdesk site ${site}, the HD Ticket field via_customer_portal (a checkbox)
 was replaced by \`source\`, a Select field with the options "Email" and "Portal".
 
-These scripts still use the old field and need fixing:
+These scripts and conditions still use the old field and need fixing:
 ${list.join("\n")}
 
-Use frappectl (log in with \`frappectl auth login ${site} --oauth\`) to read each script.
+Use frappectl (log in with \`frappectl auth login ${site} --oauth\`) to read each one.
 Change every use of via_customer_portal to source:
 - a true check (doc.via_customer_portal, == 1, \`= 1\` in SQL) becomes source == "Portal"
   (=== "Portal" in JavaScript)
 - a false check (not doc.via_customer_portal, !doc.via_customer_portal, == 0) becomes source == "Email"
 
-Show me the change for each script and wait for my OK before you save it.`;
+Show me the change for each one and wait for my OK before you save it.`;
 }
 </script>
