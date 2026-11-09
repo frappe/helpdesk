@@ -5,8 +5,14 @@ import { createResource } from "frappe-ui";
 export type BannerName =
   | "customer_portal_permission"
   | "ticket_field_permission"
+  | "ticket_source"
   | "trial";
-export type Banner = { name: BannerName; trial?: BillingTrial };
+export type BannerScript = { doctype: string; name: string };
+export type Banner = {
+  name: BannerName;
+  trial?: BillingTrial;
+  scripts?: BannerScript[];
+};
 
 const banners = createResource({
   url: "helpdesk.api.banners.get_banners",

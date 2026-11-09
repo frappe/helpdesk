@@ -8,14 +8,16 @@ from helpdesk.utils import agent_manager_only, is_agent_manager
 BANNERS = {
     "customer_portal_permission": "show_customer_portal_permission_notice",
     "ticket_field_permission": "show_ticket_field_permission_notice",
+    "ticket_source": "show_ticket_source_notice",
 }
+SCRIPT_DOCTYPES = ("HD Form Script", "Client Script", "Server Script")
 
 
 @frappe.whitelist()
 def get_banners() -> list[dict]:
     """Sidebar notices as `{"name": ...}`; one that needs data carries it under its own key.
-    "customer_portal_permission", "ticket_field_permission" or "trial" (with `trial`).
-    Always empty for anyone but agent managers and admins."""
+    "customer_portal_permission", "ticket_field_permission", "ticket_source" (with `scripts`)
+    or "trial" (with `trial`). Always empty for anyone but agent managers and admins."""
     if not is_agent_manager():
         return []
 
@@ -24,18 +26,36 @@ def get_banners() -> list[dict]:
         for banner, flag in BANNERS.items()
         if frappe.db.get_single_value("HD Settings", flag)
     ]
+    for banner in banners:
+        if banner["name"] == "ticket_source":
+            banner["scripts"] = get_scripts_using_old_source_field()
     trial = get_trial()
     if trial:
         banners.append({"name": "trial", "trial": trial})
     return banners
 
 
+def get_scripts_using_old_source_field() -> list[dict]:
+    """Scripts whose code still mentions the dropped `via_customer_portal` field."""
+    return [
+        {"doctype": doctype, "name": name}
+        for doctype in SCRIPT_DOCTYPES
+        if frappe.db.table_exists(doctype)
+        for name in frappe.get_all(
+            doctype,
+            filters={"script": ["like", "%via_customer_portal%"]},
+            pluck="name",
+            order_by="name",
+        )
+    ]
+
+
 @frappe.whitelist(methods=["POST"])
 @agent_manager_only
 def dismiss_banner(banner: str) -> None:
     """Hide a sidebar notice. Agent managers only.
-    "trial" hides the trial card for this user for a day; "customer_portal_permission"
-    or "ticket_field_permission" turns that notice off for everyone."""
+    "trial" hides the trial card for this user for a day; any other banner
+    turns that notice off for everyone."""
     if banner == "trial":
         dismiss_trial()
         # Only this user's other tabs need to hide the card

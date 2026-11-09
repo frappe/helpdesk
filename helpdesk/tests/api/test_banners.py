@@ -17,6 +17,7 @@ from helpdesk.test_utils import (
 
 PORTAL_BANNER = "customer_portal_permission"
 FIELD_BANNER = "ticket_field_permission"
+SOURCE_BANNER = "ticket_source"
 
 
 def banner_names() -> list[str]:
@@ -49,7 +50,7 @@ class TestBanners(IntegrationTestCase):
     def test_agents_and_customers_see_no_banners(self) -> None:
         agent = create_agent(unique_email("banner-agent")).name
         customer = create_contact("Banner Customer", unique_email("banner-customer"))
-        show_only_banners(PORTAL_BANNER, FIELD_BANNER)
+        show_only_banners(PORTAL_BANNER, FIELD_BANNER, SOURCE_BANNER)
         for user in (agent, customer["user"]):
             with self.subTest(user=user), self.set_user(user):
                 self.assertEqual(banner_names(), [])
@@ -64,6 +65,24 @@ class TestBanners(IntegrationTestCase):
             publish_realtime.call_args.args[0], "helpdesk:settings-updated"
         )
 
+    def test_source_banner_lists_scripts_using_the_old_field(self) -> None:
+        old_check = "if doc.via_customer_portal: pass"
+        expected = [
+            make_script("HD Form Script", "Old Form Script", old_check),
+            make_script("Client Script", "Old Client Script", old_check),
+            make_script("Server Script", "Old Server Script", old_check),
+        ]
+        make_script("Server Script", "Updated Server Script", "doc.source == 'Portal'")
+        show_only_banners(SOURCE_BANNER)
+        manager = make_agent_manager("source-banner-manager")
+
+        with self.set_user(manager):
+            self.assertEqual(
+                get_banners(), [{"name": SOURCE_BANNER, "scripts": expected}]
+            )
+        dismiss_banner_as(manager, SOURCE_BANNER)
+        self.assertEqual(banner_names(), [])
+
     def test_unknown_banner_is_rejected(self) -> None:
         with self.assertRaises(frappe.ValidationError):
             dismiss_banner_as("Administrator", "no_such_banner")
@@ -76,6 +95,21 @@ class TestBanners(IntegrationTestCase):
             with self.subTest(user=user), self.assertRaises(frappe.PermissionError):
                 dismiss_banner_as(user, PORTAL_BANNER)
         self.assertEqual(banner_names(), [PORTAL_BANNER])
+
+
+def make_script(doctype: str, name: str, script: str) -> dict:
+    """Insert a script of `doctype` on HD Ticket and return it as the banner lists it."""
+    doc = {"doctype": doctype, "script": script, "__newname": name}
+    if doctype == "Server Script":
+        doc.update(
+            script_type="DocType Event",
+            reference_doctype="HD Ticket",
+            doctype_event="Before Save",
+        )
+    else:
+        doc.update(dt="HD Ticket", enabled=0)
+    frappe.get_doc(doc).insert(set_name=name)
+    return {"doctype": doctype, "name": name}
 
 
 ACTIVE_TRIAL = {"state": "Active", "days_left": 10}

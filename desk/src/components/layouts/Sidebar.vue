@@ -25,6 +25,10 @@
           v-if="isBannerVisible('ticket_field_permission')"
           :isSidebarCollapsed="isCollapsed"
         />
+        <TicketSourceBanner
+          v-if="isBannerVisible('ticket_source')"
+          :isSidebarCollapsed="isCollapsed"
+        />
       </div>
       <SidebarItem
         v-if="isOnboardingStepsCompleted"
@@ -70,6 +74,7 @@ import {
 } from "@/components/icons";
 import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalPermissionBanner.vue";
 import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
+import TicketSourceBanner from "@/components/banners/TicketSourceBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import {
