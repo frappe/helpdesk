@@ -166,8 +166,7 @@
                 <TicketAgentFields
                   :ticket="ticketWithFields"
                   @update="
-                    ({ field, value }) =>
-                      ticket.setValue.submit({ [field]: value })
+                    ({ field, value }) => updateTicketField(field, value)
                   "
                   class="!border-0"
                 />
@@ -293,6 +292,7 @@ import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 import { parseField } from "@/composables/fieldDependsOn";
+import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { setupCustomizations } from "@helpdesk/shared/formScripts";
 import { useScreenSize } from "@/composables/screen";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
@@ -348,6 +348,32 @@ const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
 const assignees = computed(() => ticketComposable.value.assignees);
 const contact = computed(() => ticketComposable.value.contact);
+const { notifyTicketUpdate } = useNotifyTicketUpdate(String(props.ticketId));
+const customerContacts = ref<string[]>([]);
+
+watch(
+  () => ticket.value.doc?.customer,
+  async (customer) => {
+    customerContacts.value = [];
+    if (!customer) {
+      return;
+    }
+    try {
+      const customerDoc = await call("frappe.client.get", {
+        doctype: "HD Customer",
+        name: customer,
+      });
+      if (ticket.value.doc?.customer === customer) {
+        customerContacts.value = (customerDoc.contacts || []).map(
+          (row: { contact_name: string }) => row.contact_name
+        );
+      }
+    } catch {
+      customerContacts.value = [];
+    }
+  },
+  { immediate: true }
+);
 
 const customizations: Resource<Customizations> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
@@ -358,8 +384,28 @@ const customizations: Resource<Customizations> = createResource({
 // Build fields from getMeta + customizations (same as TicketDetailsTab)
 const { getField, getFields } = getMeta("HD Ticket");
 
-function updateField(name: string, value: string) {
-  ticket.value.setValue.submit({ [name]: value });
+function updateField(name: string, value: string | null) {
+  updateTicketField(name, value);
+}
+
+function updateTicketField(name: string, value: string | null) {
+  const currentValue = ticket.value.doc?.[name] ?? "";
+  const nextValue = value ?? "";
+  if (currentValue === nextValue) return;
+
+  const updates = { [name]: nextValue };
+  if (name === "customer" && ticket.value.doc?.contact) {
+    updates.contact = "";
+    notifyTicketUpdate(__("Contact"), "");
+  }
+  if (
+    ["customer", "contact", "priority", "ticket_type", "agent_group"].includes(
+      name
+    )
+  ) {
+    notifyTicketUpdate(getField(name)?.label || name, String(nextValue));
+  }
+  ticket.value.setValue.submit(updates);
 }
 
 const customizationCtx = computed(() => ({
@@ -409,11 +455,41 @@ const ticketFields = computed(() => {
   const fieldsMeta = getFields();
   if (!fieldsMeta || fieldsMeta.length === 0) return [];
 
+  const mobileCoreFields = ["customer", "contact", "priority", "ticket_type"];
+  const coreFields = mobileCoreFields
+    .map((fieldname) => {
+      let fieldMeta = getField(fieldname);
+      if (!fieldMeta) return null;
+      fieldMeta = parseField(fieldMeta, ticket.value.doc);
+      const filters =
+        fieldname === "contact"
+          ? {
+              name: [
+                "in",
+                customerContacts.value.length
+                  ? customerContacts.value
+                  : ["__no_customer__"],
+              ],
+            }
+          : fieldMeta.filters;
+      return {
+        label: fieldMeta.label || fieldname,
+        fieldname,
+        fieldtype: fieldMeta.fieldtype,
+        options: fieldMeta.options || "",
+        filters,
+        placeholder: `Set ${fieldMeta.label || fieldname}...`,
+        readonly: Boolean(fieldMeta.read_only),
+        disabled: Boolean(fieldMeta.read_only),
+        required: fieldMeta.reqd || false,
+        visible: fieldMeta.display_via_depends_on && !fieldMeta.hidden,
+      };
+    })
+    .filter(Boolean);
+
   const coreFieldNames = [
-    "ticket_type",
+    ...mobileCoreFields,
     "agent_group",
-    "priority",
-    "customer",
     "subject",
     "status",
   ];
@@ -422,7 +498,7 @@ const ticketFields = computed(() => {
     (f) => !coreFieldNames.includes(f.fieldname)
   );
 
-  return custom_fields
+  const customFields = custom_fields
     .map((f) => {
       let fieldMeta = getField(f.fieldname);
       if (!fieldMeta) return null;
@@ -445,6 +521,8 @@ const ticketFields = computed(() => {
       };
     })
     .filter(Boolean);
+
+  return [...coreFields, ...customFields];
 });
 
 // Merged ticket doc with computed fields for TicketAgentFields

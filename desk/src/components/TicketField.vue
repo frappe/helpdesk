@@ -153,6 +153,7 @@ const component = computed(() => {
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     const linkProps = {
       doctype: props.field.options,
+      filters: props.field.filters,
       redirectable: props.field.options in REDIRECT_ROUTES,
       class: "!w-full !bg-surface-base !border-transparent !text-base",
       onRedirect: handleRedirect,
