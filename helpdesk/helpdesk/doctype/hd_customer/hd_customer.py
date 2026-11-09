@@ -5,7 +5,7 @@ import frappe
 from frappe import _
 from frappe.core.api.user_invitation import invite_by_email
 from frappe.model.document import Document
-from frappe.utils import validate_email_address
+from frappe.utils import has_common, validate_email_address
 
 from helpdesk.integrations.erpnext.utils import (
     cascade_rename,
@@ -523,6 +523,10 @@ def get_customer_membership(customer: str, user: str) -> dict | None:
         if member.get("name") == customer:
             return member
     return None
+
+
+def has_customer_role(user: str | None = None) -> bool:
+    return has_common(CUSTOMER_ROLES, frappe.get_roles(user))
 
 
 def is_customer_manager(customer: str | None, user: str | None = None) -> bool:

@@ -1,6 +1,10 @@
 import frappe
+from frappe.utils.user import is_website_user
 
-from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
+    CUSTOMER_ROLES,
+    has_customer_role,
+)
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT, is_agent
 
 
@@ -49,11 +53,3 @@ def add_customer_role(user: str) -> None:
 def is_helpdesk_only_app() -> bool:
     apps = {app.get("name") for app in frappe.get_hooks("add_to_apps_screen")}
     return apps - {"frappe"} == {"helpdesk"}
-
-
-def is_website_user(user: str) -> bool:
-    return frappe.get_cached_value("User", user, "user_type") == "Website User"
-
-
-def has_customer_role(user: str) -> bool:
-    return bool(set(CUSTOMER_ROLES) & set(frappe.get_roles(user)))
