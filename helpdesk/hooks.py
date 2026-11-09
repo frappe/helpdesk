@@ -123,6 +123,7 @@ user_invitation = {
 }
 
 studio_app_boot = {"helpdesk": "helpdesk.helpdesk.hooks.studio_app.get_boot"}
+get_website_user_home_page = "helpdesk.helpdesk.hooks.portal.get_website_user_home_page"
 update_website_context = "helpdesk.helpdesk.hooks.studio_app.update_website_context"
 
 doc_events = {

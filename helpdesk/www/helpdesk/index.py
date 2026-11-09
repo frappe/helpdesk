@@ -24,8 +24,7 @@ def get_context(context):
 
 
 def redirect_customer_home():
-    """Customer roles keep `/helpdesk` as their home, so a user who is also an
-    agent lands on the desk. Everyone else goes on to the portal from here."""
+    """Agents stay on the desk; everyone else who opens `/helpdesk` goes on to the portal."""
     # as `has_desk_access` in api/auth.py
     if (
         frappe.session.user == "Guest"
