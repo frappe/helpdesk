@@ -3472,7 +3472,7 @@ class TestTicketSource(IntegrationTestCase):
                 "assign_condition": f"{OLD_FIELD} and status == 'Open'",
                 "assign_condition_json": old_json,
                 "unassign_condition": f"not {OLD_FIELD}",
-                "close_condition": f"doc.get('{OLD_FIELD}')",
+                "close_condition": f"doc.get('{OLD_FIELD}') or doc.{OLD_FIELD} in (1,)",
             },
         )
         set_ticket_source.execute()
@@ -3488,7 +3488,9 @@ class TestTicketSource(IntegrationTestCase):
         self.assertFalse(rule.safe_eval("unassign_condition", portal.as_dict()))
         self.assertTrue(rule.safe_eval("unassign_condition", email.as_dict()))
         self.assertEqual(rule.assign_condition_json, sla.condition_json)
-        self.assertEqual(rule.close_condition, f"doc.get('{OLD_FIELD}')")
+        self.assertEqual(
+            rule.close_condition, f"doc.get('{OLD_FIELD}') or doc.{OLD_FIELD} in (1,)"
+        )
 
     def test_customer_quick_filters_hide_agent_only_fields(self):
         fields = get_quick_filters("HD Ticket", show_customer_portal_fields=True)

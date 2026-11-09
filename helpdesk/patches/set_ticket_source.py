@@ -4,9 +4,10 @@ import re
 import frappe
 
 OLD_FIELD = "via_customer_portal"
-# bare and negated builder forms; quoted names like doc.get('...') stay for a manual move
+# bare and negated builder forms; quoted names and comparisons stay for a manual move
 OLD_CHECK = re.compile(
-    rf"\b(not\s+)?((?:doc\.)?)(?<!['\"]){OLD_FIELD}\b(?!['\"]|\s*[=!<>])"
+    rf"\b(not\s+)?((?:doc\.)?)(?<!['\"]){OLD_FIELD}\b"
+    rf"(?!['\"]|\s*(?:[=!<>]|(?:is|in|not\s+in)\b))"
 )
 
 
