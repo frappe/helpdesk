@@ -13,6 +13,7 @@ on:
       - '**.md'
       - '**.html'
       - '**.csv'
+  workflow_dispatch:
 
 concurrency:
   group: develop-helpdesk-${{ github.event.number }}
