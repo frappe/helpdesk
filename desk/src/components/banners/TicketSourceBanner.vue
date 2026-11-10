@@ -52,14 +52,17 @@
             {{ column.label }}
           </div>
         </div>
-        <hr />
+        <hr class="mx-2" />
         <template
           v-for="(script, index) in scripts"
           :key="script.doctype + script.name"
         >
-          <div
-            class="grid items-start gap-6 p-2"
+          <a
+            class="grid items-start gap-6 rounded-4 p-2 hover:bg-surface-sidebar"
             :style="{ gridTemplateColumns }"
+            :href="deskLink(script)"
+            target="_blank"
+            rel="noopener"
           >
             <div class="ms-2 flex min-h-8 min-w-0 items-center break-words">
               {{ __(script.doctype) }}
@@ -68,15 +71,10 @@
               {{ script.name }}
             </div>
             <div class="flex min-h-8 items-center justify-end">
-              <Button
-                variant="ghost"
-                icon="lucide-external-link"
-                :href="deskLink(script)"
-                :label="__('Open {0}', [script.name])"
-              />
+              <LucideExternalLink class="size-4 text-ink-gray-7" />
             </div>
-          </div>
-          <hr v-if="index !== scripts.length - 1" />
+          </a>
+          <hr v-if="index !== scripts.length - 1" class="mx-2" />
         </template>
       </div>
       <p>{{ __("In each one, change the old field to Source:") }}</p>
@@ -123,6 +121,7 @@ import { getGridTemplateColumnsForTable } from "@/utils";
 import { copyToClipboard } from "@helpdesk/shared/utils";
 import { computed } from "vue";
 import LucideCopy from "~icons/lucide/copy";
+import LucideExternalLink from "~icons/lucide/external-link";
 import LucideTriangleAlert from "~icons/lucide/triangle-alert";
 import SidebarBanner from "./SidebarBanner.vue";
 
