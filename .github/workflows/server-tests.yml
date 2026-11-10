@@ -82,6 +82,15 @@ jobs:
           pilot get-app "${GITHUB_WORKSPACE}" --branch "${GITHUB_SHA}" --skip-assets
           pilot install-app test_site helpdesk
 
+      - name: Build helpdesk assets
+        shell: bash
+        working-directory: /home/runner/pilot/benches/frappe-bench
+        run: |
+          export PATH="$HOME/pilot/bin:$HOME/.local/bin:$PATH"
+          # The desk portal's routes (and their redirects) resolve through the
+          # built SPA entry; the routing tests 404 without it.
+          pilot build helpdesk
+
       - name: Run Tests
         working-directory: /home/runner/pilot/benches/frappe-bench
         run: pilot frappe --site test_site run-tests --app helpdesk --coverage
