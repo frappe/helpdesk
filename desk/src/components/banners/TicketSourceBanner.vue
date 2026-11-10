@@ -103,7 +103,11 @@
           @click="copyFixPrompt"
         />
         <span class="text-sm text-ink-gray-5">
-          {{ __("Paste it into a coding agent to fix these for you.") }}
+          {{
+            __(
+              "Paste it into a coding agent (Claude/Codex) to fix these for you."
+            )
+          }}
         </span>
       </div>
       <div class="flex gap-1.5 text-p-sm font-medium text-ink-gray-8">
