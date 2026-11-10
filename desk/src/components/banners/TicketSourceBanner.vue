@@ -6,14 +6,16 @@
     :dialog-title="__('Via Customer Portal is now Source')"
     :is-sidebar-collapsed="isSidebarCollapsed"
   >
-    <p>
-      <span class="font-medium text-ink-gray-8">{{ __("What changed:") }}</span>
-      {{
-        __(
-          "The Via Customer Portal field on tickets is now called Source. Instead of a checkbox, Source says whether a ticket came in by Email or through the Portal. Tickets that agents raise count as Portal, as before."
-        )
-      }}
-    </p>
+    <div class="flex flex-col gap-1">
+      <div class="font-medium text-ink-gray-9">{{ __("What changed") }}</div>
+      <p>
+        {{
+          __(
+            "The Via Customer Portal field on tickets is now called Source. Instead of a checkbox, Source says whether a ticket came in by Email or through the Portal. Tickets that agents raise count as Portal, as before."
+          )
+        }}
+      </p>
+    </div>
     <div class="flex flex-col gap-1">
       <div class="font-medium text-ink-gray-9">
         {{ __("Updated for you") }}
