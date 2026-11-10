@@ -34,11 +34,15 @@ cd "$BENCH_PATH"
 
 uv pip install --python env/bin/python -e "apps/frappe[test]"
 
-# The framework's esbuild toolchain (fast-glob et al.) lives in its root
-# node_modules, which --skip-frontend leaves out; the per-run helpdesk build
-# needs it.
+# Install build dependencies sequentially to avoid Yarn cache contention while new-site runs.
 npm install -g yarn
-(cd apps/frappe && yarn install --frozen-lockfile)
+(
+  cd apps/frappe
+  yarn install --frozen-lockfile
+  cd studio/frontend
+  yarn install --frozen-lockfile
+) > "$RUNNER_TEMP/yarn-install.log" 2>&1 &
+yarn_pid=$!
 
 pilot -b "$BENCH_NAME" start > "$RUNNER_TEMP/pilot.log" 2>&1 &
 curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 1 \
@@ -54,6 +58,7 @@ pilot get-app https://github.com/frappe/erpnext --branch develop --skip-assets
 pilot get-app https://github.com/frappe/telephony --skip-assets
 # shellcheck disable=SC2086
 pilot new-site "$SITE" --admin-password admin --apps frappe erpnext telephony --skip-assets
+wait "$yarn_pid" || { cat "$RUNNER_TEMP/yarn-install.log"; exit 1; }
 SITE_NAME="$SITE" python3 - <<'EOF'
 import json, os
 path = os.path.join("sites", os.environ["SITE_NAME"], "site_config.json")
