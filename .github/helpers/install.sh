@@ -1,61 +1,71 @@
 #!/bin/bash
 
-set -e
+# Backend-only CI bench: framework + erpnext + telephony, no frontend assets,
+# external MariaDB. Fresh provision every run; the app under test (helpdesk)
+# is installed per-run afterwards.
+#
+# Expects from the caller: FRAPPE_BRANCH, SITE.
 
-cd ~ || ex
+set -eo pipefail
 
-sudo apt update
-sudo apt remove mysql-server mysql-client
-sudo apt install libcups2-dev redis-server mariadb-client libmariadb-dev
+FRAPPE_BRANCH="${FRAPPE_BRANCH:-develop}"
+SITE="${SITE:-test_site}"
+BENCH_NAME="frappe-bench"
+BENCH_PATH="$HOME/pilot/benches/$BENCH_NAME"
+DB_HOST="127.0.0.1"
+DB_PORT="3306"
+DB_ROOT_PASSWORD="root"
 
-# Ubuntu 26.04's mariadb-client (11.8) requires SSL; the mariadb:10.6 service has none.
+export PATH="$HOME/pilot/bin:$HOME/.local/bin:$PATH"
+printf '%s\n' "$HOME/pilot/bin" "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+curl -fsSL "https://raw.githubusercontent.com/frappe/pilot/develop/install.sh" | sh -s -- --ci
+
+pilot new "$BENCH_NAME" --frappe-branch "$FRAPPE_BRANCH"
+pilot -b "$BENCH_NAME" set-bench-config admin_allow_site_to_pilot_communication false
+pilot -b "$BENCH_NAME" set-bench-config mariadb_existing true
+pilot -b "$BENCH_NAME" set-bench-config mariadb_host "$DB_HOST"
+pilot -b "$BENCH_NAME" set-bench-config mariadb_port "$DB_PORT"
+pilot -b "$BENCH_NAME" set-bench-config mariadb_admin_user root
+pilot -b "$BENCH_NAME" set-bench-config mariadb_password "$DB_ROOT_PASSWORD"
+pilot -b "$BENCH_NAME" init --skip-frontend
+
+cd "$BENCH_PATH"
+
+uv pip install --python env/bin/python -e "apps/frappe[test]"
+
+pilot -b "$BENCH_NAME" start > "$RUNNER_TEMP/pilot.log" 2>&1 &
+curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 1 \
+  http://127.0.0.1:7000/api/v1/health
+
 printf '[client]\nskip-ssl\n' > ~/.my.cnf
+mariadb --host "$DB_HOST" --port "$DB_PORT" -u root -p"$DB_ROOT_PASSWORD" -e "SET GLOBAL character_set_server = 'utf8mb4'"
+mariadb --host "$DB_HOST" --port "$DB_PORT" -u root -p"$DB_ROOT_PASSWORD" -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
 
-pip install frappe-bench
-git clone "https://github.com/frappe/frappe" --branch "develop" --depth 1 
-bench init --skip-assets --frappe-path ~/frappe --python "$(which python)" frappe-bench
-
-mkdir ~/frappe-bench/sites/test_site
-
-cp -r "${GITHUB_WORKSPACE}/.github/helpers/site_config_mariadb.json" ~/frappe-bench/sites/test_site/site_config.json
-
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL character_set_server = 'utf8mb4'"
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
-
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "CREATE USER 'test_frappe'@'localhost' IDENTIFIED BY 'test_frappe'"
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "CREATE DATABASE test_frappe"
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "GRANT ALL PRIVILEGES ON \`test_frappe\`.* TO 'test_frappe'@'localhost'"
-
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "FLUSH PRIVILEGES"
-
-install_whktml() {
-    wget -O /tmp/wkhtmltox.tar.xz https://github.com/frappe/wkhtmltopdf/raw/master/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
-    tar -xf /tmp/wkhtmltox.tar.xz -C /tmp
-    sudo mv /tmp/wkhtmltox/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
-    sudo chmod o+x /usr/local/bin/wkhtmltopdf
-}
-install_whktml &
-
-cd ~/frappe-bench || exit
-
-sed -i 's/watch:/# watch:/g' Procfile
-sed -i 's/schedule:/# schedule:/g' Procfile
-sed -i 's/socketio:/# socketio:/g' Procfile
-sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
-
-bench get-app erpnext --branch "develop"
-bench get-app telephony
-# get-app builds helpdesk's Studio portal with frappe's Studio toolchain,
-# which --skip-assets left without its node_modules
-(cd apps/frappe/studio/frontend && yarn install --frozen-lockfile)
-bench get-app helpdesk "${GITHUB_WORKSPACE}"
-bench setup requirements --dev
-
-
-bench start &>> ~/frappe-bench/bench_start.log &
-CI=Yes bench build --app frappe &
-bench --site test_site reinstall --yes
-
-bench --verbose --site test_site install-app erpnext
-bench --verbose --site test_site install-app telephony
-bench --verbose --site test_site install-app helpdesk
+# shellcheck disable=SC2086
+pilot get-app https://github.com/frappe/erpnext --branch develop --skip-assets
+# shellcheck disable=SC2086
+pilot get-app https://github.com/frappe/telephony --skip-assets
+# shellcheck disable=SC2086
+pilot new-site "$SITE" --admin-password admin --apps frappe erpnext telephony --skip-assets
+SITE_NAME="$SITE" python3 - <<'EOF'
+import json, os
+path = os.path.join("sites", os.environ["SITE_NAME"], "site_config.json")
+with open(path) as f:
+    config = json.load(f)
+config.update(
+    {
+        "allow_tests": True,
+        "auto_email_id": "test@example.com",
+        "mail_server": "smtp.example.com",
+        "mail_login": "test@example.com",
+        "mail_password": "test",
+        "host_name": "http://test_site:8000",
+        "throttle_user_limit": 100,
+    }
+)
+with open(path, "w") as f:
+    json.dump(config, f, indent=1)
+EOF
+# Tests never load the built bundles; emails only need assets.json to exist.
+mkdir -p sites/assets && echo '{}' > sites/assets/assets.json
