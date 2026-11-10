@@ -15,8 +15,7 @@
       }}
     </p>
     <div class="flex flex-col gap-1">
-      <div class="flex items-center gap-1.5 font-medium text-ink-gray-9">
-        <LucideCircleCheck class="size-4 shrink-0" />
+      <div class="font-medium text-ink-gray-9">
         {{ __("Updated for you") }}
       </div>
       <p>
@@ -29,8 +28,7 @@
     </div>
     <template v-if="scripts.length">
       <div class="flex flex-col gap-1">
-        <div class="flex items-center gap-1.5 font-medium text-ink-gray-9">
-          <LucideWrench class="size-4 shrink-0" />
+        <div class="font-medium text-ink-gray-9">
           {{ __("Needs your update") }}
         </div>
         <p>
@@ -66,7 +64,7 @@
             <div class="ms-2 flex min-h-8 min-w-0 items-center break-words">
               {{ __(script.doctype) }}
             </div>
-            <div class="flex min-h-8 min-w-0 items-center break-words">
+            <div class="ms-2 flex min-h-8 min-w-0 items-center break-words">
               {{ script.name }}
             </div>
             <div class="flex min-h-8 items-center justify-end">
@@ -124,10 +122,8 @@ import { __ } from "@/translation";
 import { getGridTemplateColumnsForTable } from "@/utils";
 import { copyToClipboard } from "@helpdesk/shared/utils";
 import { computed } from "vue";
-import LucideCircleCheck from "~icons/lucide/circle-check";
 import LucideCopy from "~icons/lucide/copy";
 import LucideTriangleAlert from "~icons/lucide/triangle-alert";
-import LucideWrench from "~icons/lucide/wrench";
 import SidebarBanner from "./SidebarBanner.vue";
 
 defineProps<{ isSidebarCollapsed: boolean }>();
