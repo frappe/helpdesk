@@ -41,7 +41,7 @@
           }}
         </p>
       </div>
-      <div class="rounded-5 border border-outline-gray-2 px-1 pb-1 text-sm">
+      <div class="rounded-5 border border-outline-gray-2 px-1 text-sm">
         <div
           class="grid items-center gap-6 p-2"
           :style="{ gridTemplateColumns }"
@@ -49,29 +49,36 @@
           <div
             v-for="column in COLUMNS"
             :key="column.key"
-            class="ms-2 truncate text-ink-gray-5"
+            class="ms-2 overflow-hidden text-ellipsis whitespace-nowrap text-ink-gray-5"
           >
             {{ column.label }}
           </div>
         </div>
-        <hr class="mx-2" />
+        <hr />
         <template
           v-for="(script, index) in scripts"
           :key="script.doctype + script.name"
         >
-          <a
-            :href="deskLink(script)"
-            target="_blank"
-            class="grid items-center gap-6 rounded-4 p-2 text-ink-gray-8 hover:bg-surface-sidebar"
+          <div
+            class="grid items-start gap-6 p-2"
             :style="{ gridTemplateColumns }"
           >
-            <span class="ms-2 min-w-0 break-words text-ink-gray-5">
+            <div class="ms-2 flex min-h-8 min-w-0 items-center break-words">
               {{ __(script.doctype) }}
-            </span>
-            <span class="min-w-0 break-words">{{ script.name }}</span>
-            <LucideExternalLink class="size-3.5 text-ink-gray-4" />
-          </a>
-          <hr v-if="index !== scripts.length - 1" class="mx-2" />
+            </div>
+            <div class="flex min-h-8 min-w-0 items-center break-words">
+              {{ script.name }}
+            </div>
+            <div class="flex min-h-8 items-center justify-end">
+              <Button
+                variant="ghost"
+                icon="lucide-external-link"
+                :href="deskLink(script)"
+                :label="__('Open {0}', [script.name])"
+              />
+            </div>
+          </div>
+          <hr v-if="index !== scripts.length - 1" />
         </template>
       </div>
       <p>{{ __("In each one, change the old field to Source:") }}</p>
@@ -119,7 +126,6 @@ import { copyToClipboard } from "@helpdesk/shared/utils";
 import { computed } from "vue";
 import LucideCircleCheck from "~icons/lucide/circle-check";
 import LucideCopy from "~icons/lucide/copy";
-import LucideExternalLink from "~icons/lucide/external-link";
 import LucideTriangleAlert from "~icons/lucide/triangle-alert";
 import LucideWrench from "~icons/lucide/wrench";
 import SidebarBanner from "./SidebarBanner.vue";
