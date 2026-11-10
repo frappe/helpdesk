@@ -34,6 +34,12 @@ cd "$BENCH_PATH"
 
 uv pip install --python env/bin/python -e "apps/frappe[test]"
 
+# The framework's esbuild toolchain (fast-glob et al.) lives in its root
+# node_modules, which --skip-frontend leaves out; the per-run helpdesk build
+# needs it.
+npm install -g yarn
+(cd apps/frappe && yarn install --frozen-lockfile)
+
 pilot -b "$BENCH_NAME" start > "$RUNNER_TEMP/pilot.log" 2>&1 &
 curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 1 \
   http://127.0.0.1:7000/api/v1/health
