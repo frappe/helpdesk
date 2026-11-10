@@ -22,6 +22,7 @@ printf '%s\n' "$HOME/pilot/bin" "$HOME/.local/bin" >> "$GITHUB_PATH"
 curl -fsSL "https://raw.githubusercontent.com/frappe/pilot/develop/install.sh" | sh -s -- --ci
 
 pilot new "$BENCH_NAME" --frappe-branch "$FRAPPE_BRANCH"
+sed -i 's|https://github.com/frappe/frappe|https://github.com/BreadGenie/frappe|' "$BENCH_PATH/bench.toml"
 pilot -b "$BENCH_NAME" set-bench-config admin_allow_site_to_pilot_communication false
 pilot -b "$BENCH_NAME" set-bench-config mariadb_existing true
 pilot -b "$BENCH_NAME" set-bench-config mariadb_host "$DB_HOST"

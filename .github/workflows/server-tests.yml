@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: develop-helpdesk-${{ github.event.number }}
+  group: develop-helpdesk-walker-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -70,7 +70,7 @@ jobs:
       - name: Setup Pilot bench
         shell: bash
         env:
-          FRAPPE_BRANCH: develop
+          FRAPPE_BRANCH: test-records-skip-custom-links
           SITE: test_site
         run: bash ${GITHUB_WORKSPACE}/.github/helpers/install.sh
 
@@ -90,7 +90,11 @@ jobs:
         env:
           TYPE: server
           CI_BUILD_ID: ${{ github.run_id }}
-      
+
+      - name: Frappe generator regression tests
+        working-directory: /home/runner/pilot/benches/frappe-bench
+        run: pilot frappe --site test_site run-tests --module frappe.tests.test_test_utils
+       
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
         with:
