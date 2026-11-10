@@ -41,34 +41,38 @@
           }}
         </p>
       </div>
-      <div
-        class="overflow-hidden rounded-lg border border-outline-gray-2 text-p-sm"
-      >
+      <div class="rounded-5 border border-outline-gray-2 px-1 text-sm">
         <div
-          class="flex items-baseline justify-between gap-2 border-b border-outline-gray-2 bg-surface-gray-1 px-3 py-2"
+          class="grid items-center gap-6 p-2"
+          :style="{ gridTemplateColumns }"
         >
-          <span class="font-medium text-ink-gray-9">
-            {{ __("To update") }}
-          </span>
-          <span class="text-ink-gray-5">
-            {{ __("{0} found", [scripts.length]) }}
-          </span>
+          <div
+            v-for="column in COLUMNS"
+            :key="column.key"
+            class="ms-2 truncate text-ink-gray-5"
+          >
+            {{ column.label }}
+          </div>
         </div>
-        <ul class="p-1">
-          <li v-for="script in scripts" :key="script.doctype + script.name">
-            <a
-              :href="deskLink(script)"
-              target="_blank"
-              class="grid grid-cols-[1fr_auto] items-center gap-x-2 rounded px-2 py-1.5 text-ink-gray-9 hover:bg-surface-gray-2 sm:grid-cols-[7rem_1fr_auto]"
-            >
-              <span class="col-span-2 text-sm text-ink-gray-5 sm:col-span-1">{{
-                __(script.doctype)
-              }}</span>
-              <span class="min-w-0 break-words">{{ script.name }}</span>
-              <LucideExternalLink class="size-3.5 text-ink-gray-4" />
-            </a>
-          </li>
-        </ul>
+        <hr />
+        <template
+          v-for="(script, index) in scripts"
+          :key="script.doctype + script.name"
+        >
+          <a
+            :href="deskLink(script)"
+            target="_blank"
+            class="grid items-center gap-6 rounded p-2 text-ink-gray-8 hover:bg-surface-gray-2"
+            :style="{ gridTemplateColumns }"
+          >
+            <span class="ms-2 min-w-0 break-words text-ink-gray-5">
+              {{ __(script.doctype) }}
+            </span>
+            <span class="min-w-0 break-words">{{ script.name }}</span>
+            <LucideExternalLink class="size-3.5 text-ink-gray-4" />
+          </a>
+          <hr v-if="index !== scripts.length - 1" />
+        </template>
       </div>
       <p>{{ __("In each one, change the old field to Source:") }}</p>
       <dl
@@ -110,6 +114,7 @@
 <script setup lang="ts">
 import { type BannerScript, useBanners } from "@/composables/useBanners";
 import { __ } from "@/translation";
+import { getGridTemplateColumnsForTable } from "@/utils";
 import { copyToClipboard } from "@helpdesk/shared/utils";
 import { computed } from "vue";
 import LucideCircleCheck from "~icons/lucide/circle-check";
@@ -134,6 +139,12 @@ const RULES = [
   },
   { language: "SQL", from: "via_customer_portal = 1", to: "source = 'Portal'" },
 ];
+
+const COLUMNS = [
+  { key: "doctype", label: __("Type"), width: "9rem" },
+  { key: "name", label: __("Name") },
+];
+const gridTemplateColumns = getGridTemplateColumnsForTable(COLUMNS);
 
 const { banner } = useBanners();
 const scripts = computed(() => banner("ticket_source")?.scripts ?? []);
