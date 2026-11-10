@@ -93,7 +93,10 @@ jobs:
 
       - name: Frappe generator regression tests
         working-directory: /home/runner/pilot/benches/frappe-bench
-        run: pilot frappe --site test_site run-tests --module frappe.tests.test_test_utils
+        run: |
+          pilot new-site walker_site --admin-password admin --apps frappe --skip-assets
+          pilot frappe --site walker_site set-config allow_tests true
+          pilot frappe --site walker_site run-tests --module frappe.tests.test_test_utils
        
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
