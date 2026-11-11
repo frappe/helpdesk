@@ -29,7 +29,7 @@ class HDTeam(Document):
             return
         ar = frappe.get_doc("Assignment Rule", self.assignment_rule)
         self.sync_users(ar)
-        ar.disabled = bool(self.disabled)
+        ar.disabled = self.assignment_rule_disabled()
         ar.save(ignore_permissions=True)
 
     def on_trash(self):
@@ -71,7 +71,7 @@ class HDTeam(Document):
             self.name
         )
         ar.priority = 1
-        ar.disabled = bool(self.disabled)
+        ar.disabled = self.assignment_rule_disabled()
 
         for day in ASSIGNMENT_DAYS:
             ar.append("assignment_days", {"doctype": "Assignment Rule Day", "day": day})
@@ -79,6 +79,10 @@ class HDTeam(Document):
         self.sync_users(ar)
         ar.save(ignore_permissions=True)
         self.db_set("assignment_rule", ar.name, update_modified=False)
+
+    def assignment_rule_disabled(self):
+        # Frappe requires users on an enabled rotation, and a team can have no agents yet.
+        return bool(self.disabled) or not any(u.user for u in self.users)
 
     def sync_users(self, ar):
         members = [u.user for u in self.users if u.user]

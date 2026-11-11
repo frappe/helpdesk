@@ -778,6 +778,7 @@ class TestERPNextIntegration(FrappeTestCase):
         )
 
         hd_perm.apply_to_all_doctypes = 0
+        hd_perm.applicable_for = "HD Ticket"
         hd_perm.save(ignore_permissions=True)
 
         self.assertEqual(
@@ -975,7 +976,11 @@ class TestERPNextIntegration(FrappeTestCase):
         hd_doc, erp_doc = link_customers(self, "UP Flag")
 
         perm = make_user_permission(
-            "Administrator", "Customer", erp_doc.name, apply_to_all_doctypes=0
+            "Administrator",
+            "Customer",
+            erp_doc.name,
+            apply_to_all_doctypes=0,
+            applicable_for="HD Ticket",
         )
         self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
         self.addCleanup(
