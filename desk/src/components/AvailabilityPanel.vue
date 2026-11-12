@@ -49,7 +49,7 @@
       >
         <div class="min-h-0">
           <div
-            class="mt-1 space-y-2 border-t border-outline-gray-1 px-2 pb-1 pt-2.5"
+            class="mt-1 space-y-2 border-t border-outline-gray-1 px-3 pb-1 pt-2.5"
           >
             <div class="flex items-baseline justify-between">
               <p class="text-sm text-ink-gray-5">{{ __("Clear after") }}</p>
@@ -74,6 +74,7 @@
                 :aria-label="__('Clear after')"
               />
               <Button
+                class="-mr-1.5"
                 theme="red"
                 variant="ghost"
                 icon="lucide-timer-reset"
