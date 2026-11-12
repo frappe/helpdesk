@@ -63,7 +63,6 @@ website_route_rules = [
         "from_route": "/helpdesk/<path:app_path>",
         "to_route": "helpdesk",
     },
-    # Article as Markdown for LLMs, served by ArticleMarkdownPage.
     {
         "from_route": "/help/articles/<name>.md",
         "to_route": "help-article-markdown",

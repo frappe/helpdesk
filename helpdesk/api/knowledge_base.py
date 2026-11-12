@@ -40,7 +40,6 @@ from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
 from helpdesk.search import NUM_RESULTS
 from helpdesk.utils import is_agent
 
-# `website_route_rules` in hooks.py maps `/help/articles/<name>.md` here.
 ARTICLE_MARKDOWN_ENDPOINT = "help-article-markdown"
 
 PUBLIC_ARTICLE_FIELDS = [
@@ -607,8 +606,6 @@ def render_article_markdown(name: str) -> str:
 
 
 class ArticleMarkdownPage(BaseRenderer):
-    """Serves `/help/articles/<name>.md` as plain Markdown, the link LLMs are given."""
-
     def can_render(self) -> bool:
         return self.path == ARTICLE_MARKDOWN_ENDPOINT
 

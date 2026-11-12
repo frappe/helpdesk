@@ -74,7 +74,6 @@ const { copy } = useClipboard({ legacy: true });
 // Fetched on press/focus: Safari drops clipboard writes that await the network.
 const markdown = ref("");
 let request: Promise<void> | null = null;
-// Served by ArticleMarkdownPage (helpdesk/api/knowledge_base.py).
 const markdownUrl = computed(
   () =>
     `${window.location.origin}${ROUTES.appRoot}${ROUTES.article({
