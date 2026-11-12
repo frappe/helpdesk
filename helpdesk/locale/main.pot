@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-11-01 16:52+0000\n"
-"PO-Revision-Date: 2026-11-01 16:52+0000\n"
+"POT-Creation-Date: 2026-11-08 16:45+0000\n"
+"PO-Revision-Date: 2026-11-08 16:45+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -123,14 +123,6 @@ msgstr ""
 msgid "<span class=\"h4\">Helpdesk Configuration<br></span>"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:225
-msgid "A Frappe partner or consultant"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:224
-msgid "A friend or colleague"
-msgstr ""
-
 #: desk/src/pages/ticket/TicketNew.vue:71
 msgid "A short description"
 msgstr ""
@@ -140,7 +132,7 @@ msgstr ""
 msgid "A ticket can have at most {0} pinned comments"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:268
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:295
 msgid "A workday with this name already exists"
 msgstr ""
 
@@ -156,7 +148,7 @@ msgstr ""
 msgid "Access only this team's tickets"
 msgstr ""
 
-#: desk/src/components/Settings/SettingsModal.vue:19
+#: desk/src/components/Settings/SettingsModal.vue:21
 msgid "Account"
 msgstr ""
 
@@ -167,7 +159,7 @@ msgstr ""
 #. Label of the acknowledgement_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:72
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:415
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:406
 msgid "Acknowledgement"
 msgstr ""
 
@@ -264,7 +256,7 @@ msgstr ""
 msgid "Add Weekly Holidays"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:303
+#: desk/src/components/layouts/Sidebar.vue:305
 msgid "Add a comment on a ticket"
 msgstr ""
 
@@ -274,10 +266,6 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
-msgstr ""
-
-#: desk/src/components/Questionnaire.vue:266
-msgid "Add a few words so we can continue"
 msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:87
@@ -342,6 +330,10 @@ msgstr ""
 msgid "Add to recipients"
 msgstr ""
 
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:5
+msgid "Add workday"
+msgstr ""
+
 #: desk/src/components/Settings/Agents.vue:4
 msgid "Add, manage agents and assign roles to them."
 msgstr ""
@@ -358,13 +350,9 @@ msgstr ""
 msgid "Administrator"
 msgstr ""
 
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:42
-msgid "After raising a ticket, customers can only close it, rate it and change the fields marked Editable after creation in the ticket template."
-msgstr ""
-
 #. Name of a role
 #. Label of a Link in the Helpdesk Workspace
-#: desk/src/components/layouts/Sidebar.vue:408
+#: desk/src/components/layouts/Sidebar.vue:410
 #: desk/src/pages/dashboard/Dashboard.vue:71
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json:92
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json:98
@@ -374,7 +362,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json:104
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json:111
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json:94
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:588
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:579
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json:89
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:539
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json:56
@@ -407,7 +395,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json:106
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:165
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json:220
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:597
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:588
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:551
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json:64
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json:117
@@ -425,7 +413,7 @@ msgstr ""
 #. Label of the agent_status_section (Section Break) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json:22
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:246
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:237
 msgid "Agent Status"
 msgstr ""
 
@@ -448,7 +436,7 @@ msgstr ""
 msgid "Agents"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:387
+#: desk/src/components/layouts/Sidebar.vue:389
 msgid "Agents & Teams"
 msgstr ""
 
@@ -463,6 +451,7 @@ msgstr ""
 #: desk/src/components/SavedRepliesSelectorModal.vue:185
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:306
 #: desk/src/components/contact/FeedbackList.vue:118
+#: desk/src/components/notifications/NotificationFilters.vue:28
 #: desk/src/components/ticket/TicketSplitModal.vue:6
 msgid "All"
 msgstr ""
@@ -481,6 +470,10 @@ msgstr ""
 msgid "All articles from this category will move to General category."
 msgstr ""
 
+#: desk/src/components/notifications/NotificationFilters.vue:34
+msgid "All categories"
+msgstr ""
+
 #: desk/src/components/ticket/TicketMergeModal.vue:7
 msgid "All comments and emails from both tickets will be merged into the selected ticket"
 msgstr ""
@@ -492,13 +485,13 @@ msgstr ""
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:109
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:319
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:310
 msgid "Allow anyone to create tickets"
 msgstr ""
 
 #. Description of the 'Enable comment reactions' (Check) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:369
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:360
 msgid "Allow users to react to comments with emojis"
 msgstr ""
 
@@ -511,14 +504,6 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json:47
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json:30
 msgid "Amber"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:226
-msgid "An event or conference"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:218
-msgid "Another Frappe product (ERPNext, Frappe Cloud, etc.)"
 msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:113
@@ -534,7 +519,7 @@ msgid "Appears in the left sidebar. Recommended size is minimum 32x32 px in PNG 
 msgstr ""
 
 #. Description of the 'Favicon' (Attach Image) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:516
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:507
 msgid "Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO"
 msgstr ""
 
@@ -571,6 +556,10 @@ msgstr ""
 msgid "Apply To"
 msgstr ""
 
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:115
+msgid "Apply break to all workdays"
+msgstr ""
+
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json:70
 msgid "Apply on new page"
@@ -578,7 +567,7 @@ msgstr ""
 
 #. Label of the enable_outside_hours_banner (Check) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:550
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:541
 msgid "Apply outside working hours"
 msgstr ""
 
@@ -599,7 +588,7 @@ msgstr ""
 msgid "Archived"
 msgstr ""
 
-#: desk/src/components/Settings/SettingsModal.vue:74
+#: desk/src/components/Settings/SettingsModal.vue:79
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr ""
 
@@ -619,7 +608,7 @@ msgstr ""
 msgid "Are you sure you want to delete this customer? The reference to this customer will be removed from all the related tickets."
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:193
+#: desk/src/components/ticket-agent/TicketHeader.vue:196
 msgid "Are you sure you want to delete this ticket? This is an irreversible action and cannot be undone."
 msgstr ""
 
@@ -703,7 +692,7 @@ msgstr ""
 msgid "Assign"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:278
+#: desk/src/components/layouts/Sidebar.vue:280
 msgid "Assign a ticket to an agent"
 msgstr ""
 
@@ -747,10 +736,6 @@ msgstr ""
 msgid "Assignees updated successfully."
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:201
-msgid "Assigning tickets"
-msgstr ""
-
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json:43
 msgid "Assignment"
@@ -777,7 +762,7 @@ msgstr ""
 #. Label of the assignment_rules_section (Section Break) field in DocType 'HD
 #. Settings'
 #: ⁨desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue⁩:5
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:95
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:94
 msgid "Assignment Rules"
 msgstr ""
 
@@ -814,6 +799,10 @@ msgstr ""
 msgid "Assignment rule {0} updated successfully."
 msgstr ""
 
+#: desk/src/components/notifications/NotificationFilters.vue:36
+msgid "Assignments"
+msgstr ""
+
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:74
 #, python-brace-format
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
@@ -844,13 +833,13 @@ msgstr ""
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:80
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:326
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:317
 msgid "Auto update status"
 msgstr ""
 
 #. Label of the auto_close_after_days (Int) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:176
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:350
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:341
 msgid "Auto-close after (Days)"
 msgstr ""
 
@@ -871,12 +860,12 @@ msgstr ""
 
 #. Label of the auto_set_customer_from_contact (Check) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:562
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:553
 msgid "Auto-set customer from contact"
 msgstr ""
 
 #. Label of the auto_close_tickets (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:343
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:334
 msgid "Automatically Close Tickets when"
 msgstr ""
 
@@ -886,7 +875,7 @@ msgstr ""
 
 #. Description of the 'Auto-set customer from contact' (Check) field in DocType
 #. 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:559
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:550
 msgid "Automatically set the customer on a ticket based on the contact's linked customer(s)"
 msgstr ""
 
@@ -1018,7 +1007,7 @@ msgid "Back to Tickets"
 msgstr ""
 
 #. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:101
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:100
 msgid "Base Support Rotation"
 msgstr ""
 
@@ -1061,8 +1050,48 @@ msgstr ""
 
 #. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:4
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:221
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:212
 msgid "Branding"
+msgstr ""
+
+#. Label of the section_break_break (Section Break) field in DocType 'HD
+#. Service Day'
+#: desk/src/components/Settings/Sla/SlaWorkDaysList.vue:110
+#: desk/src/components/Settings/Sla/SlaWorkDaysListItem.vue:61
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:52
+msgid "Break"
+msgstr ""
+
+#. Label of the break_end (Time) field in DocType 'HD Service Day'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:69
+msgid "Break End"
+msgstr ""
+
+#. Label of the break_start (Time) field in DocType 'HD Service Day'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:59
+msgid "Break Start"
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:337
+msgid "Break applied to 1 workday."
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:338
+#, python-brace-format
+msgid "Break applied to {0} workdays."
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:93
+msgid "Break end"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:159
+#, python-brace-format
+msgid "Break must start after Start Time, end after it starts and end before End Time in row <u>{0}</u>."
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:85
+msgid "Break start"
 msgstr ""
 
 #: desk/src/components/ListViewBuilder.vue:295
@@ -1152,6 +1181,7 @@ msgstr ""
 
 #: desk/src/components/EmailEditor.vue:444
 #: desk/src/components/ListViewBuilder.vue:749
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:141
 #: desk/src/components/ticket-agent/BulkAssignModal.vue:8
 #: desk/src/components/ticket-agent/BulkEditModal.vue:23
 #: desk/src/pages/home/Home.vue:44
@@ -1295,12 +1325,29 @@ msgstr ""
 msgid "Channels"
 msgstr ""
 
+#: desk/src/components/banners/TicketFieldPermissionBanner.vue:25
+msgid "Check this:"
+msgstr ""
+
 #: desk/src/components/Settings/FieldDependency/FieldDependencyFieldsSelection.vue:18
 msgid "Child field"
 msgstr ""
 
 #: desk/src/components/view-controls/filter/Filter.vue:204
 msgid "Choose a field"
+msgstr ""
+
+#: desk/src/components/layouts/TrialCard.vue:63
+#: desk/src/components/layouts/TrialCard.vue:82
+msgid "Choose a plan"
+msgstr ""
+
+#: desk/src/components/layouts/TrialCard.vue:62
+msgid "Choose a plan to keep using your site."
+msgstr ""
+
+#: desk/src/components/layouts/TrialCard.vue:81
+msgid "Choose a plan to keep your site after the trial."
 msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:162
@@ -1392,6 +1439,8 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:176
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:56
 #: desk/src/components/command-palette/CommandPalette.vue:263
+#: desk/src/components/notifications/Notifications.vue:36
+#: desk/src/components/notifications/Notifications.vue:37
 #: desk/src/pages/ticket/MobileTicketAgent.vue:234
 #: desk/src/pages/ticket/TicketCustomer.vue:14
 msgid "Close"
@@ -1469,7 +1518,7 @@ msgstr ""
 #. Label of the comments_section (Section Break) field in DocType 'HD Settings'
 #: desk/src/pages/SearchAgent.vue:353
 #: desk/src/pages/ticket/MobileTicketAgent.vue:539
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:365
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:356
 msgid "Comments"
 msgstr ""
 
@@ -1521,11 +1570,11 @@ msgstr ""
 msgid "Configure your telephony settings."
 msgstr ""
 
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:7
 #: desk/src/components/customer/ContactCard.vue:225
 #: desk/src/components/customer/ContactCard.vue:263
 #: desk/src/components/customer/ContactCard.vue:292
 #: desk/src/components/customer/RevokeInviteButton.vue:11
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:45
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:327
 #: desk/src/pages/knowledge-base/NewArticle.vue:157
 #: desk/src/pages/ticket/MobileTicketAgent.vue:231
@@ -1538,6 +1587,10 @@ msgstr ""
 msgid "Confirm Changes"
 msgstr ""
 
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:131
+msgid "Confirm Delete"
+msgstr ""
+
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:19
 msgid "Confirm Password"
 msgstr ""
@@ -1546,24 +1599,20 @@ msgstr ""
 msgid "Confirm overwrite"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:236
-msgid "Connect my support email"
-msgstr ""
-
-#: desk/src/components/layouts/Sidebar.vue:235
+#: desk/src/components/layouts/Sidebar.vue:237
 msgid "Connect your support email"
 msgstr ""
 
 #. Label of the contact (Link) field in DocType 'HD Ticket'
 #: desk/src/components/contact/EditContactDialog.vue:26
 #: desk/src/components/contact/NewContactDialog.vue:42
-#: desk/src/components/layouts/Sidebar.vue:410
+#: desk/src/components/layouts/Sidebar.vue:412
 #: desk/src/pages/customer/Customer.vue:166
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:347
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:56
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:44
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:43
-#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:72
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:73
 msgid "Contact"
 msgstr ""
 
@@ -1574,6 +1623,10 @@ msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:305
 msgid "Contact removed successfully"
+msgstr ""
+
+#: desk/src/components/Settings/CloudSettings/CloudPanel.vue:15
+msgid "Contact support"
 msgstr ""
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:84
@@ -1661,6 +1714,10 @@ msgstr ""
 msgid "Could not note parked mail on ticket"
 msgstr ""
 
+#: desk/src/components/Settings/CloudSettings/CloudPanel.vue:54
+msgid "Could not open Cloud Settings"
+msgstr ""
+
 #: desk/src/components/ticket-agent/timeline/TimelineCommentRow.vue:224
 msgid "Could not pin the comment"
 msgstr ""
@@ -1689,7 +1746,7 @@ msgstr ""
 #: desk/src/components/Settings/NewTeamModal.vue:7
 #: desk/src/components/contact/NewContactDialog.vue:102
 #: desk/src/components/customer/NewCustomerDialog.vue:99
-#: desk/src/components/layouts/Sidebar.vue:340
+#: desk/src/components/layouts/Sidebar.vue:342
 #: desk/src/components/tag/Tags.vue:187 desk/src/components/tag/Tags.vue:202
 #: desk/src/pages/call-logs/CallLogModal.vue:230
 #: desk/src/pages/contact/Contacts.vue:11
@@ -1700,8 +1757,8 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:333
-#: desk/src/components/layouts/Sidebar.vue:339
+#: desk/src/components/layouts/Sidebar.vue:335
+#: desk/src/components/layouts/Sidebar.vue:341
 msgid "Create & invite a contact"
 msgstr ""
 
@@ -1721,11 +1778,11 @@ msgstr ""
 msgid "Create View"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:268
+#: desk/src/components/layouts/Sidebar.vue:270
 msgid "Create a ticket"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:316
+#: desk/src/components/layouts/Sidebar.vue:318
 msgid "Create an article"
 msgstr ""
 
@@ -1735,10 +1792,6 @@ msgstr ""
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:13
 msgid "Create field dependencies to dynamically update options based on user selections. Learn more about field dependencies"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:238
-msgid "Create my first ticket"
 msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:57
@@ -1753,7 +1806,7 @@ msgstr ""
 msgid "Created by"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:379
+#: desk/src/components/layouts/Sidebar.vue:381
 msgid "Creating a ticket"
 msgstr ""
 
@@ -1761,13 +1814,13 @@ msgstr ""
 msgid "Current icon"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:423
+#: desk/src/components/layouts/Sidebar.vue:425
 msgid "Custom Actions"
 msgstr ""
 
 #. Label of the outside_working_hours_message (Small Text) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:541
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:532
 msgid "Custom Outside Working Hours Message"
 msgstr ""
 
@@ -1780,7 +1833,7 @@ msgstr ""
 msgid "Custom Range"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:425
+#: desk/src/components/layouts/Sidebar.vue:427
 msgid "Custom Views"
 msgstr ""
 
@@ -1790,15 +1843,15 @@ msgstr ""
 #: desk/src/components/customer/EditCustomerDialog.vue:30
 #: desk/src/components/customer/InviteContactDialog.vue:130
 #: desk/src/components/customer/NewCustomerDialog.vue:14
-#: desk/src/components/layouts/Sidebar.vue:411
+#: desk/src/components/layouts/Sidebar.vue:413
 #: desk/src/pages/contact/Contact.vue:78
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:355
 msgid "Customer"
 msgstr ""
 
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:22
 #: desk/src/components/customer/ContactCard.vue:169
 #: desk/src/components/customer/InviteContactDialog.vue:131
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:18
 msgid "Customer Manager"
 msgstr ""
 
@@ -1807,7 +1860,7 @@ msgstr ""
 msgid "Customer Name"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:399
+#: desk/src/components/layouts/Sidebar.vue:401
 msgid "Customer Portal"
 msgstr ""
 
@@ -1840,15 +1893,15 @@ msgid "Customer name cannot be empty"
 msgstr ""
 
 #: desk/src/components/layouts/MobileSidebar.vue:108
-#: desk/src/components/layouts/Sidebar.vue:152
+#: desk/src/components/layouts/Sidebar.vue:160
 msgid "Customer portal"
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:4
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:6
 msgid "Customer portal permissions have changed"
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionBanner.vue:10
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:4
 msgid "Customer portal update"
 msgstr ""
 
@@ -1862,7 +1915,7 @@ msgstr ""
 msgid "Customers"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:391
+#: desk/src/components/layouts/Sidebar.vue:393
 msgid "Customers & Contacts"
 msgstr ""
 
@@ -1870,7 +1923,11 @@ msgstr ""
 msgid "Customers are in sync"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:420
+#: desk/src/components/banners/TicketFieldPermissionBanner.vue:12
+msgid "Customers now see only the ticket fields meant for them. All other fields are visible to agents only."
+msgstr ""
+
+#: desk/src/components/layouts/Sidebar.vue:422
 msgid "Customizations"
 msgstr ""
 
@@ -1894,8 +1951,8 @@ msgstr ""
 msgid "Daily volume of the top {0} tags"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:137
-#: desk/src/components/layouts/Sidebar.vue:186
+#: desk/src/components/layouts/Sidebar.vue:145
+#: desk/src/components/layouts/Sidebar.vue:200
 #: desk/src/pages/contact/Contact.vue:308
 #: desk/src/pages/customer/Customer.vue:203
 #: desk/src/pages/knowledge-base/Article.vue:666
@@ -1944,7 +2001,7 @@ msgstr ""
 msgid "Default SLA"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:32
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:30
 msgid "Default SLA turned off"
 msgstr ""
 
@@ -1966,13 +2023,13 @@ msgstr ""
 msgid "Default Views"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:252
-#: desk/src/components/ticket-agent/TicketHeader.vue:263
+#: desk/src/components/ticket-agent/TicketHeader.vue:255
+#: desk/src/components/ticket-agent/TicketHeader.vue:266
 msgid "Default actions"
 msgstr ""
 
 #. Label of the default_agent_status (Link) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:252
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:243
 msgid "Default agent status"
 msgstr ""
 
@@ -1985,7 +2042,7 @@ msgid "Default medium"
 msgstr ""
 
 #. Label of the default_priority (Link) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:265
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:256
 msgid "Default priority"
 msgstr ""
 
@@ -1994,13 +2051,13 @@ msgid "Default template can not be deleted"
 msgstr ""
 
 #. Label of the default_ticket_status (Link) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:482
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:473
 msgid "Default ticket status"
 msgstr ""
 
 #. Label of the default_ticket_type (Link) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:129
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:188
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:179
 msgid "Default ticket type"
 msgstr ""
 
@@ -2014,8 +2071,9 @@ msgstr ""
 #: desk/src/components/ListViewBuilder.vue:262
 #: desk/src/components/ListViewBuilder.vue:268
 #: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:57
-#: desk/src/components/ticket-agent/TicketHeader.vue:198
-#: desk/src/components/ticket-agent/TicketHeader.vue:267
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:131
+#: desk/src/components/ticket-agent/TicketHeader.vue:201
+#: desk/src/components/ticket-agent/TicketHeader.vue:270
 #: desk/src/pages/contact/Contact.vue:312
 #: desk/src/pages/customer/Customer.vue:207
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:180
@@ -2087,7 +2145,7 @@ msgid "Description Template"
 msgstr ""
 
 #. Label of the description_weight (Int) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:293
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:284
 msgid "Description Weight"
 msgstr ""
 
@@ -2113,7 +2171,7 @@ msgstr ""
 
 #. Label of the disable_saved_replies_global_scope (Check) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:526
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:517
 msgid "Disable saved replies with scope 'Global'"
 msgstr ""
 
@@ -2162,7 +2220,7 @@ msgstr ""
 
 #. Label of the do_not_restrict_tickets_without_an_agent_group (Check) field in
 #. DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:130
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:129
 msgid "Do not restrict tickets without a Team"
 msgstr ""
 
@@ -2178,13 +2236,17 @@ msgid "DocType"
 msgstr ""
 
 #: desk/src/components/layouts/MobileSidebar.vue:122
-#: desk/src/components/layouts/Sidebar.vue:166
+#: desk/src/components/layouts/Sidebar.vue:174
 msgid "Docs"
 msgstr ""
 
 #. Label of the document_type (Link) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json:20
 msgid "Document Type"
+msgstr ""
+
+#: desk/src/components/EmptyState.vue:31 desk/src/components/EmptyState.vue:86
+msgid "Documentation"
 msgstr ""
 
 #: desk/src/components/contact/EditContactDialog.vue:43
@@ -2287,7 +2349,7 @@ msgstr ""
 msgid "ERPNext is not installed on your site. Please install ERPNext to enable this setting"
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:10
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:14
 msgid "Earlier, every contact could see all the tickets of their company. Now, contacts only see the tickets they raised themselves."
 msgstr ""
 
@@ -2329,6 +2391,10 @@ msgstr ""
 msgid "Edit Title"
 msgstr ""
 
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:5
+msgid "Edit workday"
+msgstr ""
+
 #: desk/src/components/Settings/EmailEdit.vue:4
 msgid "Edit your email account"
 msgstr ""
@@ -2342,7 +2408,7 @@ msgstr ""
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:61
 #: desk/src/components/contact/EditContactDialog.vue:50
 #: desk/src/components/customer/NewCustomerDialog.vue:80
-#: desk/src/pages/PersonaForm.vue:149 desk/src/pages/SearchAgent.vue:184
+#: desk/src/pages/SearchAgent.vue:184
 msgid "Email"
 msgstr ""
 
@@ -2366,7 +2432,7 @@ msgstr ""
 #. Label of the reply_via_agent_email_content (Text) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:61
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:410
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:401
 msgid "Email Content"
 msgstr ""
 
@@ -2378,7 +2444,7 @@ msgstr ""
 #. Label of the email_customisations_tab (Tab Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:3
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:400
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:391
 msgid "Email Notifications"
 msgstr ""
 
@@ -2440,12 +2506,12 @@ msgstr ""
 
 #. Label of the enable_comment_reactions (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:23
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:372
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:363
 msgid "Enable comment reactions"
 msgstr ""
 
 #. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:333
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:324
 msgid "Enable feedback for Customer Portal"
 msgstr ""
 
@@ -2478,7 +2544,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json:57
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json:45
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json:127
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:388
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:379
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json:24
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json:74
 msgid "Enabled"
@@ -2490,8 +2556,20 @@ msgid "End Date"
 msgstr ""
 
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:42
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:46
 msgid "End Time"
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:71
+msgid "End time"
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:248
+msgid "End time is required"
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:252
+msgid "End time must be after start time"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
@@ -2554,7 +2632,7 @@ msgstr ""
 msgid "Excel"
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:73
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:55
 msgid "Existing contacts are being made customer managers in the background"
 msgstr ""
 
@@ -2567,12 +2645,8 @@ msgstr ""
 msgid "Exotel"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:353
+#: desk/src/components/layouts/Sidebar.vue:355
 msgid "Explore customer portal"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:240
-msgid "Explore the product first"
 msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:2
@@ -2608,7 +2682,7 @@ msgstr ""
 msgid "Failed to create email account, Invalid credentials"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:211
+#: desk/src/components/ticket-agent/TicketHeader.vue:214
 msgid "Failed to delete ticket."
 msgstr ""
 
@@ -2635,6 +2709,11 @@ msgstr ""
 #: desk/src/components/Settings/Telephony/Telephony.vue:215
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:216
 msgid "Failed to save Twilio settings"
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:227
+#, python-brace-format
+msgid "Failed to save workday: {0}"
 msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:622
@@ -2664,7 +2743,7 @@ msgstr ""
 
 #. Label of the favicon (Attach Image) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:27
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:519
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:510
 msgid "Favicon"
 msgstr ""
 
@@ -2676,7 +2755,7 @@ msgstr ""
 #: desk/src/pages/home/components/RecentFeedback.vue:197
 #: desk/src/pages/home/components/RecentFeedback.vue:314
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json:25
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:356
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:347
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:423
 msgid "Feedback"
 msgstr ""
@@ -2740,7 +2819,7 @@ msgstr ""
 msgid "Field Dependencies"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:424
+#: desk/src/components/layouts/Sidebar.vue:426
 msgid "Field Dependency"
 msgstr ""
 
@@ -2807,14 +2886,6 @@ msgstr ""
 msgid "Find out all of the variables that can be used in the content"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:187
-msgid "Finding past conversations"
-msgstr ""
-
-#: desk/src/components/Questionnaire.vue:129
-msgid "Finish"
-msgstr ""
-
 #: desk/src/components/contact/EditContactDialog.vue:34
 #: desk/src/components/customer/NewCustomerDialog.vue:67
 msgid "First Name"
@@ -2874,22 +2945,14 @@ msgstr ""
 msgid "Form"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:216
-msgid "Frappe Discuss"
-msgstr ""
-
-#: desk/src/components/layouts/Sidebar.vue:433
+#: desk/src/components/layouts/Sidebar.vue:435
 msgid "Frappe Helpdesk Mobile"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:129
-msgid "Freshdesk"
 msgstr ""
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:20
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:24
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:74
 msgid "Friday"
 msgstr ""
@@ -2927,7 +2990,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:6
 #: desk/src/components/command-palette/CommandPalette.vue:418
-#: desk/src/components/layouts/Sidebar.vue:324
+#: desk/src/components/layouts/Sidebar.vue:326
 #: desk/src/components/modals/ShortcutsModal.vue:76
 msgid "General"
 msgstr ""
@@ -2950,12 +3013,8 @@ msgstr ""
 msgid "General is a reserved category name. Please use a different name to proceed."
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:374
+#: desk/src/components/layouts/Sidebar.vue:376
 msgid "Getting Started"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:213
-msgid "GitHub"
 msgstr ""
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
@@ -2972,11 +3031,7 @@ msgstr ""
 msgid "Go to pinned comment {0}"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:214
-msgid "Google Ads"
-msgstr ""
-
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:70
+#: desk/src/components/banners/SidebarBanner.vue:35
 msgid "Got it"
 msgstr ""
 
@@ -3067,8 +3122,11 @@ msgstr ""
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json:139
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json:79
+#: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json:68
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json:178
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json:110
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:568
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json:84
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json:95
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json:128
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json:92
@@ -3118,7 +3176,7 @@ msgid "HD Saved Reply Team"
 msgstr ""
 
 #. Name of a DocType
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:52
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:78
 msgid "HD Service Day"
 msgstr ""
 
@@ -3139,7 +3197,7 @@ msgid "HD Service Level Priority"
 msgstr ""
 
 #. Name of a DocType
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:571
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:562
 msgid "HD Settings"
 msgstr ""
 
@@ -3222,7 +3280,7 @@ msgid "HD View"
 msgstr ""
 
 #. Label of the headings_weight (Int) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:303
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:294
 msgid "Headings Weight"
 msgstr ""
 
@@ -3230,7 +3288,7 @@ msgstr ""
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:30
+#: desk/src/components/layouts/Sidebar.vue:33
 msgid "Help"
 msgstr ""
 
@@ -3311,28 +3369,8 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:109
-msgid "How big is your support team?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:210
-msgid "How did you hear about Frappe Helpdesk?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:145
-msgid "How do your customers currently contact your support team?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:163
-msgid "How would you like your customers to create support tickets in Frappe Helpdesk?"
-msgstr ""
-
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:142
 msgid "I understand, add conditions"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:173
-msgid "I'm not sure yet"
 msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:24
@@ -3348,35 +3386,39 @@ msgid "Icon"
 msgstr ""
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:424
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:415
 msgid "If enabled, a ticket creation acknowledgement email will be sent to the user right after creating an email ticket"
 msgstr ""
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:443
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:434
 msgid "If enabled, an email is sent to all of the recipients associated with an agent's reply"
 msgstr ""
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:431
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:422
 msgid "If enabled, an email will be sent to all of the assigned agents after a reply from one of the contacts"
 msgstr ""
 
 #. Description of the 'Allow anyone to create tickets' (Check) field in DocType
 #. 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:316
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:307
 msgid "If enabled, anyone will be able to create tickets (without any permission). "
 msgstr ""
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:385
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:376
 msgid "If enabled, feedback email will be sent to the customer when you mark a ticket as the status selected below.\n"
 msgstr ""
 
 #. Description of the 'Enable feedback for Customer Portal' (Check) field in
 #. DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:330
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:321
 msgid "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n"
+msgstr ""
+
+#: desk/src/components/banners/TicketFieldPermissionBanner.vue:27
+msgid "If you created custom agent roles, raise their permission level to 8 in Role Permission Manager so they can see agent-only fields."
 msgstr ""
 
 #: desk/src/components/knowledge-base/ArticleFeedback.vue:15
@@ -3400,7 +3442,7 @@ msgid "Image removed successfully."
 msgstr ""
 
 #. Description of the 'Logo' (Attach Image) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:228
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:219
 msgid "Image to be used in various places, including Login and Signup pages. An image with transparent background and 160 x 32 is preferred"
 msgstr ""
 
@@ -3410,10 +3452,6 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:218
 msgid "In Progress"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:156
-msgid "In person"
 msgstr ""
 
 #: desk/src/components/Settings/Agents.vue:122
@@ -3446,17 +3484,13 @@ msgid "Install the"
 msgstr ""
 
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:216
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:207
 msgid "Instantly send e-mail"
 msgstr ""
 
-#: helpdesk/utils.py:31
+#: helpdesk/utils.py:27
 #, python-brace-format
 msgid "Insufficient Permission for {0}"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:130
-msgid "Intercom"
 msgstr ""
 
 #: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:60
@@ -3467,8 +3501,8 @@ msgstr ""
 msgid "Internal note. Type / for commands"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:366
-#: desk/src/components/layouts/Sidebar.vue:369
+#: desk/src/components/layouts/Sidebar.vue:368
+#: desk/src/components/layouts/Sidebar.vue:371
 msgid "Introduction"
 msgstr ""
 
@@ -3544,7 +3578,7 @@ msgstr ""
 msgid "Invite agent"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:246
+#: desk/src/components/layouts/Sidebar.vue:248
 msgid "Invite agents"
 msgstr ""
 
@@ -3555,10 +3589,6 @@ msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:11
 msgid "Invite by email"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:239
-msgid "Invite my support team"
 msgstr ""
 
 #: desk/src/pages/contact/Contact.vue:259
@@ -3611,7 +3641,7 @@ msgstr ""
 
 #. Label of the initial_helpdesk_name_setup_skipped (Check) field in DocType
 #. 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:152
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:151
 msgid "Is name setup skipped"
 msgstr ""
 
@@ -3621,12 +3651,8 @@ msgid "Is pinned"
 msgstr ""
 
 #. Label of the setup_complete (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:146
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:145
 msgid "Is setup complete"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:131
-msgid "Jira Service Management"
 msgstr ""
 
 #: desk/src/components/contact/EditContactDialog.vue:37
@@ -3645,10 +3671,6 @@ msgstr ""
 msgid "KB"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:197
-msgid "Keeping track of customer requests"
-msgstr ""
-
 #. Label of the key (Data) field in DocType 'HD Email Feedback'
 #. Label of the key (Data) field in DocType 'HD Ticket'
 #. Label of a field in the email-feedback Web Form
@@ -3664,13 +3686,13 @@ msgstr ""
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
-#: desk/src/components/layouts/Sidebar.vue:395
-#: desk/src/components/layouts/Sidebar.vue:412
+#: desk/src/components/layouts/Sidebar.vue:397
+#: desk/src/components/layouts/Sidebar.vue:414
 #: desk/src/pages/knowledge-base/Article.vue:680
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:462
 #: desk/src/pages/knowledge-base/NewArticle.vue:179
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:108
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:107
 msgid "Knowledge Base"
 msgstr ""
 
@@ -3784,29 +3806,23 @@ msgstr ""
 msgid "Learn about conditions"
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionBanner.vue:17
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:19
+#: desk/src/components/banners/SidebarBanner.vue:13
 msgid "Learn more"
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:23
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:53
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:25
 msgid "Learn more in the"
 msgstr ""
 
 #. Description of the 'Apply outside working hours' (Check) field in DocType
 #. 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:547
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:538
 msgid "Let customers know they're raising a ticket outside working hours, and when they can expect a reply."
 msgstr ""
 
 #. Label of the level (Select) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json:24
 msgid "Level"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:221
-msgid "LinkedIn"
 msgstr ""
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
@@ -3826,10 +3842,6 @@ msgstr ""
 
 #: desk/src/components/CallArea.vue:72
 msgid "Listen"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:153 desk/src/pages/PersonaForm.vue:172
-msgid "Live chat"
 msgstr ""
 
 #. Label of the load_default_columns (Check) field in DocType 'HD View'
@@ -3855,12 +3867,12 @@ msgstr ""
 
 #: desk/src/components/layouts/MobileSidebar.vue:98
 #: desk/src/components/layouts/MobileSidebar.vue:126
-#: desk/src/components/layouts/Sidebar.vue:141
-#: desk/src/components/layouts/Sidebar.vue:190
+#: desk/src/components/layouts/Sidebar.vue:149
+#: desk/src/components/layouts/Sidebar.vue:204
 msgid "Log out"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:170
+#: desk/src/components/layouts/Sidebar.vue:184
 msgid "Login to Frappe Cloud"
 msgstr ""
 
@@ -3868,7 +3880,7 @@ msgstr ""
 #: desk/src/components/Settings/General/components/Branding.vue:15
 #: desk/src/components/customer/EditCustomerDialog.vue:29
 #: desk/src/components/customer/NewCustomerDialog.vue:13
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:231
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:222
 msgid "Logo"
 msgstr ""
 
@@ -3895,7 +3907,7 @@ msgstr ""
 msgid "Make a Call"
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:34
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:36
 msgid "Make all existing contacts customer managers"
 msgstr ""
 
@@ -3905,6 +3917,11 @@ msgstr ""
 
 #: desk/src/components/ViewModal.vue:50
 msgid "Make it public"
+msgstr ""
+
+#: desk/src/components/layouts/Sidebar.vue:179
+#: desk/src/components/layouts/TrialCard.vue:74
+msgid "Manage billing"
 msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:2
@@ -3939,21 +3956,15 @@ msgstr ""
 msgid "Manager"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:183
-msgid "Managing customer conversations across channels"
-msgstr ""
-
+#: desk/src/components/notifications/Notifications.vue:28
+#: desk/src/components/notifications/Notifications.vue:29
 #: desk/src/pages/MobileNotifications.vue:11
 #: desk/src/pages/MobileNotifications.vue:14
 msgid "Mark all as read"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:404
+#: desk/src/components/layouts/Sidebar.vue:406
 msgid "Masters"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:191
-msgid "Measuring team performance"
 msgstr ""
 
 #. Option for the 'Level' (Select) field in DocType 'HD Ticket Priority'
@@ -3975,11 +3986,15 @@ msgstr ""
 msgid "Mention"
 msgstr ""
 
+#: desk/src/components/notifications/NotificationFilters.vue:35
+msgid "Mentions"
+msgstr ""
+
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:158
 msgid "Merge"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:243
+#: desk/src/components/ticket-agent/TicketHeader.vue:246
 msgid "Merge Ticket"
 msgstr ""
 
@@ -3996,15 +4011,11 @@ msgid "Message"
 msgstr ""
 
 #. Label of the misc_tab (Tab Break) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:135
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:134
 msgid "Misc"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:195
-msgid "Missing or delayed responses"
-msgstr ""
-
-#: desk/src/components/layouts/Sidebar.vue:436
+#: desk/src/components/layouts/Sidebar.vue:438
 msgid "Mobile App Installation"
 msgstr ""
 
@@ -4025,7 +4036,7 @@ msgstr ""
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:20
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:24
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:74
 msgid "Monday"
 msgstr ""
@@ -4036,6 +4047,10 @@ msgstr ""
 
 #: desk/src/components/ticket-agent/TicketDetailsTab.vue:80
 msgid "More Details"
+msgstr ""
+
+#: desk/src/components/ticket-agent/TicketHeader.vue:67
+msgid "More actions"
 msgstr ""
 
 #: helpdesk/api/dashboard_tags.py:46
@@ -4092,13 +4107,13 @@ msgstr ""
 #: desk/src/components/customer/NewCustomerDialog.vue:21
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json:22
 #: helpdesk/helpdesk/doctype/hd_customer_member/hd_customer_member.json:24
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:513
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:504
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json:22
 msgid "Name"
 msgstr ""
 
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:281
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:272
 msgid "Name Weight"
 msgstr ""
 
@@ -4210,7 +4225,7 @@ msgstr ""
 
 #. Description of the 'Default agent status' (Link) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:249
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:240
 msgid "New agents start on this status, and agents are moved here when the status they are on is disabled."
 msgstr ""
 
@@ -4232,10 +4247,6 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:50
 msgid "New users will have to be manually registered by system managers."
-msgstr ""
-
-#: desk/src/components/Questionnaire.vue:129
-msgid "Next"
 msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:108
@@ -4452,7 +4463,7 @@ msgstr ""
 msgid "No {0} yet"
 msgstr ""
 
-#: helpdesk/api/ticket.py:83 helpdesk/utils.py:189 helpdesk/utils.py:217
+#: helpdesk/api/ticket.py:83 helpdesk/utils.py:185 helpdesk/utils.py:213
 msgid "Not Allowed"
 msgstr ""
 
@@ -4469,7 +4480,7 @@ msgid "Not Set"
 msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
-#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:271
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:363
 msgid "Not Specified"
 msgstr ""
@@ -4494,13 +4505,9 @@ msgstr ""
 
 #: desk/src/components/layouts/AppSidebar.vue:230
 #: desk/src/components/layouts/AppSidebar.vue:239
-#: desk/src/components/notifications/Notifications.vue:15
+#: desk/src/components/notifications/Notifications.vue:23
 #: desk/src/pages/MobileNotifications.vue:6
 msgid "Notifications"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:127
-msgid "Notion"
 msgstr ""
 
 #: ⁨desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue⁩:144
@@ -4521,6 +4528,10 @@ msgstr ""
 msgid "On ticket status"
 msgstr ""
 
+#: desk/src/components/banners/TicketFieldPermissionBanner.vue:19
+msgid "Once a ticket is raised, customers can only close it, rate it, or edit fields marked 'Editable after creation' in HD Ticket Template."
+msgstr ""
+
 #: helpdesk/api/ticket.py:82
 msgid "Only administrators can delete tickets."
 msgstr ""
@@ -4538,7 +4549,7 @@ msgstr ""
 msgid "Only the 'color' and 'order' fields of the 'Closed' status can be modified."
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:16
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:20
 msgid "Only users with the role of "
 msgstr ""
 
@@ -4596,6 +4607,11 @@ msgstr ""
 msgid "Opening Time"
 msgstr ""
 
+#. Description of the 'Break Start' (Time) field in DocType 'HD Service Day'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:55
+msgid "Optional. The SLA clock stops between break start and break end."
+msgstr ""
+
 #. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json:47
@@ -4618,8 +4634,6 @@ msgstr ""
 msgid "Organization Dashboard"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:139 desk/src/pages/PersonaForm.vue:157
-#: desk/src/pages/PersonaForm.vue:204 desk/src/pages/PersonaForm.vue:227
 #: desk/src/pages/ticket/TicketFeedback.vue:52
 msgid "Other"
 msgstr ""
@@ -4735,11 +4749,6 @@ msgstr ""
 msgid "Period"
 msgstr ""
 
-#. Label of the persona_captured (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:174
-msgid "Persona Captured"
-msgstr ""
-
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:186
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:307
@@ -4756,10 +4765,6 @@ msgstr ""
 #: desk/src/components/contact/EditContactDialog.vue:80
 #: desk/src/components/ticket/SetContactPhoneModal.vue:25
 msgid "Phone"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:152
-msgid "Phone calls"
 msgstr ""
 
 #: desk/src/components/contact/EditContactDialog.vue:24
@@ -4814,7 +4819,7 @@ msgstr ""
 msgid "Please configure your Twilio settings correctly"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:454
+#: desk/src/components/layouts/Sidebar.vue:456
 msgid "Please create a new ticket to proceed with the next step."
 msgstr ""
 
@@ -4846,7 +4851,7 @@ msgstr ""
 msgid "Please fill all required fields for Twilio"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:244
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:218
 msgid "Please fix the errors in the form"
 msgstr ""
 
@@ -4890,7 +4895,7 @@ msgstr ""
 
 #. Label of the prefer_knowledge_base (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:10
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:241
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:232
 msgid "Prefer knowledge base"
 msgstr ""
 
@@ -4958,18 +4963,18 @@ msgstr ""
 #: desk/src/pages/SearchAgent.vue:68 desk/src/pages/SearchAgent.vue:69
 #: desk/src/pages/home/components/PendingTickets.vue:33
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json:22
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:260
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:251
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:114
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json:28
 #: helpdesk/helpdesk/web_form/tickets/tickets.json:94
 msgid "Priority"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:95
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:93
 msgid "Priority in use"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:77
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:75
 #, python-brace-format
 msgid "Priority {0} has been repeated."
 msgstr ""
@@ -5046,6 +5051,10 @@ msgstr ""
 msgid "Queued"
 msgstr ""
 
+#: desk/src/components/layouts/TrialCard.vue:71
+msgid "Raise the limit or choose a smaller plan to end your trial."
+msgstr ""
+
 #. Label of the raised_by (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:92
 msgid "Raised By (Email)"
@@ -5098,6 +5107,7 @@ msgid "Reaction"
 msgstr ""
 
 #. Label of the reactions (Table) field in DocType 'HD Ticket Comment'
+#: desk/src/components/notifications/NotificationFilters.vue:37
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json:52
 msgid "Reactions"
 msgstr ""
@@ -5145,10 +5155,6 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json:47
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json:30
 msgid "Red"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:223
-msgid "Reddit"
 msgstr ""
 
 #. Label of the reference_tab (Tab Break) field in DocType 'HD Ticket'
@@ -5202,6 +5208,11 @@ msgstr ""
 msgid "Remove Photo"
 msgstr ""
 
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:103
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:104
+msgid "Remove break"
+msgstr ""
+
 #: desk/src/components/SavedReplyActions/SavedReplyActionComment.vue:13
 msgid "Remove comment"
 msgstr ""
@@ -5248,6 +5259,10 @@ msgstr ""
 msgid "Rename team"
 msgstr ""
 
+#: desk/src/components/notifications/NotificationFilters.vue:38
+msgid "Reopened tickets"
+msgstr ""
+
 #: desk/src/components/EmailEditor.vue:446
 msgid "Replace"
 msgstr ""
@@ -5287,13 +5302,13 @@ msgstr ""
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:461
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:452
 msgid "Reply From Agent"
 msgstr ""
 
 #. Label of the reply_from_contact_section (Section Break) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:456
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:447
 msgid "Reply From Contact"
 msgstr ""
 
@@ -5305,7 +5320,7 @@ msgstr ""
 msgid "Reply from contact"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:290
+#: desk/src/components/layouts/Sidebar.vue:292
 msgid "Reply on a ticket"
 msgstr ""
 
@@ -5414,7 +5429,7 @@ msgstr ""
 msgid "Response By"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:68
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:66
 #, python-brace-format
 msgid "Response Time for {0} priority in row {1} can't be greater than Resolution Time."
 msgstr ""
@@ -5431,7 +5446,7 @@ msgid "Response is required"
 msgstr ""
 
 #. Label of the assign_within_team (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:395
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:386
 msgid "Restrict agent assignment to selected Team"
 msgstr ""
 
@@ -5441,7 +5456,7 @@ msgstr ""
 
 #. Label of the restrict_tickets_by_agent_group (Check) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:119
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:118
 msgid "Restrict tickets by Team"
 msgstr ""
 
@@ -5488,10 +5503,6 @@ msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:240
 msgid "Role updated successfully"
-msgstr ""
-
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:49
-msgid "Roles you created get level 7 only. Add level 8 in Role Permission Manager for your own agent roles."
 msgstr ""
 
 #. Label of the route_name (Data) field in DocType 'HD View'
@@ -5545,7 +5556,7 @@ msgstr ""
 msgid "SLA changed"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:33
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:31
 msgid "SLA disabled"
 msgstr ""
 
@@ -5589,14 +5600,10 @@ msgstr ""
 msgid "SLAs align your team and customers with defined timelines for a reliable experience. Learn more about SLA "
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:133
-msgid "Salesforce Service Cloud"
-msgstr ""
-
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:20
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:24
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:74
 msgid "Saturday"
 msgstr ""
@@ -5610,6 +5617,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:9
 #: desk/src/components/Settings/Preferences/Preferences.vue:16
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:22
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:143
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:25
 #: desk/src/components/Settings/Teams/NewTeam.vue:16
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:10
@@ -5630,7 +5638,7 @@ msgstr ""
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:6
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:3
-#: desk/src/components/layouts/Sidebar.vue:413
+#: desk/src/components/layouts/Sidebar.vue:415
 msgid "Saved Replies"
 msgstr ""
 
@@ -5656,10 +5664,6 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:407
 msgid "Saved reply updated successfully."
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:194
-msgid "Scaling support as we grow"
 msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:29
@@ -5688,7 +5692,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamsList.vue:26
 #: desk/src/components/layouts/AppSidebar.vue:218
 #: desk/src/pages/SearchAgent.vue:7
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:275
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:266
 msgid "Search"
 msgstr ""
 
@@ -5784,6 +5788,10 @@ msgstr ""
 msgid "See all {0} tickets"
 msgstr ""
 
+#: desk/src/components/banners/TicketFieldPermissionBanner.vue:35
+msgid "See how"
+msgstr ""
+
 #: desk/src/components/command-palette/CommandPalette.vue:150
 #: desk/src/pages/call-logs/CallLogModal.vue:28
 #: desk/src/pages/call-logs/CallLogModal.vue:57
@@ -5810,7 +5818,7 @@ msgstr ""
 msgid "Select Ticket"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:187
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:207
 msgid "Select a Default Priority."
 msgstr ""
 
@@ -5861,10 +5869,6 @@ msgstr ""
 msgid "Select tags"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:110
-msgid "Select team size"
-msgstr ""
-
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:78
 msgid "Select teams"
 msgstr ""
@@ -5879,6 +5883,10 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:132
 msgid "Select what type all tickets get by default."
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:14
+msgid "Select workday"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:41
@@ -5906,7 +5914,7 @@ msgstr ""
 
 #. Label of the send_email_feedback_on_status (Link) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:378
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:369
 msgid "Send feedback when"
 msgstr ""
 
@@ -5935,7 +5943,7 @@ msgstr ""
 msgid "Sent to the user who has raised the ticket after the ticket is closed or resolved."
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:414
+#: desk/src/components/layouts/Sidebar.vue:416
 msgid "Service Level Agreement"
 msgstr ""
 
@@ -5971,12 +5979,12 @@ msgstr ""
 msgid "Set Primary Contact"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:58
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
 #, python-brace-format
 msgid "Set Resolution Time for Priority {0} in row {1}."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:50
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:48
 #, python-brace-format
 msgid "Set Response Time for Priority {0} in row {1}."
 msgstr ""
@@ -5998,9 +6006,9 @@ msgstr ""
 msgid "Set as primary"
 msgstr ""
 
-#. Description of the 'Persona Captured' (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:170
-msgid "Set once an admin completes the onboarding persona questionnaire"
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:149
+#, python-brace-format
+msgid "Set both Break Start and Break End in row <u>{0}</u>, or neither."
 msgstr ""
 
 #: desk/src/components/AvailabilityMenu.vue:5
@@ -6010,10 +6018,6 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:258
 msgid "Set the default status assigned when a ticket is created, and the status to apply when a ticket is reopened. If not specified, the default status from HD Settings will be used."
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:237
-msgid "Set up a customer portal"
 msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:9
@@ -6028,18 +6032,18 @@ msgstr ""
 msgid "Set your team’s working days, hours, and holidays using a template or custom schedule."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:156
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:176
 #, python-brace-format
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:370
+#: desk/src/components/layouts/Sidebar.vue:372
 msgid "Setting up"
 msgstr ""
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
-#: desk/src/components/layouts/Sidebar.vue:181
-#: desk/src/components/layouts/Sidebar.vue:428
+#: desk/src/components/layouts/Sidebar.vue:195
+#: desk/src/components/layouts/Sidebar.vue:430
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json:51
 msgid "Settings"
 msgstr ""
@@ -6058,7 +6062,7 @@ msgid "Settings updated successfully."
 msgstr ""
 
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:140
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:139
 msgid "Setup"
 msgstr ""
 
@@ -6066,7 +6070,7 @@ msgstr ""
 msgid "Setup Email"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:257
+#: desk/src/components/layouts/Sidebar.vue:259
 msgid "Setup SLA"
 msgstr ""
 
@@ -6077,7 +6081,7 @@ msgstr ""
 
 #. Label of the share_feedback_section (Section Break) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:405
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:396
 msgid "Share Feedback"
 msgstr ""
 
@@ -6085,23 +6089,19 @@ msgstr ""
 msgid "Share feedback"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:136
-msgid "Shared email inbox (Gmail, Outlook, etc.)"
-msgstr ""
-
-#: desk/src/components/layouts/Sidebar.vue:176
+#: desk/src/components/layouts/Sidebar.vue:190
 msgid "Shortcuts"
 msgstr ""
 
 #. Label of the show_customer_portal_permission_notice (Check) field in DocType
 #. 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:159
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:158
 msgid "Show Customer Portal Permission Notice"
 msgstr ""
 
 #. Label of the show_ticket_field_permission_notice (Check) field in DocType
 #. 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:166
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:165
 msgid "Show Ticket Field Permission Notice"
 msgstr ""
 
@@ -6146,7 +6146,7 @@ msgid "Simple Python Expression, Example: doc.status == 'Open' and doc.ticket_ty
 msgstr ""
 
 #. Label of the skip_email_workflow (Check) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:205
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:196
 msgid "Skip e-mail workflow"
 msgstr ""
 
@@ -6154,17 +6154,14 @@ msgstr ""
 msgid "Skip email workflow"
 msgstr ""
 
-#: desk/src/components/Questionnaire.vue:138
-msgid "Skip for now"
-msgstr ""
-
 #: desk/src/components/SavedReplyActions/SavedReplyActions.vue:215
 #, python-brace-format
 msgid "Skipped {0} saved reply action(s) that are no longer valid"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:155
-msgid "Social media"
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:340
+#, python-brace-format
+msgid "Skipped {0}: outside working hours."
 msgstr ""
 
 #: ⁨desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue⁩:619
@@ -6187,8 +6184,8 @@ msgstr ""
 msgid "Some error occurred while updating holiday list"
 msgstr ""
 
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:14
-msgid "Some ticket fields are now visible to agents only"
+#: desk/src/components/banners/TicketFieldPermissionBanner.vue:5
+msgid "Some fields are now hidden from customers"
 msgstr ""
 
 #: desk/src/components/view-controls/SortBy.vue:9
@@ -6227,10 +6224,6 @@ msgstr ""
 msgid "Split and Merge"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:126
-msgid "Spreadsheets"
-msgstr ""
-
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.js:9
 msgid "Standard Form Scripts can't be modified, duplicate the script instead."
 msgstr ""
@@ -6245,13 +6238,21 @@ msgid "Start Date"
 msgstr ""
 
 #. Label of the start_time (Time) field in DocType 'HD Service Day'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:31
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:35
 msgid "Start Time"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:131
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:129
 #, python-brace-format
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:58
+msgid "Start time"
+msgstr ""
+
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:247
+msgid "Start time is required"
 msgstr ""
 
 #. Label of the status (Select) field in DocType 'HD Article'
@@ -6264,7 +6265,7 @@ msgstr ""
 #: desk/src/pages/call-logs/CallLogModal.vue:53
 #: desk/src/pages/home/components/PendingTickets.vue:30
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json:74
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:475
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:466
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:102
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:44
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:31
@@ -6273,7 +6274,7 @@ msgid "Status"
 msgstr ""
 
 #. Label of the auto_close_status (Link) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:505
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:496
 msgid "Status "
 msgstr ""
 
@@ -6309,7 +6310,7 @@ msgstr ""
 
 #. Description of the 'Ticket Reopen status' (Link) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:492
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:483
 msgid "Status of the ticket, when a customer replies on the ticket."
 msgstr ""
 
@@ -6323,7 +6324,7 @@ msgstr ""
 
 #. Description of the 'Default ticket status' (Link) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:478
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:469
 msgid "Status of the ticket, when it is created in the system."
 msgstr ""
 
@@ -6339,7 +6340,7 @@ msgid "Subject"
 msgstr ""
 
 #. Label of the subject_weight (Int) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:287
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:278
 msgid "Subject Weight"
 msgstr ""
 
@@ -6361,13 +6362,13 @@ msgstr ""
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:20
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:24
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:74
 msgid "Sunday"
 msgstr ""
 
 #: desk/src/components/layouts/MobileSidebar.vue:117
-#: desk/src/components/layouts/Sidebar.vue:161
+#: desk/src/components/layouts/Sidebar.vue:169
 msgid "Support"
 msgstr ""
 
@@ -6385,10 +6386,6 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:141
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json:73
 msgid "Support Team"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:150
-msgid "Support portal"
 msgstr ""
 
 #: desk/src/components/Settings/Preferences/components/ThemeSwitcher.vue:9
@@ -6467,7 +6464,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json:82
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:153
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json:208
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:580
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:571
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json:48
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json:43
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json:77
@@ -6525,7 +6522,7 @@ msgstr ""
 #. Label of a Link in the Helpdesk Workspace
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:345
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:214
-#: desk/src/components/layouts/Sidebar.vue:409
+#: desk/src/components/layouts/Sidebar.vue:411
 #: desk/src/pages/SearchAgent.vue:50 desk/src/pages/SearchAgent.vue:51
 #: desk/src/pages/dashboard/Dashboard.vue:55
 #: desk/src/pages/home/components/PendingTickets.vue:36
@@ -6543,7 +6540,7 @@ msgstr ""
 
 #. Label of the agent_groups_section (Section Break) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:113
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:112
 msgid "Team Restrictions"
 msgstr ""
 
@@ -6605,11 +6602,6 @@ msgstr ""
 msgid "Telephony settings updated successfully."
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:102
-msgid "Tell us about your organization"
-msgstr ""
-
-#: desk/src/components/Questionnaire.vue:194
 #: desk/src/pages/ticket/TicketFeedback.vue:56
 msgid "Tell us more"
 msgstr ""
@@ -6638,12 +6630,12 @@ msgstr ""
 msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:167
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:187
 #, python-brace-format
 msgid "The assignment condition '{0}' is invalid: {1}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:174
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:194
 #, python-brace-format
 msgid "The assignment condition json '{0}' is invalid: {1}"
 msgstr ""
@@ -6726,23 +6718,23 @@ msgstr ""
 msgid "This doctype will be deprecated in the future"
 msgstr ""
 
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:241
+msgid "This field is required"
+msgstr ""
+
 #. Description of the 'Instantly send e-mail' (Check) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:213
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:204
 msgid "This field is used to send an email instantly without adding it into the queue. If this field is checked, the email will be sent immediately after clicking the \"Send\" button, instead of being added to the email queue for later processing."
 msgstr ""
 
 #. Description of the 'Skip e-mail workflow' (Check) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:202
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:193
 msgid "This field is used to skip email-related workflows for tickets. If this field is checked, no emails will be sent related to tickets, such as new ticket creation, status updates, or notifications."
 msgstr ""
 
-#: desk/src/components/Questionnaire.vue:25
-msgid "This helps us personalize your Helpdesk experience."
-msgstr ""
-
-#: helpdesk/www/helpdesk/index.py:26
+#: helpdesk/www/helpdesk/index.py:27
 msgid "This method is only meant for developer mode"
 msgstr ""
 
@@ -6764,14 +6756,14 @@ msgstr ""
 msgid "This will reset the content to the default message."
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:170
-msgid "Through a support portal"
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:294
+msgid "This workday already exists"
 msgstr ""
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:20
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:24
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:74
 msgid "Thursday"
 msgstr ""
@@ -6782,12 +6774,12 @@ msgstr ""
 #. Title of the tickets Web Form
 #: desk/src/components/command-palette/CommandPalette.vue:27
 #: desk/src/components/command-palette/CommandPalette.vue:91
-#: desk/src/components/layouts/Sidebar.vue:407
+#: desk/src/components/layouts/Sidebar.vue:409
 #: desk/src/components/ticket/TicketMergeModal.vue:61
 #: desk/src/pages/call-logs/CallLogModal.vue:102
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json:37
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json:49
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:308
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:299
 #: helpdesk/helpdesk/web_form/tickets/tickets.json:36
 msgid "Ticket"
 msgstr ""
@@ -6831,11 +6823,11 @@ msgstr ""
 msgid "Ticket Not Found"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:416
+#: desk/src/components/layouts/Sidebar.vue:418
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:50
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:77
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:37
-#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:105
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:106
 msgid "Ticket Priority"
 msgstr ""
 
@@ -6843,14 +6835,14 @@ msgstr ""
 #. Agreement'
 #. Label of the ticket_reopen_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json:179
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:496
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:487
 msgid "Ticket Reopen status"
 msgstr ""
 
 #. Label of the ticket_routing_section (Section Break) field in DocType 'HD
 #. Settings'
 #: ⁨desk/src/components/Settings/Assignment Rules/AssigneeRules.vue⁩:18
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:555
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:546
 msgid "Ticket Routing"
 msgstr ""
 
@@ -6886,11 +6878,11 @@ msgstr ""
 #. Settings'
 #. Label of the ticket_type (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
-#: desk/src/components/layouts/Sidebar.vue:415
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:183
+#: desk/src/components/layouts/Sidebar.vue:417
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:174
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json:126
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:66
-#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:94
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:95
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json:98
 msgid "Ticket Type"
 msgstr ""
@@ -6899,7 +6891,7 @@ msgstr ""
 msgid "Ticket closed successfully."
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:207
+#: desk/src/components/ticket-agent/TicketHeader.vue:210
 msgid "Ticket deleted successfully."
 msgstr ""
 
@@ -6907,16 +6899,12 @@ msgstr ""
 msgid "Ticket does not exist."
 msgstr ""
 
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:11
-msgid "Ticket field permissions"
+#: desk/src/components/banners/TicketFieldPermissionBanner.vue:6
+msgid "Ticket fields have changed"
 msgstr ""
 
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:29
-msgid "Ticket field permissions have changed"
-msgstr ""
-
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:35
-msgid "Ticket fields now use permission levels. Customers can read fields at level 7, and only agents can read fields at level 8."
+#: desk/src/components/banners/TicketFieldPermissionBanner.vue:4
+msgid "Ticket fields update"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:103
@@ -6983,7 +6971,7 @@ msgstr ""
 msgid "Ticket-Search Analysis"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:162
+#: desk/src/components/ticket-agent/TicketHeader.vue:165
 #: desk/src/pages/SearchAgent.vue:351 desk/src/pages/contact/Contact.vue:70
 #: desk/src/pages/contact/Contact.vue:172
 #: desk/src/pages/customer/Customer.vue:65
@@ -7118,7 +7106,7 @@ msgid "Today"
 msgstr ""
 
 #: desk/src/components/layouts/MobileSidebar.vue:91
-#: desk/src/components/layouts/Sidebar.vue:128
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Toggle theme"
 msgstr ""
 
@@ -7144,7 +7132,7 @@ msgstr ""
 msgid "Total Holidays"
 msgstr ""
 
-#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:127
 msgid "Total Ticket"
 msgstr ""
 
@@ -7171,7 +7159,7 @@ msgstr ""
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:20
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:24
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:74
 msgid "Tuesday"
 msgstr ""
@@ -7230,8 +7218,13 @@ msgstr ""
 msgid "Unavailable"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:383
+#: desk/src/components/layouts/Sidebar.vue:385
 msgid "Understanding ticket view"
+msgstr ""
+
+#: helpdesk/api/banners.py:42
+#, python-brace-format
+msgid "Unknown banner {0}"
 msgstr ""
 
 #: desk/src/components/ticket-agent/timeline/TimelineCommentRow.vue:136
@@ -7240,6 +7233,10 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Unpublish"
+msgstr ""
+
+#: desk/src/components/notifications/NotificationFilters.vue:29
+msgid "Unread"
 msgstr ""
 
 #: desk/src/components/UnsavedBadge.vue:8
@@ -7255,7 +7252,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:192
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:263
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:297
-#: desk/src/components/Settings/SettingsModal.vue:72
+#: desk/src/components/Settings/SettingsModal.vue:77
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:382
 #: desk/src/components/Settings/Teams/NewTeam.vue:108
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:207
@@ -7283,7 +7280,7 @@ msgid "Update Account"
 msgstr ""
 
 #. Label of the update_status_to (Link) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:467
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:458
 msgid "Update status to"
 msgstr ""
 
@@ -7347,7 +7344,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_team_member/hd_team_member.json:17
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json:50
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:55
-#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:83
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:84
 msgid "User"
 msgstr ""
 
@@ -7394,14 +7391,6 @@ msgstr ""
 msgid "Via Customer Portal"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:171
-msgid "Via WhatsApp"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:169
-msgid "Via email"
-msgstr ""
-
 #: desk/src/components/Settings/Teams/TeamEdit.vue:244
 msgid "View Assignment rule"
 msgstr ""
@@ -7439,22 +7428,14 @@ msgstr ""
 msgid "Was this article Helpful?"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:134
-msgid "We don't use any helpdesk yet"
-msgstr ""
-
-#: desk/src/components/layouts/CustomerPortalPermissionBanner.vue:13
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:5
 msgid "We have changed how customer portal permissions work"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:154
-msgid "Web form"
 msgstr ""
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:20
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:24
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json:74
 msgid "Wednesday"
 msgstr ""
@@ -7470,54 +7451,18 @@ msgstr ""
 msgid "Weekly Off"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:245
-msgid "Welcome to Frappe Helpdesk"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:123
-msgid "What do you currently use to manage customer support?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:104
-msgid "What is your organization's name?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:206
-msgid "What makes support hard right now?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:233
-msgid "What would you like to do first in Frappe Helpdesk?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:178
-msgid "What's your biggest support challenge today?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:151
-msgid "WhatsApp"
+#: desk/src/components/banners/TicketFieldPermissionBanner.vue:10
+msgid "What changed:"
 msgstr ""
 
 #. Description of the 'Auto update status' (Check) field in DocType 'HD
 #. Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:323
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:314
 msgid "When enabled, the ticket status will automatically change to the status selected below whenever the agent responds to a ticket.\n"
 msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:71
 msgid "When more than one policy matches, the lower rank is applied first. 0 means unranked, and is applied last."
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:229
-msgid "Where did you hear about us?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:159
-msgid "Which channel do they use?"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:141
-msgid "Which tool does your team use?"
 msgstr ""
 
 #. Label of the word (Data) field in DocType 'HD Stopword'
@@ -7532,25 +7477,26 @@ msgid "Work Schedule and Holidays"
 msgstr ""
 
 #. Label of the workday (Select) field in DocType 'HD Service Day'
-#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:19
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:15
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json:23
 msgid "Workday"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:274
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:299
 msgid "Workday added successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:259
+#: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:287
 msgid "Workday updated successfully."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:141
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:140
 #, python-brace-format
 msgid "Workday {0} has been repeated."
 msgstr ""
 
 #. Label of the workflow_tab (Tab Break) field in DocType 'HD Settings'
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:198
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json:189
 msgid "Workflow"
 msgstr ""
 
@@ -7579,10 +7525,6 @@ msgstr ""
 msgid "Write your reply..."
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:222
-msgid "X (Twitter)"
-msgstr ""
-
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
 msgid "Yearly"
 msgstr ""
@@ -7606,7 +7548,7 @@ msgstr ""
 msgid "You are not allowed to view this dashboard data."
 msgstr ""
 
-#: helpdesk/utils.py:188 helpdesk/utils.py:216
+#: helpdesk/utils.py:184 helpdesk/utils.py:212
 msgid "You are not permitted to access this resource."
 msgstr ""
 
@@ -7640,7 +7582,7 @@ msgstr ""
 msgid "You cannot change {0} after the ticket is raised"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:43
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:41
 msgid "You cannot set more than one Default Priority."
 msgstr ""
 
@@ -7673,13 +7615,8 @@ msgstr ""
 msgid "You have already provided feedback for this ticket."
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:37
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:62
+#: desk/src/components/banners/SidebarBanner.vue:27
 msgid "You won't see this notice again."
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:215
-msgid "YouTube"
 msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:422
@@ -7690,12 +7627,25 @@ msgstr ""
 msgid "Your performance is"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:128
-msgid "Zendesk"
+#: desk/src/components/layouts/TrialCard.vue:70
+msgid "Your plan is over your spending limit"
 msgstr ""
 
-#: desk/src/pages/PersonaForm.vue:132
-msgid "Zoho Desk"
+#: desk/src/components/layouts/TrialCard.vue:90
+#, python-brace-format
+msgid "Your trial ends in {0} days"
+msgstr ""
+
+#: desk/src/components/layouts/TrialCard.vue:88
+msgid "Your trial ends today"
+msgstr ""
+
+#: desk/src/components/layouts/TrialCard.vue:89
+msgid "Your trial ends tomorrow"
+msgstr ""
+
+#: desk/src/components/layouts/TrialCard.vue:57
+msgid "Your trial has ended"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.py:110
@@ -7722,7 +7672,7 @@ msgstr ""
 msgid "back to email event list"
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:21
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:24
 msgid "can see every ticket of their company and manage its contacts."
 msgstr ""
 
@@ -7743,18 +7693,13 @@ msgstr ""
 msgid "days"
 msgstr ""
 
-#: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:28
-#: desk/src/components/layouts/TicketFieldPermissionBanner.vue:58
+#: desk/src/components/banners/CustomerPortalPermissionBanner.vue:30
 msgid "documentation"
 msgstr ""
 
 #: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:739
 #, python-brace-format
 msgid "due {0}"
-msgstr ""
-
-#: desk/src/pages/PersonaForm.vue:105
-msgid "e.g. Acme Inc."
 msgstr ""
 
 #: desk/src/components/ticket/TicketSplitModal.vue:7
@@ -7996,12 +7941,12 @@ msgstr ""
 msgid "{0} on {1}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:93
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:91
 #, python-brace-format
 msgid "{0} open tickets use priority {1}. They lose this SLA the next time they are updated."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:108
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:106
 #, python-brace-format
 msgid "{0} open tickets will lose this SLA the next time they are updated, unless another policy matches them."
 msgstr ""
