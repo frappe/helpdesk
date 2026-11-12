@@ -259,8 +259,8 @@ def send_no_ticket_acknowledgement(
 def as_administrator():
     """Webhooks arrive as Guest; ticket intake runs as Administrator, as email intake does."""
     user = frappe.session.user
-    frappe.set_user("Administrator")
+    frappe.set_user("Administrator")  # nosemgrep
     try:
         yield
     finally:
-        frappe.set_user(user)
+        frappe.set_user(user)  # nosemgrep

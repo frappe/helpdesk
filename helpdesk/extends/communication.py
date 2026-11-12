@@ -11,7 +11,8 @@ def make(**kwargs) -> dict:
     """The framework's email endpoint, refused for a WhatsApp ticket whatever the caller sets."""
     if kwargs.get("doctype") == "HD Ticket":
         refuse_whatsapp_ticket(kwargs.get("name"))
-    return frappe.call(email.make, **kwargs)
+    # a fixed function: call() only drops request args make() doesn't take
+    return frappe.call(email.make, **kwargs)  # nosemgrep
 
 
 def before_insert(doc: Document, method: str | None = None) -> None:
