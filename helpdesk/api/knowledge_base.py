@@ -597,7 +597,7 @@ def get_article(name: str) -> dict:
     return article
 
 
-def render_article_markdown(name: str) -> str:
+def get_article_markdown(name: str) -> str:
     """A readable article as Markdown, title as the heading. Guests only when the
     knowledge base is public."""
     article = _get_viewable_article(name, ["title", "content"])
@@ -611,7 +611,7 @@ class ArticleMarkdownPage(BaseRenderer):
 
     def render(self) -> Response:
         return Response(
-            render_article_markdown(frappe.form_dict.name),
+            get_article_markdown(frappe.form_dict.name),
             content_type="text/markdown; charset=utf-8",
         )
 
