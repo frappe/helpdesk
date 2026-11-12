@@ -12,7 +12,9 @@ from frappe.utils import (
     expand_relative_urls,
     get_user_info_for_avatar,
 )
+from frappe.website.page_renderers.base_renderer import BaseRenderer
 from frappe.website.utils import cleanup_page_name, find_first_image
+from werkzeug.wrappers import Response
 
 from helpdesk.api.article import search_accessible_articles
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
@@ -37,6 +39,8 @@ from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
 )
 from helpdesk.search import NUM_RESULTS
 from helpdesk.utils import is_agent
+
+ARTICLE_MARKDOWN_ENDPOINT = "help-article-markdown"
 
 PUBLIC_ARTICLE_FIELDS = [
     "name",
@@ -596,17 +600,32 @@ def get_article(name: str) -> dict:
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_article_markdown(name: str) -> None:
     """Download a readable article as a Markdown file, `<name>.md`.
-    Served inline, title as the heading. Takes the bare name, not the URL slug. Guests
-    only when the knowledge base is public."""
-    article = _get_viewable_article(name, ["title", "content"])
-    body = html2text(expand_relative_urls(article.content or ""), wrap=False)
+    Served inline. Takes the bare name, not the URL slug."""
     frappe.response.update(
         type="download",
         filename=f"{name}.md",
-        filecontent=f"# {article.title}\n\n{body.strip()}\n",
+        filecontent=_get_article_markdown(name),
         content_type="text/markdown",
         display_content_as="inline",
     )
+
+
+def _get_article_markdown(name: str) -> str:
+    """Title as the heading. Guests only when the knowledge base is public."""
+    article = _get_viewable_article(name, ["title", "content"])
+    body = html2text(expand_relative_urls(article.content or ""), wrap=False)
+    return f"# {article.title}\n\n{body.strip()}\n"
+
+
+class ArticleMarkdownPage(BaseRenderer):
+    def can_render(self) -> bool:
+        return self.path == ARTICLE_MARKDOWN_ENDPOINT
+
+    def render(self) -> Response:
+        return Response(
+            _get_article_markdown(frappe.form_dict.name),
+            content_type="text/markdown; charset=utf-8",
+        )
 
 
 def _get_article_name(path_name: str) -> str:

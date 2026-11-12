@@ -4,6 +4,8 @@ import frappe
 from frappe.desk.search import search_link, search_widget
 from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import change_settings
+from frappe.utils import set_request
+from frappe.website.serve import get_response
 from redis.exceptions import ResponseError
 
 from helpdesk.api.article import get_related
@@ -445,6 +447,25 @@ class TestPublicReads(IntegrationTestCase):
             self.assertRaises(
                 frappe.DoesNotExistError, get_article_markdown, self.draft
             )
+
+    def get_markdown_page(self, name: str):
+        set_request(method="GET", path=f"/help/articles/{name}.md")
+        return get_response()
+
+    def test_the_md_link_serves_the_article_as_markdown(self) -> None:
+        with self.set_user("Guest"):
+            response = self.get_markdown_page(self.published)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "text/markdown")
+        self.assertTrue(
+            response.get_data(as_text=True).startswith("# Fixture published\n")
+        )
+
+    def test_the_md_link_refuses_a_guest_on_a_private_knowledge_base(self) -> None:
+        self.enterContext(change_settings("HD Settings", public_knowledge_base=0))
+        with self.set_user("Guest"):
+            self.assertEqual(self.get_markdown_page(self.published).status_code, 403)
 
     def test_categories_carry_a_fixed_shape(self) -> None:
         category = category_row(self.category.name)
