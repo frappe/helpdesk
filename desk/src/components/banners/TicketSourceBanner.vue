@@ -55,29 +55,32 @@
           </div>
         </div>
         <hr class="mx-2" />
-        <template
-          v-for="(script, index) in scripts"
-          :key="script.doctype + script.name"
-        >
-          <a
-            class="grid items-start gap-6 rounded-4 p-2 hover:bg-surface-sidebar"
-            :style="{ gridTemplateColumns }"
-            :href="deskLink(script)"
-            target="_blank"
-            rel="noopener"
+        <!-- 10 rows of 49px before it scrolls -->
+        <div class="max-h-[490px] overflow-y-auto">
+          <template
+            v-for="(script, index) in scripts"
+            :key="script.doctype + script.name"
           >
-            <div class="ms-2 flex min-h-8 min-w-0 items-center break-words">
-              {{ __(script.doctype) }}
-            </div>
-            <div class="ms-2 flex min-h-8 min-w-0 items-center break-words">
-              {{ script.name }}
-            </div>
-            <div class="flex min-h-8 items-center justify-end">
-              <LucideExternalLink class="size-4 text-ink-gray-7" />
-            </div>
-          </a>
-          <hr v-if="index !== scripts.length - 1" class="mx-2" />
-        </template>
+            <a
+              class="grid items-start gap-6 rounded-4 p-2 hover:bg-surface-sidebar"
+              :style="{ gridTemplateColumns }"
+              :href="deskLink(script)"
+              target="_blank"
+              rel="noopener"
+            >
+              <div class="ms-2 flex min-h-8 min-w-0 items-center break-words">
+                {{ __(script.doctype) }}
+              </div>
+              <div class="ms-2 flex min-h-8 min-w-0 items-center break-words">
+                {{ script.name }}
+              </div>
+              <div class="flex min-h-8 items-center justify-end">
+                <LucideExternalLink class="size-4 text-ink-gray-7" />
+              </div>
+            </a>
+            <hr v-if="index !== scripts.length - 1" class="mx-2" />
+          </template>
+        </div>
       </div>
       <p>{{ __("In each one, change the old field to Source:") }}</p>
       <dl
