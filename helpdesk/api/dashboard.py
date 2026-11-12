@@ -591,14 +591,11 @@ def get_ticket_channel_chart_data(
     """
     result = frappe.get_all(
         HD_TICKET,
-        fields=["via_customer_portal as channel ", COUNT_NAME],
+        fields=["source as channel", COUNT_NAME],
         filters=filters,
-        group_by="via_customer_portal",
-        order_by="via_customer_portal desc",
+        group_by="source",
+        order_by=COUNT_DESC,
     )
-
-    for row in result:
-        row.channel = "Portal" if row.channel == 1 else "Email"
 
     return get_pie_chart_config(
         result,

@@ -12,11 +12,13 @@ test.describe("field permission notice", () => {
     restoreSettings = await snapshotSettings(api, [
       NOTICE,
       "show_customer_portal_permission_notice",
+      "show_ticket_source_notice",
     ]);
-    // the customer portal notice has its own Learn more button
+    // the other notices have their own Learn more buttons
     await api.update("HD Settings", "HD Settings", {
       [NOTICE]: 1,
       show_customer_portal_permission_notice: 0,
+      show_ticket_source_notice: 0,
     });
   });
 

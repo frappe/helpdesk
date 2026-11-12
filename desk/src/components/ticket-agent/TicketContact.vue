@@ -29,9 +29,7 @@
           #{{ ticket.doc.name }}
         </p>
         <div class="flex items-center">
-          <span>{{
-            ticket.doc.via_customer_portal ? __("via Portal") : __("via Email")
-          }}</span>
+          <span>{{ __("via {0}", [__(ticket.doc.source || "Email")]) }}</span>
         </div>
       </div>
     </div>

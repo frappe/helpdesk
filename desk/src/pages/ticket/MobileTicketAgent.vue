@@ -152,11 +152,7 @@
                     {{ __("Source") }}
                   </div>
                   <div>
-                    {{
-                      ticket.doc?.via_customer_portal
-                        ? __("Portal")
-                        : __("Mail")
-                    }}
+                    {{ __(ticket.doc?.source || "Email") }}
                   </div>
                 </div>
                 <!-- Ticket Fields -->

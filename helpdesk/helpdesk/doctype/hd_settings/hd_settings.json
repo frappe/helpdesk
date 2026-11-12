@@ -75,6 +75,7 @@
   "initial_helpdesk_name_setup_skipped",
   "show_customer_portal_permission_notice",
   "show_ticket_field_permission_notice",
+  "show_ticket_source_notice",
   "column_break_hjfh",
   "search_tab",
   "name_weight",
@@ -179,6 +180,13 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "Show Ticket Field Permission Notice"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_ticket_source_notice",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Show Ticket Source Notice"
   },
   {
    "fieldname": "column_break_hjfh",
@@ -641,7 +649,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-02 15:54:13.209685",
+ "modified": "2026-11-09 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

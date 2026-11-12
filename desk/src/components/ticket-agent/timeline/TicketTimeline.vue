@@ -335,7 +335,7 @@ function withTagNamesBold(activity: LogActivity): LogActivity {
 function withEmailFixups(activity: EmailActivity): EmailActivity {
   const data = { ...activity.data };
   // portal tickets have no real delivery pipeline; hide the badge
-  if (ticket.value?.doc?.via_customer_portal) delete data.deliveryStatus;
+  if (ticket.value?.doc?.source === "Portal") delete data.deliveryStatus;
   data.content = plainTextToHtml(data.content);
   return { ...activity, data };
 }

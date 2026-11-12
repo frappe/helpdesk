@@ -314,7 +314,7 @@ class TestCommentTrustBoundary(CoreCommentsTestCase):
         create_user(cls.SYSTEM_MANAGER).add_roles("System Manager")
 
     def test_customer_cannot_read_agent_comments(self):
-        ticket = make_ticket(raised_by=CUSTOMER, via_customer_portal=True)
+        ticket = make_ticket(raised_by=CUSTOMER, source="Portal")
         comment = self.make_comment(ticket, "internal note")
 
         frappe.set_user(CUSTOMER)

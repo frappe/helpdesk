@@ -101,13 +101,14 @@
   },
   {
    "allow_read_on_all_link_options": 0,
-   "default": "1",
-   "fieldname": "via_customer_portal",
-   "fieldtype": "Check",
+   "default": "Portal",
+   "fieldname": "source",
+   "fieldtype": "Select",
    "hidden": 1,
-   "label": "Via Customer Portal",
+   "label": "Source",
    "max_length": 0,
    "max_value": 0,
+   "options": "Email\nPortal",
    "read_only": 1,
    "reqd": 0,
    "show_in_filter": 0
