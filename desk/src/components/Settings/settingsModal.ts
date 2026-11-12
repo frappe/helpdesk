@@ -25,7 +25,7 @@ import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNext
 import TelephonyPage from "./Telephony/TelephonyPage.vue";
 import WhatsApp from "./WhatsApp/WhatsApp.vue";
 import { isWhatsAppInstalled } from "@/components/whatsapp/conversationTab";
-import LucideMessageCircle from "~icons/lucide/message-circle";
+import WhatsAppIcon from "@/components/whatsapp/WhatsAppIcon.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
 import SavedReplies from "./SavedReplies/SavedReplies.vue";
@@ -188,7 +188,7 @@ export const tabs = computed(() => {
         },
         {
           label: __("WhatsApp"),
-          icon: markRaw(LucideMessageCircle),
+          icon: markRaw(WhatsAppIcon),
           component: markRaw(WhatsApp),
           condition: () => auth.isAdmin && isWhatsAppInstalled(),
         },

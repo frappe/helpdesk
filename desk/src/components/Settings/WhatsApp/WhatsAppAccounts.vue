@@ -148,7 +148,7 @@
             <div
               class="grid size-10 place-items-center rounded-full bg-surface-gray-2 text-ink-gray-6"
             >
-              <span class="lucide-message-circle size-5" aria-hidden="true" />
+              <WhatsAppIcon class="size-5" aria-hidden="true" />
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-base-medium text-ink-gray-8">
@@ -187,6 +187,7 @@
 
 <script setup lang="ts">
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import WhatsAppIcon from "@/components/whatsapp/WhatsAppIcon.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
 import { copyToClipboard } from "@helpdesk/shared/utils";
