@@ -4,6 +4,8 @@ import frappe
 from frappe.desk.search import search_link, search_widget
 from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import change_settings
+from frappe.utils import set_request
+from frappe.website.serve import get_response
 from redis.exceptions import ResponseError
 
 from helpdesk.api.article import get_related
@@ -116,6 +118,7 @@ class TestPublicReads(IntegrationTestCase):
             get_articles,
             get_featured_articles,
             get_article,
+            get_article_markdown,
             get_categories,
             get_kb_sidebar,
             get_subcategory_articles,
@@ -430,8 +433,11 @@ class TestPublicReads(IntegrationTestCase):
             "Fixture markdown",
             content='<h2>Setup</h2><p>Open <b>Settings</b></p><img src="/files/a.png">',
         )
-        markdown = get_article_markdown(name)
+        get_article_markdown(name)
 
+        self.assertEqual(frappe.response.content_type, "text/markdown")
+        self.assertEqual(frappe.response.display_content_as, "inline")
+        markdown = frappe.response.filecontent
         self.assertTrue(markdown.startswith("# Fixture markdown\n\n## Setup\n"))
         self.assertIn("Open **Settings**", markdown)
         self.assertIn(f"]({frappe.utils.get_url()}/files/a.png)", markdown)
@@ -441,6 +447,25 @@ class TestPublicReads(IntegrationTestCase):
             self.assertRaises(
                 frappe.DoesNotExistError, get_article_markdown, self.draft
             )
+
+    def get_markdown_page(self, name: str):
+        set_request(method="GET", path=f"/help/articles/{name}.md")
+        return get_response()
+
+    def test_the_md_link_serves_the_article_as_markdown(self) -> None:
+        with self.set_user("Guest"):
+            response = self.get_markdown_page(self.published)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "text/markdown")
+        self.assertTrue(
+            response.get_data(as_text=True).startswith("# Fixture published\n")
+        )
+
+    def test_the_md_link_refuses_a_guest_on_a_private_knowledge_base(self) -> None:
+        self.enterContext(change_settings("HD Settings", public_knowledge_base=0))
+        with self.set_user("Guest"):
+            self.assertEqual(self.get_markdown_page(self.published).status_code, 403)
 
     def test_categories_carry_a_fixed_shape(self) -> None:
         category = category_row(self.category.name)

@@ -597,9 +597,21 @@ def get_article(name: str) -> dict:
     return article
 
 
-def get_article_markdown(name: str) -> str:
-    """A readable article as Markdown, title as the heading. Guests only when the
-    knowledge base is public."""
+@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+def get_article_markdown(name: str) -> None:
+    """Download a readable article as a Markdown file, `<name>.md`.
+    Served inline. Takes the bare name, not the URL slug."""
+    frappe.response.update(
+        type="download",
+        filename=f"{name}.md",
+        filecontent=_get_article_markdown(name),
+        content_type="text/markdown",
+        display_content_as="inline",
+    )
+
+
+def _get_article_markdown(name: str) -> str:
+    """Title as the heading. Guests only when the knowledge base is public."""
     article = _get_viewable_article(name, ["title", "content"])
     body = html2text(expand_relative_urls(article.content or ""), wrap=False)
     return f"# {article.title}\n\n{body.strip()}\n"
@@ -611,7 +623,7 @@ class ArticleMarkdownPage(BaseRenderer):
 
     def render(self) -> Response:
         return Response(
-            get_article_markdown(frappe.form_dict.name),
+            _get_article_markdown(frappe.form_dict.name),
             content_type="text/markdown; charset=utf-8",
         )
 
