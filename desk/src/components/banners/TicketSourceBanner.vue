@@ -122,6 +122,7 @@
 
 <script setup lang="ts">
 import { type BannerScript, useBanners } from "@/composables/useBanners";
+import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { getGridTemplateColumnsForTable } from "@/utils";
 import { copyToClipboard } from "@helpdesk/shared/utils";
@@ -162,6 +163,7 @@ function deskLink(script: BannerScript): string {
 }
 
 function copyFixPrompt() {
+  capture("source_fix_prompt");
   copyToClipboard(fixPrompt(window.location.origin), __("Fix prompt copied"));
 }
 
