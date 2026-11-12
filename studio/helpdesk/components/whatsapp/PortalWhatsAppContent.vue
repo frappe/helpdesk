@@ -127,7 +127,9 @@ const mediaUrl = computed(() =>
 const fileName = computed(
   () =>
     props.message.file_name ||
-    (mediaUrl.value ? mediaUrl.value.split("/").pop() : props.message.media_url) ||
+    (mediaUrl.value
+      ? mediaUrl.value.split("/").pop()
+      : props.message.media_url) ||
     __("Document")
 );
 

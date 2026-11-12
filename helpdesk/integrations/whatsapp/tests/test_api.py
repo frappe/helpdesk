@@ -175,9 +175,7 @@ class TestWhatsAppAgentAPI(IntegrationTestCase):
         )
         self.assertEqual(linked, ("HD Ticket", self.ticket))
         self.assertFalse(
-            frappe.db.get_value(
-                "File", {"file_url": someone_elses}, "attached_to_name"
-            )
+            frappe.db.get_value("File", {"file_url": someone_elses}, "attached_to_name")
         )
 
     def test_only_this_numbers_templates_are_offered_and_sent(self) -> None:

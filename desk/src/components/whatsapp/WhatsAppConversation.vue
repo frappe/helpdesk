@@ -17,12 +17,17 @@
         :react-label="__('React')"
         :failed-message-label="__('Failed to send message')"
         :empty-label="__('No WhatsApp messages yet')"
-        :empty-description="__('Messages to and from this contact show up here.')"
+        :empty-description="
+          __('Messages to and from this contact show up here.')
+        "
         :error-label="__('Could not load the WhatsApp conversation')"
         :today-label="__('Today')"
         :yesterday-label="__('Yesterday')"
         @reply="emit('reply', $event)"
-        @react="({ messageName, emoji }) => whatsapp.messages.react(messageName, emoji)"
+        @react="
+          ({ messageName, emoji }) =>
+            whatsapp.messages.react(messageName, emoji)
+        "
       />
       <div
         v-if="whatsapp.messages.error && !whatsapp.messages.messages.length"
