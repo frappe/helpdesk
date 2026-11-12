@@ -150,6 +150,7 @@ def make_notification(name: str) -> dict:
         document_type="HD Ticket",
         event="New",
         channel="System Notification",
+        recipients=[{"receiver_by_role": "System Manager"}],
         condition="doc.via_customer_portal",
         enabled=0,
     ).insert(set_name=name)
