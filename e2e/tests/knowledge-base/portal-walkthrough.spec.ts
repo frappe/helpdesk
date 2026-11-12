@@ -804,8 +804,13 @@ test.describe("article page, public knowledge base", () => {
     const popup = context.waitForEvent("page");
     await page.getByRole("menuitem", { name: "Open in Claude" }).click();
     const claude = await popup;
-    expect(decodeURIComponent(claude.url())).toContain(`get_article_markdown?name=${article.name}`);
+    expect(decodeURIComponent(claude.url())).toContain(`/help/articles/${article.name}.md`);
     await claude.close();
+    // The link answers with Markdown itself, no redirect.
+    const markdown = await page.request.get(`/help/articles/${article.name}.md`, { maxRedirects: 0 });
+    expect(markdown.status()).toBe(200);
+    expect(markdown.headers()["content-type"]).toContain("text/markdown");
+    expect(await markdown.text()).toContain(`# ${article.title}`);
   });
 });
 

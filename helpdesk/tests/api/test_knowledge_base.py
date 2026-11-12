@@ -16,7 +16,6 @@ from helpdesk.api.knowledge_base import (
     delete_articles,
     delete_category,
     get_article,
-    get_article_markdown,
     get_articles,
     get_categories,
     get_category_access,
@@ -32,6 +31,7 @@ from helpdesk.api.knowledge_base import (
     increment_views,
     merge_category,
     move_to_category,
+    render_article_markdown,
     search_articles,
     search_categories,
     set_category_visibility,
@@ -116,7 +116,6 @@ class TestPublicReads(IntegrationTestCase):
             get_articles,
             get_featured_articles,
             get_article,
-            get_article_markdown,
             get_categories,
             get_kb_sidebar,
             get_subcategory_articles,
@@ -135,7 +134,7 @@ class TestPublicReads(IntegrationTestCase):
                 (get_categories, ()),
                 (get_subcategory_articles, (self.category.name,)),
                 (get_article, (self.published,)),
-                (get_article_markdown, (self.published,)),
+                (render_article_markdown, (self.published,)),
                 (increment_views, (self.published,)),
             ):
                 with self.subTest(endpoint=endpoint.__name__):
@@ -431,11 +430,8 @@ class TestPublicReads(IntegrationTestCase):
             "Fixture markdown",
             content='<h2>Setup</h2><p>Open <b>Settings</b></p><img src="/files/a.png">',
         )
-        get_article_markdown(name)
+        markdown = render_article_markdown(name)
 
-        self.assertEqual(frappe.response.content_type, "text/markdown")
-        self.assertEqual(frappe.response.display_content_as, "inline")
-        markdown = frappe.response.filecontent
         self.assertTrue(markdown.startswith("# Fixture markdown\n\n## Setup\n"))
         self.assertIn("Open **Settings**", markdown)
         self.assertIn(f"]({frappe.utils.get_url()}/files/a.png)", markdown)
@@ -443,7 +439,7 @@ class TestPublicReads(IntegrationTestCase):
     def test_a_guest_cannot_read_a_draft_as_markdown(self) -> None:
         with self.set_user("Guest"):
             self.assertRaises(
-                frappe.DoesNotExistError, get_article_markdown, self.draft
+                frappe.DoesNotExistError, render_article_markdown, self.draft
             )
 
     def test_categories_carry_a_fixed_shape(self) -> None:
