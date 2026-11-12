@@ -42,7 +42,7 @@
       </Button>
     </template>
     <template #default="{ close }">
-      <div class="w-[352px] p-1">
+      <div class="w-[352px] px-1 pb-1 pt-2">
         <AvailabilityPanel @close="close" />
       </div>
     </template>
