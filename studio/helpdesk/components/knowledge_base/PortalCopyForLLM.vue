@@ -57,9 +57,7 @@ import { useClipboard } from "@vueuse/core";
 import { Button, Dropdown, toast } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import { copyPageLink } from "@helpdesk/shared/utils";
-
-const MARKDOWN_METHOD =
-  "/api/method/helpdesk.api.knowledge_base.get_article_markdown";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
 
 const props = withDefaults(
   defineProps<{
@@ -78,9 +76,9 @@ const markdown = ref("");
 let request: Promise<void> | null = null;
 const markdownUrl = computed(
   () =>
-    `${window.location.origin}${MARKDOWN_METHOD}?name=${encodeURIComponent(
-      props.name
-    )}`
+    `${window.location.origin}${ROUTES.appRoot}${ROUTES.article({
+      name: props.name,
+    })}.md`
 );
 
 watch(
@@ -117,7 +115,7 @@ async function copyMarkdown() {
 }
 
 function openInAssistant(baseUrl: string) {
-  const prompt = __("Read {0} so I can ask questions about it.", [
+  const prompt = __("Read from {0} so I can ask questions about it.", [
     markdownUrl.value,
   ]);
   window.open(`${baseUrl}${encodeURIComponent(prompt)}`, "_blank", "noopener");
