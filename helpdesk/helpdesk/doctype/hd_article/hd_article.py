@@ -15,7 +15,7 @@ from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     index_articles,
     validate_keeps_content,
 )
-from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import has_customer_role
 from helpdesk.utils import capture_event, is_agent
 
 PUBLIC = "Public"
@@ -219,7 +219,7 @@ def make_article_filters(user: str | None = None, **extra) -> dict:
 
 def get_readable_visibilities(user: str) -> list[str]:
     """Other apps' signed-in users lack a customer role: Public only."""
-    if set(CUSTOMER_ROLES) & set(frappe.get_roles(user)):
+    if has_customer_role(user):
         return [PUBLIC, CUSTOMERS]
     return [PUBLIC]
 
