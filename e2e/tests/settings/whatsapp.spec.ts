@@ -214,6 +214,11 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       const row = dialog.getByTestId("whatsapp-template").filter({ hasText: label });
       await expect(row.getByText("Pending", { exact: true })).toBeVisible();
       await expect(row).toContainText(account);
+      const search = dialog.getByPlaceholder("Search template");
+      await search.fill("no-such-template");
+      await expect(dialog.getByText("No templates match your search")).toBeVisible();
+      await search.fill(tag);
+      await expect(row).toBeVisible();
       await shoot(page, "wa-settings-templates");
       await page.route("**/*.get_active_accounts", (route) => route.fulfill({ json: { message: accounts.map((name) => ({ name })) } }));
       await dialog.getByRole("button", { name: "Sync" }).click();

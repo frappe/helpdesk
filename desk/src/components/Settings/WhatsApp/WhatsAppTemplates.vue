@@ -2,7 +2,7 @@
   <section class="flex flex-col gap-3">
     <div class="flex items-center gap-2">
       <TextInput
-        v-if="templates.data?.length > 10"
+        v-if="templates.data?.length"
         v-model="search"
         class="min-w-0 flex-1"
         :placeholder="__('Search template')"
