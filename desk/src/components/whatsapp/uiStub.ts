@@ -53,15 +53,36 @@ export function useTemplates() {
 }
 
 export function useAccount() {
-  return reactive({ doc: {}, isNew: true, isDirty: false, saving: false, save: nothing, reload: nothing });
+  return reactive({
+    doc: {},
+    isNew: true,
+    isDirty: false,
+    saving: false,
+    save: nothing,
+    reload: nothing,
+  });
 }
 
 export function useTemplate() {
-  return reactive({ doc: {}, isNew: true, isDirty: false, saving: false, save: nothing, reload: nothing });
+  return reactive({
+    doc: {},
+    isNew: true,
+    isDirty: false,
+    saving: false,
+    save: nothing,
+    reload: nothing,
+  });
 }
 
 export type MessagesController = ReturnType<typeof useMessages>;
 export type TemplatesController = ReturnType<typeof useTemplates>;
-export type WhatsAppMessage = { name: string; direction: "Incoming" | "Outgoing" };
+export type WhatsAppMessage = {
+  name: string;
+  direction: "Incoming" | "Outgoing";
+};
 export type WhatsAppTemplate = Record<string, any> & { name: string };
 export type ReactPayload = { messageName: string; emoji: string };
+
+export function serverErrorMessage(_error?: unknown) {
+  return "";
+}

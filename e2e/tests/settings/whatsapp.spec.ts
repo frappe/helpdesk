@@ -2,6 +2,7 @@ import type { Locator, Page } from "@playwright/test";
 import { expectDenied, type Api } from "../../helpers/api";
 import { expect, skipGettingStarted, test, uid, usePersona } from "../../helpers/fixtures";
 import { openSettings } from "../../helpers/settings";
+import { FakeMeta, makeWhatsAppAccount } from "../../helpers/whatsapp";
 
 const WEBHOOK_PATH = "/api/method/whatsapp.whatsapp.webhook.handler";
 const SCREENS = process.env.FACTORY_SCREENS;
@@ -13,13 +14,23 @@ async function shoot(page: Page, name: string) {
   const device = (page.viewportSize()?.width ?? 1440) <= PHONE.width ? "phone" : "desktop";
   for (const theme of ["light", "dark"]) {
     await page.evaluate((value) => document.documentElement.setAttribute("data-theme", value), theme);
-    await page.screenshot({ path: `${SCREENS}/${name}-${device}-${theme}.png`, animations: "disabled" });
+    await page.screenshot({
+      path: `${SCREENS}/${name}-${device}-${theme}.png`,
+      animations: "disabled",
+    });
   }
   await page.evaluate(() => document.documentElement.setAttribute("data-theme", "light"));
 }
 
+const meta = new FakeMeta();
+let metaUrl: string;
+
 usePersona("admin");
 
+test.beforeAll(async () => {
+  metaUrl = await meta.start();
+});
+test.afterAll(() => meta.stop());
 test.beforeEach(({ page }) => skipGettingStarted(page, "Administrator"));
 
 for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
@@ -33,7 +44,8 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       restoreSettings = await snapshotSettings(api);
       tag = uid();
       accounts = [await makeAccount(api, `E2E Support ${tag}`)];
-      await showOnlyAccounts(page, tag);
+      await showOnly(page, "WA Account", tag);
+      await showOnly(page, "WA Template", tag, "template_label");
     });
 
     test.afterEach(async ({ api }) => {
@@ -44,16 +56,20 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
     test("an admin creates, edits and defaults an account and copies the webhook URL", async ({ page, api }) => {
       await page.goto("/helpdesk/tickets");
       const dialog = await openSettings(page, "WhatsApp");
+      await openTab(dialog, "Advanced");
       await expect(dialog.getByTestId("whatsapp-webhook-url")).toHaveValue(new RegExp(`${WEBHOOK_PATH.replaceAll(".", "\\.")}$`));
       await dialog.getByRole("button", { name: "Copy webhook URL" }).click();
       await expect(page.getByText("Copied to clipboard.")).toBeVisible();
+      await openTab(dialog, "Accounts");
       await expect(accountRow(dialog, accounts[0]).getByText("Active", { exact: true })).toBeVisible();
-      await expect(page.getByText("Copied to clipboard.")).toBeHidden({ timeout: 15000 });
+      await expect(page.getByText("Copied to clipboard.")).toBeHidden({
+        timeout: 15000,
+      });
       await shoot(page, "wa-settings-list");
 
       const created = `E2E Sales ${tag}`;
-      await dialog.getByRole("button", { name: "New", exact: true }).click();
-      await expect(dialog.getByRole("button", { name: "New account" })).toBeVisible();
+      await dialog.getByRole("button", { name: "New account" }).click();
+      await expect(dialog.getByLabel("Account name")).toBeVisible();
       await dialog.getByLabel("Account name").fill(created);
       await dialog.getByLabel("Phone ID").fill(`${Date.now()}`);
       await dialog.getByLabel("Access token").fill("e2e-token");
@@ -72,7 +88,9 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await row.getByRole("button", { name: created }).click();
       await expect(dialog.getByLabel("Account name")).toHaveValue(created);
       await dialog.getByLabel("Phone ID").fill("15550100199");
-      await expect(page.getByText("Default account updated")).toBeHidden({ timeout: 15000 });
+      await expect(page.getByText("Default account updated")).toBeHidden({
+        timeout: 15000,
+      });
       await expect(dialog.getByRole("button", { name: "Save", exact: true })).toBeVisible();
       await shoot(page, "wa-settings-edit");
       await dialog.getByRole("button", { name: "Save", exact: true }).click();
@@ -82,31 +100,36 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await expect(accountRow(dialog, created)).toContainText("Phone ID: 15550100199");
     });
 
-    test("the verify token survives setting a default and saves to WA Settings", async ({ page, api }) => {
+    test("a new default account survives saving the verify token", async ({ page, api }) => {
       const other = await makeAccount(api, `E2E Billing ${tag}`);
       accounts.push(other);
       await page.goto("/helpdesk/tickets");
       const dialog = await openSettings(page, "WhatsApp");
-      const token = `verify-${tag}`;
-      await dialog.getByLabel("Verify token").fill(token);
+      await openTab(dialog, "Accounts");
       await accountRow(dialog, other).getByRole("button", { name: "Account actions" }).click();
       await page.getByRole("menuitem", { name: "Set as default" }).click();
       await expect(accountRow(dialog, other).getByText("Default", { exact: true })).toBeVisible();
-      await expect(dialog.getByLabel("Verify token")).toHaveValue(token);
+      await openTab(dialog, "Advanced");
+      const token = `verify-${tag}`;
+      await dialog.getByLabel("Verify token").fill(token);
       await dialog.getByRole("button", { name: "Save", exact: true }).click();
       await expect(page.getByText("Webhook settings saved")).toBeVisible();
       await expect(dialog.getByRole("button", { name: "Save", exact: true })).toHaveCount(0);
-      expect((await api.get("WA Settings", "WA Settings")).webhook_verify_token).toBe(token);
+      const settings = await api.get("WA Settings", "WA Settings");
+      expect(settings.webhook_verify_token).toBe(token);
+      expect(settings.default_account).toBe(other);
     });
 
     test("unsaved edits ask before they are dropped", async ({ page, api }) => {
       await page.goto("/helpdesk/tickets");
       const dialog = await openSettings(page, "WhatsApp");
+      await openTab(dialog, "Advanced");
       await dialog.getByLabel("Verify token").fill(`draft-${tag}`);
-      await accountRow(dialog, accounts[0]).getByRole("button", { name: accounts[0] }).click();
+      await openTab(dialog, "Accounts");
       const confirm = page.getByRole("dialog", { name: "Unsaved changes" });
       await expect(confirm).toBeVisible();
       await confirm.getByRole("button", { name: "Confirm" }).click();
+      await accountRow(dialog, accounts[0]).getByRole("button", { name: accounts[0] }).click();
 
       const phoneId = (await api.get("WA Account", accounts[0])).phone_id;
       await dialog.getByLabel("Phone ID").fill("15550100777");
@@ -118,6 +141,7 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await dialog.getByRole("button", { name: accounts[0] }).click();
       await confirm.getByRole("button", { name: "Confirm" }).click();
       await expect(accountRow(dialog, accounts[0])).toContainText(`Phone ID: ${phoneId}`);
+      await openTab(dialog, "Advanced");
       await expect(dialog.getByLabel("Verify token")).not.toHaveValue(`draft-${tag}`);
     });
 
@@ -126,21 +150,28 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
         if (!route.request().url().includes("WA+Settings") && !route.request().url().includes("WA%20Settings")) return route.fallback();
         const response = await route.fetch();
         const body = await response.json();
-        await route.fulfill({ response, json: { ...body, message: { ...body.message, webhook_secret: "" } } });
+        await route.fulfill({
+          response,
+          json: { ...body, message: { ...body.message, webhook_secret: "" } },
+        });
       });
       await page.route("**/api/method/frappe.client.get_list", (route) =>
         route.request().postDataJSON()?.doctype === "WA Account" ? route.fulfill({ status: 500, json: {} }) : route.fallback()
       );
       await page.goto("/helpdesk/tickets");
       const dialog = await openSettings(page, "WhatsApp");
+      await openTab(dialog, "Advanced");
       await expect(dialog.getByTestId("whatsapp-secret-warning")).toBeVisible();
+      await openTab(dialog, "Accounts");
       const listError = dialog.getByTestId("whatsapp-accounts-error");
       await expect(listError).toBeVisible();
-      await expect(dialog.getByRole("button", { name: "New", exact: true })).toBeVisible();
-      await expect(page.getByText("Internal Server Error")).toBeHidden({ timeout: 15000 });
+      await expect(dialog.getByRole("button", { name: "New account" })).toBeVisible();
+      await expect(page.getByText("Internal Server Error")).toBeHidden({
+        timeout: 15000,
+      });
       await shoot(page, "wa-settings-accounts-error");
       await page.unroute("**/api/method/frappe.client.get_list");
-      await showOnlyAccounts(page, tag);
+      await showOnly(page, "WA Account", tag);
       await listError.getByRole("button", { name: "Retry" }).click();
       const row = accountRow(dialog, accounts[0]);
       await expect(row).toBeVisible();
@@ -160,17 +191,54 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await expect(dialog.getByRole("button", { name: "Save", exact: true })).toHaveCount(0);
     });
 
-    test("with no accounts the page offers to create one", async ({ page }) => {
-      await page.unroute("**/api/method/frappe.client.get_list");
-      await showOnlyAccounts(page, `none-${uid()}`);
+    test("an admin creates, previews, syncs and opens a template", async ({ page, api }) => {
+      const account = await makeWhatsAppAccount(api, metaUrl);
+      accounts.push(account);
+      await api.update("WA Settings", "WA Settings", {
+        default_account: account,
+      });
       await page.goto("/helpdesk/tickets");
       const dialog = await openSettings(page, "WhatsApp");
+      await expect(dialog.getByTestId("whatsapp-templates-empty")).toBeVisible();
+
+      const label = `E2E Order shipped ${tag}`;
+      await dialog.getByRole("button", { name: "New template" }).click();
+      await dialog.getByLabel("Template label").fill(label);
+      await dialog.locator("[contenteditable=true]").first().fill("Your order is on its way.");
+      await shoot(page, "wa-settings-template-create");
+      await dialog.getByRole("button", { name: "Preview" }).click();
+      await expect(dialog.getByText("Your order is on its way.")).toBeVisible();
+      await dialog.getByRole("button", { name: "Create", exact: true }).click();
+      await expect(page.getByText("Template created and sent to Meta for review")).toBeVisible();
+
+      const row = dialog.getByTestId("whatsapp-template").filter({ hasText: label });
+      await expect(row.getByText("Pending", { exact: true })).toBeVisible();
+      await expect(row).toContainText(account);
+      await shoot(page, "wa-settings-templates");
+      await page.route("**/*.get_active_accounts", (route) => route.fulfill({ json: { message: accounts.map((name) => ({ name })) } }));
+      await dialog.getByRole("button", { name: "Sync" }).click();
+      await expect(page.getByText(/\d+ new, \d+ updated/)).toBeVisible();
+      // the spec's own account has no access token, which skips it but not the rest
+      await expect(page.getByText(`Could not sync ${accounts[0]}`)).toBeVisible();
+
+      await row.getByRole("button", { name: label }).click();
+      await expect(dialog.getByLabel("Template label")).toHaveValue(label);
+      await dialog.getByRole("button", { name: label }).click();
+      await expect(row).toBeVisible();
+    });
+
+    test("with no accounts or templates both tabs show an empty state", async ({ page }) => {
+      await page.unroute("**/api/method/frappe.client.get_list");
+      await showOnly(page, "WA Account", `none-${uid()}`);
+      await showOnly(page, "WA Template", `none-${uid()}`, "template_label");
+      await page.goto("/helpdesk/tickets");
+      const dialog = await openSettings(page, "WhatsApp");
+      await expect(dialog.getByTestId("whatsapp-templates-empty")).toContainText("No WhatsApp templates yet");
+      await openTab(dialog, "Accounts");
       const empty = dialog.getByTestId("whatsapp-empty-state");
       await expect(empty).toContainText("No WhatsApp accounts yet");
-      await expect(dialog.getByRole("button", { name: "New", exact: true })).toHaveCount(0);
-      await empty.scrollIntoViewIfNeeded();
       await shoot(page, "wa-settings-empty");
-      await empty.getByRole("button", { name: "Create account" }).click();
+      await dialog.getByRole("button", { name: "New account" }).click();
       await expect(dialog.getByLabel("Account name")).toBeVisible();
       await dialog.getByRole("button", { name: "New account" }).click();
       await expect(empty).toBeVisible();
@@ -186,9 +254,18 @@ test.describe("as an agent manager", () => {
     const dialog = await openSettings(page, "Preferences");
     await expect(dialog.getByRole("button", { name: "WhatsApp", exact: true })).toHaveCount(0);
     const manager = await apiAs("manager");
-    await expectDenied(manager.raw("frappe.client.insert", { doc: { doctype: "WA Account", account_name: `E2E ${uid()}` } }));
     await expectDenied(
-      manager.raw("frappe.client.set_value", { doctype: "WA Settings", name: "WA Settings", fieldname: "webhook_verify_token", value: "x" })
+      manager.raw("frappe.client.insert", {
+        doc: { doctype: "WA Account", account_name: `E2E ${uid()}` },
+      })
+    );
+    await expectDenied(
+      manager.raw("frappe.client.set_value", {
+        doctype: "WA Settings",
+        name: "WA Settings",
+        fieldname: "webhook_verify_token",
+        value: "x",
+      })
     );
   });
 });
@@ -197,17 +274,27 @@ function accountRow(dialog: Locator, name: string) {
   return dialog.getByTestId("whatsapp-account").filter({ hasText: name });
 }
 
-/** Ask only for accounts named with `tag`, so the hundreds other suites leave never page this spec's rows out. */
-async function showOnlyAccounts(page: Page, tag: string) {
+function openTab(dialog: Locator, name: "Templates" | "Accounts" | "Advanced") {
+  return dialog.getByRole("tab", { name }).click();
+}
+
+/** Ask only for `doctype` rows whose `field` holds `tag`, so the hundreds other suites leave never page this spec's rows out. */
+async function showOnly(page: Page, doctype: string, tag: string, field = "name") {
   await page.route("**/api/method/frappe.client.get_list", (route) => {
     const body = route.request().postDataJSON();
-    if (body?.doctype !== "WA Account") return route.fallback();
-    route.fallback({ postData: { ...body, filters: { name: ["like", `%${tag}%`] } } });
+    if (body?.doctype !== doctype) return route.fallback();
+    route.fallback({
+      postData: { ...body, filters: { [field]: ["like", `%${tag}%`] } },
+    });
   });
 }
 
 async function makeAccount(api: Api, accountName: string) {
-  const doc = await api.insert("WA Account", { account_name: accountName, phone_id: `${Date.now()}`, status: "Active" });
+  const doc = await api.insert("WA Account", {
+    account_name: accountName,
+    phone_id: `${Date.now()}`,
+    status: "Active",
+  });
   return doc.name as string;
 }
 
@@ -217,6 +304,7 @@ async function snapshotSettings(api: Api) {
   const saved = {
     default_account: settings.default_account ?? "",
     webhook_verify_token: settings.webhook_verify_token ?? "",
+    whatsapp_api_url: settings.whatsapp_api_url ?? "",
   };
   return async () => {
     await api.update("WA Settings", "WA Settings", saved);
