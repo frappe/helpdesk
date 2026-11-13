@@ -210,6 +210,8 @@ test("each notification saves its content and switch, and share feedback its sta
       await dialog.getByRole("switch", { name: "Enabled" }).click();
       await dialog.getByRole("button", { name: "Save", exact: true }).click();
       await expect.poll(() => setting(api, notification.content)).toBe(content);
+      // The DB can update before the client clears its unsaved flag; going back early opens the unsaved-changes confirm.
+      await expect(dialog.getByRole("button", { name: "Save", exact: true })).toBeDisabled();
       expect(await setting(api, notification.enabled)).toBe(before[notification.enabled] ? 0 : 1);
       await dialog.getByRole("button", { name: notification.label, exact: true }).click();
     }
