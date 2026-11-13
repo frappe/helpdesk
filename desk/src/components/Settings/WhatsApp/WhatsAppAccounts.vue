@@ -1,5 +1,20 @@
 <template>
   <section class="flex flex-col gap-2">
+    <Alert
+      v-if="ticketAppenders.length"
+      theme="amber"
+      :title="
+        __('Remove the append action to HD Ticket from {0}', [
+          ticketAppenders.join(', '),
+        ])
+      "
+      :description="
+        __(
+          'Helpdesk files WhatsApp messages on tickets itself. That action moves a new message onto the closed ticket, so its new ticket opens empty.'
+        )
+      "
+      data-testid="whatsapp-ticket-append-warning"
+    />
     <div
       v-if="!accounts.data && !accounts.list.error"
       class="flex items-center justify-center py-10 text-ink-gray-5"
@@ -93,6 +108,7 @@ import {
   LoadingIndicator,
   toast,
 } from "frappe-ui";
+import { computed } from "vue";
 
 interface Account {
   name: string;
@@ -111,6 +127,20 @@ const accounts = createListResource({
   pageLength: 99,
   auto: true,
 });
+
+// Saving refuses these rows now, but accounts set up earlier still carry them
+const appenders = createListResource({
+  doctype: "WA Account",
+  fields: ["account_name"],
+  filters: [["WA Account Append", "append_to", "=", "HD Ticket"]],
+  pageLength: 99,
+  auto: true,
+});
+const ticketAppenders = computed<string[]>(() => [
+  ...new Set<string>(
+    (appenders.data ?? []).map((row: Account) => row.account_name)
+  ),
+]);
 
 function open(name: string) {
   emit("open", name);

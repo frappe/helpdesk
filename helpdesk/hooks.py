@@ -177,6 +177,9 @@ doc_events = {
     "WA Log": {
         "after_insert": "helpdesk.integrations.whatsapp.incoming.after_status_log",
     },
+    "WA Account": {
+        "validate": "helpdesk.integrations.whatsapp.account.validate",
+    },
     "HD Ticket": {
         "on_trash": "helpdesk.integrations.whatsapp.incoming.delete_thread",
     },

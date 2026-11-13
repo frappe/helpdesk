@@ -232,6 +232,29 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await expect(row).toBeVisible();
     });
 
+    test("an account that still appends to HD Ticket is flagged on the Accounts tab", async ({ page }) => {
+      await page.goto("/helpdesk/tickets");
+      const dialog = await openSettings(page, "WhatsApp");
+      await openTab(dialog, "Accounts");
+      await expect(accountRow(dialog, accounts[0])).toBeVisible();
+      const warning = dialog.getByTestId("whatsapp-ticket-append-warning");
+      await expect(warning).toHaveCount(0);
+
+      // saving refuses the row now, so only an account set up before this release can hold one
+      await page.route("**/api/method/frappe.client.get_list", (route) =>
+        JSON.stringify(route.request().postDataJSON()?.filters ?? []).includes("WA Account Append")
+          ? route.fulfill({ json: { message: [{ account_name: accounts[0] }, { account_name: accounts[0] }] } })
+          : route.fallback()
+      );
+      await openTab(dialog, "Templates");
+      await openTab(dialog, "Accounts");
+      await expect(warning).toContainText(`Remove the append action to HD Ticket from ${accounts[0]}`);
+      await expect(warning).toContainText("Helpdesk files WhatsApp messages on tickets itself.");
+      // one account with two such rows is named once
+      await expect(warning).not.toContainText(`${accounts[0]}, ${accounts[0]}`);
+      await shoot(page, "wa-settings-ticket-append-warning");
+    });
+
     test("with no accounts or templates both tabs show an empty state", async ({ page }) => {
       await page.unroute("**/api/method/frappe.client.get_list");
       await showOnly(page, "WA Account", `none-${uid()}`);
@@ -288,9 +311,11 @@ async function showOnly(page: Page, doctype: string, tag: string, field = "name"
   await page.route("**/api/method/frappe.client.get_list", (route) => {
     const body = route.request().postDataJSON();
     if (body?.doctype !== doctype) return route.fallback();
-    route.fallback({
-      postData: { ...body, filters: { [field]: ["like", `%${tag}%`] } },
-    });
+    const only = [doctype, field, "like", `%${tag}%`];
+    const filters = Array.isArray(body.filters)
+      ? [...body.filters, only]
+      : [...Object.entries(body.filters ?? {}).map(([key, value]) => [doctype, key, "=", value]), only];
+    route.fallback({ postData: { ...body, filters } });
   });
 }
 
