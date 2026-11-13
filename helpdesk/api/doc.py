@@ -4,7 +4,6 @@ from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
 from frappe.query_builder.functions import Date
-from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
 from helpdesk.utils import (
@@ -251,8 +250,6 @@ def get_filterable_fields(
     ignore_team_restrictions: bool = False,
 ):
     check_permissions(doctype, None)
-    QBDocField = frappe.qb.DocType("DocField")
-    QBCustomField = frappe.qb.DocType("Custom Field")
     allowed_fieldtypes = [
         "Check",
         "Data",
@@ -282,58 +279,33 @@ def get_filterable_fields(
         "customer",
     ]
 
-    from_doc_fields = (
-        frappe.qb.from_(QBDocField)
-        .select(
-            QBDocField.fieldname,
-            QBDocField.fieldtype,
-            QBDocField.label,
-            QBDocField.options,
-        )
-        .where(QBDocField.parent == doctype)
-        .where(QBDocField.hidden == False)
-        .where(Criterion.any([QBDocField.fieldtype == i for i in allowed_fieldtypes]))
-    )
-
-    from_custom_fields = (
-        frappe.qb.from_(QBCustomField)
-        .select(
-            QBCustomField.fieldname,
-            QBCustomField.fieldtype,
-            QBCustomField.label,
-            QBCustomField.options,
-        )
-        .where(QBCustomField.dt == doctype)
-        .where(QBCustomField.hidden == False)
-        .where(
-            Criterion.any([QBCustomField.fieldtype == i for i in allowed_fieldtypes])
-        )
-    )
-
-    # for customer portal show only fields present in customer_portal_fields
+    # meta, not the DocField table, so options and labels from Property Setters show up
+    fields = [
+        field
+        for field in frappe.get_meta(doctype).fields
+        if not field.hidden and field.fieldtype in allowed_fieldtypes
+    ]
     if show_customer_portal_fields:
-        from_doc_fields = from_doc_fields.where(
-            QBDocField.fieldname.isin(customer_portal_fields)
-        )
-        if len(visible_custom_fields) > 0:
-            from_custom_fields = from_custom_fields.where(
-                QBCustomField.fieldname.isin(visible_custom_fields)
+        fields = [
+            field
+            for field in fields
+            if field.fieldname
+            in (
+                visible_custom_fields
+                if field.get("is_custom_field")
+                else customer_portal_fields
             )
-            from_custom_fields = from_custom_fields.run(as_dict=True)
-        else:
-            from_custom_fields = []
+        ]
 
-    if not show_customer_portal_fields:
-        from_custom_fields = from_custom_fields.run(as_dict=True)
-
-    from_doc_fields = from_doc_fields.run(as_dict=True)
-    # from hd ticket template get children with fieldname and hidden_from_customer
-
-    res = []
-    res.extend(from_doc_fields)
-    # TODO: Ritvik => till a better way we have for custom fields, just show custom fields
-
-    res.extend(from_custom_fields)
+    res = [
+        {
+            "fieldname": field.fieldname,
+            "fieldtype": field.fieldtype,
+            "label": field.label,
+            "options": field.options,
+        }
+        for field in fields
+    ]
     if not show_customer_portal_fields and doctype == "HD Ticket":
         res.append(
             {
