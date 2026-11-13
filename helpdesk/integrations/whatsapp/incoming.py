@@ -52,7 +52,7 @@ def after_insert(doc: Document, method: str | None = None) -> None:
 
 def after_status_log(log: Document, method: str | None = None) -> None:
     """Ping the portal when a sent message turns Failed, the one status change it shows."""
-    # ponytail: the app's status update only writes a WA Log; hook WA Message once it runs a doc event
+    # the app's status update only writes a WA Log; hook WA Message once it runs a doc event
     if log.event_type != "Webhook" or log.reference_doctype != "WA Message":
         return
     message = frappe.db.get_value(

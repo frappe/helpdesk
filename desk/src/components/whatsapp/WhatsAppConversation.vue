@@ -77,7 +77,7 @@ onMounted(scrollToLatest);
 </script>
 
 <style scoped>
-/* ponytail: reaches into @whatsapp/ui's bubble markup; drop once the package reveals actions on touch itself */
+/* reaches into @whatsapp/ui's bubble markup; drop once the package reveals actions on touch itself */
 @media (hover: none) {
   :deep([data-direction] > div > .opacity-0) {
     opacity: 1;
