@@ -70,7 +70,7 @@ test.describe("routing", () => {
       const category = await createCategory(api);
       const article = await createArticle(api, category.name);
       await page.goto("/help");
-      await expect(page.getByRole("heading", { name: "Here's what might help" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: /^How can .+ help you\?$/ })).toBeVisible();
       await expect(page.getByRole("button", { name: "Log in" })).toBeVisible();
       await page.goto("/help/categories");
       await expect(page.getByRole("heading", { name: "All categories" })).toBeVisible();
@@ -109,7 +109,7 @@ test.describe("routing", () => {
     test("R6 /help and /help/ open the knowledge base home", async ({ page }) => {
       for (const path of ["/help", "/help/"]) {
         await page.goto(path);
-        await expect(page.getByRole("heading", { name: "Here's what might help" })).toBeVisible();
+        await expect(page.getByRole("heading", { name: /^How can .+ help you\?$/ })).toBeVisible();
       }
     });
 
@@ -393,7 +393,7 @@ test.describe("knowledge base home", () => {
   test("K1 the hero shows the title and the banner preset", async ({ page, kb }) => {
     await kb({ banner_preset: "Blue" });
     await page.goto("/help");
-    const title = page.getByRole("heading", { name: "Here's what might help", level: 1 });
+    const title = page.getByRole("heading", { name: /^How can .+ help you\?$/, level: 1 });
     await expect(title).toBeVisible();
     await expect(page.getByText("Explore answers to frequently asked questions")).toBeVisible();
     const background = await page.evaluate(() =>
