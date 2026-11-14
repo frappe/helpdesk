@@ -255,6 +255,21 @@ def send_no_ticket_acknowledgement(
     )
 
 
+def send_new_ticket_acknowledgement(
+    to: str, account: str, closed_ticket: str, new_ticket: str
+) -> None:
+    """Tell the customer, on the closed ticket, which ticket now carries their request."""
+    send_system_message(
+        to,
+        account,
+        reference_doctype="HD Ticket",
+        reference_docname=closed_ticket,
+        message=_(
+            "A new ticket #{0} has been created. We will reply to you shortly."
+        ).format(new_ticket),
+    )
+
+
 @contextmanager
 def as_administrator():
     """Webhooks arrive as Guest; ticket intake runs as Administrator, as email intake does."""

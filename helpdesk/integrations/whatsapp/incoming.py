@@ -12,6 +12,7 @@ from helpdesk.integrations.whatsapp.outgoing import (
     NO_TICKET_BUTTON,
     as_administrator,
     send_closed_ticket_prompt,
+    send_new_ticket_acknowledgement,
     send_no_ticket_acknowledgement,
 )
 from helpdesk.integrations.whatsapp.setup import WHATSAPP_SOURCE, is_whatsapp_installed
@@ -95,7 +96,8 @@ class IncomingMessage:
         if answer:
             return self.answer_prompt(answer, ticket)
         if not ticket:
-            return self.open_ticket([])
+            self.open_ticket([])
+            return
         if ticket.status != "Closed":
             return self.add_to(ticket)
         if not self.is_prompt_pending(ticket.name):
@@ -165,10 +167,15 @@ class IncomingMessage:
             return self.add_to(ticket)
         if answer == NEW_TICKET_BUTTON:
             held = self.get_held_messages(ticket.name) if ticket else []
-            self.open_ticket(held, answered=True)
+            new_ticket = self.open_ticket(held, answered=True)
+            if not ticket:
+                return
             # the answer stays beside its prompt; the held messages carry the sender to the new ticket
-            if ticket and held:
+            if held:
                 self.link(ticket.name)
+            send_new_ticket_acknowledgement(
+                self.profile, self.account, ticket.name, new_ticket
+            )
             return
         if ticket:
             self.link(ticket.name)
@@ -244,7 +251,7 @@ class IncomingMessage:
             order_by="creation desc",
         )
 
-    def open_ticket(self, held: list[dict], answered: bool = False) -> None:
+    def open_ticket(self, held: list[dict], answered: bool = False) -> str:
         # a button answer is not part of the customer's problem
         messages = held if answered else [*held, self.message]
         texts = [m.message for m in messages if m.message and not m.media_id]
@@ -265,6 +272,7 @@ class IncomingMessage:
         ticket.insert(ignore_permissions=True)
         link_messages([message.name for message in held], ticket.name)
         self.link(ticket.name)
+        return ticket.name
 
     def get_subject(self, texts: list[str], contact: str) -> str:
         if texts:

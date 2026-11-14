@@ -105,7 +105,13 @@ for (const viewport of [
 
       expect(await api.get("HD Ticket", ticket)).toMatchObject({ source: "WhatsApp", subject: held });
       expect((await api.get("HD Ticket", closed)).status).toBe("Closed");
-      await seeConversation(page, closed, "is closed. Do you want to raise a new one?", "Create new ticket");
+      await seeConversation(
+        page,
+        closed,
+        "is closed. Do you want to raise a new one?",
+        "Create new ticket",
+        `A new ticket #${ticket} has been created.`,
+      );
       await shoot(page, "closed-prompt");
       await seeConversation(page, ticket, held);
       await expect(bubble(page, "Create new ticket")).toHaveCount(0);

@@ -250,6 +250,13 @@ class TestWhatsAppIncoming(IncomingTestCase):
         for message in held:
             message.reload()
             self.assertEqual(message.reference_docname, ticket.name)
+        # the closed ticket names the new one, after the answer, so agents know where to follow up
+        notice = frappe.get_last_doc(
+            "WA Message", {"direction": "Outgoing", "to": self.profile()}
+        )
+        self.assertEqual(notice.reference_docname, closed)
+        self.assertIn(f"#{ticket.name}", notice.message)
+        self.assertGreater(notice.creation, answer.creation)
         self.assertEqual(self.ticket_of(self.receive("Thanks")), ticket.name)
         # a second press on the same prompt only follows up on the new ticket
         self.assertEqual(self.ticket_of(self.press(NEW_TICKET_BUTTON)), ticket.name)
