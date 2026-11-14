@@ -45,10 +45,14 @@ class Customer {
 const bubble = (page: Page, text: string) =>
   page.getByTestId("whatsapp-thread").getByText(text).first();
 
-async function shoot(page: Page, scenario: string, dark = false) {
+// one shot per theme, so every scenario lands in the UI matrix
+async function shoot(page: Page, scenario: string) {
   const device = (page.viewportSize()?.width ?? 1440) < 640 ? "phone" : "desktop";
-  if (dark) await page.evaluate(() => document.documentElement.setAttribute("data-theme", "dark"));
-  await page.screenshot({ path: join(SCREENS, `inbound-${scenario}-${device}${dark ? "-dark" : ""}.png`) });
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate((value) => document.documentElement.setAttribute("data-theme", value), theme);
+    await page.screenshot({ path: join(SCREENS, `inbound-${scenario}-${device}-${theme}.png`) });
+  }
+  await page.evaluate(() => document.documentElement.setAttribute("data-theme", "light"));
 }
 
 async function seeConversation(page: Page, ticket: string, ...texts: string[]) {
@@ -94,7 +98,6 @@ for (const viewport of [
       await expect(page.getByText(subject).first()).toBeVisible();
       await seeConversation(page, first.reference_docname, subject, "It was due on Monday");
       await shoot(page, "new-ticket");
-      if (viewport.width > 640) await shoot(page, "new-ticket", true);
     });
 
     test("a closed ticket asks first, then a new ticket takes the held message", async ({ page, api }) => {

@@ -211,9 +211,11 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       const dialog = await openSettings(page, "WhatsApp");
       await listRequested;
       await expect(dialog.getByRole("button", { name: "Sync" })).toHaveCount(0);
+      await shoot(page, "wa-settings-templates-loading");
       release();
       await expect(dialog.getByTestId("whatsapp-templates-empty")).toBeVisible();
       await expect(dialog.getByRole("button", { name: "Sync" })).toBeVisible();
+      await shoot(page, "wa-settings-templates-empty");
 
       const label = `E2E Order shipped ${tag}`;
       await dialog.getByRole("button", { name: "New template" }).click();

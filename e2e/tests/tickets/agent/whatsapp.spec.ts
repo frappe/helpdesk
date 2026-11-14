@@ -264,6 +264,8 @@ test("an agent quotes a message, replies and reacts", async ({ page, api }) => {
     .poll(async () => (await outgoing(api, ticket)).filter((row) => row.reaction))
     .toEqual([expect.objectContaining({ reaction: "👍", context_message_id: first.message_id })]);
   await shoot(page, "reaction");
+  await messageAction(page, bubble(page, "insured"), "React");
+  await shoot(page, "reaction-picker-selected");
 });
 
 test("an agent sends an image with a caption, and it shows in the thread", async ({ page, api }) => {
