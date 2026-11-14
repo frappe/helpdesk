@@ -5,7 +5,7 @@
     >
       <div class="flex gap-1.5 items-center">
         <Button
-          v-if="!whatsapp || whatsapp.enabled"
+          v-if="!whatsapp || whatsapp.canReply"
           ref="sendEmailRef"
           variant="ghost"
           label="Reply"
@@ -153,8 +153,8 @@ const emailBoxRef = ref(null);
 const commentBoxRef = ref(null);
 
 function toggleEmailBox() {
-  // a WhatsApp ticket has nothing to reply with without the whatsapp app
-  if (props.whatsapp && !props.whatsapp.enabled) return;
+  // nothing to reply with without the whatsapp app, nor once the customer moved to a new ticket
+  if (props.whatsapp && !props.whatsapp.canReply) return;
   if (showCommentBox.value) {
     showCommentBox.value = false;
   }

@@ -14,6 +14,8 @@ export interface Conversation {
   business_number: string | null;
   /** WA Template names the customer's Business Number may send */
   templates: string[];
+  /** the newer ticket the customer moved to after this one closed; agents answer there */
+  follow_up_ticket: string | null;
 }
 
 interface TicketLike {
@@ -57,6 +59,9 @@ export function useTicketWhatsApp(
     conversation: computed(() => conversation.data as Conversation | undefined),
     windowOpen,
     enabled: computed(enabled),
+    canReply: computed(
+      () => enabled() && !conversation.data?.follow_up_ticket
+    ),
     ticketName: computed(ticketName),
     contactName: computed(() => toValue(ticket)?.contact || ""),
   });

@@ -6,6 +6,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.auth import authenticate
+from helpdesk.integrations.whatsapp.api import get_conversation
 from helpdesk.integrations.whatsapp.outgoing import NEW_TICKET_BUTTON, NO_TICKET_BUTTON
 from helpdesk.integrations.whatsapp.setup import setup_whatsapp
 from helpdesk.integrations.whatsapp.test_utils import (
@@ -257,6 +258,9 @@ class TestWhatsAppIncoming(IncomingTestCase):
         self.assertEqual(notice.reference_docname, closed)
         self.assertIn(f"#{ticket.name}", notice.message)
         self.assertGreater(notice.creation, answer.creation)
+        # agents answer on the new ticket, so the closed one stops offering Reply
+        self.assertEqual(get_conversation(closed)["follow_up_ticket"], ticket.name)
+        self.assertIsNone(get_conversation(ticket.name)["follow_up_ticket"])
         self.assertEqual(self.ticket_of(self.receive("Thanks")), ticket.name)
         # a second press on the same prompt only follows up on the new ticket
         self.assertEqual(self.ticket_of(self.press(NEW_TICKET_BUTTON)), ticket.name)

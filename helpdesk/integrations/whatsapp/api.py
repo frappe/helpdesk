@@ -6,6 +6,7 @@ from frappe.utils import now_datetime
 from helpdesk.api.saved_replies import get_rendered_saved_reply
 from helpdesk.integrations.whatsapp.business_number import get_business_number
 from helpdesk.integrations.whatsapp.formatting import html_to_whatsapp
+from helpdesk.integrations.whatsapp.incoming import get_latest_ticket
 from helpdesk.integrations.whatsapp.outgoing import (
     get_last_incoming,
     get_reply_window_closes_at,
@@ -47,6 +48,7 @@ def get_conversation(ticket: str) -> dict:
             "reply_window_closes_at": None,
             "business_number": None,
             "templates": [],
+            "follow_up_ticket": None,
         }
     last_incoming = get_last_incoming(ticket)
     sender = last_incoming or {}
@@ -58,7 +60,16 @@ def get_conversation(ticket: str) -> dict:
         "reply_window_closes_at": closes_at,
         "business_number": get_business_number(last_incoming),
         "templates": get_sendable_template_names(sender.get("whatsapp_account")),
+        "follow_up_ticket": get_follow_up_ticket(ticket, sender.get("to")),
     }
+
+
+def get_follow_up_ticket(ticket: str, profile: str | None) -> str | None:
+    """The newer ticket a customer moved to after this one closed, where agents should answer instead."""
+    if not profile or frappe.db.get_value("HD Ticket", ticket, "status") != "Closed":
+        return None
+    latest = get_latest_ticket(profile)
+    return latest if latest != ticket else None
 
 
 @frappe.whitelist()

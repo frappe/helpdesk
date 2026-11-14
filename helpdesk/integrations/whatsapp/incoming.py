@@ -115,28 +115,10 @@ class IncomingMessage:
         )
 
     def get_last_ticket(self) -> Document | None:
-        """The newest ticket this sender wrote on, since a Create new ticket answer stays on the closed one."""
-        Message = frappe.qb.DocType("WA Message")
-        Ticket = frappe.qb.DocType("HD Ticket")
-        names = (
-            frappe.qb.from_(Message)
-            .join(Ticket)
-            .on(Ticket.name == Message.reference_docname)
-            .select(Message.reference_docname)
-            .where(
-                (Message.to == self.profile)
-                & (Message.direction == "Incoming")
-                & Message.reaction.isnull()
-                & (Message.reference_doctype == "HD Ticket")
-            )
-            .orderby(Ticket.creation, order=Order.desc)
-            .limit(1)
-            .for_update()
-            .run(pluck=True)
-        )
-        if not names:
+        name = get_latest_ticket(self.profile, for_update=True)
+        if not name:
             return None
-        ticket = frappe.get_doc("HD Ticket", names[0], for_update=True)
+        ticket = frappe.get_doc("HD Ticket", name, for_update=True)
         if not ticket.is_merged:
             return ticket
         target = ticket.get_merge_target()
@@ -313,6 +295,28 @@ class IncomingMessage:
     def link(self, ticket: str) -> None:
         self.message.reference_doctype = "HD Ticket"
         self.message.reference_docname = ticket
+
+
+def get_latest_ticket(profile: str, for_update: bool = False) -> str | None:
+    """The newest ticket this sender wrote on, since a Create new ticket answer stays on the closed one."""
+    Message = frappe.qb.DocType("WA Message")
+    Ticket = frappe.qb.DocType("HD Ticket")
+    query = (
+        frappe.qb.from_(Message)
+        .join(Ticket)
+        .on(Ticket.name == Message.reference_docname)
+        .select(Message.reference_docname)
+        .where(
+            (Message.to == profile)
+            & (Message.direction == "Incoming")
+            & Message.reaction.isnull()
+            & (Message.reference_doctype == "HD Ticket")
+        )
+        .orderby(Ticket.creation, order=Order.desc)
+        .limit(1)
+    )
+    names = (query.for_update() if for_update else query).run(pluck=True)
+    return names[0] if names else None
 
 
 def is_prompt(message: str) -> bool:

@@ -9,6 +9,7 @@
         :messages="whatsapp.messages.messages"
         :loading="whatsapp.messages.loading"
         :error="whatsapp.messages.error"
+        :can-reply="whatsapp.canReply"
         :sender-name="whatsapp.contactName || __('Contact')"
         :you-label="__('You')"
         :reacted-by-label="__('Reacted by')"

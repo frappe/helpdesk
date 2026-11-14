@@ -113,6 +113,8 @@ for (const viewport of [
         `A new ticket #${ticket} has been created.`,
       );
       await shoot(page, "closed-prompt");
+      // agents answer on the new ticket, so neither the bar nor a bubble offers Reply here
+      await expect(page.getByRole("button", { name: "Reply", exact: true })).toHaveCount(0);
       const notice = page.getByTestId("whatsapp-thread").getByRole("listitem").filter({ hasText: "A new ticket" });
       await notice.hover();
       await shoot(page, "new-ticket-link");
@@ -120,6 +122,7 @@ for (const viewport of [
       await expect(page).toHaveURL(new RegExp(`/tickets/${ticket}`));
       await seeConversation(page, ticket, held);
       await expect(bubble(page, "Create new ticket")).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Reply", exact: true }).first()).toBeVisible();
       await shoot(page, "held-message-ticket");
     });
   });
