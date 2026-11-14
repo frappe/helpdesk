@@ -113,6 +113,11 @@ for (const viewport of [
         `A new ticket #${ticket} has been created.`,
       );
       await shoot(page, "closed-prompt");
+      const notice = page.getByTestId("whatsapp-thread").getByRole("listitem").filter({ hasText: "A new ticket" });
+      await notice.hover();
+      await shoot(page, "new-ticket-link");
+      await notice.getByRole("link", { name: `Open ticket #${ticket}` }).click();
+      await expect(page).toHaveURL(new RegExp(`/tickets/${ticket}`));
       await seeConversation(page, ticket, held);
       await expect(bubble(page, "Create new ticket")).toHaveCount(0);
       await shoot(page, "held-message-ticket");

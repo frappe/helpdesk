@@ -28,7 +28,25 @@
           ({ messageName, emoji }) =>
             whatsapp.messages.react(messageName, emoji)
         "
-      />
+      >
+        <template #actions="{ message }">
+          <Button
+            v-if="mentionedTicket(message)"
+            variant="ghost"
+            size="xs"
+            :tooltip="__('Open ticket #{0}', [mentionedTicket(message)])"
+            :aria-label="__('Open ticket #{0}', [mentionedTicket(message)])"
+            :route="{
+              name: 'TicketAgent',
+              params: { ticketId: mentionedTicket(message) },
+            }"
+          >
+            <template #icon>
+              <LucideArrowUpRight class="size-4 text-ink-gray-7" />
+            </template>
+          </Button>
+        </template>
+      </MessageList>
       <div
         v-if="whatsapp.messages.error && !whatsapp.messages.messages.length"
         class="mt-3 flex justify-center"
@@ -44,6 +62,7 @@ import { __ } from "@/translation";
 import { useResizeObserver } from "@vueuse/core";
 import { MessageList, type WhatsAppMessage } from "@whatsapp/ui";
 import { Button } from "frappe-ui";
+import LucideArrowUpRight from "~icons/lucide/arrow-up-right";
 import { nextTick, onMounted, useTemplateRef, watch } from "vue";
 import type { TicketWhatsApp } from "./useTicketWhatsApp";
 
@@ -63,6 +82,13 @@ function keepPinned() {
   const gap = element.scrollHeight - element.scrollTop - previousHeight;
   if (!previousHeight || gap < 8) element.scrollTop = element.scrollHeight;
   previousHeight = element.clientHeight;
+}
+
+// our own messages naming another ticket, like the new-ticket notice on a closed one
+function mentionedTicket(message: WhatsAppMessage): string | undefined {
+  if (message.direction !== "Outgoing") return;
+  const ticket = message.message?.match(/#(\d+)/)?.[1];
+  return ticket && ticket !== props.whatsapp.ticketName ? ticket : undefined;
 }
 
 function scrollToLatest() {
