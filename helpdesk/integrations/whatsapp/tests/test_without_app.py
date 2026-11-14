@@ -186,6 +186,7 @@ class TestWithoutWhatsApp(IntegrationTestCase):
                     "reply_window_closes_at": None,
                     "business_number": None,
                     "templates": [],
+                    "follow_up_ticket": None,
                 },
             )
         self.assertTrue(get_conversation(ticket)["installed"])
