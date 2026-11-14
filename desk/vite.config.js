@@ -1,6 +1,7 @@
 import frameworkUI from "@framework/ui/vite";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
+import { existsSync } from "node:fs";
 import path from "path";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
@@ -8,6 +9,12 @@ import {
   getLocalFrappeUIDevConfig,
   importFrappeUIPlugin,
 } from "./vite-helpers";
+
+// the whatsapp app is a soft dependency: without it on the bench, @whatsapp/ui is an inert stub
+const whatsappUI = path.resolve(__dirname, "../../whatsapp/ui/src");
+const whatsappUIPath = existsSync(whatsappUI)
+  ? whatsappUI
+  : path.resolve(__dirname, "src/components/whatsapp/uiStub.ts");
 
 export default defineConfig(async ({ mode }) => {
   const { useLocalFrappeUI, localFrappeUIAliases } = getLocalFrappeUIDevConfig({
@@ -103,6 +110,12 @@ export default defineConfig(async ({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "src"),
         "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
+        "@whatsapp/ui": whatsappUIPath,
+        // @whatsapp/ui imports @framework/ui source paths its exports map leaves out
+        "@framework/ui/components": path.resolve(
+          __dirname,
+          "node_modules/@framework/ui/src/components"
+        ),
         // @framework/ui still imports the `frappe-ui/editor-style.css` subpath,
         // dropped in frappe-ui 1.0.0-beta.63 (the editor entrypoint pulls its
         // own stylesheet now). Point it at the real file until frappe drops it.
@@ -158,7 +171,12 @@ export default defineConfig(async ({ mode }) => {
         "lowlight",
         "interactjs",
       ],
-      exclude: ["frappe-ui", "@framework/ui", "@helpdesk/shared"],
+      exclude: [
+        "frappe-ui",
+        "@framework/ui",
+        "@helpdesk/shared",
+        "@whatsapp/ui",
+      ],
     },
   };
   return config;

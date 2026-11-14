@@ -3,7 +3,7 @@ import { call, useFileUpload } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty, runAction, uploadableFileTypes } from '@helpdesk/shared/utils'
 
-export function useReplyComposer(ticket, { ticketId, isClosed, isAgent }) {
+export function useReplyComposer(ticket, { ticketId, canReply, isAgent }) {
   const isComposerOpen = ref(false)
   const reply = ref('')
 
@@ -22,8 +22,6 @@ export function useReplyComposer(ticket, { ticketId, isClosed, isAgent }) {
   const isSending = ref(false)
   // Composer overlays the thread; its height is kept clear below.
   const composerReserve = ref(0)
-
-  const canReply = computed(() => !isClosed.value)
 
   function uploadFile(file: File) {
     return useFileUpload().upload(file, {

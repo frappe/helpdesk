@@ -19,6 +19,8 @@ export function useActiveTabManager(tabs) {
   const firstTab = () => tabs.value?.[0]?.value;
 
   const changeTabTo = (tab) => {
+    // Tabs mounted empty picks its first tab; the URL hash decides instead
+    if (!activeTab.value) return setActiveTab();
     activeTab.value = tab;
     if (tab === firstTab()) {
       router.replace({ path: route.path, query: route.query });
@@ -45,8 +47,8 @@ export function useActiveTabManager(tabs) {
       return;
     }
 
+    // keep the hash: it may name a tab that appears later, like WhatsApp once the ticket loads
     activeTab.value = firstTab();
-    router.replace({ path: route.path, query: route.query });
   };
 
   // Handle when page is navigated

@@ -19,11 +19,13 @@ class IntegrationTestERPNextHDSettings(FrappeTestCase):
     Use this class for testing interactions between multiple components.
     """
 
-    @patch("frappe.get_installed_apps", return_value=["frappe", "helpdesk", "erpnext"])
-    def test_validate_with_erpnext_installed(self, mock_get_installed_apps):
+    def test_validate_with_erpnext_installed(self):
+        # keep the real apps so their wildcard doc_events (e.g. the whatsapp app) still resolve
+        installed_apps = [*frappe.get_installed_apps(), "erpnext"]
         settings_doc = frappe.get_single("ERPNext HD Settings")
         settings_doc.enabled = 1
-        try:
-            settings_doc.save()
-        except Exception as e:
-            self.fail(f"Validation failed when ERPNext is installed: {e}")
+        with patch("frappe.get_installed_apps", return_value=installed_apps):
+            try:
+                settings_doc.save()
+            except Exception as e:
+                self.fail(f"Validation failed when ERPNext is installed: {e}")

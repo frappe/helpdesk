@@ -8,7 +8,11 @@
       class="w-fit min-w-0 max-w-full break-words rounded-6 px-2.5 py-2.5 text-p-base text-ink-gray-9 shadow-[inset_0_0_0.25px_0.25px_rgba(0,0,0,0.03)]"
       :class="isCustomer ? 'bg-surface-gray-2' : 'bg-surface-gray-1'"
     >
-      <PortalEmailContent v-if="hasText" :content="activity.data.content" />
+      <PortalWhatsAppContent v-if="isWhatsApp" :message="activity.data" />
+      <PortalEmailContent
+        v-else-if="hasText"
+        :content="activity.data.content"
+      />
       <!-- Attached images stay chips too; the chip previews them on click. -->
       <div
         v-if="attachments.length"
@@ -22,8 +26,20 @@
           :url="file.file_url"
         />
       </div>
-      <span v-if="isBlank" class="italic text-ink-gray-6">
+      <span v-if="isBlank && !isWhatsApp" class="italic text-ink-gray-6">
         {{ __("No message") }}
+      </span>
+    </div>
+    <!-- Overlaps the body's bottom edge, as on WhatsApp. -->
+    <div v-if="activity.data.reactions?.length" class="-mt-3 mx-2 flex gap-0.5">
+      <span
+        v-for="reaction in activity.data.reactions"
+        :key="reaction.direction"
+        class="rounded-full border border-outline-gray-1 bg-surface-white px-1 text-sm leading-5"
+        role="img"
+        :aria-label="__('Reaction: {0}', [reaction.emoji])"
+      >
+        {{ reaction.emoji }}
       </span>
     </div>
 
@@ -40,6 +56,10 @@
           {{ at.format(DATE_FORMATS.clock) }}
         </time>
       </Tooltip>
+      <template v-if="isWhatsApp && activity.data.status === 'Failed'">
+        <span aria-hidden="true">·</span>
+        <span class="shrink-0 text-ink-red-6">{{ __("Not delivered") }}</span>
+      </template>
     </div>
   </div>
 </template>
@@ -52,6 +72,7 @@ import { DATE_FORMATS, isContentEmpty } from "@helpdesk/shared/utils";
 import { AttachmentChip } from "@framework/ui/components/ActivityTimeline";
 import { dateFormat, dayjsLocal } from "@helpdesk/shared/timezone";
 import PortalEmailContent from "./PortalEmailContent.vue";
+import PortalWhatsAppContent from "@app/components/whatsapp/PortalWhatsAppContent.vue";
 
 type Attachment = { file_name: string; file_url: string };
 
@@ -61,6 +82,7 @@ const props = defineProps<{
   isViewer: boolean;
 }>();
 
+const isWhatsApp = computed(() => props.activity.type === "whatsapp");
 const at = computed(() => dayjsLocal(props.activity.timestamp));
 const hasText = computed(() => !isContentEmpty(props.activity.data.content));
 

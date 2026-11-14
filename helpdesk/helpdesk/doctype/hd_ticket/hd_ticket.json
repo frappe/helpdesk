@@ -378,7 +378,7 @@
   },
   {
    "default": "Email",
-   "description": "The channel the ticket came in through.",
+   "description": "The channel the ticket came in through. WhatsApp is added when the WhatsApp app is installed.",
    "fieldname": "source",
    "fieldtype": "Select",
    "in_standard_filter": 1,
