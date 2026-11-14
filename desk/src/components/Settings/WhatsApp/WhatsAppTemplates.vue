@@ -1,6 +1,6 @@
 <template>
   <section class="flex flex-col gap-3">
-    <div class="flex items-center gap-2">
+    <div v-if="templates.data" class="flex items-center gap-2">
       <TextInput
         v-if="templates.data?.length"
         v-model="search"

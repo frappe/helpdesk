@@ -1,4 +1,4 @@
-import type { Locator, Page } from "@playwright/test";
+import type { Locator, Page, Request } from "@playwright/test";
 import { expectDenied, type Api } from "../../helpers/api";
 import { expect, skipGettingStarted, test, uid, usePersona } from "../../helpers/fixtures";
 import { openSettings } from "../../helpers/settings";
@@ -197,9 +197,23 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await api.update("WA Settings", "WA Settings", {
         default_account: account,
       });
+      // hold the template list so the loading state stays up
+      let release = () => {};
+      const held = new Promise<void>((resolve) => (release = resolve));
+      const isTemplateList = (request: Request) =>
+        request.url().includes("frappe.client.get_list") && request.postDataJSON()?.doctype === "WA Template";
+      await page.route("**/api/method/frappe.client.get_list", async (route) => {
+        if (isTemplateList(route.request())) await held;
+        await route.fallback();
+      });
       await page.goto("/helpdesk/tickets");
+      const listRequested = page.waitForRequest(isTemplateList);
       const dialog = await openSettings(page, "WhatsApp");
+      await listRequested;
+      await expect(dialog.getByRole("button", { name: "Sync" })).toHaveCount(0);
+      release();
       await expect(dialog.getByTestId("whatsapp-templates-empty")).toBeVisible();
+      await expect(dialog.getByRole("button", { name: "Sync" })).toBeVisible();
 
       const label = `E2E Order shipped ${tag}`;
       await dialog.getByRole("button", { name: "New template" }).click();
