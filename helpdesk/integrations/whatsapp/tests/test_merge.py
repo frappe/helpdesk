@@ -130,12 +130,12 @@ class TestWhatsAppMerge(IntegrationTestCase):
     def open_new_ticket_after_closing(self, ticket: str) -> str:
         frappe.db.set_value("HD Ticket", ticket, "status", "Closed")
         with mock_meta():
-            receive_message(CUSTOMER_NUMBER, "Another problem", self.account)
+            held = receive_message(CUSTOMER_NUMBER, "Another problem", self.account)
             prompt = frappe.get_last_doc("WA Message", {"direction": "Outgoing"})
-            answer = press_button(
-                CUSTOMER_NUMBER, self.account, prompt.name, NEW_TICKET_BUTTON
-            )
-        return answer.reference_docname
+            press_button(CUSTOMER_NUMBER, self.account, prompt.name, NEW_TICKET_BUTTON)
+        # the answer stays on the closed ticket; the held message is on the new one
+        held.reload()
+        return held.reference_docname
 
     def message_names(self, ticket: str) -> list[str]:
         return frappe.get_all(

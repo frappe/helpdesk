@@ -38,9 +38,11 @@ async function ticketsOfOneCustomer(api: Api, account: string): Promise<[Ticket,
   const from = newWhatsAppNumber();
   const first = await receiveMessage(api, account, from);
   await api.update("HD Ticket", first.name, { status: "Closed" });
-  await receiveWhatsApp(api, account, from, { message: "Hello again" });
-  const answer = await pressPromptButton(api, account, from, first.name, "helpdesk_new_ticket");
-  const second = { name: answer.reference_docname, subject: `WhatsApp merge ${uid()}` };
+  const held = await receiveWhatsApp(api, account, from, { message: "Hello again" });
+  await pressPromptButton(api, account, from, first.name, "helpdesk_new_ticket");
+  // the answer stays on the closed ticket; the held message opens the new one
+  const opened = (await api.get("WA Message", held.name)).reference_docname;
+  const second = { name: opened, subject: `WhatsApp merge ${uid()}` };
   await api.update("HD Ticket", second.name, { subject: second.subject });
   await api.update("HD Ticket", first.name, { status: "Open" });
   return [first, second];

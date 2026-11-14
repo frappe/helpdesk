@@ -54,6 +54,17 @@ class IncomingTestCase(IntegrationTestCase):
     def press(self, button: str):
         return press_button(self.number, self.account, self.prompts()[-1].name, button)
 
+    def create_new_ticket(self) -> str:
+        """Press Create new ticket and return the ticket it opened, which its answer isn't on."""
+        self.press(NEW_TICKET_BUTTON)
+        return frappe.get_last_doc("HD Ticket", {"contact": self.contact()}).name
+
+    def contact(self) -> str:
+        message = frappe.get_last_doc(
+            "WA Message", {"to": self.profile(), "direction": "Incoming"}
+        )
+        return frappe.db.get_value("HD Ticket", message.reference_docname, "contact")
+
     def profile(self) -> str:
         return frappe.db.get_value(
             "WA Profile",
@@ -229,7 +240,9 @@ class TestWhatsAppIncoming(IncomingTestCase):
         held = [self.receive("New problem"), self.receive("More detail")]
         answer = self.press(NEW_TICKET_BUTTON)
 
-        ticket = frappe.get_doc("HD Ticket", answer.reference_docname)
+        # the answer stays on the closed ticket, under the prompt it answers
+        self.assertEqual(answer.reference_docname, closed)
+        ticket = frappe.get_last_doc("HD Ticket", {"contact": self.contact()})
         self.assertNotEqual(ticket.name, closed)
         self.assertEqual(ticket.subject, "New problem")
         self.assertEqual(ticket.description, "New problem<br>More detail")
@@ -238,6 +251,7 @@ class TestWhatsAppIncoming(IncomingTestCase):
             message.reload()
             self.assertEqual(message.reference_docname, ticket.name)
         self.assertEqual(self.ticket_of(self.receive("Thanks")), ticket.name)
+        # a second press on the same prompt only follows up on the new ticket
         self.assertEqual(self.ticket_of(self.press(NEW_TICKET_BUTTON)), ticket.name)
 
     def test_no_thanks_acknowledges_and_the_next_message_prompts_again(self) -> None:
@@ -256,7 +270,7 @@ class TestWhatsAppIncoming(IncomingTestCase):
 
         self.receive("Actually it broke again")
         self.assertEqual(len(self.prompts()), 2)
-        ticket = self.ticket_of(self.press(NEW_TICKET_BUTTON))
+        ticket = self.create_new_ticket()
         self.assertEqual(
             frappe.db.get_value("HD Ticket", ticket, "subject"),
             "Actually it broke again",
@@ -274,7 +288,7 @@ class TestWhatsAppIncoming(IncomingTestCase):
         first = self.receive("Old problem")
         closed = self.close(first.reference_docname)
         self.receive("New problem")
-        active = self.ticket_of(self.press(NEW_TICKET_BUTTON))
+        active = self.create_new_ticket()
 
         reaction = react_to(self.number, self.account, first.message_id, "👍")
         self.assertEqual(reaction.reference_docname, closed)

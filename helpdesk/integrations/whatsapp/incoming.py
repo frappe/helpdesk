@@ -113,23 +113,26 @@ class IncomingMessage:
         )
 
     def get_last_ticket(self) -> Document | None:
+        """The newest ticket this sender wrote on, since a Create new ticket answer stays on the closed one."""
         Message = frappe.qb.DocType("WA Message")
+        Ticket = frappe.qb.DocType("HD Ticket")
         names = (
             frappe.qb.from_(Message)
+            .join(Ticket)
+            .on(Ticket.name == Message.reference_docname)
             .select(Message.reference_docname)
             .where(
                 (Message.to == self.profile)
                 & (Message.direction == "Incoming")
                 & Message.reaction.isnull()
                 & (Message.reference_doctype == "HD Ticket")
-                & Message.reference_docname.isnotnull()
             )
-            .orderby(Message.creation, order=Order.desc)
+            .orderby(Ticket.creation, order=Order.desc)
             .limit(1)
             .for_update()
             .run(pluck=True)
         )
-        if not names or not frappe.db.exists("HD Ticket", names[0]):
+        if not names:
             return None
         ticket = frappe.get_doc("HD Ticket", names[0], for_update=True)
         if not ticket.is_merged:
@@ -162,7 +165,11 @@ class IncomingMessage:
             return self.add_to(ticket)
         if answer == NEW_TICKET_BUTTON:
             held = self.get_held_messages(ticket.name) if ticket else []
-            return self.open_ticket(held, answered=True)
+            self.open_ticket(held, answered=True)
+            # the answer stays beside its prompt; the held messages carry the sender to the new ticket
+            if ticket and held:
+                self.link(ticket.name)
+            return
         if ticket:
             self.link(ticket.name)
         send_no_ticket_acknowledgement(

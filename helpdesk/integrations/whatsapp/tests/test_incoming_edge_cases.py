@@ -88,7 +88,7 @@ class TestWhatsAppIncomingEdgeCases(IncomingTestCase):
             held.name,
             {"reference_doctype": "Contact", "reference_docname": contact},
         )
-        ticket = self.ticket_of(self.press(NEW_TICKET_BUTTON))
+        ticket = self.create_new_ticket()
         held.reload()
         self.assertEqual(held.reference_docname, ticket)
         self.assertEqual(
@@ -100,13 +100,13 @@ class TestWhatsAppIncomingEdgeCases(IncomingTestCase):
     ) -> None:
         self.close(self.ticket_of(self.receive("First problem")))
         self.receive("Second problem")
-        second = self.close(self.ticket_of(self.press(NEW_TICKET_BUTTON)))
+        second = self.close(self.create_new_ticket())
         third = self.receive("Third problem")
 
         prompts = self.prompts()
         self.assertEqual(len(prompts), 2)
         self.assertIn(second, [prompt.reference_docname for prompt in prompts])
-        ticket = self.ticket_of(self.press(NEW_TICKET_BUTTON))
+        ticket = self.create_new_ticket()
         third.reload()
         self.assertEqual(third.reference_docname, ticket)
         self.assertNotEqual(ticket, second)
@@ -138,7 +138,7 @@ class TestWhatsAppIncomingEdgeCases(IncomingTestCase):
         self.close(self.ticket_of(self.receive("First problem")))
         self.receive("Second problem")
         stale = self.prompts()[-1].name
-        active = self.ticket_of(self.press(NEW_TICKET_BUTTON))
+        active = self.create_new_ticket()
         again = press_button(self.number, self.account, stale, NO_TICKET_BUTTON)
         self.assertEqual(again.reference_docname, active)
         self.assertEqual(frappe.db.count("HD Ticket", {"contact": self.contact()}), 2)
@@ -152,12 +152,6 @@ class TestWhatsAppIncomingEdgeCases(IncomingTestCase):
                 frappe.db.get_value("Contact", contact, "first_name"),
                 first_name or f"+{self.number}",
             )
-
-    def contact(self) -> str:
-        message = frappe.get_last_doc(
-            "WA Message", {"to": self.profile(), "direction": "Incoming"}
-        )
-        return frappe.db.get_value("HD Ticket", message.reference_docname, "contact")
 
     def customize_ticket(
         self, fieldname: str, property: str, value: str, property_type: str

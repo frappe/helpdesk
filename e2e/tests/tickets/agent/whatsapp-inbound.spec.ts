@@ -68,8 +68,11 @@ async function reopenAfterClosing(api: Api, customer: Customer, closed: string, 
   const { interactive_buttons } = await api.get("WA Message", prompt.name);
   expect(interactive_buttons.map((button: any) => button.title)).toEqual(["Create new ticket", "No, thanks"]);
   const answer = await customer.press(closed, "helpdesk_new_ticket");
-  expect(answer.reference_docname).not.toBe(closed);
-  return answer.reference_docname as string;
+  // the answer stays under the prompt; the held message moves to the new ticket
+  expect(answer.reference_docname).toBe(closed);
+  const ticket = (await api.get("WA Message", heldMessage.name)).reference_docname;
+  expect(ticket).not.toBe(closed);
+  return ticket as string;
 }
 
 for (const viewport of [
@@ -102,9 +105,10 @@ for (const viewport of [
 
       expect(await api.get("HD Ticket", ticket)).toMatchObject({ source: "WhatsApp", subject: held });
       expect((await api.get("HD Ticket", closed)).status).toBe("Closed");
-      await seeConversation(page, closed, "is closed. Do you want to raise a new one?");
+      await seeConversation(page, closed, "is closed. Do you want to raise a new one?", "Create new ticket");
       await shoot(page, "closed-prompt");
-      await seeConversation(page, ticket, held, "Create new ticket");
+      await seeConversation(page, ticket, held);
+      await expect(bubble(page, "Create new ticket")).toHaveCount(0);
       await shoot(page, "held-message-ticket");
     });
   });
