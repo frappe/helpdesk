@@ -148,6 +148,7 @@ class HelpdeskSearch(SQLiteSearch):
                 and type(doc.reference_name) is str
             ):
                 document["reference_name"] = str(doc.reference_name)
+				document["reference_ticket"] = document["reference_name"]
 
         if doc.doctype == "HD Ticket":
             document["reference_ticket"] = str(doc.name)
