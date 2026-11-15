@@ -18,7 +18,7 @@ If you are on a version that is no longer supported, please upgrade to a support
 
 ## Security Advisories
 
-We publish security advisories for Frappe Framework in this repository's [Security tab](https://github.com/frappe/helpdesk/security/advisories).
+We publish security advisories for Frappe Helpdesk in this repository's [Security tab](https://github.com/frappe/helpdesk/security/advisories).
 
 <br>
 <br>
