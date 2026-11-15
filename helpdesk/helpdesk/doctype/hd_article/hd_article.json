@@ -19,6 +19,9 @@
   "pinned_order",
   "author",
   "title_slug",
+  "docs_page_url",
+  "docs_copied_on",
+  "docs_content_hash",
   "content_section",
   "content",
   "excerpt"
@@ -99,6 +102,31 @@
    "fieldtype": "Data",
    "is_virtual": 1,
    "label": "Title Slug"
+  },
+  {
+   "fieldname": "docs_page_url",
+   "fieldtype": "Data",
+   "label": "Docs page URL",
+   "length": 500,
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "docs_copied_on",
+   "fieldtype": "Datetime",
+   "label": "Docs copied on",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "docs_content_hash",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Docs content hash",
+   "length": 64,
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "default": "0",

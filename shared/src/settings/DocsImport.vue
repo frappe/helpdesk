@@ -1,0 +1,99 @@
+<template>
+  <div class="flex flex-col gap-3">
+    <div
+      class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+    >
+      <div class="flex min-w-0 flex-col">
+        <h3 class="text-base-medium text-ink-gray-8">
+          {{ __("Copy pages from your docs site") }}
+        </h3>
+        <span class="mt-1 text-base leading-5 text-ink-gray-6">
+          {{ __("Copied once as drafts you can edit and publish.") }}
+        </span>
+      </div>
+      <Button
+        class="shrink-0 self-start"
+        :label="__('Import pages')"
+        @click="open = true"
+      />
+    </div>
+
+    <button
+      v-if="result?.state === 'running'"
+      type="button"
+      class="flex min-h-11 w-full items-center gap-2.5 rounded-5 border border-outline-gray-2 px-3 text-left text-p-base text-ink-gray-7 hover:bg-surface-gray-1 sm:min-h-10"
+      @click="open = true"
+    >
+      <LucideLoaderCircle
+        class="size-4 shrink-0 animate-spin text-ink-gray-6 motion-reduce:animate-none"
+        aria-hidden="true"
+      />
+      <span
+        class="min-w-0 flex-1 truncate"
+        :title="result.host"
+        aria-live="polite"
+      >
+        {{ runningLine }}
+      </span>
+    </button>
+
+    <div
+      v-else-if="result?.state === 'done'"
+      class="flex min-h-11 items-center gap-2.5 rounded-5 border border-outline-gray-2 px-3 text-p-base text-ink-gray-7 sm:min-h-10"
+    >
+      <LucideCheck class="size-4 shrink-0 text-ink-gray-6" aria-hidden="true" />
+      <span class="min-w-0 flex-1 truncate" :title="doneLine">
+        {{ doneLine }}
+      </span>
+      <a
+        v-if="result.created"
+        :href="viewDraftsHref(result.category)"
+        target="_blank"
+        rel="noopener"
+        class="shrink-0 text-ink-gray-8 underline underline-offset-2"
+      >
+        {{ __("View drafts") }}
+      </a>
+    </div>
+
+    <DocsImportDialog v-model:open="open" @started="refresh" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { Button } from "frappe-ui";
+import { computed, onMounted, ref, watch } from "vue";
+import LucideCheck from "~icons/lucide/check";
+import LucideLoaderCircle from "~icons/lucide/loader-circle";
+import { __ } from "../translation";
+import DocsImportDialog from "./DocsImportDialog.vue";
+import { useImportResult, viewDraftsHref } from "./docsImport";
+
+const open = ref(false);
+const { result, refresh } = useImportResult(5000);
+
+const runningLine = computed(() => {
+  const run = result.value;
+  if (run?.state !== "running") return "";
+  if (run.stage === "waiting")
+    return __("Waiting to import from {0}…", [run.host]);
+  return run.stage === "reading"
+    ? __("Importing from {0}, {1} read…", [
+        run.host,
+        run.done === 1 ? __("1 page") : __("{0} pages", [run.done]),
+      ])
+    : __("Importing from {0}…", [run.host]);
+});
+
+const doneLine = computed(() => {
+  const run = result.value;
+  if (run?.state !== "done") return "";
+  return run.created
+    ? __("Last import from {0}: {1} drafts added", [run.host, run.created])
+    : __("Last import from {0}: nothing new", [run.host]);
+});
+
+onMounted(refresh);
+// The dialog may have finished or started a run while closed.
+watch(open, (isOpen) => !isOpen && refresh());
+</script>

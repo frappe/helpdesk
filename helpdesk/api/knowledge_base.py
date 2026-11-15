@@ -11,6 +11,7 @@ from frappe.utils import (
     escape_html,
     expand_relative_urls,
     get_user_info_for_avatar,
+    sha256_hash,
 )
 from frappe.website.page_renderers.base_renderer import BaseRenderer
 from frappe.website.utils import cleanup_page_name, find_first_image
@@ -217,23 +218,35 @@ def create_category(
     """Create an article category holding one "New Article"; returns both names.
     Under `parent` when given, as a Subcategory. Returns {"article": name,
     "category": name}. "General" is a reserved name."""
+    category = insert_category(title, icon, parent, description)
+    article = frappe.new_doc(
+        "HD Article", title="New Article", category=category.name
+    ).insert()
+    return {"article": article.name, "category": category.name}
+
+
+def insert_category(
+    title: str,
+    icon: str | None = None,
+    parent: str | None = None,
+    description: str | None = None,
+):
+    """Insert an empty article category. "General" is a reserved name."""
+    if not isinstance(title, str) or not title.strip():
+        frappe.throw(_("Enter a category name."))
     if title.strip().lower() == "general":
         frappe.throw(
             _(
                 "General is a reserved category name. Please use a different name to proceed."
             )
         )
-    category = frappe.new_doc(
+    return frappe.new_doc(
         "HD Article Category",
-        category_name=title,
+        category_name=title.strip(),
         description=description,
         icon=icon,
         parent_article_category=parent,
     ).insert()
-    article = frappe.new_doc(
-        "HD Article", title="New Article", category=category.name
-    ).insert()
-    return {"article": article.name, "category": category.name}
 
 
 def _validate_category(category: str) -> None:
@@ -559,16 +572,26 @@ def get_kb_sidebar() -> list[dict]:
 def get_article(name: str) -> dict:
     """Get a readable article: content, author, category, reading time, caller's vote.
     `name` may be the URL path `<name>-<title slug>`. `feedback` is 0 none, 1 helpful,
-    2 not helpful. Agents also get `pinned` and `weight`. Doesn't count a view (see
+    2 not helpful. Agents also get `pinned`, `weight`, `docs_page_url`, `docs_copied_on`
+    and `docs_edited` (changed since it was copied from docs). Doesn't count a view (see
     increment_views). Guests only when the knowledge base is public."""
     name = _get_article_name(name)
     # the desk article page shows the pin and edits the weight
-    desk_fields = ["pinned", "weight"] if is_agent() else []
+    desk_fields = (
+        ["pinned", "weight", "docs_page_url", "docs_copied_on", "docs_content_hash"]
+        if is_agent()
+        else []
+    )
     article = _get_viewable_article(
         name, [*PUBLIC_ARTICLE_FIELDS, "content", *desk_fields]
     )
     article.author = _get_byline(article.author)
     article.title_slug = cleanup_page_name(article.title)
+    if "docs_content_hash" in article:
+        saved_hash = article.pop("docs_content_hash")
+        article.docs_edited = bool(saved_hash) and saved_hash != sha256_hash(
+            article.content or ""
+        )
     # archived articles have no category
     category = (
         frappe.db.get_value(

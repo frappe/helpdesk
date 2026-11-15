@@ -45,6 +45,9 @@ _Avoid_: Visibility, audience
 **Category access**:
 The Access shared by every Article in a Category and its Subcategories; Mixed when they differ. It is derived from the Articles, never stored. A reader sees a Category when they can read any Article in it or its Subcategories.
 
+**Converted Article**:
+An Article created by pasting a docs site address in knowledge base settings: a one-time copy of a page, which agents then own, edit and publish, with its own views and votes. Pasting the same address again skips pages already imported; later changes to the site never reach it.
+
 ## SLA
 
 **Working hours**: the hours of a workday, set per weekday on an SLA policy (HD Service Day: start and end time). Only working hours count towards an SLA: due dates (response by, resolution by), elapsed times (first response, resolution, hold, failed by), ticket analytics and the outside-hours banner all skip holidays, non-workdays and the time outside these hours.
