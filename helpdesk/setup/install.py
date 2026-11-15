@@ -448,6 +448,8 @@ def add_default_agent_status():
 
 
 def add_fts_index():
+    if frappe.db.db_type != "mariadb":
+        return
     indexes = [
         {"table": "tabHD Ticket", "column": "subject", "index_name": "ft_subject"},
         {
