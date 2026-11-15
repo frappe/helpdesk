@@ -747,13 +747,11 @@ def apply_datetime_filter(query, field, filter_value):
         if isinstance(value, list) and len(value) == 2:
             query = query.where(field >= value[0]).where(field <= value[1])
     elif operator == "timespan":
-        from frappe.utils import get_datetime, get_timespan_date_range
+        from frappe.utils import get_timespan_date_range
 
+        # `field` is a date, so the range's dates cover its first and last day whole
         start, end = get_timespan_date_range(value)
-        # convert to datetime to include full start and end day
-        start_dt = get_datetime(str(start)).replace(hour=0, minute=0, second=0)
-        end_dt = get_datetime(str(end)).replace(hour=23, minute=59, second=59)
-        query = query.where(field >= start_dt).where(field <= end_dt)
+        query = query.where(field >= str(start)).where(field <= str(end))
     elif operator == "is":
         if value == "set":
             query = query.where(field.isnotnull())
