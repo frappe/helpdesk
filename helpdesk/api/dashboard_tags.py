@@ -11,6 +11,7 @@ import frappe
 from frappe import _
 from frappe.query_builder import DocType
 from frappe.query_builder.functions import Count, Function
+from frappe.utils import getdate
 from pypika import Order
 
 from helpdesk.api.dashboard import HD_TICKET, HelpdeskDashboard, get_bar_chart_config
@@ -115,7 +116,9 @@ class TagDashboard(HelpdeskDashboard):
         """One row per date with a column per tag, zero filled so bars stack."""
         by_date = {}
         for row in rows:
-            day = by_date.setdefault(row.date, dict.fromkeys(tags, 0))
-            day["date"] = row.date
+            # SQLite returns DATE() as text, MariaDB as a date
+            date = getdate(row.date)
+            day = by_date.setdefault(date, dict.fromkeys(tags, 0))
+            day["date"] = date
             day[row.tag] = row.count
         return [by_date[date] for date in sorted(by_date)]
