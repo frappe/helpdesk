@@ -8,6 +8,7 @@ from frappe.query_builder import DocType
 from frappe.query_builder.functions import Avg, Count, Function
 from pypika import Case
 
+from helpdesk.api.analytics_utils import assigned_to_condition
 from helpdesk.utils import agent_only, is_frappe_version
 
 HD_TICKET = "HD Ticket"
@@ -110,12 +111,7 @@ class HelpdeskDashboard:
         if self.team:
             conds.append(self.ticket.agent_group == self.team)
         if self.agent:
-            # Pass args to Function(...) directly. ParameterizedFunction is not callable.
-            conds.append(
-                Function(
-                    "JSON_SEARCH", self.ticket._assign, "one", self.agent
-                ).isnotnull()
-            )
+            conds.append(assigned_to_condition(self.ticket, self.agent))
         return conds
 
     def _get_case(self, start, end, value, func, extra_cond=None, date_field=None):
