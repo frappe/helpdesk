@@ -55,6 +55,7 @@
           <WhatsAppReplyBox
             v-if="whatsapp"
             ref="whatsAppReplyBoxRef"
+            class="border-t"
             :whatsapp="whatsapp"
             @sent="emit('update')"
           />

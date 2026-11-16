@@ -1,5 +1,5 @@
 <template>
-  <div class="border-t" data-testid="whatsapp-composer">
+  <div data-testid="whatsapp-composer">
     <p
       v-if="whatsapp.conversation && !whatsapp.conversation.to"
       class="flex items-center gap-2 px-6 py-4 text-p-base text-ink-gray-7 md:px-5"
