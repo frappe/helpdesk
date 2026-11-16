@@ -8,6 +8,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import random_string
 
+from helpdesk.integrations.whatsapp.account import TICKET_ACTION
 from helpdesk.integrations.whatsapp.setup import is_whatsapp_installed
 
 # every Graph API call the whatsapp app makes goes through these
@@ -29,6 +30,7 @@ def make_whatsapp_account(**values) -> str:
             "business_id": random_string(10),
             "status": "Active",
             "access_token": "test-token",
+            "append_actions": [TICKET_ACTION],
             **values,
         }
     )

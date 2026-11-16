@@ -41,7 +41,7 @@ export class FakeMeta {
   }
 }
 
-/** A Business Number; the whatsapp app sends every account's Graph API calls to `url`. */
+/** A Business Number that creates tickets; the whatsapp app sends every account's Graph API calls to `url`. */
 export async function makeWhatsAppAccount(api: Api, url: string): Promise<string> {
   await api.update(SETTINGS, SETTINGS, { whatsapp_api_url: url });
   const account = await api.insert("WA Account", {
@@ -50,6 +50,7 @@ export async function makeWhatsAppAccount(api: Api, url: string): Promise<string
     business_id: uid(),
     status: "Active",
     access_token: "e2e-token",
+    append_actions: [{ append_to: "HD Ticket", trigger_on: "Incoming" }],
   });
   return account.name;
 }

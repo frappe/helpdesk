@@ -1,6 +1,11 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
+from helpdesk.integrations.whatsapp.account import (
+    TICKET_ACTION,
+    add_ticket_action,
+    creates_tickets,
+)
 from helpdesk.integrations.whatsapp.test_utils import (
     make_whatsapp_account,
     requires_whatsapp,
@@ -29,16 +34,24 @@ class TestWhatsAppSettingsAccess(IntegrationTestCase):
 
 @requires_whatsapp
 class TestWhatsAppAppendActions(IntegrationTestCase):
-    """Helpdesk files messages itself, so an account may not append them to tickets too."""
+    """An HD Ticket row only turns Create tickets on; Helpdesk fills the ticket itself."""
 
     def tearDown(self) -> None:
         frappe.db.rollback()
 
-    def test_an_append_action_to_hd_ticket_is_refused(self) -> None:
-        with self.assertRaisesRegex(frappe.ValidationError, "remove this append"):
-            make_whatsapp_account(
-                append_actions=[append_action("HD Ticket", "raised_by", "subject")]
-            )
+    def test_a_bare_hd_ticket_row_saves_and_a_mapped_or_outgoing_one_is_refused(
+        self,
+    ) -> None:
+        self.assertTrue(creates_tickets(make_whatsapp_account()))
+        for row in (
+            append_action("HD Ticket", "raised_by", "subject"),
+            {**TICKET_ACTION, "trigger_on": "Both"},
+        ):
+            with (
+                self.subTest(row=row),
+                self.assertRaisesRegex(frappe.ValidationError, "no field mapping"),
+            ):
+                make_whatsapp_account(append_actions=[row])
 
     def test_an_append_action_to_another_doctype_saves(self) -> None:
         account = make_whatsapp_account(
@@ -46,12 +59,16 @@ class TestWhatsAppAppendActions(IntegrationTestCase):
         )
         rows = frappe.get_doc("WA Account", account).append_actions
         self.assertEqual([row.append_to for row in rows], ["Contact"])
+        self.assertFalse(creates_tickets(account))
 
-    def test_adding_one_to_an_existing_account_is_refused(self) -> None:
-        doc = frappe.get_doc("WA Account", make_whatsapp_account())
-        doc.append("append_actions", append_action("HD Ticket", "raised_by", "subject"))
-        with self.assertRaisesRegex(frappe.ValidationError, "remove this append"):
-            doc.save(ignore_permissions=True)
+    def test_the_patch_turns_create_tickets_on_once_keeping_other_rows(self) -> None:
+        account = make_whatsapp_account(
+            append_actions=[append_action("Contact", "mobile_no", "first_name")]
+        )
+        add_ticket_action(account)
+        add_ticket_action(account)
+        rows = frappe.get_doc("WA Account", account).append_actions
+        self.assertEqual([row.append_to for row in rows], ["Contact", "HD Ticket"])
 
 
 def append_action(doctype: str, sender_field: str, sender_name_field: str) -> dict:

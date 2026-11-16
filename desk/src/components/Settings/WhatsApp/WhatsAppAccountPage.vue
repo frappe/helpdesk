@@ -27,7 +27,11 @@
         :primary-action="{ label: __('Retry'), onClick: account.reload }"
         data-testid="whatsapp-account-error"
       />
-      <AccountForm v-else :controller="account" />
+      <AccountForm v-else :controller="account" :append-actions="false">
+        <template #settings>
+          <Checkbox v-model="createTickets" :label="__('Create tickets')" />
+        </template>
+      </AccountForm>
     </template>
   </SettingsLayoutBase>
   <ConfirmDialog
@@ -45,18 +49,38 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
 import { AccountForm, useAccount } from "@whatsapp/ui";
-import { Alert, Button, LoadingIndicator, toast } from "frappe-ui";
+import { Alert, Button, Checkbox, LoadingIndicator, toast } from "frappe-ui";
 import { computed } from "vue";
 import { useUnsavedGuard } from "./useUnsavedGuard";
 
 const props = defineProps<{ name: string }>();
 const emit = defineEmits<{ back: [] }>();
 
-const account = useAccount({ name: () => props.name });
+// an HD Ticket append action is what makes an account's incoming messages tickets
+const TICKET_ACTION = {
+  append_to: "HD Ticket",
+  trigger_on: "Incoming",
+} as const;
+
+const account = useAccount({
+  name: () => props.name,
+  defaults: { append_actions: [{ ...TICKET_ACTION }] },
+});
 // An existing account counts as loaded once the server copy is in the form.
 const loaded = computed(() => account.isNew || Boolean(account.doc.name));
 const isDirty = computed(() => loaded.value && account.isDirty);
 const { confirming, leave, confirm } = useUnsavedGuard(() => isDirty.value);
+
+const createTickets = computed({
+  get: () =>
+    account.doc.append_actions.some((row) => row.append_to === "HD Ticket"),
+  set: (on: boolean) => {
+    const rows = account.doc.append_actions.filter(
+      (row) => row.append_to !== "HD Ticket"
+    );
+    account.doc.append_actions = on ? [...rows, { ...TICKET_ACTION }] : rows;
+  },
+});
 
 /** Create goes back to the list; the form shows a failed save itself. */
 async function save() {

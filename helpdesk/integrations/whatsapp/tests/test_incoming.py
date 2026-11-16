@@ -326,6 +326,12 @@ class TestWhatsAppIncoming(IncomingTestCase):
         self.assertEqual(first.contact, second.contact)
         self.assertEqual(self.ticket_of(self.receive("Sales again")), first.name)
 
+    def test_an_account_without_create_tickets_is_left_to_the_app(self) -> None:
+        message = self.receive(
+            "Order status?", account=make_whatsapp_account(append_actions=[])
+        )
+        self.assertFalse(message.reference_doctype)
+
     def test_a_meta_failure_on_the_prompt_still_stores_the_message(self) -> None:
         self.close(self.ticket_of(self.receive("First problem")))
         with patch(META_REQUEST, side_effect=Exception("Meta is down")):

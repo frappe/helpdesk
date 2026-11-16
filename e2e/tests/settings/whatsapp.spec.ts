@@ -73,10 +73,13 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await dialog.getByLabel("Account name").fill(created);
       await dialog.getByLabel("Phone ID").fill(`${Date.now()}`);
       await dialog.getByLabel("Access token").fill("e2e-token");
+      await expect(dialog.getByLabel("Create tickets")).toBeChecked();
+      await expect(dialog.getByText("Append Actions")).toHaveCount(0);
       await shoot(page, "wa-settings-create");
       await dialog.getByRole("button", { name: "Create", exact: true }).click();
       accounts.push(created);
       await expect(page.getByText("Account created")).toBeVisible();
+      expect((await api.get("WA Account", created)).append_actions.map((action) => action.append_to)).toEqual(["HD Ticket"]);
       const row = accountRow(dialog, created);
       await expect(row.getByText("Active", { exact: true })).toBeVisible();
 
@@ -88,6 +91,7 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await row.getByRole("button", { name: created }).click();
       await expect(dialog.getByLabel("Account name")).toHaveValue(created);
       await dialog.getByLabel("Phone ID").fill("15550100199");
+      await dialog.getByLabel("Create tickets").uncheck();
       await expect(page.getByText("Default account updated")).toBeHidden({
         timeout: 15000,
       });
@@ -95,7 +99,9 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await shoot(page, "wa-settings-edit");
       await dialog.getByRole("button", { name: "Save", exact: true }).click();
       await expect(page.getByText("Account updated")).toBeVisible();
-      expect((await api.get("WA Account", created)).phone_id).toBe("15550100199");
+      const saved = await api.get("WA Account", created);
+      expect(saved.phone_id).toBe("15550100199");
+      expect(saved.append_actions).toEqual([]);
       await dialog.getByRole("button", { name: created }).click();
       await expect(accountRow(dialog, created)).toContainText("Phone ID: 15550100199");
     });
@@ -246,29 +252,6 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await expect(dialog.getByLabel("Template label")).toHaveValue(label);
       await dialog.getByRole("button", { name: label }).click();
       await expect(row).toBeVisible();
-    });
-
-    test("an account that still appends to HD Ticket is flagged on the Accounts tab", async ({ page }) => {
-      await page.goto("/helpdesk/tickets");
-      const dialog = await openSettings(page, "WhatsApp");
-      await openTab(dialog, "Accounts");
-      await expect(accountRow(dialog, accounts[0])).toBeVisible();
-      const warning = dialog.getByTestId("whatsapp-ticket-append-warning");
-      await expect(warning).toHaveCount(0);
-
-      // saving refuses the row now, so only an account set up before this release can hold one
-      await page.route("**/api/method/frappe.client.get_list", (route) =>
-        JSON.stringify(route.request().postDataJSON()?.filters ?? []).includes("WA Account Append")
-          ? route.fulfill({ json: { message: [{ account_name: accounts[0] }, { account_name: accounts[0] }] } })
-          : route.fallback()
-      );
-      await openTab(dialog, "Templates");
-      await openTab(dialog, "Accounts");
-      await expect(warning).toContainText(`Remove the append action to HD Ticket from ${accounts[0]}`);
-      await expect(warning).toContainText("Helpdesk files WhatsApp messages on tickets itself.");
-      // one account with two such rows is named once
-      await expect(warning).not.toContainText(`${accounts[0]}, ${accounts[0]}`);
-      await shoot(page, "wa-settings-ticket-append-warning");
     });
 
     test("with no accounts or templates both tabs show an empty state", async ({ page }) => {
