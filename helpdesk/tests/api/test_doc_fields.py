@@ -1,11 +1,6 @@
 import frappe
-<<<<<<< HEAD
-from frappe.tests.utils import FrappeTestCase, change_settings
-=======
 from frappe.custom.doctype.property_setter.property_setter import make_property_setter
-from frappe.tests import IntegrationTestCase
-from frappe.tests.utils import change_settings
->>>>>>> 914d28a (fix(filters): offer select options set by Property Setters)
+from frappe.tests.utils import FrappeTestCase, change_settings
 
 from helpdesk.api.doc import get_filterable_fields, get_quick_filters, sort_options
 from helpdesk.test_utils import create_agent, create_contact, create_user, unique_email
