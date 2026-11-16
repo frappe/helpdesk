@@ -53,15 +53,17 @@
           >
             <div class="flex items-baseline justify-between">
               <p class="text-sm text-ink-gray-5">{{ __("Resets in") }}</p>
-              <p class="text-sm tabular-nums text-ink-gray-5">
+              <!-- old and new time share one cell so they slide past each other -->
+              <p
+                class="grid justify-items-end text-sm tabular-nums text-ink-gray-5"
+              >
                 <Transition
-                  mode="out-in"
-                  enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
-                  enter-from-class="translate-y-1 opacity-0"
-                  leave-active-class="transition duration-100 ease-in motion-reduce:transition-none"
-                  leave-to-class="-translate-y-1 opacity-0"
+                  enter-active-class="motion-safe:transition motion-safe:duration-200 motion-safe:ease-out"
+                  leave-active-class="motion-safe:transition motion-safe:duration-200 motion-safe:ease-out"
+                  enter-from-class="translate-x-2 opacity-0"
+                  leave-to-class="-translate-x-2 opacity-0"
                 >
-                  <span :key="expiresLabel" class="inline-block">
+                  <span :key="expiresLabel" class="[grid-area:1/1]">
                     {{ expiresLabel }}
                   </span>
                 </Transition>
