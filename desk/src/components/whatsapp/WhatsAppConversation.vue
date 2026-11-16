@@ -4,7 +4,16 @@
     class="min-h-0 flex-1 overflow-y-auto"
     data-testid="whatsapp-thread"
   >
-    <div class="px-3 py-4 sm:px-5">
+    <div
+      v-if="isEmpty"
+      class="flex h-full flex-col items-center justify-center gap-2 text-ink-gray-4"
+    >
+      <WhatsAppIcon class="size-6" />
+      <p class="text-p-base text-ink-gray-5">
+        {{ __("No {0} yet", [__("WhatsApp messages")]) }}
+      </p>
+    </div>
+    <div v-else class="px-3 py-4 sm:px-5">
       <MessageList
         :messages="whatsapp.messages.messages"
         :loading="whatsapp.messages.loading"
@@ -17,10 +26,6 @@
         :replying-to-label="__('Replying to')"
         :react-label="__('React')"
         :failed-message-label="__('Failed to send message')"
-        :empty-label="__('No WhatsApp messages yet')"
-        :empty-description="
-          __('Messages to and from this contact show up here.')
-        "
         :error-label="__('Could not load the WhatsApp conversation')"
         :today-label="__('Today')"
         :yesterday-label="__('Yesterday')"
@@ -64,14 +69,20 @@ import { useResizeObserver } from "@vueuse/core";
 import { MessageList, type WhatsAppMessage } from "@whatsapp/ui";
 import { Button } from "frappe-ui";
 import LucideArrowUpRight from "~icons/lucide/arrow-up-right";
-import { nextTick, onMounted, useTemplateRef, watch } from "vue";
+import { computed, nextTick, onMounted, useTemplateRef, watch } from "vue";
 import type { TicketWhatsApp } from "./useTicketWhatsApp";
+import WhatsAppIcon from "./WhatsAppIcon.vue";
 
 const props = defineProps<{ whatsapp: TicketWhatsApp }>();
 const emit = defineEmits<{ reply: [message: WhatsAppMessage] }>();
 
 const scroller = useTemplateRef<HTMLElement>("scroller");
 let previousHeight = 0;
+
+const isEmpty = computed(() => {
+  const { loading, error, messages } = props.whatsapp.messages;
+  return !loading && !error && !messages.length;
+});
 
 // stay on the latest message while the composer slides open and the thread shrinks
 useResizeObserver(scroller, keepPinned);
