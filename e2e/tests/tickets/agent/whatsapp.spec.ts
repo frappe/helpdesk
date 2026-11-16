@@ -323,23 +323,30 @@ test("an agent sends an image with a caption, and it shows in the thread", async
     ]);
 });
 
-test("a failed send shows one error toast", async ({ page, api }) => {
+test("the composer locks while sending, and a failed send shows one error toast", async ({ page, api }) => {
   const { ticket } = await seedTicket(api);
-  await page.route(`**/api/method/${MESSAGES_API}.send_message`, (route) =>
-    route.fulfill({
+  let release = () => {};
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route(`**/api/method/${MESSAGES_API}.send_message`, async (route) => {
+    await held;
+    await route.fulfill({
       status: 417,
       contentType: "application/json",
       body: JSON.stringify({
         exc_type: "ValidationError",
         _server_messages: JSON.stringify([JSON.stringify({ message: "Boom failure" })]),
       }),
-    })
-  );
+    });
+  });
   await openWhatsApp(page, ticket);
   await openComposer(page);
   await composerBox(page).fill("This will fail");
   await composerBox(page).press("Enter");
+  await expect(composerBox(page)).toBeDisabled();
+  release();
   await expect(page.getByText("Boom failure").first()).toBeVisible();
+  await expect(composerBox(page)).toBeEnabled();
+  await expect(composerBox(page)).toBeFocused();
   // a one-off count: a retrying assertion would wait for the toasts to expire
   await page.waitForTimeout(300);
   expect(await page.getByText("Boom failure").count()).toBe(1);
