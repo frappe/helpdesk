@@ -88,8 +88,7 @@ The 24 hours after the contact's last message, when an agent may send any messag
 - Email tickets never count as a contact's **Active WhatsApp Ticket**; the two channels stay separate
 - A contact gets one **Closed-Ticket Prompt** until they answer it; "No, thanks" leaves the **Held Messages** unlinked
 - A contact with a portal login sees their **WhatsApp Tickets** on the portal read-only; they reply only on WhatsApp
-- A message for a merged **WhatsApp Ticket** goes to the ticket it was merged into
-- A **WhatsApp Ticket** merges only into another WhatsApp Ticket on the same **Business Number**, and is never split
+- A **WhatsApp Ticket** is never merged or split, with any ticket
 
 ## Flagged ambiguities
 

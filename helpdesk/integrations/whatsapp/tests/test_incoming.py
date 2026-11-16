@@ -308,14 +308,6 @@ class TestWhatsAppIncoming(IncomingTestCase):
         self.assertEqual(frappe.db.get_value("HD Ticket", closed, "status"), "Closed")
         self.assertEqual(self.ticket_of(self.receive("Any update?")), active)
 
-    def test_merged_tickets_route_to_the_merge_target(self) -> None:
-        source = self.ticket_of(self.receive("Duplicate"))
-        target = self.ticket_of(self.receive("Original", number=make_number()))
-        frappe.db.set_value(
-            "HD Ticket", source, {"is_merged": 1, "merged_with": target}
-        )
-        self.assertEqual(self.ticket_of(self.receive("Follow up")), target)
-
     def test_each_business_number_keeps_its_own_ticket(self) -> None:
         first = frappe.get_doc(
             "HD Ticket", self.ticket_of(self.receive("Sales question"))

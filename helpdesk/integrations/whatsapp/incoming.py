@@ -119,13 +119,7 @@ class IncomingMessage:
 
     def get_last_ticket(self) -> Document | None:
         name = get_latest_ticket(self.profile, for_update=True)
-        if not name:
-            return None
-        ticket = frappe.get_doc("HD Ticket", name, for_update=True)
-        if not ticket.is_merged:
-            return ticket
-        target = ticket.get_merge_target()
-        return frappe.get_doc("HD Ticket", target, for_update=True) if target else None
+        return frappe.get_doc("HD Ticket", name, for_update=True) if name else None
 
     def get_prompt_answer(self) -> str | None:
         """The button pressed, when this message answers a Closed-Ticket Prompt."""

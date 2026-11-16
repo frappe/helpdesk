@@ -135,6 +135,10 @@ const mergeConditions = [
     code: "is_merged === 0",
   },
   {
+    text: "Ticket must not be a WhatsApp ticket.",
+    code: "source !== 'WhatsApp'",
+  },
+  {
     text: "Source and target tickets which are to be merged cannot be the same.",
   },
   {
@@ -150,6 +154,7 @@ const mergeConditions = [
 interface Filter {
   status_category: [string, string[] | string];
   is_merged: number;
+  source: string[];
   name: string[];
   customer?: any;
   raised_by?: [string, string[] | string];
@@ -159,6 +164,7 @@ function getDefaultFilters() {
   const filters: Filter = {
     status_category: ["in", ["Open", "Paused"]],
     is_merged: 0,
+    source: ["!=", "WhatsApp"],
     name: ["!=", props.ticket.name],
   };
   // if part of an organization show all tickets of the organization

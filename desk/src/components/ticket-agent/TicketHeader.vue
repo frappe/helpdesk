@@ -235,6 +235,7 @@ const ticketCount = createResource({
 const showMergeOption = computed(() => {
   return (
     !ticket?.value?.doc?.is_merged &&
+    ticket?.value?.doc?.source !== "WhatsApp" &&
     ["Open", "Paused"].includes(ticket?.value?.doc?.status_category) &&
     ticketCount.data > 1
   );

@@ -14,7 +14,6 @@ from helpdesk.api.doc import handle_at_me_support
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket.ticket_origin import TICKET_ORIGIN_FIELDS
-from helpdesk.integrations.whatsapp.merge import WhatsAppMerge
 from helpdesk.integrations.whatsapp.outgoing import get_first_agent_reply_on
 from helpdesk.integrations.whatsapp.setup import WHATSAPP_SOURCE
 from helpdesk.ticket_fields import TicketFields
@@ -294,8 +293,10 @@ def merge_ticket(source: str, target: str):
         frappe.throw(_("Ticket #{0} is already merged").format(source))
     for name in (source, target):
         frappe.has_permission("HD Ticket", "write", doc=name, throw=True)
-    whatsapp = WhatsAppMerge(source, target)
-    whatsapp.validate()
+    if WHATSAPP_SOURCE in frappe.get_all(
+        "HD Ticket", filters={"name": ("in", (source, target))}, pluck="source"
+    ):
+        frappe.throw(_("WhatsApp tickets cannot be merged"))
 
     controller = get_controller("HD Ticket")
 
@@ -332,16 +333,13 @@ def merge_ticket(source: str, target: str):
     doc.flags.ignore_permlevel_for_fields = ["is_merged", "merged_with"]
     doc.save()
 
-    if whatsapp.is_whatsapp:
-        whatsapp.merge()
-    else:
-        message = _(
-            "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
-        ).format(source, target)
-        controller.reply_via_agent(
-            doc,
-            message=message,
-        )
+    message = _(
+        "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
+    ).format(source, target)
+    controller.reply_via_agent(
+        doc,
+        message=message,
+    )
 
     # comment in target ticket that
     c = frappe.new_doc("Comment")
