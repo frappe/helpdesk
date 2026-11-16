@@ -52,7 +52,7 @@
             class="mt-1 space-y-2 border-t border-outline-gray-1 px-3 pb-1 pt-2.5"
           >
             <div class="flex items-baseline justify-between">
-              <p class="text-sm text-ink-gray-5">{{ __("Clear after") }}</p>
+              <p class="text-sm text-ink-gray-5">{{ __("Resets in") }}</p>
               <p class="text-sm tabular-nums text-ink-gray-5">
                 <Transition
                   mode="out-in"
@@ -73,7 +73,7 @@
                 v-model="activePreset"
                 class="min-w-0 flex-1 [&_[data-slot=tab-button]]:flex-auto"
                 :options="presetOptions"
-                :aria-label="__('Clear after')"
+                :aria-label="__('Resets in')"
                 :fluid="isMobileView"
               />
               <Button
