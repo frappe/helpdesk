@@ -45,6 +45,7 @@
     ref="communicationAreaRef"
     :ticketId="String(ticket.doc?.name)"
     :whatsapp="isWhatsApp ? whatsapp : null"
+    :conversation="activeTab === 'whatsapp'"
     :to-emails="[ticket.doc?.raised_by]"
     :cc-emails="[]"
     :bcc-emails="[]"

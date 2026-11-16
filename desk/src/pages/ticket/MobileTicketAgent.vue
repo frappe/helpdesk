@@ -194,6 +194,7 @@
             v-model="ticket.doc"
             :ticketId="ticket.doc?.name"
             :whatsapp="ticket.doc?.source === 'WhatsApp' ? whatsapp : null"
+            :conversation="activeTab === 'whatsapp'"
             :to-emails="[ticket.doc.raised_by]"
             :cc-emails="[]"
             :bcc-emails="[]"

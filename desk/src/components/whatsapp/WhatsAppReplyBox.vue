@@ -69,7 +69,7 @@
             variant="ghost"
             :tooltip="__('Templates')"
             :aria-label="__('Templates')"
-            icon="lucide-layout-template"
+            :icon="WhatsAppIcon"
             @click="showTemplates = true"
           />
         </template>
@@ -103,6 +103,7 @@ import { MessageInput } from "@whatsapp/ui";
 import { Button, call } from "frappe-ui";
 import { inject, onBeforeUnmount, onMounted, ref, useTemplateRef } from "vue";
 import type { TicketWhatsApp } from "./useTicketWhatsApp";
+import WhatsAppIcon from "./WhatsAppIcon.vue";
 import WhatsAppTemplatePicker from "./WhatsAppTemplatePicker.vue";
 
 const props = defineProps<{ whatsapp: TicketWhatsApp }>();

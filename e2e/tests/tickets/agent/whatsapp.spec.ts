@@ -53,6 +53,7 @@ const composerBox = (page: Page) => composer(page).getByPlaceholder("Type a What
 // the bar's Reply has a visible label; a bubble's Reply is icon only
 const replyButton = (page: Page) =>
   page.getByRole("button", { name: "Reply", exact: true }).filter({ hasText: "Reply" });
+const commentButton = (page: Page) => page.getByRole("button", { name: "Comment", exact: true });
 
 async function openWhatsApp(page: Page, ticket: string) {
   await openTicket(page, ticket, "#whatsapp");
@@ -93,8 +94,8 @@ function shownOpacity(control: Locator): Promise<number> {
   });
 }
 
+// the WhatsApp tab shows its reply box already open, with no Reply and Comment bar
 async function openComposer(page: Page) {
-  await replyButton(page).click();
   await expect(composerBox(page)).toBeVisible();
   await composerSettled(page);
 }
@@ -203,9 +204,14 @@ async function expectDefaultTabs(page: Page, api: Api, emailDefault: string) {
   await expect(selectedTab(page)).toHaveText("WhatsApp");
   expect(new URL(page.url()).hash).toBe("");
   await expect(bubble(page, "Hi, my order")).toBeVisible();
+  await expect(composerBox(page)).toBeVisible();
+  await expect(replyButton(page)).toHaveCount(0);
+  await expect(commentButton(page)).toHaveCount(0);
 
   await page.getByRole("tab", { name: "Activity" }).click();
   await expect(page).toHaveURL(/#activity$/);
+  await expect(replyButton(page)).toBeVisible();
+  await expect(commentButton(page)).toBeVisible();
   await page.reload();
   await expect(selectedTab(page)).toHaveText("Activity");
 
@@ -424,7 +430,6 @@ test("after the reply window closes only a template can be sent", async ({ page,
   const { ticket } = await seedTicket(api);
   await page.clock.setFixedTime(Date.now() + 25 * 60 * 60 * 1000);
   await openWhatsApp(page, ticket);
-  await replyButton(page).click();
 
   const templateOnly = composer(page).getByTestId("whatsapp-template-only");
   await expect(templateOnly).toContainText("The 24-hour reply window has closed.");
@@ -443,7 +448,6 @@ test("a ticket with no messages shows the empty state, a slow load a spinner and
   await openWhatsApp(page, empty.name);
   await expect(thread(page)).toContainText("No WhatsApp messages yet");
   await shoot(page, "empty");
-  await replyButton(page).click();
   await expect(composer(page).getByTestId("whatsapp-no-recipient")).toHaveText(
     "This contact has not messaged on WhatsApp yet"
   );
@@ -549,7 +553,6 @@ test.describe("on a touch phone", () => {
     const next = await seedTicket(api, "A different customer");
     await navigateInApp(page, `/tickets/${next.ticket}#whatsapp`);
     await expect(bubble(page, "A different customer")).toBeVisible();
-    await replyButton(page).click();
     await expect(composerBox(page)).toHaveValue("");
   });
 });

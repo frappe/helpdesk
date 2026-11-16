@@ -1,6 +1,16 @@
 <template>
   <div class="comm-area" resizable="true">
+    <!-- the WhatsApp tab replies straight from its own box; a moved-on customer gets none -->
+    <template v-if="inConversation">
+      <WhatsAppReplyBox
+        v-if="whatsapp.canReply"
+        ref="whatsAppReplyBoxRef"
+        :whatsapp="whatsapp"
+        @sent="emit('update')"
+      />
+    </template>
     <div
+      v-else
       class="flex justify-between gap-3 border-t px-6 md:px-5 py-4 md:py-2.5"
     >
       <div class="flex gap-1.5 items-center">
@@ -33,7 +43,7 @@
         <TypingIndicator :ticketId="ticketId" />
       </div>
     </div>
-    <Transition name="slide">
+    <Transition v-if="!inConversation" name="slide">
       <div
         v-show="showEmailBox"
         ref="emailBoxRef"
@@ -79,7 +89,7 @@
         </div>
       </div>
     </Transition>
-    <Transition name="slide">
+    <Transition v-if="!inConversation" name="slide">
       <div
         v-show="showCommentBox"
         ref="commentBoxRef"
@@ -136,7 +146,7 @@ import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { onClickOutside } from "@vueuse/core";
-import { ref, watch, type PropType } from "vue";
+import { computed, ref, watch, type PropType } from "vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
@@ -153,6 +163,7 @@ const emailBoxRef = ref(null);
 const commentBoxRef = ref(null);
 
 function toggleEmailBox() {
+  if (inConversation.value) return whatsAppReplyBoxRef.value?.focus();
   // nothing to reply with without the whatsapp app, nor once the customer moved to a new ticket
   if (props.whatsapp && !props.whatsapp.canReply) return;
   if (showCommentBox.value) {
@@ -162,6 +173,7 @@ function toggleEmailBox() {
 }
 
 function toggleCommentBox() {
+  if (inConversation.value) return;
   if (showEmailBox.value) {
     showEmailBox.value = false;
   }
@@ -200,8 +212,9 @@ function replyToEmail(data: object) {
 }
 
 function replyToWhatsApp(message: WhatsAppMessage) {
-  showEmailBox.value = true;
   props.whatsapp?.messages.setReplyTo(message);
+  if (inConversation.value) whatsAppReplyBoxRef.value?.focus();
+  else showEmailBox.value = true;
 }
 
 const props = defineProps({
@@ -209,6 +222,11 @@ const props = defineProps({
   whatsapp: {
     type: Object as PropType<TicketWhatsApp | null>,
     default: null,
+  },
+  /** True while the WhatsApp tab is open: its reply box shows without the Reply and Comment bar */
+  conversation: {
+    type: Boolean,
+    default: false,
   },
   doctype: {
     type: String,
@@ -231,6 +249,10 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+const inConversation = computed(() =>
+  Boolean(props.whatsapp && props.conversation)
+);
 
 watch(
   () => showEmailBox.value,
