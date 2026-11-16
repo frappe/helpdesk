@@ -47,33 +47,39 @@
         v-if="agentStatusStore.statusCanExpire(agentStatusStore.myStatus)"
         class="grid grid-rows-[1fr]"
       >
-        <div class="min-h-0">
+        <div class="min-h-0 min-w-0">
           <div
             class="mt-1 space-y-2 border-t border-outline-gray-1 px-3 pb-1 pt-2.5"
           >
             <div class="flex items-baseline justify-between">
-              <p class="text-sm text-ink-gray-5">{{ __("Clear after") }}</p>
-              <p class="text-sm tabular-nums text-ink-gray-5">
+              <p class="text-sm text-ink-gray-5">{{ __("Resets in") }}</p>
+              <!-- old and new time share one cell so they slide past each other -->
+              <p
+                class="grid justify-items-end text-sm tabular-nums text-ink-gray-5"
+              >
                 <Transition
-                  mode="out-in"
-                  enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
-                  enter-from-class="translate-y-1 opacity-0"
-                  leave-active-class="transition duration-100 ease-in motion-reduce:transition-none"
-                  leave-to-class="-translate-y-1 opacity-0"
+                  enter-active-class="motion-safe:transition motion-safe:duration-200 motion-safe:ease-out"
+                  leave-active-class="motion-safe:transition motion-safe:duration-200 motion-safe:ease-out"
+                  enter-from-class="translate-x-2 opacity-0"
+                  leave-to-class="-translate-x-2 opacity-0"
                 >
-                  <span :key="expiresLabel" class="inline-block">
+                  <span :key="expiresLabel" class="[grid-area:1/1]">
                     {{ expiresLabel }}
                   </span>
                 </Transition>
               </p>
             </div>
             <div class="flex items-center justify-between gap-2">
+              <!-- phones: presets take the full row, reset moves below -->
               <TabButtons
                 v-model="activePreset"
+                class="min-w-0 flex-1 [&_[data-slot=tab-button]]:flex-auto"
                 :options="presetOptions"
-                :aria-label="__('Clear after')"
+                :aria-label="__('Resets in')"
+                :fluid="isMobileView"
               />
               <Button
+                v-if="!isMobileView"
                 class="-mr-1.5"
                 theme="red"
                 variant="ghost"
@@ -83,6 +89,15 @@
                 @click="clearNow"
               />
             </div>
+            <Button
+              v-if="isMobileView"
+              class="w-full"
+              theme="red"
+              variant="ghost"
+              icon-left="lucide-timer-reset"
+              :label="__('Clear status')"
+              @click="clearNow"
+            />
           </div>
         </div>
       </div>
@@ -91,6 +106,7 @@
 </template>
 
 <script setup lang="ts">
+import { useScreenSize } from "@/composables/screen";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import { expiryLabel, expiryPresets } from "@/stores/statusExpiry";
 import { __ } from "@/translation";
@@ -101,6 +117,7 @@ import { computed } from "vue";
 const emit = defineEmits<{ close: [] }>();
 
 const agentStatusStore = useAgentStatusStore();
+const { isMobileView } = useScreenSize();
 
 const expiresLabel = computed(() =>
   expiryLabel(agentStatusStore.myStatusExpiresOn)
