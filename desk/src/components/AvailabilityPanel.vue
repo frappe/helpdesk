@@ -47,7 +47,7 @@
         v-if="agentStatusStore.statusCanExpire(agentStatusStore.myStatus)"
         class="grid grid-rows-[1fr]"
       >
-        <div class="min-h-0">
+        <div class="min-h-0 min-w-0">
           <div
             class="mt-1 space-y-2 border-t border-outline-gray-1 px-3 pb-1 pt-2.5"
           >
@@ -68,12 +68,16 @@
               </p>
             </div>
             <div class="flex items-center justify-between gap-2">
+              <!-- phones: presets take the full row, reset moves below -->
               <TabButtons
                 v-model="activePreset"
+                class="min-w-0 flex-1 [&_[data-slot=tab-button]]:flex-auto"
                 :options="presetOptions"
                 :aria-label="__('Clear after')"
+                :fluid="isMobileView"
               />
               <Button
+                v-if="!isMobileView"
                 class="-mr-1.5"
                 theme="red"
                 variant="ghost"
@@ -83,6 +87,15 @@
                 @click="clearNow"
               />
             </div>
+            <Button
+              v-if="isMobileView"
+              class="w-full"
+              theme="red"
+              variant="ghost"
+              icon-left="lucide-timer-reset"
+              :label="__('Clear status')"
+              @click="clearNow"
+            />
           </div>
         </div>
       </div>
@@ -91,6 +104,7 @@
 </template>
 
 <script setup lang="ts">
+import { useScreenSize } from "@/composables/screen";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import { expiryLabel, expiryPresets } from "@/stores/statusExpiry";
 import { __ } from "@/translation";
@@ -101,6 +115,7 @@ import { computed } from "vue";
 const emit = defineEmits<{ close: [] }>();
 
 const agentStatusStore = useAgentStatusStore();
+const { isMobileView } = useScreenSize();
 
 const expiresLabel = computed(() =>
   expiryLabel(agentStatusStore.myStatusExpiresOn)

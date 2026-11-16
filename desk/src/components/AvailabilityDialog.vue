@@ -3,7 +3,7 @@
   <Dialog v-model:open="open" bare size="sm">
     <template #default="{ close }">
       <div class="p-2 pb-3">
-        <div class="flex items-center justify-between pb-1 ps-2">
+        <div class="flex items-center justify-between pb-1 pe-1.5 ps-2">
           <Dialog.Title class="text-lg-semibold text-ink-gray-8">
             {{ __("Set status") }}
           </Dialog.Title>
