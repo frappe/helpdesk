@@ -52,7 +52,7 @@
         class="flex-1 [&_[role='tablist']]:px-0 [&_[role='tabpanel'][data-state='inactive']]:hidden"
       >
         <template #tab-panel="{ tab: panel }">
-          <div class="pt-5">
+          <div class="pt-2">
             <WhatsAppTemplates
               v-if="panel.value === 'templates'"
               @open="(name) => open('template', name)"
