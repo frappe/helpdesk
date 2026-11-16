@@ -90,12 +90,13 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
 
       await row.getByRole("button", { name: created }).click();
       await expect(dialog.getByLabel("Account name")).toHaveValue(created);
+      await expect(dialog.getByRole("button", { name: "Save", exact: true })).toBeDisabled();
       await dialog.getByLabel("Phone ID").fill("15550100199");
       await dialog.getByLabel("Create tickets").uncheck();
       await expect(page.getByText("Default account updated")).toBeHidden({
         timeout: 15000,
       });
-      await expect(dialog.getByRole("button", { name: "Save", exact: true })).toBeVisible();
+      await expect(dialog.getByRole("button", { name: "Save", exact: true })).toBeEnabled();
       await shoot(page, "wa-settings-edit");
       await dialog.getByRole("button", { name: "Save", exact: true }).click();
       await expect(page.getByText("Account updated")).toBeVisible();
@@ -194,7 +195,7 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await page.unroute("**/api/method/frappe.client.get");
       await loadError.getByRole("button", { name: "Retry" }).click();
       await expect(dialog.getByLabel("Account name")).toHaveValue(accounts[0]);
-      await expect(dialog.getByRole("button", { name: "Save", exact: true })).toHaveCount(0);
+      await expect(dialog.getByRole("button", { name: "Save", exact: true })).toBeDisabled();
     });
 
     test("an admin creates, previews, syncs and opens a template", async ({ page, api }) => {

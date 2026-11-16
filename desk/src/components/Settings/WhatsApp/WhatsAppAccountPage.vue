@@ -4,10 +4,11 @@
     :on-back="() => leave(() => emit('back'))"
     :dirty="isDirty && !account.isNew"
   >
-    <template v-if="loaded && (isDirty || account.isNew)" #header-actions>
+    <template v-if="loaded" #header-actions>
       <Button
         :label="account.isNew ? __('Create') : __('Save')"
         :loading="account.saving"
+        :disabled="!isDirty && !account.isNew"
         theme="gray"
         variant="solid"
         @click="save"
