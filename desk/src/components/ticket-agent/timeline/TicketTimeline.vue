@@ -42,7 +42,7 @@
         </template>
 
         <template #item-email="{ activity }">
-          <EmailItem :email="withEmailFixups(activity)">
+          <EmailItem :email="withEmailFixups(activity)" hide-subject>
             <template #actions>
               <Button
                 variant="ghost"
