@@ -280,6 +280,8 @@ test("an agent sends an image with a caption, and it shows in the thread", async
   await openComposer(page);
 
   await composer(page).getByRole("button", { name: "Attach a file" }).click();
+  await expect(page.getByRole("menuitem", { name: "Upload Image" })).toBeVisible();
+  await shoot(page, "attach-menu");
   const chooser = page.waitForEvent("filechooser");
   await page.getByRole("menuitem", { name: "Upload Image" }).click();
   await (await chooser).setFiles({
@@ -289,6 +291,7 @@ test("an agent sends an image with a caption, and it shows in the thread", async
   });
   const preview = page.getByRole("dialog");
   await preview.getByPlaceholder("Add a caption...").fill("Photo of the replacement");
+  await shoot(page, "media-preview");
   await preview.getByRole("button", { name: /send/i }).click();
   await expect
     .poll(async () => (await outgoing(api, ticket)).map((row) => row.mime_type))
