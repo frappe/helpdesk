@@ -5,7 +5,7 @@ from frappe import _
 from frappe.utils import add_to_date, now, now_datetime, sha256_hash
 from frappe.web_crawler import CrawledPage, start_crawl
 from frappe.web_crawler.limits import CrawlLimits
-from frappe.website.doctype.web_crawl.web_crawl import ERRORS
+from frappe.website.doctype.web_crawl.web_crawl import ERRORS, STOPPED_REASONS
 
 # Pages read per run, unless Web Crawl Settings allow fewer; importing again picks up the next batch.
 MAX_PAGES = 200
@@ -49,7 +49,7 @@ def page_key(url: str) -> str:
 
 def page_limit() -> int:
     """The most pages one import reads: MAX_PAGES, or the lower Web Crawl Settings cap."""
-    return CrawlLimits.from_settings(MAX_PAGES).max_pages
+    return min(MAX_PAGES, CrawlLimits.from_settings().max_pages)
 
 
 def start_import(url: str, category: str):
@@ -57,7 +57,7 @@ def start_import(url: str, category: str):
     return start_crawl(
         url,
         sitemap="only",
-        limit=MAX_PAGES,
+        limit=page_limit(),
         on_page=ON_PAGE,
         skip_urls=SKIP_URLS,
         reference_doctype="HD Article Category",
@@ -108,7 +108,15 @@ def last_import() -> dict | None:
     crawl = frappe.db.get_value(
         "Web Crawl",
         {"on_page_method": ON_PAGE},
-        ["name", "url", "status", "pages_crawled", "reference_name", "creation"],
+        [
+            "name",
+            "url",
+            "status",
+            "stopped_reason",
+            "pages_crawled",
+            "reference_name",
+            "creation",
+        ],
         order_by="creation desc",
         as_dict=True,
     )
@@ -204,6 +212,10 @@ class ImportResult:
         )
 
     def nothing_read(self) -> str:
+        if self.crawl.stopped_reason == STOPPED_REASONS["robots_too_large"]:
+            return _(
+                "The robots.txt of {0} is larger than Web Crawl Settings allow, so no page was read. Ask an administrator to raise Maximum robots.txt size."
+            ).format(self.host)
         if self.crawl.pages_crawled:
             return _("We found pages on {0} but could not read any of them.").format(
                 self.host

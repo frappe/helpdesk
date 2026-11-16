@@ -81,6 +81,15 @@ class TestImportDocs(DocsImportCase):
         self.assertEqual(result["state"], "error")
         self.assertIn("llms.txt or sitemap.xml", result["message"])
 
+    def test_a_robots_txt_over_the_size_limit_asks_to_raise_it(self):
+        self.site.add(f"{URL}/robots.txt", "#" * 2048, "text/plain")
+
+        with change_settings("Web Crawl Settings", {"max_robots_size": 1}):
+            result = self.import_site()
+
+        self.assertEqual(result["state"], "error")
+        self.assertIn("Maximum robots.txt size", result["message"])
+
     def test_new_category_is_created_only_when_the_import_starts(self):
         name = unique_name("Docs Site")
 
