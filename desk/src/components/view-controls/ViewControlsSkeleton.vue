@@ -9,7 +9,6 @@
       <Skeleton :class="[BLOCK, 'w-7']" />
       <Skeleton :class="[BLOCK, 'w-[73px]']" />
       <Skeleton :class="[BLOCK, 'w-36']" />
-      <Skeleton v-if="groupBy" :class="[BLOCK, 'w-[81px]']" />
       <Skeleton v-if="columnSetting" :class="[BLOCK, 'w-[98px]']" />
     </div>
   </template>
@@ -18,7 +17,6 @@
     <div class="flex items-center gap-2">
       <Skeleton :class="[BLOCK, 'w-7']" />
       <Skeleton :class="[BLOCK, 'w-7']" />
-      <Skeleton v-if="groupBy" :class="[BLOCK, 'w-7']" />
     </div>
   </div>
 </template>
@@ -28,7 +26,6 @@ import { Skeleton } from "frappe-ui";
 
 defineProps<{
   isMobileView: boolean;
-  groupBy: boolean;
   columnSetting: boolean;
 }>();
 

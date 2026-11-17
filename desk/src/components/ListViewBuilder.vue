@@ -12,7 +12,6 @@
     <ViewControlsSkeleton
       v-if="!viewControlsReady"
       :is-mobile-view="isMobileView"
-      :group-by="false"
       :column-setting="!options.hideColumnSetting"
     />
     <template v-else>

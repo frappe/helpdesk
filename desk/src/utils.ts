@@ -60,10 +60,6 @@ export function serverInstant(date: string) {
   return dayjs(dayjs.tz(date, systemTimezone).valueOf());
 }
 
-export function getBrowserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
 export function formatTime(
   seconds: number,
   config: {
