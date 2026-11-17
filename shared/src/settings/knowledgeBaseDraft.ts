@@ -187,18 +187,20 @@ function createDraft() {
   // Order is 1-based; 0 means unpinned.
   async function savePinned(pinned: string[]) {
     const { failed_docs } = await call("frappe.client.bulk_update", {
-      docs: categories.data
-        .map((row) => ({ row, order: pinned.indexOf(row.name) + 1 }))
-        .filter(
-          ({ row, order }) =>
-            Boolean(row.pinned) !== order > 0 || row.pinned_order !== order
-        )
-        .map(({ row, order }) => ({
-          doctype: "HD Article Category",
-          docname: row.name,
-          pinned: order > 0 ? 1 : 0,
-          pinned_order: order,
-        })),
+      docs: JSON.stringify(
+        categories.data
+          .map((row) => ({ row, order: pinned.indexOf(row.name) + 1 }))
+          .filter(
+            ({ row, order }) =>
+              Boolean(row.pinned) !== order > 0 || row.pinned_order !== order
+          )
+          .map(({ row, order }) => ({
+            doctype: "HD Article Category",
+            docname: row.name,
+            pinned: order > 0 ? 1 : 0,
+            pinned_order: order,
+          }))
+      ),
     });
     if (failed_docs.length) {
       throw new Error(__("Could not update the pinned categories"));

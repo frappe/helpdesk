@@ -346,11 +346,13 @@ async function updateArticlesAccess(visibility: string) {
   let failed_docs;
   try {
     ({ failed_docs } = await call("frappe.client.bulk_update", {
-      docs: Array.from(listSelections.value).map((docname) => ({
-        doctype: "HD Article",
-        docname,
-        visibility,
-      })),
+      docs: JSON.stringify(
+        Array.from(listSelections.value).map((docname) => ({
+          doctype: "HD Article",
+          docname,
+          visibility,
+        }))
+      ),
     }));
   } catch {
     // per-article failures come back in `failed_docs`
