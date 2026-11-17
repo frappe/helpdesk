@@ -49,7 +49,7 @@ const bubble = (page: Page, text: string) =>
   thread(page).getByRole("listitem").filter({ hasText: text }).first();
 const direction = (message: Locator) => message.locator("[data-direction]");
 const composer = (page: Page) => page.getByTestId("whatsapp-composer");
-const composerBox = (page: Page) => composer(page).getByPlaceholder("Type a WhatsApp message");
+const composerBox = (page: Page) => composer(page).getByPlaceholder("Type a message");
 // the bar's Reply has a visible label; a bubble's Reply is icon only
 const replyButton = (page: Page) =>
   page.getByRole("button", { name: "Reply", exact: true }).filter({ hasText: "Reply" });

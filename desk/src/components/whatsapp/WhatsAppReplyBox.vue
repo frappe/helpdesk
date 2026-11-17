@@ -44,7 +44,7 @@
         ref="input"
         v-bind="whatsapp.messages"
         :sender-name="whatsapp.contactName || __('Contact')"
-        :placeholder="__('Type a WhatsApp message')"
+        :placeholder="__('Type a message')"
         :you-label="__('You')"
         :upload-document-label="__('Upload Document')"
         :upload-image-label="__('Upload Image')"
