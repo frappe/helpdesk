@@ -8,6 +8,7 @@ on:
       - version-16-hotfix
     paths:
       - "desk/**"
+      - "shared/**"
       - "e2e/**"
       - "playwright.config.ts"
       - "package.json"
