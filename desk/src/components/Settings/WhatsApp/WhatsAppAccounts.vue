@@ -15,17 +15,17 @@
     />
     <div v-else-if="accounts.data.length" class="-mx-2 flex flex-col">
       <template v-for="(account, index) in accounts.data" :key="account.name">
-        <hr v-if="index" class="mx-2 border-outline-elevation-2" />
+        <hr v-if="index" class="mx-2" />
         <div
-          class="flex items-center gap-3 rounded-4 px-2 py-3 hover:bg-surface-gray-2"
+          class="flex h-12.5 items-center gap-3 rounded-4 px-2 hover:bg-surface-sidebar"
           data-testid="whatsapp-account"
         >
           <button
-            class="flex min-w-0 flex-1 flex-col items-start gap-1 text-start"
+            class="flex h-full min-w-0 flex-1 items-center gap-2 text-start"
             @click="open(account.name)"
           >
-            <span class="flex max-w-full items-center gap-1.5">
-              <span class="truncate text-base-medium text-ink-gray-8">
+            <span class="flex min-w-0 items-center gap-1.5">
+              <span class="truncate text-base-medium text-ink-gray-7">
                 {{ account.account_name }}
               </span>
               <Badge
@@ -40,7 +40,7 @@
                 :label="__('Default')"
               />
             </span>
-            <span class="truncate text-p-sm text-ink-gray-6">
+            <span class="truncate text-sm text-ink-gray-5">
               {{ __("Phone ID: {0}", [account.phone_id || "-"]) }}
             </span>
           </button>

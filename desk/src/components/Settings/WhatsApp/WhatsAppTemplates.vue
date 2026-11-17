@@ -1,11 +1,10 @@
 <template>
   <section class="flex flex-col gap-3">
     <div
-      v-if="templates.data"
+      v-if="templates.data?.length"
       class="sticky top-0 z-10 flex items-center gap-2 bg-surface-elevation-2 py-2"
     >
       <TextInput
-        v-if="templates.data?.length"
         v-model="search"
         class="min-w-0 flex-1"
         :placeholder="__('Search template')"
@@ -38,19 +37,19 @@
     />
     <div v-else-if="filtered.length" class="-mx-2 flex flex-col">
       <template v-for="(template, index) in filtered" :key="template.name">
-        <hr v-if="index" class="mx-2 border-outline-elevation-2" />
+        <hr v-if="index" class="mx-2" />
         <div
-          class="flex items-center gap-3 rounded-4 px-2 py-3 hover:bg-surface-gray-2"
+          class="flex h-12.5 items-center gap-3 rounded-4 px-2 hover:bg-surface-sidebar"
           data-testid="whatsapp-template"
         >
           <button
-            class="flex min-w-0 flex-1 flex-col items-start gap-1 text-start"
+            class="flex h-full min-w-0 flex-1 items-center gap-2 text-start"
             @click="emit('open', template.name)"
           >
-            <span class="max-w-full truncate text-base-medium text-ink-gray-8">
+            <span class="truncate text-base-medium text-ink-gray-7">
               {{ template.template_label || template.template_name }}
             </span>
-            <span class="max-w-full truncate text-p-sm text-ink-gray-6">
+            <span class="truncate text-sm text-ink-gray-5">
               {{ details(template) }}
             </span>
           </button>
@@ -84,6 +83,14 @@
         :description="
           __('Create one, or sync the templates already on your Meta account.')
         "
+        :actions="[
+          {
+            label: __('Sync'),
+            iconLeft: 'lucide-refresh-cw',
+            loading: syncing,
+            onClick: sync,
+          },
+        ]"
       />
     </div>
   </section>
