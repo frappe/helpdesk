@@ -672,6 +672,9 @@ declare global {
     apps: string[];
     cloud_settings?: { enabled: boolean };
     customer_home_page: string;
+    site_name: string;
+    setup_complete: boolean;
+    setup_pending: boolean;
   }
 }
 

@@ -107,7 +107,11 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { handleInviteUserSuccess } from "@/utils";
+import {
+  type AgentRole,
+  getInviteByEmailRoles,
+  handleInviteUserSuccess,
+} from "@/utils";
 import {
   Button,
   FormControl,
@@ -128,7 +132,7 @@ const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const emails = ref("");
 
-type Role = "Agent" | "Agent Manager" | "System Manager";
+type Role = AgentRole;
 type RoleOption = {
   label: string;
   value: Role;
@@ -260,25 +264,6 @@ const rolesToLabel = (roles: readonly Role[]) => {
     return roleToLabel("Agent");
   }
   throw new Error(`Invalid roles: ${roles.join(", ")}`);
-};
-
-const getInviteByEmailRoles = (selectedRole: Role) => {
-  const res: Role[] = [];
-  switch (selectedRole) {
-    case "System Manager":
-      res.push("Agent", "Agent Manager");
-      break;
-    case "Agent Manager":
-      res.push("Agent");
-      break;
-    case "Agent":
-      break;
-    default:
-      const x: never = selectedRole;
-      throw new Error(`Invalid selected role: ${x}`);
-  }
-  res.push(selectedRole);
-  return res;
 };
 </script>
 
