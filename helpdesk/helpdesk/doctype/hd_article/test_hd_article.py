@@ -1,6 +1,7 @@
 # Copyright (c) 2021, Frappe Technologies and Contributors
 # See license.txt
 import frappe
+from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import FrappeTestCase, change_settings
 
 from helpdesk.test_utils import make_article, make_article_category, unique_name
