@@ -30,7 +30,11 @@
       />
       <AccountForm v-else :controller="account" :show-append-actions="false">
         <template #settings>
-          <Checkbox v-model="createTickets" :label="__('Create tickets')" />
+          <Checkbox
+            v-model="createTickets"
+            class="mt-2"
+            :label="__('Create tickets')"
+          />
         </template>
       </AccountForm>
     </template>
