@@ -255,6 +255,23 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       await expect(row).toBeVisible();
     });
 
+    test("the template search stays in view while a long list scrolls", async ({ page }) => {
+      const message = Array.from({ length: 30 }, (_, index) => ({
+        name: `E2E Template ${index}`,
+        template_name: `e2e_template_${index}`,
+        status: "Approved",
+      }));
+      await page.route("**/api/method/frappe.client.get_list", (route) =>
+        route.request().postDataJSON()?.doctype === "WA Template" ? route.fulfill({ json: { message } }) : route.fallback()
+      );
+      await page.goto("/helpdesk/tickets");
+      const dialog = await openSettings(page, "WhatsApp");
+      await dialog.getByTestId("whatsapp-template").last().scrollIntoViewIfNeeded();
+      await expect(dialog.getByTestId("whatsapp-template").first()).not.toBeInViewport();
+      await expect(dialog.getByPlaceholder("Search template")).toBeInViewport();
+      await shoot(page, "wa-settings-templates-scrolled");
+    });
+
     test("with no accounts or templates both tabs show an empty state", async ({ page }) => {
       await page.unroute("**/api/method/frappe.client.get_list");
       await showOnly(page, "WA Account", `none-${uid()}`);
