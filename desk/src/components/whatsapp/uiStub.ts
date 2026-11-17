@@ -1,5 +1,5 @@
 /** Stands in for @whatsapp/ui when the whatsapp app is not on the bench; nothing here is ever shown. */
-import { defineComponent, reactive } from "vue";
+import { defineComponent, reactive, ref } from "vue";
 
 const Empty = defineComponent({ name: "WhatsAppUIStub", render: () => null });
 const nothing = async () => null;
@@ -61,6 +61,10 @@ export function useAccount() {
     save: nothing,
     reload: nothing,
   });
+}
+
+export function useAppendToggle() {
+  return ref(false);
 }
 
 export function useTemplate() {

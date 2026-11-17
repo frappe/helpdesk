@@ -25,8 +25,6 @@ SUBJECT_LENGTH = 140
 def before_insert(doc: Document, method: str | None = None) -> None:
     """File an inbound message from WhatsApp onto its sender's ticket, on accounts that create tickets."""
     if doc.direction == "Incoming" and creates_tickets(doc.whatsapp_account):
-        # Helpdesk files it, or holds it off every ticket for the prompt, so the app's actions leave it alone
-        doc.flags.skip_append_actions = True
         with as_administrator():
             IncomingMessage(doc).route()
     if doc.reference_doctype == "HD Ticket":

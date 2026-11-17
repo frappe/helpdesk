@@ -1,11 +1,7 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.integrations.whatsapp.account import (
-    TICKET_ACTION,
-    add_ticket_action,
-    creates_tickets,
-)
+from helpdesk.integrations.whatsapp.account import add_ticket_action, creates_tickets
 from helpdesk.integrations.whatsapp.test_utils import (
     make_whatsapp_account,
     requires_whatsapp,
@@ -39,21 +35,8 @@ class TestWhatsAppAppendActions(IntegrationTestCase):
     def tearDown(self) -> None:
         frappe.db.rollback()
 
-    def test_a_bare_hd_ticket_row_saves_and_a_mapped_or_outgoing_one_is_refused(
-        self,
-    ) -> None:
+    def test_only_an_hd_ticket_row_creates_tickets(self) -> None:
         self.assertTrue(creates_tickets(make_whatsapp_account()))
-        for row in (
-            append_action("HD Ticket", "raised_by", "subject"),
-            {**TICKET_ACTION, "trigger_on": "Both"},
-        ):
-            with (
-                self.subTest(row=row),
-                self.assertRaisesRegex(frappe.ValidationError, "no field mapping"),
-            ):
-                make_whatsapp_account(append_actions=[row])
-
-    def test_an_append_action_to_another_doctype_saves(self) -> None:
         account = make_whatsapp_account(
             append_actions=[append_action("Contact", "mobile_no", "first_name")]
         )

@@ -28,7 +28,7 @@
         :primary-action="{ label: __('Retry'), onClick: account.reload }"
         data-testid="whatsapp-account-error"
       />
-      <AccountForm v-else :controller="account" :append-actions="false">
+      <AccountForm v-else :controller="account" :show-append-actions="false">
         <template #settings>
           <Checkbox v-model="createTickets" :label="__('Create tickets')" />
         </template>
@@ -49,7 +49,7 @@
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
-import { AccountForm, useAccount } from "@whatsapp/ui";
+import { AccountForm, useAccount, useAppendToggle } from "@whatsapp/ui";
 import { Alert, Button, Checkbox, LoadingIndicator, toast } from "frappe-ui";
 import { computed } from "vue";
 import { useUnsavedGuard } from "./useUnsavedGuard";
@@ -72,16 +72,7 @@ const loaded = computed(() => account.isNew || Boolean(account.doc.name));
 const isDirty = computed(() => loaded.value && account.isDirty);
 const { confirming, leave, confirm } = useUnsavedGuard(() => isDirty.value);
 
-const createTickets = computed({
-  get: () =>
-    account.doc.append_actions.some((row) => row.append_to === "HD Ticket"),
-  set: (on: boolean) => {
-    const rows = account.doc.append_actions.filter(
-      (row) => row.append_to !== "HD Ticket"
-    );
-    account.doc.append_actions = on ? [...rows, { ...TICKET_ACTION }] : rows;
-  },
-});
+const createTickets = useAppendToggle(account, TICKET_ACTION);
 
 /** Create goes back to the list; the form shows a failed save itself. */
 async function save() {

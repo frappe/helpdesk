@@ -35,6 +35,8 @@ after_migrate = [
 after_app_install = "helpdesk.integrations.whatsapp.setup.setup_whatsapp"
 # the whatsapp app has no role model; ticket conversations are gated here
 whatsapp_access_guard = ["helpdesk.integrations.whatsapp.permissions.validate_access"]
+# the HD Ticket append action only switches tickets on; Helpdesk files the messages itself
+whatsapp_managed_doctypes = ["HD Ticket"]
 
 
 # Full Text Search
@@ -176,9 +178,6 @@ doc_events = {
     },
     "WA Log": {
         "after_insert": "helpdesk.integrations.whatsapp.incoming.after_status_log",
-    },
-    "WA Account": {
-        "validate": "helpdesk.integrations.whatsapp.account.validate",
     },
     "HD Ticket": {
         "on_trash": "helpdesk.integrations.whatsapp.incoming.delete_thread",
