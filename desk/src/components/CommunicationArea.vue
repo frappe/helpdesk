@@ -1,10 +1,21 @@
 <template>
   <div class="comm-area" resizable="true">
+    <!-- the WhatsApp tab replies straight from its own box; a moved-on customer gets none -->
+    <template v-if="inConversation">
+      <WhatsAppReplyBox
+        v-if="whatsapp.canReply"
+        ref="whatsAppReplyBoxRef"
+        :whatsapp="whatsapp"
+        @sent="emit('update')"
+      />
+    </template>
     <div
+      v-else
       class="flex justify-between gap-3 border-t px-6 md:px-5 py-4 md:py-2.5"
     >
       <div class="flex gap-1.5 items-center">
         <Button
+          v-if="!whatsapp || whatsapp.canReply"
           ref="sendEmailRef"
           variant="ghost"
           label="Reply"
@@ -14,7 +25,7 @@
           @click="toggleEmailBox()"
         >
           <template #prefix>
-            <EmailIcon class="h-4" />
+            <component :is="whatsapp ? WhatsAppIcon : EmailIcon" class="h-4" />
           </template>
         </Button>
         <Button
@@ -32,7 +43,7 @@
         <TypingIndicator :ticketId="ticketId" />
       </div>
     </div>
-    <Transition name="slide">
+    <Transition v-if="!inConversation" name="slide">
       <div
         v-show="showEmailBox"
         ref="emailBoxRef"
@@ -41,7 +52,15 @@
         @keydown.esc.capture.stop="showEmailBox = false"
       >
         <div class="overflow-hidden">
+          <WhatsAppReplyBox
+            v-if="whatsapp"
+            ref="whatsAppReplyBoxRef"
+            class="border-t"
+            :whatsapp="whatsapp"
+            @sent="emit('update')"
+          />
           <EmailEditor
+            v-else
             ref="emailEditorRef"
             :label="
               isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
@@ -71,7 +90,7 @@
         </div>
       </div>
     </Transition>
-    <Transition name="slide">
+    <Transition v-if="!inConversation" name="slide">
       <div
         v-show="showCommentBox"
         ref="commentBoxRef"
@@ -119,12 +138,16 @@
 <script setup lang="ts">
 import { CommentTextEditor, EmailEditor, TypingIndicator } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
+import type { TicketWhatsApp } from "@/components/whatsapp/useTicketWhatsApp";
+import WhatsAppIcon from "@/components/whatsapp/WhatsAppIcon.vue";
+import WhatsAppReplyBox from "@/components/whatsapp/WhatsAppReplyBox.vue";
+import type { WhatsAppMessage } from "@whatsapp/ui";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { onClickOutside } from "@vueuse/core";
-import { ref, watch } from "vue";
+import { computed, ref, watch, type PropType } from "vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
@@ -133,11 +156,17 @@ const { isMobileView } = useScreenSize();
 let doc = defineModel();
 // let doc = inject(TicketSymbol)?.value.doc
 const emailEditorRef = ref(null);
+const whatsAppReplyBoxRef = ref<InstanceType<typeof WhatsAppReplyBox> | null>(
+  null
+);
 const commentTextEditorRef = ref(null);
 const emailBoxRef = ref(null);
 const commentBoxRef = ref(null);
 
 function toggleEmailBox() {
+  if (inConversation.value) return whatsAppReplyBoxRef.value?.focus();
+  // nothing to reply with without the whatsapp app, nor once the customer moved to a new ticket
+  if (props.whatsapp && !props.whatsapp.canReply) return;
   if (showCommentBox.value) {
     showCommentBox.value = false;
   }
@@ -145,6 +174,7 @@ function toggleEmailBox() {
 }
 
 function toggleCommentBox() {
+  if (inConversation.value) return;
   if (showEmailBox.value) {
     showEmailBox.value = false;
   }
@@ -154,6 +184,8 @@ function toggleCommentBox() {
 // the editors emit `submit` once the write lands; reloading here too would
 // fetch twice, and the guards' `false` never reaches this side anyway
 function submitEmail() {
+  // MessageInput sends on Enter itself
+  if (props.whatsapp) return;
   emailEditorRef.value.submitMail();
 }
 
@@ -169,6 +201,7 @@ function splitIfString(str: string | string[]) {
 }
 
 function replyToEmail(data: object) {
+  if (props.whatsapp) return;
   showEmailBox.value = true;
 
   emailEditorRef.value.addToReply(
@@ -179,7 +212,23 @@ function replyToEmail(data: object) {
   );
 }
 
+function replyToWhatsApp(message: WhatsAppMessage) {
+  props.whatsapp?.messages.setReplyTo(message);
+  if (inConversation.value) whatsAppReplyBoxRef.value?.focus();
+  else showEmailBox.value = true;
+}
+
 const props = defineProps({
+  // set on a WhatsApp ticket: the reply box sends through it instead of email
+  whatsapp: {
+    type: Object as PropType<TicketWhatsApp | null>,
+    default: null,
+  },
+  /** True while the WhatsApp tab is open: its reply box shows without the Reply and Comment bar */
+  conversation: {
+    type: Boolean,
+    default: false,
+  },
   doctype: {
     type: String,
     default: "HD Ticket",
@@ -202,12 +251,16 @@ const props = defineProps({
   },
 });
 
+const inConversation = computed(() =>
+  Boolean(props.whatsapp && props.conversation)
+);
+
 watch(
   () => showEmailBox.value,
   (value) => {
-    if (value) {
-      emailEditorRef.value?.editor?.commands?.focus("start");
-    }
+    if (!value) return;
+    if (props.whatsapp) whatsAppReplyBoxRef.value?.focus();
+    else emailEditorRef.value?.editor?.commands?.focus("start");
   }
 );
 
@@ -229,6 +282,7 @@ useShortcut("c", () => {
 
 defineExpose({
   replyToEmail,
+  replyToWhatsApp,
   toggleEmailBox,
   toggleCommentBox,
   editor: emailEditorRef,

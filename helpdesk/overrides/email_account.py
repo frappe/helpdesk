@@ -7,7 +7,10 @@ from frappe.core.doctype.communication.communication import Communication
 from frappe.email.doctype.email_account.email_account import EmailAccount
 from frappe.email.doctype.email_queue.email_queue import EmailQueue
 from frappe.email.receive import InboundMail
+from frappe.model.document import Document
 from frappe.utils import parse_addr
+
+from helpdesk.integrations.whatsapp.setup import WHATSAPP_SOURCE
 
 
 def auto_generated_reason(msg) -> str | None:
@@ -76,6 +79,16 @@ class CustomInboundMail(InboundMail):
             return Communication.find(eq.communication, ignore_error=True) or None
 
         return None
+
+    def reference_document(self) -> Document | str:
+        """Mail threaded onto a WhatsApp ticket opens a new ticket, as refusing it stalls the mailbox."""
+        document = super().reference_document()
+        if document and (document.doctype, document.get("source")) == (
+            "HD Ticket",
+            WHATSAPP_SOURCE,
+        ):
+            self._reference_document = ""
+        return self._reference_document
 
     def parent_communication(self):
         # Respect cached result from any prior call on this instance

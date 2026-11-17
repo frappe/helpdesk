@@ -10,6 +10,8 @@ export type ChatRow =
   // Customers on the right, agents on the left; the viewer's own go unnamed.
   | { kind: 'message'; key: string; activity: Activity; isCustomer: boolean; isViewer: boolean }
 
+const MESSAGE_TYPES = ['email', 'whatsapp']
+
 // The only structure is a rule between calendar days; messages never group.
 export function useChatRows(
   activities: Ref<Activity[]>,
@@ -28,7 +30,7 @@ export function useChatRows(
       }
       const key = activity.key ?? `${activity.type}:${activity.data?.name ?? activity.timestamp}`
       rows.push(
-        activity.type === 'email'
+        MESSAGE_TYPES.includes(activity.type ?? '')
           ? { kind: 'message', key, activity, isCustomer: isCustomer(activity), isViewer: isViewer(activity) }
           : { kind: 'event', key, activity },
       )

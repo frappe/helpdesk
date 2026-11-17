@@ -180,6 +180,7 @@ function mergeCommand(ticketId: string): Command[] {
   const mergeable =
     doc &&
     !doc.is_merged &&
+    doc.source !== "WhatsApp" &&
     ["Open", "Paused"].includes(doc.status_category ?? "");
   if (!mergeable) return [];
   return [

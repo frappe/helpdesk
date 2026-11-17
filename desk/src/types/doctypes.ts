@@ -31,7 +31,7 @@ export interface HDTicketStatus extends DocType {
   enabled: 0 | 1;
 }
 
-// Last updated: 2026-10-18 16:20:00.000000
+// Last updated: 2026-10-26 10:00:00.000000
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
@@ -90,7 +90,7 @@ export interface HDTicket extends DocType {
   /** Email Account: Link (Email Account) */
   email_account?: string;
   /** Source: Select */
-  source?: "Email" | "Portal";
+  source?: "Email" | "Portal" | "WhatsApp";
   /** Feedback (Extra): Long Text */
   feedback_extra?: any;
   /** Feedback (Option): Link (HD Ticket Feedback Option) */
