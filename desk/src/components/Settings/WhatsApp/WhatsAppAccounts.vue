@@ -54,33 +54,23 @@
         </div>
       </template>
     </div>
-    <div
-      v-else
-      class="flex flex-col items-center gap-3 rounded-6 border border-dashed border-outline-gray-2 px-4 py-10 text-center"
-      data-testid="whatsapp-empty-state"
-    >
-      <div
-        class="grid size-10 place-items-center rounded-full bg-surface-gray-2 text-ink-gray-6"
-      >
-        <WhatsAppIcon class="size-5" aria-hidden="true" />
-      </div>
-      <div class="flex flex-col gap-1">
-        <span class="text-base-medium text-ink-gray-8">
-          {{ __("No WhatsApp accounts yet") }}
-        </span>
-        <span class="max-w-72 text-p-sm text-ink-gray-6">
-          {{
-            __(
-              "Add your Meta app's phone number as an account to start receiving messages."
-            )
-          }}
-        </span>
-      </div>
+    <div v-else class="relative h-72" data-testid="whatsapp-empty-state">
+      <EmptyState
+        variant="badge"
+        :icon="WhatsAppIcon"
+        :title="__('No WhatsApp accounts yet')"
+        :description="
+          __(
+            'Add your Meta app\'s phone number as an account to start receiving messages.'
+          )
+        "
+      />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import EmptyState from "@/components/EmptyState.vue";
 import WhatsAppIcon from "@/components/whatsapp/WhatsAppIcon.vue";
 import { __ } from "@/translation";
 import {
