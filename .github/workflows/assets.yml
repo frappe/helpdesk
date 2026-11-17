@@ -1,8 +1,15 @@
 name: Pre-build assets
 
+# Every develop push is also advertised in frappe/marketplace as the nightly release, once its assets exist.
+
 on:
   push:
     branches: [develop, main]
+
+# Release PRs edit the same marketplace entry, so run one at a time per branch.
+concurrency:
+  group: assets-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   assets:
@@ -13,3 +20,16 @@ jobs:
       frappe-branch: ${{ github.ref_name == 'main' && 'version-16' || 'develop' }}
     permissions:
       contents: write
+
+  marketplace:
+    name: Open the marketplace release PR
+    needs: assets
+    if: github.ref_name == 'develop'
+    uses: frappe/marketplace/.github/workflows/publish-release.yml@main
+    with:
+      app: helpdesk
+      branch: develop
+      commit: ${{ github.sha }}
+      channel: nightly
+    secrets:
+      registry_token: ${{ secrets.MARKETPLACE_PR_TOKEN }}
