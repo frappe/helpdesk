@@ -1155,24 +1155,6 @@ def get_granted_rights(role: str) -> set[tuple]:
     }
 
 
-def show_only_banners(*banners: str):
-    """Turn on exactly `banners` in HD Settings and turn every other banner off."""
-    for banner, flag in BANNERS.items():
-        frappe.db.set_single_value("HD Settings", flag, int(banner in banners))
-
-
-def dismiss_banner_as(user: str, banner: str) -> MagicMock:
-    """Dismiss `banner` as `user`, returning the realtime publisher mock."""
-    previous_user = frappe.session.user
-    frappe.set_user(user)
-    try:
-        with patch("frappe.publish_realtime") as publish_realtime:
-            dismiss_banner(banner)
-    finally:
-        frappe.set_user(previous_user)
-    return publish_realtime
-
-
 def ticket_pings(publish_realtime: MagicMock) -> set[str]:
     return {
         call.kwargs["user"]

@@ -9,6 +9,7 @@ from frappe.client import get as client_get
 from frappe.client import save as client_save
 from frappe.client import set_value as client_set_value
 from frappe.desk.form.utils import add_comment as desk_add_comment
+from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
@@ -1365,6 +1366,7 @@ class TestHDTicket(FrappeTestCase):
         ticket.reply_via_agent(message="Test reply", cc="cc_only@test.com")
         communication = get_latest_ticket_communication(ticket.name)
         self.assertFalse(communication.recipients)
+
     def test_get_one_says_whether_an_agent_replied(self):
         ticket = make_ticket()
         self.assertFalse(get_one(ticket.name)["has_agent_replied"])
