@@ -203,11 +203,16 @@
                 <span class="text-base text-ink-gray-5">published by </span>
                 {{ article.data.author.name }}
               </p>
-              <div class="flex items-center gap-1">
-                <span class="text-p-xs text-ink-gray-6">
-                  {{
-                    dayjsLocal(article.data.modified).format("MMM D, h:mm A")
-                  }}
+              <div class="flex flex-wrap items-center gap-1">
+                <span v-if="publishedOn" class="text-p-xs text-ink-gray-6">
+                  {{ publishedOn }}
+                </span>
+                <IconDot
+                  v-if="publishedOn && updatedOn"
+                  class="h-4 w-4 text-ink-gray-5"
+                />
+                <span v-if="updatedOn" class="text-p-xs text-ink-gray-6">
+                  {{ __("Updated on {0}", [updatedOn]) }}
                 </span>
                 <IconDot
                   v-if="!editable && !isCustomerPortal && isMobileView"
@@ -234,7 +239,7 @@
       v-if="article.loading"
       class="w-full h-screen flex items-center justify-center"
     >
-      <LoadingIndicator class="size-10" />
+      <LoadingIndicator class="size-8" />
     </div>
     <MoveToCategoryModal
       v-model="moveToModal"
@@ -362,6 +367,21 @@ const editable = ref(route.query.isEdit ?? false);
 const likes = ref(0);
 const dislikes = ref(0);
 const views = ref(0);
+const DATE_TIME_FORMAT = "MMM D, h:mm A";
+const publishedOn = computed(() => {
+  const date = article.data?.published_on;
+  return date ? dayjsLocal(date).format(DATE_TIME_FORMAT) : "";
+});
+const updatedOn = computed(() => {
+  const { modified, published_on } = article.data ?? {};
+  const edited = modified && dayjsLocal(modified);
+  if (
+    !edited ||
+    (published_on && edited.isSame(dayjsLocal(published_on), "day"))
+  )
+    return "";
+  return edited.format(DATE_TIME_FORMAT);
+});
 const content = ref("");
 const title = ref("");
 const feedback = ref<FeedbackAction>();
@@ -452,7 +472,9 @@ const toggleStatus = debounce(() => {
       value: status,
     },
     {
-      onSuccess: () => {
+      onSuccess: (doc: Article) => {
+        article.data.modified = doc.modified;
+        article.data.published_on = doc.published_on;
         if (status === "Published")
           toast.success("Article published successfully.");
         else toast.success("Article unpublished successfully.");
