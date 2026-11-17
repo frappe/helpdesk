@@ -167,6 +167,7 @@ import { Field } from "@/types";
 import { useUploadTracker } from "@/composables/useUploadTracker";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
 import { useOnboarding } from "@framework/ui";
+import CustomActions from "@helpdesk/shared/CustomActions.vue";
 import {
   Breadcrumbs,
   Button,

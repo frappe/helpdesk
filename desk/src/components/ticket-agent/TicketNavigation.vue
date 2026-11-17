@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import {
   ticketsToNavigate,
   useTicketNavigation,

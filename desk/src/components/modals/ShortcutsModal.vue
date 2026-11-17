@@ -42,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { useDevice } from "@/composables/device";
-import { useShortcut } from "@/composables/shortcuts";
+import { useDevice } from "@helpdesk/shared/device";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { isCustomerPortal } from "@/utils";
 import { Dialog } from "frappe-ui";
 import { computed, onMounted } from "vue";

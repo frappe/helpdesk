@@ -121,6 +121,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { useUploadTracker } from "@/composables/useUploadTracker";
 import { isContentEmpty, uploadFunction } from "@/utils";
+import CustomActions from "@helpdesk/shared/CustomActions.vue";
 import LucideWarning from "~icons/lucide/triangle-alert";
 import { ActivityIcon, DetailsIcon } from "@/components/icons";
 import {

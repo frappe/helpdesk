@@ -178,27 +178,32 @@ function makeOutgoingCall(number) {
     });
 }
 
+let agentEmail = "";
+
 function setup(userEmail) {
-  $socket.on("exotel_call", (data) => {
-    callData.value = data;
+  agentEmail = userEmail;
+  $socket.on("exotel_call", onExotelCall);
+}
 
-    callStatus.value = updateStatus(data);
+function onExotelCall(data) {
+  callData.value = data;
 
-    if (!showCallPopup.value && !showSmallCallPopup.value) {
-      if (data.AgentEmail && data.AgentEmail == userEmail) {
-        // Incoming call
-        phoneNumber.value = data.CallFrom || data.From;
-        showCallPopup.value = true;
-      } else {
-        // Outgoing call
-        phoneNumber.value = data.To;
-      }
+  callStatus.value = updateStatus(data);
+
+  if (!showCallPopup.value && !showSmallCallPopup.value) {
+    if (data.AgentEmail && data.AgentEmail == agentEmail) {
+      // Incoming call
+      phoneNumber.value = data.CallFrom || data.From;
+      showCallPopup.value = true;
+    } else {
+      // Outgoing call
+      phoneNumber.value = data.To;
     }
-  });
+  }
 }
 
 onBeforeUnmount(() => {
-  $socket.off("exotel_call");
+  $socket.off("exotel_call", onExotelCall);
 });
 
 function closeCallPopup() {
