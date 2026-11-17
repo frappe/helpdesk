@@ -352,15 +352,6 @@ async function indexForSearch(api: Api, token: string) {
     .toBeGreaterThan(0);
 }
 
-async function runScheduledJob(api: Api, method: string) {
-  const [job] = await api.list("Scheduled Job Type", { filters: { method } });
-  // index_docs_in_queue is frappe develop only; v16 indexes on save
-  if (!job) return;
-  await api.call("frappe.core.doctype.scheduled_job_type.scheduled_job_type.execute_event", {
-    doc: JSON.stringify({ name: job.name }),
-  });
-}
-
 // The browser runs in UTC (see playwright.config.ts), so the date is computed in UTC too.
 function daysAgo(days: number, timeZone: string) {
   return new Intl.DateTimeFormat("en-CA", { timeZone }).format(Date.now() - days * 86_400_000);

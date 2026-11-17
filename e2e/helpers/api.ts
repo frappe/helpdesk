@@ -88,6 +88,7 @@ export class Api {
 /** Run a scheduled job now; it is enqueued, so callers poll for its effect. */
 export async function runScheduledJob(api: Api, method: string) {
   const [job] = await api.list("Scheduled Job Type", { filters: { method } });
+  if (!job) return;
   await api.call("frappe.core.doctype.scheduled_job_type.scheduled_job_type.execute_event", {
     doc: JSON.stringify({ name: job.name }),
   });
