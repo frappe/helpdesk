@@ -524,7 +524,7 @@ const box = computed(() => ({
 
 const agent = computed(() => invitees.value[0]);
 const replied = computed(() => !!agent.value?.sent);
-const arrived = computed(() => !!setup.ticket);
+const arrived = computed(() => setup.ticketArrived);
 
 const target = computed<Page>(() => {
   if (setup.showDone) return arrived.value ? "portal-ticket" : "home";

@@ -61,48 +61,48 @@
           class="rounded-5 border border-outline-gray-1 p-4"
           aria-live="polite"
         >
-          <div v-if="pull.error" class="flex items-start gap-3">
-            <LucideCircleAlert
-              class="mt-0.5 size-4 shrink-0 text-ink-red-5"
-              aria-hidden="true"
-            />
-            <div class="min-w-0 space-y-0.5">
-              <p class="text-base text-ink-gray-8">
-                {{ __("Couldn't pull your tickets") }}
-              </p>
-              <ErrorMessage :message="pull.error" />
-            </div>
-          </div>
-          <div v-else-if="!ready" class="flex items-center gap-3">
-            <Spinner class="size-4 shrink-0 text-ink-gray-5" />
-            <Transition
-              mode="out-in"
-              enter-active-class="transition duration-300 ease-out motion-reduce:transition-none"
-              enter-from-class="opacity-0 translate-y-1"
-              leave-active-class="transition duration-200 ease-in motion-reduce:transition-none"
-              leave-to-class="opacity-0 -translate-y-1"
-            >
-              <p :key="phase" class="text-base text-ink-gray-8">
-                {{ PHASES[phase] }}
-              </p>
-            </Transition>
-          </div>
-          <div v-else class="flex items-start gap-3">
-            <LucideCircleCheck
-              class="mt-0.5 size-4 shrink-0 text-ink-green-5"
-              aria-hidden="true"
-            />
-            <div class="min-w-0 space-y-0.5">
-              <p class="text-base text-ink-gray-8">
-                {{ __("You're good to go!") }}
-              </p>
-              <p class="text-p-sm text-ink-gray-5">
-                {{
-                  __(
-                    "Your tickets are being pulled in the background and will arrive soon."
-                  )
-                }}
-              </p>
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 flex size-4 shrink-0">
+              <LucideCircleCheck
+                v-if="ready"
+                class="size-4 text-ink-green-5"
+                aria-hidden="true"
+              />
+              <Spinner v-else class="size-4 text-ink-gray-5" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <Transition
+                mode="out-in"
+                enter-active-class="transition duration-300 ease-out motion-reduce:transition-none"
+                enter-from-class="opacity-0 translate-y-1"
+                leave-active-class="transition duration-200 ease-in motion-reduce:transition-none"
+                leave-to-class="opacity-0 -translate-y-1"
+              >
+                <p
+                  :key="ready ? 'ready' : phase"
+                  class="text-base text-ink-gray-8"
+                >
+                  {{ ready ? __("Emails queued for import") : PHASES[phase] }}
+                </p>
+              </Transition>
+              <div
+                class="grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none"
+                :class="
+                  ready
+                    ? 'grid-rows-[1fr] opacity-100'
+                    : 'grid-rows-[0fr] opacity-0'
+                "
+              >
+                <div class="min-h-0 overflow-hidden">
+                  <p class="truncate pt-0.5 text-p-sm text-ink-gray-5">
+                    {{
+                      __(
+                        "Tickets will arrive shortly. You can proceed with the setup."
+                      )
+                    }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -133,22 +133,36 @@
   </section>
 </template>
 
+<script lang="ts">
+import { __ } from "@/translation";
+import { useIntervalFn } from "@vueuse/core";
+import { computed, ref, watch } from "vue";
+import { setup } from "./setup";
+
+const PHASE_SECONDS = 5;
+const PHASES = [
+  __("Knocking on your inbox…"),
+  __("Turning emails into tickets…"),
+  __("Starting the SLA clocks…"),
+];
+const waited = ref(0);
+const clock = useIntervalFn(() => waited.value++, 1000, { immediate: false });
+const phase = computed(() => Math.floor(waited.value / PHASE_SECONDS));
+const ready = computed(() => phase.value >= PHASES.length);
+watch(ready, (done) => {
+  if (!done) return;
+  clock.pause();
+  setup.ticketArrived = true;
+});
+let startedFor: string | null = null;
+</script>
+
 <script setup lang="ts">
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { useOnboarding } from "@framework/ui";
 import { useEmailAccounts, useOneClick } from "@framework/ui/EmailAccounts";
-import {
-  Badge,
-  Button,
-  createListResource,
-  createResource,
-  dialog,
-  ErrorMessage,
-  Spinner,
-  toast,
-} from "frappe-ui";
-import { useIntervalFn } from "@vueuse/core";
+import { Badge, Button, createListResource, dialog, toast } from "frappe-ui";
 import { computed, onMounted, ref, watch } from "vue";
 import Banner from "@framework/ui/components/EmailAccounts/Banner.vue";
 import SetupProviderPicker from "./SetupProviderPicker.vue";
@@ -163,49 +177,22 @@ const reveal = {
   enterFromClass: "opacity-0 translate-y-1",
   leaveActiveClass: "hidden",
 };
+watch(
+  () => setup.mailbox?.name,
+  (mailbox) => {
+    if (!mailbox || startedFor === mailbox) return;
+    startedFor = mailbox;
+    waited.value = 0;
+    clock.resume();
+  },
+  { immediate: true }
+);
 const picker = ref<InstanceType<typeof SetupProviderPicker> | null>(null);
 const receiveOnly = ref(false);
 const defaultOutgoing = computed(
   () => controller.accounts.find((a) => a.default_outgoing)?.email_id
 );
 const pickerScreen = ref("picker");
-
-const firstTicket = createListResource({
-  doctype: "HD Ticket",
-  fields: ["name", "subject"],
-  orderBy: "creation asc",
-  pageLength: 1,
-  onSuccess(tickets: { name: string; subject: string }[]) {
-    if (tickets.length) setup.ticket = tickets[0];
-  },
-});
-const pull = createResource({
-  url: "frappe.email.doctype.email_account.email_account.pull_emails",
-  onSuccess: () => firstTicket.reload(),
-});
-const PHASE_SECONDS = 8;
-const PHASES = [
-  __("Pulling emails"),
-  __("Creating tickets"),
-  __("Setting up your Helpdesk"),
-];
-const waited = ref(0);
-const clock = useIntervalFn(() => waited.value++, 1000, { immediate: false });
-const phase = computed(() => Math.floor(waited.value / PHASE_SECONDS));
-const ready = computed(() => pull.fetched || phase.value >= PHASES.length);
-watch(ready, (done) => done && clock.pause());
-
-watch(
-  () => setup.mailbox?.name,
-  (mailbox) => {
-    if (!mailbox) return;
-    firstTicket.update({ filters: { email_account: mailbox } });
-    pull.submit({ email_account: mailbox });
-    waited.value = 0;
-    clock.resume();
-  },
-  { immediate: true }
-);
 
 onMounted(() => {
   controller.load();
