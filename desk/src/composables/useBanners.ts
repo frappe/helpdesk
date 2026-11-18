@@ -6,12 +6,31 @@ export type BannerName =
   | "customer_portal_permission"
   | "ticket_field_permission"
   | "ticket_source"
-  | "trial";
+  | "trial"
+  | "whats_new";
 export type BannerScript = { doctype: string; name: string };
+export type WhatsNewMedia = {
+  url: string;
+  dark_url: string | null;
+  kind: "image" | "video";
+};
+export type WhatsNewNote = {
+  id: string;
+  title: string;
+  media: WhatsNewMedia | null;
+  body: string;
+};
+export type WhatsNewRelease = {
+  version: string | null;
+  date: string | null;
+  notes: WhatsNewNote[];
+};
 export type Banner = {
   name: BannerName;
   trial?: BillingTrial;
   scripts?: BannerScript[];
+  title?: string;
+  releases?: WhatsNewRelease[];
 };
 
 const banners = createResource({

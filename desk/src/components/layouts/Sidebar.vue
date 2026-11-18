@@ -8,6 +8,8 @@
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
         <TrialCard :is-sidebar-collapsed="isCollapsed" />
+        <WhatsNewCard :is-sidebar-collapsed="isCollapsed" />
+        <WhatsNewModal />
         <TrialBanner
           v-if="isFCSite && !isCloudSettingsAvailable()"
           :isSidebarCollapsed="isCollapsed"
@@ -75,6 +77,8 @@ import {
 import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalPermissionBanner.vue";
 import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
 import TicketSourceBanner from "@/components/banners/TicketSourceBanner.vue";
+import WhatsNewCard from "@/components/banners/WhatsNewCard.vue";
+import WhatsNewModal from "@/components/banners/WhatsNewModal.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import {

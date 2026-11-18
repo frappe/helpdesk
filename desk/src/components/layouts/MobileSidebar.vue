@@ -11,7 +11,13 @@
         leave-to="-translate-x-full rtl:translate-x-full"
       >
         <div class="relative z-10 h-full w-fit">
-          <AppSidebar mobile :profile-settings="profileSettings" />
+          <AppSidebar mobile :profile-settings="profileSettings">
+            <template #footer>
+              <div class="px-2">
+                <WhatsNewCard />
+              </div>
+            </template>
+          </AppSidebar>
         </div>
       </TransitionChild>
       <TransitionChild
@@ -28,6 +34,7 @@
     </Dialog>
   </TransitionRoot>
   <AvailabilityDialog v-model:open="availabilityDialogOpen" />
+  <WhatsNewModal />
 </template>
 
 <script setup lang="ts">
@@ -50,6 +57,8 @@ import { __ } from "@/translation";
 import AppSidebar from "./AppSidebar.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import AvailabilityDialog from "../AvailabilityDialog.vue";
+import WhatsNewCard from "../banners/WhatsNewCard.vue";
+import WhatsNewModal from "../banners/WhatsNewModal.vue";
 
 const { appsMenuOption } = useApps();
 const route = useRoute();
