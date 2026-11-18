@@ -1240,7 +1240,9 @@ def write_whats_new_notes(notes_dir: Path, notes: dict[str, str]) -> None:
     whats_new.load_notes.cache_clear()
 
 
-def whats_new_note(title: str, version: str = "unreleased", body: str = "Text.", **meta) -> str:
+def whats_new_note(
+    title: str, version: str = "unreleased", body: str = "Text.", **meta
+) -> str:
     """The text of a note file with `title`, `version` and any other frontmatter in `meta`."""
     lines = [f"title: {title}", f"version: {version}"]
     lines += [f"{key}: {value}" for key, value in meta.items()]

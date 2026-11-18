@@ -3,6 +3,7 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 
+from helpdesk import whats_new
 from helpdesk.api.banners import (
     BANNERS,
     get_banners,
@@ -19,11 +20,15 @@ from helpdesk.test_utils import (
     make_sla,
     show_only_banners,
     unique_email,
+    use_whats_new_notes,
+    whats_new_note,
+    write_whats_new_notes,
 )
 
 PORTAL_BANNER = "customer_portal_permission"
 FIELD_BANNER = "ticket_field_permission"
 SOURCE_BANNER = "ticket_source"
+WHATS_NEW = "whats_new"
 
 
 def banner_names() -> list[str]:
@@ -38,6 +43,8 @@ class TestBanners(IntegrationTestCase):
         frappe.set_user("Administrator")
         # Not a Frappe Cloud site, whatever the test site's config says
         self.enterContext(patch(CLOUD_SETTINGS, None))
+        # Release notes are not what these tests are about
+        use_whats_new_notes(self, {})
 
     def test_manager_sees_only_banners_that_are_on(self) -> None:
         manager = make_agent_manager("banner-manager")
@@ -53,7 +60,7 @@ class TestBanners(IntegrationTestCase):
         )
         self.assertEqual(banner_names(), [FIELD_BANNER])
 
-    def test_agents_and_customers_see_no_banners(self) -> None:
+    def test_plain_agents_and_customers_see_no_manager_banners(self) -> None:
         agent = create_agent(unique_email("banner-agent")).name
         customer = create_contact("Banner Customer", unique_email("banner-customer"))
         show_only_banners(PORTAL_BANNER, FIELD_BANNER, SOURCE_BANNER)
@@ -111,7 +118,7 @@ class TestBanners(IntegrationTestCase):
         with self.assertRaises(frappe.ValidationError):
             dismiss_banner_as("Administrator", "no_such_banner")
 
-    def test_agents_and_customers_cannot_dismiss(self) -> None:
+    def test_agents_and_customers_cannot_dismiss_manager_banners(self) -> None:
         agent = create_agent(unique_email("dismiss-agent")).name
         customer = create_contact("Dismiss Customer", unique_email("dismiss-cust"))
         show_only_banners(PORTAL_BANNER)
@@ -119,6 +126,87 @@ class TestBanners(IntegrationTestCase):
             with self.subTest(user=user), self.assertRaises(frappe.PermissionError):
                 dismiss_banner_as(user, PORTAL_BANNER)
         self.assertEqual(banner_names(), [PORTAL_BANNER])
+
+
+class TestWhatsNewBanner(IntegrationTestCase):
+    def setUp(self) -> None:
+        frappe.set_user("Administrator")
+        self.enterContext(patch(CLOUD_SETTINGS, None))
+        show_only_banners()
+        use_whats_new_notes(
+            self,
+            {
+                "old": whats_new_note("Older", "1.0.0", date="2026-01-01"),
+                "new": whats_new_note("Newer"),
+            },
+        )
+        self.agent = create_agent(unique_email("whats-new-agent")).name
+        self.other_agent = create_agent(unique_email("whats-new-other")).name
+
+    def whats_new_as(self, user: str) -> dict | None:
+        with self.set_user(user):
+            return next((b for b in get_banners() if b["name"] == WHATS_NEW), None)
+
+    def test_agent_sees_it_with_the_newest_title_and_every_release(self) -> None:
+        banner = self.whats_new_as(self.agent)
+        self.assertEqual(banner["title"], "Newer")
+        self.assertEqual(
+            [r["version"] for r in banner["releases"]], [None, "1.0.0"]
+        )
+        with self.set_user(self.agent):
+            self.assertEqual(banner_names(), [WHATS_NEW])
+
+    def test_managers_see_it_beside_their_own_banners(self) -> None:
+        manager = make_agent_manager("whats-new-manager")
+        show_only_banners(PORTAL_BANNER)
+        with self.set_user(manager):
+            self.assertCountEqual(banner_names(), [PORTAL_BANNER, WHATS_NEW])
+
+    def test_customers_never_see_it(self) -> None:
+        customer = create_contact("Notes Customer", unique_email("notes-customer"))
+        self.assertIsNone(self.whats_new_as(customer["user"]))
+
+    def test_dismissing_hides_it_for_that_agent_only(self) -> None:
+        publish_realtime = dismiss_banner_as(self.agent, WHATS_NEW)
+
+        self.assertIsNone(self.whats_new_as(self.agent))
+        self.assertIsNotNone(self.whats_new_as(self.other_agent))
+        # saving the seen list also publishes a doc_update of its own
+        (refresh,) = [
+            call
+            for call in publish_realtime.call_args_list
+            if call.args[0] == "helpdesk:settings-updated"
+        ]
+        self.assertEqual(refresh.kwargs["user"], self.agent)
+        self.assertNotIn("room", refresh.kwargs)
+
+    def test_a_newer_note_brings_it_back_for_everyone(self) -> None:
+        dismiss_banner_as(self.agent, WHATS_NEW)
+        dismiss_banner_as(self.other_agent, WHATS_NEW)
+        write_whats_new_notes(whats_new.NOTES_DIR, {"fresh": whats_new_note("Fresh")})
+        for user in (self.agent, self.other_agent):
+            with self.subTest(user=user):
+                self.assertEqual(self.whats_new_as(user)["title"], "Fresh")
+
+    def test_no_notes_means_no_banner(self) -> None:
+        use_whats_new_notes(self, {})
+        self.assertIsNone(self.whats_new_as(self.agent))
+
+    def test_dismissing_with_nothing_unseen_is_harmless(self) -> None:
+        dismiss_banner_as(self.agent, WHATS_NEW)
+        dismiss_banner_as(self.agent, WHATS_NEW)
+        self.assertIsNone(self.whats_new_as(self.agent))
+
+    def test_customers_cannot_dismiss_it(self) -> None:
+        customer = create_contact("Notes Customer 2", unique_email("notes-cust-2"))
+        with self.assertRaises(frappe.PermissionError):
+            dismiss_banner_as(customer["user"], WHATS_NEW)
+
+    def test_agents_still_cannot_dismiss_a_manager_banner(self) -> None:
+        show_only_banners(PORTAL_BANNER)
+        with self.assertRaises(frappe.PermissionError):
+            dismiss_banner_as(self.agent, PORTAL_BANNER)
+        self.assertCountEqual(banner_names(), [PORTAL_BANNER, WHATS_NEW])
 
 
 def make_script(
