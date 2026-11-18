@@ -110,3 +110,4 @@ Redis 8.0.5.
 | `e2e/` | Playwright: use cases, usability tasks, security checks, a11y scans |
 | `a11y/`, `security/`, `perf/`, `sonar/` | reports and evidence per activity |
 | `management/` | test plan, estimation, risk register, traceability, defect log, RCA, progress, completion report |
+| `ai/` | AI-use record and every prompt, verbatim (`tools/extract_prompts.py` rebuilds `PROMPTS.md` from the session transcript) |
