@@ -9,6 +9,8 @@ Commands:
                   is reported with its exact value
   wait-task FILE  wait for the background task of an analysis (report-task.txt)
   export KEY DIR  save measures, issues, hotspots and gate status as JSON
+  gate            create the "SQE gate" quality gate and make it the default
+  check-gate KEY  print the gate result per condition; exit 1 if it failed
 
 Server: SONAR_URL (default http://127.0.0.1:9100).
 """
@@ -173,9 +175,62 @@ def export(project, out_dir):
     print(f"exported {project}: {len(files)} files, {len(issues)} issues, {len(hotspots)} hotspots -> {out}")
 
 
+SQE_GATE = "SQE gate"
+# Conditions on overall code. The CI server is created fresh for every run, so
+# there is no "new code" period to compare with; instead each count is held at
+# its value in the baseline analysis of 18 Nov 2026 (ratchet: no worse than the
+# baseline). Ratings: 1 = A ... 5 = E.
+GATE_CONDITIONS = [
+    ("reliability_rating", "4", "reliability no worse than D (baseline D)"),
+    ("security_rating", "4", "security no worse than D (baseline D)"),
+    ("sqale_rating", "1", "maintainability A (baseline A)"),
+    ("bugs", "122", "bugs no more than the baseline 122"),
+    ("vulnerabilities", "8", "vulnerabilities no more than the baseline 8"),
+    ("security_review_rating", "1", "security review A, i.e. no unreviewed hotspots (baseline 0 hotspots)"),
+    ("duplicated_lines_density", "3", "duplication at most 3 % (baseline 1.6 %)"),
+    ("test_failures", "0", "no failing unit tests in the imported report"),
+    ("test_errors", "0", "no erroring unit tests in the imported report"),
+]
+
+
+def gate():
+    """Create (or reset) the SQE quality gate and make it the default."""
+    s = session()
+    gates = call(s, "GET", "/api/qualitygates/list")["qualitygates"]
+    if not any(g["name"] == SQE_GATE for g in gates):
+        call(s, "POST", "/api/qualitygates/create", name=SQE_GATE)
+    for condition in call(s, "GET", "/api/qualitygates/show", name=SQE_GATE).get("conditions", []):
+        call(s, "POST", "/api/qualitygates/delete_condition", id=condition["id"])
+    for metric, error, meaning in GATE_CONDITIONS:
+        call(s, "POST", "/api/qualitygates/create_condition", gateName=SQE_GATE,
+             metric=metric, op="GT", error=error)
+        print(f"condition: {metric} > {error} fails ({meaning})")
+    call(s, "POST", "/api/qualitygates/set_as_default", name=SQE_GATE)
+    print(f"'{SQE_GATE}' is the default quality gate")
+
+
+def check_gate(project):
+    """Print the gate result per condition; exit 1 if the gate failed."""
+    status = call(session(), "GET", "/api/qualitygates/project_status", projectKey=project)["projectStatus"]
+    rows = [f"| {c['metricKey']} | {c.get('actualValue', '-')} | > {c.get('errorThreshold', '-')} | {c['status']} |"
+            for c in status.get("conditions", [])]
+    report = "\n".join([f"### SonarQube quality gate ({project}): {status['status']}", "",
+                        "| Metric | Actual | Fails when | Status |", "|---|---|---|---|", *rows, ""])
+    print(report)
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary, "a") as handle:
+            handle.write(report + "\n")
+    return 0 if status["status"] == "OK" else 1
+
+
 if __name__ == "__main__":
     command, *rest = sys.argv[1:] or ["help"]
-    if command == "init":
+    if command == "gate":
+        gate()
+    elif command == "check-gate":
+        sys.exit(check_gate(rest[0]))
+    elif command == "init":
         init()
     elif command == "probe-profile":
         probe_profile()

@@ -2,9 +2,24 @@
  "paging": {
   "pageIndex": 1,
   "pageSize": 100,
-  "total": 1
+  "total": 2
  },
  "analyses": [
+  {
+   "key": "acd22ecc-158c-42ef-9808-f28a59d64778",
+   "date": "2026-11-18T15:23:45+0500",
+   "events": [
+    {
+     "key": "9300419f-bb3e-4f06-bc76-1693401eb4b6",
+     "category": "VERSION",
+     "name": "not provided"
+    }
+   ],
+   "projectVersion": "not provided",
+   "manualNewCodePeriodBaseline": false,
+   "revision": "6ac45a624ef3250ca341e3a7c533d818c42ad8b9",
+   "detectedCI": "undetected"
+  },
   {
    "key": "d48e15ca-97d9-4207-b32f-55d92d07784c",
    "date": "2026-11-18T01:14:35+0500",
@@ -13,11 +28,6 @@
      "key": "e6490f2d-a3a7-4c67-8114-754bf047ef2b",
      "category": "SQ_UPGRADE",
      "name": "26.11.0.134175"
-    },
-    {
-     "key": "0343b17a-52e3-4b0e-bdb9-6a21d5868068",
-     "category": "VERSION",
-     "name": "not provided"
     }
    ],
    "projectVersion": "not provided",

@@ -97,4 +97,16 @@ test.describe("UC-05 Reply to a ticket", () => {
     expect(stored.modified).toBe(before.modified);
     expect(await app.messageCount(name)).toBe(messagesBefore);
   });
+
+  test("EF2 when the status list arrives late: a closed ticket still offers no message box [DEF-35]", async ({ app }) => {
+    test.fail(true, "DEF-35: if the ticket loads before the status list, a closed ticket is shown as open");
+    const name = await app.newTicket(app.subject("UC05 EF2 late list"));
+    await app.setStatus(name, "Closed");
+    const page = await app.pageAs("customerA", { responseOrder: "ticket-first" });
+
+    await page.goto(`/helpdesk/my-tickets/${name}`);
+
+    await expect(customerDetails(page)).toContainText(/Status\s*Closed/, { timeout: 5_000 });
+    await expect(messageBox(page)).toHaveCount(0);
+  });
 });

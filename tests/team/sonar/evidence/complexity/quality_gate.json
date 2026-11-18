@@ -1,8 +1,62 @@
 {
  "projectStatus": {
   "status": "OK",
-  "conditions": [],
+  "conditions": [
+   {
+    "status": "OK",
+    "metricKey": "reliability_rating",
+    "comparator": "GT",
+    "errorThreshold": "4",
+    "actualValue": "1"
+   },
+   {
+    "status": "OK",
+    "metricKey": "security_rating",
+    "comparator": "GT",
+    "errorThreshold": "4",
+    "actualValue": "1"
+   },
+   {
+    "status": "OK",
+    "metricKey": "sqale_rating",
+    "comparator": "GT",
+    "errorThreshold": "1",
+    "actualValue": "1"
+   },
+   {
+    "status": "OK",
+    "metricKey": "duplicated_lines_density",
+    "comparator": "GT",
+    "errorThreshold": "3",
+    "actualValue": "0.0"
+   },
+   {
+    "status": "OK",
+    "metricKey": "bugs",
+    "comparator": "GT",
+    "errorThreshold": "122",
+    "actualValue": "0"
+   },
+   {
+    "status": "OK",
+    "metricKey": "security_review_rating",
+    "comparator": "GT",
+    "errorThreshold": "1",
+    "actualValue": "1"
+   },
+   {
+    "status": "OK",
+    "metricKey": "vulnerabilities",
+    "comparator": "GT",
+    "errorThreshold": "8",
+    "actualValue": "0"
+   }
+  ],
   "ignoredConditions": false,
-  "caycStatus": "compliant"
+  "period": {
+   "mode": "PREVIOUS_VERSION",
+   "date": "2026-11-18T01:14:35+0500"
+  },
+  "caycStatus": "non-compliant"
  }
 }

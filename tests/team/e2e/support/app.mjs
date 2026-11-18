@@ -22,6 +22,57 @@ const NEW = "/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new";
 const ASSIGNEES = "/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_assignees";
 
 export const emailOf = (role) => ENV[`${ACCOUNTS[role]}_EMAIL`];
+
+const isStatusList = (request) =>
+  request.url().includes("/api/method/frappe.client.get_list") &&
+  (request.postData() || "").includes('"doctype":"HD Ticket Status"');
+const isTicket = (request) => request.url().includes("/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.get_one");
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * DEF-35: the customer's ticket page maps the ticket's status through the
+ * ticket-status list once, when the ticket arrives (TicketCustomer.vue). If
+ * the list is not back yet, the status is lost and a closed ticket is shown as
+ * open. Which response wins is a race, so the tests fix the order:
+ *   "statuses-first" (default) holds the ticket until the list has arrived,
+ *                    the order the use cases assume;
+ *   "ticket-first"   holds the list until the ticket has arrived, which
+ *                    reproduces DEF-35 every time.
+ */
+async function orderResponses(context, order) {
+  if (order === "ticket-first") {
+    let ticketArrived;
+    const ticketDone = new Promise((resolve) => (ticketArrived = resolve));
+    await context.route("**/api/method/**", async (route) => {
+      const request = route.request();
+      if (isTicket(request)) {
+        await route.fulfill({ response: await route.fetch() });
+        setTimeout(ticketArrived, 300); // let the page handle the ticket first
+      } else if (isStatusList(request)) {
+        await Promise.race([ticketDone, pause(15_000)]);
+        await route.fallback();
+      } else {
+        await route.fallback();
+      }
+    });
+    return;
+  }
+  let statusesPending = null; // the list request in flight on this page load
+  await context.route("**/api/method/**", async (route) => {
+    const request = route.request();
+    if (isStatusList(request)) {
+      let arrived;
+      statusesPending = new Promise((resolve) => (arrived = resolve));
+      await route.fulfill({ response: await route.fetch() });
+      setTimeout(arrived, 300); // let the page store the list first
+    } else if (isTicket(request) && statusesPending) {
+      await Promise.race([statusesPending, pause(15_000)]);
+      await route.fallback();
+    } else {
+      await route.fallback();
+    }
+  });
+}
 const credentials = (role) => ({ usr: emailOf(role), pwd: ENV[`${ACCOUNTS[role]}_PASSWORD`] });
 
 export const test = base.extend({
@@ -38,10 +89,12 @@ export const test = base.extend({
     const api = { customerA: await apiAs("customerA"), agent: await apiAs("agent") };
 
     const app = {
-      /** A page logged in as `role`; pass null for a visitor who is not logged in. */
-      async pageAs(role) {
+      /** A page logged in as `role`; pass null for a visitor who is not logged in.
+       *  `responseOrder` fixes the DEF-35 race (see orderResponses). */
+      async pageAs(role, { responseOrder = "statuses-first" } = {}) {
         const context = await browser.newContext({ baseURL, ...PROXY });
         disposables.push(() => context.close());
+        await orderResponses(context, responseOrder);
         if (role) {
           const response = await context.request.post("/api/method/login", { data: credentials(role) });
           expect(response.status(), `browser login as ${role}`).toBe(200);

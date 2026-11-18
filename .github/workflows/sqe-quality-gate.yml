@@ -1,0 +1,249 @@
+# SE3002 SQE project: quality gate for the team's tests (tests/team/).
+#
+# Every pull request into team/sqe-tests (and every push to it) runs four jobs;
+# the final "SQE gate" job passes only if all of them pass, and branch
+# protection on team/sqe-tests requires it, so a failing change cannot merge.
+#
+#   unit         white-box unit tests; 100 % statement + branch coverage of the
+#                business-rule scope (tools/scoped_coverage.py)
+#   mutation     Cosmic Ray on the rule scope; mutation score >= 95 %
+#   sonar        SonarQube Community Build (same version as the local server),
+#                "SQE gate" quality gate (sonar/sonar_admin.py gate)
+#   integration  full bench + site: API/integration tests (strict xfail for the
+#                pinned weaknesses) and the Playwright browser tests
+#
+# Versions are pinned to the project baseline (see tests/team/README.md).
+name: SQE quality gate
+
+on:
+  pull_request:
+    branches: [team/sqe-tests]
+  push:
+    branches: [team/sqe-tests]
+  workflow_dispatch:
+
+concurrency:
+  group: sqe-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.14"
+  NODE_VERSION: "24"
+  FRAPPE_SHA: 49789a1711d4dde2be9c6888efe35651465f4b64     # Frappe v16.56.0
+  TELEPHONY_SHA: 9447577500a25d242088398157b72c654fa34b20
+  SONARQUBE_IMAGE: sonarqube:26.11.0.134175-community
+  SCANNER_VERSION: 8.4.0.16527
+  SCANNER_SHA256: 2a28f118e2e9375dfd36eb27b803e1d37f93daba4db068aca6eef9853041bb24
+  PY_TEST_DEPS: pytest==9.2.0 pytest-cov==7.1.0 coverage==7.17.3 cosmic-ray==8.9.0 requests pyyaml
+
+jobs:
+  unit:
+    name: Unit tests + coverage gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - &frappe-src
+        name: Frappe source at the baseline
+        uses: actions/checkout@v4
+        with:
+          repository: frappe/frappe
+          ref: ${{ env.FRAPPE_SHA }}
+          path: .frappe-src
+          fetch-depth: 1
+      - &python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - &uv
+        uses: astral-sh/setup-uv@v6
+      - &venv
+        name: Test environment (Frappe as a library, no site)
+        run: |
+          uv venv --python "$(which python)" ~/venv
+          uv pip install --python ~/venv/bin/python ./.frappe-src $PY_TEST_DEPS
+      - name: Unit tests, 100 % statement and branch coverage of the rule scope
+        run: BENCH_PYTHON=~/venv/bin/python bash tests/team/run_unit.sh
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-reports
+          path: tests/team/reports/unit
+          if-no-files-found: ignore
+
+  mutation:
+    name: Mutation score >= 95 %
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - *frappe-src
+      - *python
+      - *uv
+      - *venv
+      - name: Cosmic Ray on the business-rule scope
+        run: BENCH_PYTHON=~/venv/bin/python bash tests/team/run_mutation.sh 95
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-reports
+          path: |
+            tests/team/reports/mutation/*.md
+            tests/team/reports/mutation/*.json
+          if-no-files-found: ignore
+
+  sonar:
+    name: SonarQube quality gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      sonarqube:
+        image: sonarqube:26.11.0.134175-community
+        env:
+          SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+        ports:
+          - 9000:9000
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history for SCM blame
+      - *frappe-src
+      - *python
+      - *uv
+      - *venv
+      - name: SonarScanner CLI (checksum-verified)
+        run: |
+          zip="sonar-scanner-cli-${SCANNER_VERSION}-linux-x64.zip"
+          curl -fsSLo "/tmp/$zip" "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/$zip"
+          echo "${SCANNER_SHA256}  /tmp/$zip" | sha256sum -c -
+          unzip -q "/tmp/$zip" -d ~/
+          echo "SCANNER=$HOME/sonar-scanner-${SCANNER_VERSION}-linux-x64/bin/sonar-scanner" >> "$GITHUB_ENV"
+      - name: Wait for SonarQube
+        run: |
+          for i in $(seq 1 90); do
+            status=$(curl -fs http://localhost:9000/api/system/status | python -c "import sys,json;print(json.load(sys.stdin)['status'])" 2>/dev/null || true)
+            [ "$status" = "UP" ] && { echo "SonarQube is UP"; exit 0; }
+            sleep 5
+          done
+          echo "SonarQube did not start"; exit 1
+      - name: Analyse and check the SQE gate
+        # sonar_admin.py init replaces the default admin password of this
+        # throw-away server with a random one and creates a token; both stay in
+        # ~/.sqe-env on the runner and are never printed.
+        env:
+          SONAR_URL: http://localhost:9000
+        run: BENCH_PYTHON=~/venv/bin/python bash tests/team/sonar/run_sonar.sh
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonar-evidence
+          path: tests/team/sonar/evidence
+          if-no-files-found: ignore
+
+  integration:
+    name: API + browser tests on a live site
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MARIADB_ROOT_PASSWORD: root   # throw-away CI container only
+        ports:
+          - 3306:3306
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - *frappe-src
+      - *python
+      - *uv
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: System packages
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq redis-server mariadb-client libmariadb-dev pkg-config
+          npm install -g yarn
+          pip install frappe-bench==5.31.1
+          echo "127.0.0.1 helpdesk.localhost" | sudo tee -a /etc/hosts
+          mariadb -h 127.0.0.1 -uroot -proot -e "SET GLOBAL character_set_server='utf8mb4'; SET GLOBAL collation_server='utf8mb4_unicode_ci';"
+      - name: Bench at the baseline (Frappe, telephony, this branch of Helpdesk)
+        run: |
+          cd ~
+          bench init --frappe-path "$GITHUB_WORKSPACE/.frappe-src" --python "$(which python)" frappe-bench
+          cd ~/frappe-bench
+          bench get-app --skip-assets https://github.com/frappe/telephony
+          git -C apps/telephony fetch -q --depth 1 upstream "$TELEPHONY_SHA"   # bench names the remote "upstream"
+          git -C apps/telephony checkout -q "$TELEPHONY_SHA"
+          bench get-app helpdesk "$GITHUB_WORKSPACE"
+          uv pip install --python env/bin/python $PY_TEST_DEPS
+          # no file watcher and no scheduler (the tests run the auto-close job
+          # themselves); socketio stays on: the ticket activity feed is pushed
+          # over it, and UC-04 checks that feed
+          sed -i -E 's/^(watch|schedule):/# \1:/' Procfile
+      - name: Site
+        run: |
+          cd ~/frappe-bench
+          admin_password="$(openssl rand -hex 16)"
+          bench new-site helpdesk.localhost --db-host 127.0.0.1 --db-root-username root \
+            --db-root-password root --mariadb-user-host-login-scope='%' --admin-password "$admin_password"
+          bench --site helpdesk.localhost install-app telephony
+          bench --site helpdesk.localhost install-app helpdesk
+          bench --site helpdesk.localhost set-config allow_tests true
+          bench --site helpdesk.localhost set-config developer_mode 1
+          bench use helpdesk.localhost
+      - name: Start the site and seed the test data
+        id: seed
+        run: |
+          cd ~/frappe-bench
+          nohup bench start > bench_start.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -fs -H "Host: helpdesk.localhost" http://127.0.0.1:8000/api/method/ping >/dev/null && break
+            sleep 2
+          done
+          curl -fs -H "Host: helpdesk.localhost" http://127.0.0.1:8000/api/method/ping
+          bash apps/helpdesk/tests/team/seed.sh seed
+      - name: API and integration tests
+        run: cd ~/frappe-bench/apps/helpdesk && bash tests/team/run_api.sh
+      - name: Playwright browser tests (use cases, usability, security)
+        # runs even when the API tests fail, but only on a seeded, running site
+        if: ${{ !cancelled() && steps.seed.outcome == 'success' }}
+        run: |
+          cd ~/frappe-bench/apps/helpdesk/tests/team/e2e
+          npm ci
+          npx playwright install --with-deps chromium
+          cd ~/frappe-bench/apps/helpdesk && bash tests/team/seed.sh reset && bash tests/team/run_e2e.sh
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-reports
+          path: |
+            ~/frappe-bench/apps/helpdesk/tests/team/reports/api
+            ~/frappe-bench/apps/helpdesk/tests/team/reports/e2e
+            ~/frappe-bench/bench_start.log
+            ~/frappe-bench/logs
+          if-no-files-found: ignore
+
+  gate:
+    name: SQE gate
+    if: always()
+    needs: [unit, mutation, sonar, integration]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: All checks must pass
+        run: |
+          echo "### SQE gate" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Job | Result |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| unit + coverage | ${{ needs.unit.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| mutation >= 95 % | ${{ needs.mutation.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| SonarQube gate | ${{ needs.sonar.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| API + browser | ${{ needs.integration.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          test "${{ needs.unit.result }}" = success
+          test "${{ needs.mutation.result }}" = success
+          test "${{ needs.sonar.result }}" = success
+          test "${{ needs.integration.result }}" = success
