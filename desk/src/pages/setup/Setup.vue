@@ -57,6 +57,7 @@
             enter-from-class="opacity-0 translate-y-3"
             leave-active-class="transition duration-200 ease-in motion-reduce:transition-none"
             leave-to-class="opacity-0 -translate-y-1"
+            @before-leave="(el) => ((el as HTMLElement).inert = true)"
           >
             <component :is="STEP_VIEWS[setup.step]" :key="setup.step" />
           </Transition>
@@ -102,6 +103,7 @@ import { __ } from "@/translation";
 import { TelemetryConsent, useTelemetry } from "@framework/ui";
 import { useThemeMenuItem } from "@helpdesk/shared/themeMenu";
 import { Button, Dialog, Dropdown, Progress, Tooltip } from "frappe-ui";
+import { useEventListener } from "@vueuse/core";
 import { computed, ref } from "vue";
 import SetupDoneDialog from "./SetupDoneDialog.vue";
 import SetupEmailStep from "./SetupEmailStep.vue";
@@ -113,6 +115,7 @@ import {
   back,
   canGoBack,
   currentStep,
+  holdEnter,
   invited,
   openDesk,
   setup,
@@ -128,6 +131,8 @@ const STEP_VIEWS = {
   email: SetupEmailStep,
   team: SetupTeamStep,
 };
+
+useEventListener(window, "keydown", holdEnter, { capture: true });
 
 const telemetry = useTelemetry();
 const themeMenu = useThemeMenuItem();
