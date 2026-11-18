@@ -17,7 +17,7 @@
 | DEF-11 | W-API-10 | A waiting ticket with no messages is never auto-closed | Business rule / data integrity | Trivial | P3 | Open | Defer | PR-03 | #12 |
 | DEF-12 | OBS (USE_CASES.md) | Description is mandatory in the form but optional through the API | Input validation | Trivial | P4 | Open | Defer | PR-06 | #13 |
 | DEF-13 | SEC-05 / UX-03 | Article search returns 500 with a stack trace when RediSearch is absent | Error handling (5xx) | Minor | P2 | Open | Fix | PR-06, PR-11 | #14 |
-| DEF-14 | SEC-02 | Bundled DOMPurify 3.4.8 has published CVEs | Security configuration / dependencies | Major | P2 | Open | Fix | PR-10 | #15 |
+| DEF-14 | SEC-02 | Bundled DOMPurify 3.4.8 has published CVEs | Security configuration / dependencies | Major | P2 | Closed (fixed by PR #42: lock updated to DOMPurify 3.4.18 (OSV: 8 advisories for 3.4.8, fixed in 3.4.9 to 3.4.17; none for 3.4.18); Playwright CT-08 checks the served bundle) | Fix | PR-10 | #15 |
 | DEF-15 | SEC-03 | No Content-Security-Policy header | Security configuration / dependencies | Minor | P3 | Open | Defer | PR-10 | #16 |
 | DEF-16 | SEC-04 | user_id and full_name cookies are readable by scripts | Security configuration / dependencies | Minor | P4 | Open | Accept (won't fix) | PR-10 | #17 |
 | DEF-17 | A11Y-01 | Icon-only buttons have no accessible name | Accessibility | Major | P1 | Open (fixed on S2 (customer ticket page) only) | Fix | PR-08 | #18 |
@@ -44,10 +44,10 @@
 
 | Severity | Open | Fixed / closed | Total |
 |---|---|---|---|
-| Major | 5 | 4 | 9 |
+| Major | 4 | 5 | 9 |
 | Minor | 17 | 0 | 17 |
 | Trivial | 7 | 1 | 8 |
-| **All** | 29 | 5 | 34 |
+| **All** | 28 | 6 | 34 |
 
 Excluded: 1 rejected (not a defect).
 
@@ -75,4 +75,4 @@ Excluded: 1 rejected (not a defect).
 | Defect density, `hd_ticket.py` | defects rooted in the file / its KLOC (1.25) | 5 / 1.25 = **4.0 per KLOC** |
 | Requirements coverage (tested) | requirements with at least one executed test / all | 14 / 14 = **100 %** |
 | Requirements coverage (passing) | requirements with no failing test and no open Major defect / all | 14 / 14 = **100 %** |
-| Reopen rate | reopenings / defects fixed | 0 / 5 = **0 %** |
+| Reopen rate | reopenings / defects fixed | 0 / 6 = **0 %** |

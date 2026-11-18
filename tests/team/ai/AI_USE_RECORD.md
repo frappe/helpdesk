@@ -30,9 +30,11 @@ machine and repository:
 - wrote and edited files: tests, scripts, configuration, reports and the
   management documents;
 - on GitHub, through the member's signed-in `gh` account (`ibbster05`):
-  created the 35 Issues, opened PRs #1, #37, #38, #39, #40 and #41, merged
-  all of them except #37 (closed unmerged), closed Issues #2, #3 and #4, and
-  set branch protection on `team/sqe-tests`.
+  created the 35 Issues, opened PRs #1 and #37–#42, merged all of them
+  except #37 (closed unmerged), closed Issues #2, #3, #4 and #15, and set
+  branch protection on `team/sqe-tests`;
+- queried the public OSV vulnerability database (package name and version
+  only) to check the DOMPurify advisories for DEF-14.
 
 One product decision was put to the team rather than made by the agent:
 the assignment rule for DEF-03 ("agents only", chosen 18 Nov, even though
@@ -88,7 +90,7 @@ generation; M3 = use cases, usability, accessibility, security, performance
 | 8 | Performance (M3) | 17 Nov, Opus 5.5 | k6 at 1 and 5 users, twice each, against limits set beforehand | `perf/read_ticket.js`, `perf/run_load.sh`, `perf/PERFORMANCE_REPORT.md`, `perf/evidence/` | 4 runs; p95 27.7 / 25.8 ms at 5 users against an 800 ms limit; 0 % unexpected failures | | |
 | 9 | SonarQube and cyclomatic complexity (M1) | 17–18 Nov, Opus 5.5 | Install and run SonarQube; report metrics; hand CC from a CFG | `sonar/` (scripts, `SONAR_REPORT.md`, `CYCLOMATIC_COMPLEXITY.md`, calibration, evidence) | Metrics exported from the server API; V(G) = 6 three ways; Sonar's counting rules checked with a calibration file | | |
 | 10 | Test management (all) | 17–18 Nov, Opus 5.5 | Plan, estimates, risks, traceability, defect log, RCA, Pareto, GQM, progress, completion report | `management/*`, `tools/defects_report.py`, `tools/file_issues.py` | Figures regenerated from `defects.yaml` and the traceability rows; RCA "whys" checked against Frappe and Helpdesk source | | |
-| 11 | CI gate, Issues, blocked PR, fix PR (M1) | 18 Nov, Opus 5.5 | GitHub Actions gate; file defects; one blocked and two fix PRs | `.github/workflows/sqe-quality-gate.yml`; `sonar_admin.py gate` / `check-gate`; Issues #2–#36; PRs #1, #37, #38, #39, #41; DEF-01 and DEF-02/03 fixes in `helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py`; `unit/test_assignment_access.py` | Gate green on #1, #38, #39, #41; #37 blocked by unit, API, mutation and Sonar jobs; upstream suites compared with and without each fix (only `test_non_agent_flow` changes, by design, with the DEF-03 fix) | | |
+| 11 | CI gate, Issues, blocked PR, fix PR (M1) | 18 Nov, Opus 5.5 | GitHub Actions gate; file defects; one blocked and three fix PRs | `.github/workflows/sqe-quality-gate.yml`; `sonar_admin.py gate` / `check-gate`; Issues #2–#36; PRs #1, #37, #38, #39, #41, #42; DEF-01 and DEF-02/03 fixes in `helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py`; `unit/test_assignment_access.py`; DEF-14 fix in `desk/yarn.lock` and Playwright CT-08 | Gate green on #1, #38, #39, #41, #42; DEF-14 also re-checked with ZAP (`security/evidence/zap_after_def14/`); #37 blocked by unit, API, mutation and Sonar jobs; upstream suites compared with and without each fix (only `test_non_agent_flow` changes, by design, with the DEF-03 fix) | | |
 | 12 | AI-use record (all) | 18 Nov, Opus 5.5 | This record and the prompt extract | `ai/AI_USE_RECORD.md`, `ai/PROMPTS.md`, `tools/extract_prompts.py` | Prompts compared with the transcript; model names and times read from it | | |
 
 ## 5. Mistakes the AI made, and how they were caught
@@ -109,6 +111,8 @@ wrong and evidence corrected it.
 | 9 | Wrote a YAML note containing `#38`, which YAML read as a comment | The generated defect summary cut the note short | Quoted the value |
 | 10 | Read upstream's `test_non_agent_flow` as allowing assignment to non-agent *desk* users, and narrowed DEF-03 and RCA-2 on that basis | Checking the test user's account type in the database while writing the DEF-03 fix: `non_agent@test.com` is a Website User with no roles | DEF-03 note and RCA-2 corrected; the team chose the "agents only" rule, and the upstream test's conflict is documented |
 | 11 | First version of the assignment unit tests had a check that could never fail (the mock it inspected was not the one called) | Reviewing the test before running it | Rewritten so the helper returns the mock it used; each check shown to fail when the fix is removed |
+| 12 | Wrote in the security report that DOMPurify's eight CVEs were "fixed by 3.4.16" | OSV query while fixing DEF-14: three are fixed only in 3.4.17 | Report corrected; the fix uses 3.4.18 and CT-08 requires at least 3.4.17 |
+| 13 | Assumed `bench build` would install the new DOMPurify version | The rebuilt bundle still said "DOMPurify 3.4.8" | Ran `yarn install` before the build; the bundle then said 3.4.18 |
 
 ## 6. What the agent did not do
 

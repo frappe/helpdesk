@@ -251,13 +251,15 @@
   category: Security configuration / dependencies
   severity: Major
   priority: P2
-  status: Open
+  status: Closed
   triage: Fix
   layer: dependency
-  file: yarn.lock
+  file: desk/yarn.lock
   risk: [PR-10]
   found_by: ZAP 10003
   found_on: 2026-11-17
+  fixed_on: 2026-11-18
+  note: "fixed by PR #42: lock updated to DOMPurify 3.4.18 (OSV: 8 advisories for 3.4.8, fixed in 3.4.9 to 3.4.17; none for 3.4.18); Playwright CT-08 checks the served bundle"
   reopened: 0
 
 - id: DEF-15

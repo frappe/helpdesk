@@ -30,7 +30,7 @@ workflow that cannot be completed.
 | PR-07 | Duplicate or half-written records after retries or failures | 2 | 4 | 8 | Medium | Repeated-request tests on create, resolve, assign, close; failure-and-recovery tests R1, R2 | M2, M3 | DEF-10 (trivial) | Low |
 | PR-08 | Accessibility barriers stop assistive-technology users completing a use case | 5 | 3 | 15 | High | axe-core + Lighthouse on the five key screens; keyboard-only task test; fix one screen and re-scan | M3 | DEF-17…26 | Medium: S2 fixed (Lighthouse 82→100, axe 6→0); P1 issues open on S1, S4, S5 |
 | PR-09 | Ticket page too slow when several agents work at once | 2 | 3 | 6 | Low | k6 smoke: 1 and 5 users, twice each, p95 and failure-rate limits | M3 | – | Low: p95 ≤ 28 ms vs 800 ms limit |
-| PR-10 | Vulnerable or misconfigured components (libraries, headers, cookies) | 3 | 4 | 12 | Medium | ZAP passive during the workflows; pip-audit of 178 Python packages; source and config review of cookies, CSRF, headers | M3 | DEF-14 (Major), DEF-15, DEF-16 | Medium until DOMPurify is upgraded |
+| PR-10 | Vulnerable or misconfigured components (libraries, headers, cookies) | 3 | 4 | 12 | Medium | ZAP passive during the workflows; pip-audit of 178 Python packages; source and config review of cookies, CSRF, headers | M3 | DEF-14 (Major, closed by PR #42), DEF-15, DEF-16 | Low: DOMPurify 3.4.18, checked in the served bundle by CT-08 and ZAP; no CSP (DEF-15) remains |
 | PR-11 | Users cannot find a ticket or understand why an action is unavailable | 3 | 3 | 9 | Medium | Usability task tests; UC-06 flows; observations during automation | M3 | DEF-28…31, DEF-35 | Medium |
 
 ## Project risks
