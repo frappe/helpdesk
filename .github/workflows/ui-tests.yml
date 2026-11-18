@@ -27,7 +27,7 @@ env:
 jobs:
   ui-tests:
     name: Playwright E2E Tests (${{ matrix.shard }}/2)
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -68,6 +68,9 @@ jobs:
         with:
           node-version: 24
           check-latest: true
+
+      - name: Install Yarn
+        run: npm install -g yarn
 
       - name: Cache pip
         uses: actions/cache@v4
@@ -170,7 +173,7 @@ jobs:
     name: Merge Playwright Reports
     needs: ui-tests
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
 
     steps:
       - name: Clone
@@ -180,6 +183,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+
+      - name: Install Yarn
+        run: npm install -g yarn
 
       - name: Install Playwright
         run: yarn install --frozen-lockfile --ignore-scripts

@@ -23,7 +23,7 @@ concurrency:
 jobs:
   tests:
     name: Python Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
     timeout-minutes: 60
 
     services:
