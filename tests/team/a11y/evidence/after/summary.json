@@ -1,0 +1,470 @@
+{
+  "phase": "after",
+  "date": "2026-11-17T17:11:25.507Z",
+  "base": "http://127.0.0.1:8000",
+  "screens": [
+    {
+      "id": "s1_new_ticket",
+      "title": "Customer: New Ticket form",
+      "useCase": "UC-01",
+      "url": "/helpdesk/my-tickets/new",
+      "axe": [
+        {
+          "tool": "axe",
+          "id": "aria-input-field-name",
+          "impact": "serious",
+          "help": "ARIA input fields must have an accessible name",
+          "wcag": "wcag2a wcag412",
+          "elements": [
+            ".tiptap"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "button-name",
+          "impact": "critical",
+          "help": "Buttons must have discernible text",
+          "wcag": "wcag2a wcag412",
+          "elements": [
+            ".mr-2.bg-transparent.active\\:bg-surface-gray-4"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "wcag": "wcag2aa wcag143",
+          "elements": [
+            ".hover\\:text-ink-gray-7 > span"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "landmark-one-main",
+          "impact": "moderate",
+          "help": "Document should have one main landmark",
+          "wcag": "",
+          "elements": [
+            "html"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "wcag": "",
+          "elements": [
+            "html"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "region",
+          "impact": "moderate",
+          "help": "All page content should be contained by landmarks",
+          "wcag": "",
+          "elements": [
+            ".gap-5.flex-col.flex > .flex-col.gap-2.flex",
+            ".p-3 > .text-base",
+            ".-mx-3",
+            ".text-sm-medium"
+          ]
+        }
+      ],
+      "lighthouse": {
+        "scores": {
+          "accessibility": 94,
+          "best-practices": 100,
+          "seo": 100
+        },
+        "finalUrl": "http://127.0.0.1:8000/helpdesk/my-tickets/new",
+        "failed": [
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "color-contrast",
+            "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+            "weight": 7,
+            "elements": [
+              "div.flex > div.flex > a.flex > span",
+              "div.flex > div.flex > div > h4.text-p-sm"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "landmark-one-main",
+            "title": "Document does not have a main landmark.",
+            "weight": 3,
+            "elements": [
+              "html"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "best-practices",
+            "id": "valid-source-maps",
+            "title": "Missing source maps for large first-party JavaScript",
+            "weight": 0,
+            "elements": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "s2_customer_ticket",
+      "title": "Customer: ticket page (resolved)",
+      "useCase": "UC-02, UC-05",
+      "url": "/helpdesk/my-tickets/1456",
+      "axe": [],
+      "lighthouse": {
+        "scores": {
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100
+        },
+        "finalUrl": "http://127.0.0.1:8000/helpdesk/my-tickets/1456",
+        "failed": [
+          {
+            "tool": "lighthouse",
+            "category": "best-practices",
+            "id": "valid-source-maps",
+            "title": "Missing source maps for large first-party JavaScript",
+            "weight": 0,
+            "elements": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "s3_rating_dialog",
+      "title": "Customer: Rate this ticket dialog",
+      "useCase": "UC-02",
+      "url": "/helpdesk/my-tickets/1456",
+      "axe": []
+    },
+    {
+      "id": "s4_customer_list",
+      "title": "Customer: ticket list",
+      "useCase": "UC-06",
+      "url": "/helpdesk/my-tickets",
+      "axe": [
+        {
+          "tool": "axe",
+          "id": "aria-allowed-attr",
+          "impact": "critical",
+          "help": "Elements must only use supported ARIA attributes",
+          "wcag": "wcag2a wcag412",
+          "elements": [
+            "#reka-popover-trigger-v-0-0-6",
+            "#reka-popover-trigger-v-0-0-9"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "button-name",
+          "impact": "critical",
+          "help": "Buttons must have discernible text",
+          "wcag": "wcag2a wcag412",
+          "elements": [
+            ".rounded-e-none.border-e.active\\:bg-surface-gray-4"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "wcag": "wcag21a wcag253",
+          "elements": [
+            "button[aria-label=\"Filter\"]"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "landmark-one-main",
+          "impact": "moderate",
+          "help": "Document should have one main landmark",
+          "wcag": "",
+          "elements": [
+            "html"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "wcag": "",
+          "elements": [
+            "html"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "region",
+          "impact": "moderate",
+          "help": "All page content should be contained by landmarks",
+          "wcag": "",
+          "elements": [
+            ".quick-filters",
+            ".gap-0\\.5.flex-col.justify-center"
+          ]
+        }
+      ],
+      "lighthouse": {
+        "scores": {
+          "accessibility": 85,
+          "best-practices": 100,
+          "seo": 100
+        },
+        "finalUrl": "http://127.0.0.1:8000/helpdesk/my-tickets",
+        "failed": [
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "aria-allowed-attr",
+            "title": "`[aria-*]` attributes do not match their roles",
+            "weight": 10,
+            "elements": [
+              "div.z-0 > div.flex > div.flex > div#reka-popover-trigger-v-0-0-6",
+              "div.z-0 > div.flex > div.flex > div#reka-popover-trigger-v-0-0-9"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "button-name",
+            "title": "Buttons do not have an accessible name",
+            "weight": 10,
+            "elements": [
+              "div.flex > div.flex > div#reka-popover-trigger-v-0-0-9 > button.rounded-e-none"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "landmark-one-main",
+            "title": "Document does not have a main landmark.",
+            "weight": 3,
+            "elements": [
+              "html"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "label-content-name-mismatch",
+            "title": "Elements with visible text labels do not have matching accessible names.",
+            "weight": 0,
+            "elements": [
+              "div.flex > div#reka-popover-trigger-v-0-0-6 > div.flex > button.rounded-e-none"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "best-practices",
+            "id": "valid-source-maps",
+            "title": "Missing source maps for large first-party JavaScript",
+            "weight": 0,
+            "elements": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "s5_agent_ticket",
+      "title": "Agent: ticket page",
+      "useCase": "UC-03, UC-04",
+      "url": "/helpdesk/tickets/1457",
+      "axe": [
+        {
+          "tool": "axe",
+          "id": "aria-allowed-attr",
+          "impact": "critical",
+          "help": "Elements must only use supported ARIA attributes",
+          "wcag": "wcag2a wcag412",
+          "elements": [
+            "#reka-popover-trigger-v-0-0-61",
+            "#reka-popover-trigger-v-0-0-72"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "button-name",
+          "impact": "critical",
+          "help": "Buttons must have discernible text",
+          "wcag": "wcag2a wcag412",
+          "elements": [
+            "#reka-dropdown-menu-trigger-v-0-0-2",
+            "#reka-dropdown-menu-trigger-v-0-0-3",
+            "#reka-dropdown-menu-trigger-v-0-0-4",
+            "#reka-dropdown-menu-trigger-v-0-0-5",
+            ".gap-1.flex.items-center > .w-7.active\\:bg-surface-gray-4.bg-transparent:nth-child(1)",
+            ".w-7.active\\:bg-surface-gray-4.bg-transparent:nth-child(2)",
+            "#reka-dropdown-menu-trigger-v-0-0-19"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "wcag": "wcag2aa wcag143",
+          "elements": [
+            ".leading-snug",
+            "a > span",
+            "#reka-tabs-v-0-0-10-trigger-email > .box-border.transition-\\[background-color\\,color\\,box-shadow\\].ease-out > .truncate.min-w-0",
+            "#reka-tabs-v-0-0-10-trigger-comment > .box-border.transition-\\[background-color\\,color\\,box-shadow\\].ease-out > .truncate.min-w-0",
+            "#reka-tabs-v-0-0-10-trigger-analytics > .box-border.transition-\\[background-color\\,color\\,box-shadow\\].ease-out > .truncate.min-w-0",
+            ".sm\\:block",
+            ".min-h-7.leading-5.gap-2:nth-child(1) > .w-\\[106px\\].text-ink-gray-5.truncate > span[data-grace-area-trigger=\"\"][data-slot=\"trigger\"][data-state=\"closed\"]",
+            ".min-h-7.leading-5.gap-2:nth-child(2) > .w-\\[106px\\].text-ink-gray-5.truncate > span[data-grace-area-trigger=\"\"][data-slot=\"trigger\"][data-state=\"closed\"]",
+            ".space-y-2\\.5 > .leading-5.gap-2.flex:nth-child(1) > .w-\\[106px\\].text-ink-gray-5.truncate > span[data-grace-area-trigger=\"\"][data-slot=\"trigger\"][data-state=\"closed\"]",
+            ".text-ink-gray-4[data-v-e4ec07ef=\"\"]",
+            ".leading-5.gap-2[data-v-ecc98a44=\"\"]:nth-child(2) > .w-\\[106px\\].text-ink-gray-5[data-v-ecc98a44=\"\"] > span[data-grace-area-trigger=\"\"][data-slot=\"trigger\"][data-state=\"closed\"]",
+            ".leading-5.gap-2[data-v-ecc98a44=\"\"]:nth-child(3) > .w-\\[106px\\].text-ink-gray-5[data-v-ecc98a44=\"\"] > span[data-grace-area-trigger=\"\"][data-slot=\"trigger\"][data-state=\"closed\"]",
+            ".leading-5.gap-2[data-v-ecc98a44=\"\"]:nth-child(4) > .w-\\[106px\\].text-ink-gray-5[data-v-ecc98a44=\"\"] > span[data-grace-area-trigger=\"\"][data-slot=\"trigger\"][data-state=\"closed\"]",
+            ".leading-5.gap-2[data-v-ecc98a44=\"\"]:nth-child(5) > .w-\\[106px\\].text-ink-gray-5[data-v-ecc98a44=\"\"] > span[data-grace-area-trigger=\"\"][data-slot=\"trigger\"][data-state=\"closed\"]",
+            ".pt-0\\.5.w-\\[106px\\].text-ink-gray-5 > span[data-grace-area-trigger=\"\"][data-slot=\"trigger\"][data-state=\"closed\"]"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "landmark-one-main",
+          "impact": "moderate",
+          "help": "Document should have one main landmark",
+          "wcag": "",
+          "elements": [
+            "html"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "landmark-unique",
+          "impact": "moderate",
+          "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+          "wcag": "",
+          "elements": [
+            "div[data-reka-scroll-area-viewport=\"\"] > div > nav:nth-child(1)"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "wcag": "",
+          "elements": [
+            "html"
+          ]
+        },
+        {
+          "tool": "axe",
+          "id": "region",
+          "impact": "moderate",
+          "help": "All page content should be contained by landmarks",
+          "wcag": "",
+          "elements": [
+            ".box-border.transition-\\[background-color\\,color\\,box-shadow\\][data-state=\"active\"] > .truncate.min-w-0",
+            "#reka-tabs-v-0-0-10-trigger-email > .box-border.transition-\\[background-color\\,color\\,box-shadow\\].ease-out > .truncate.min-w-0",
+            "#reka-tabs-v-0-0-10-trigger-comment > .box-border.transition-\\[background-color\\,color\\,box-shadow\\].ease-out > .truncate.min-w-0",
+            "#reka-tabs-v-0-0-10-trigger-analytics > .box-border.transition-\\[background-color\\,color\\,box-shadow\\].ease-out > .truncate.min-w-0",
+            "#reka-tabs-v-0-0-10-content-activity",
+            ".space-y-4 > .gap-3.flex.items-center",
+            ".min-h-7.leading-5.gap-2:nth-child(1) > .w-\\[106px\\].text-ink-gray-5.truncate",
+            ".min-h-7.leading-5.gap-2:nth-child(1) > .ps-\\[9px\\].gap-1\\.5.flex-1 > .text-ink-gray-7.truncate.text-base",
+            ".min-h-7.leading-5.gap-2:nth-child(2) > .w-\\[106px\\].text-ink-gray-5.truncate",
+            ".min-h-7.leading-5.gap-2:nth-child(2) > .ps-\\[9px\\].gap-1\\.5.flex-1 > .text-ink-gray-7.truncate.text-base",
+            ".divide-y-\\[1px\\] > .px-4 > .section-header.sticky.py-3\\.5 > .font-medium.text-ink-gray-8.text-base",
+            ".space-y-2\\.5 > .leading-5.gap-2.flex:nth-child(1) > .w-\\[106px\\].text-ink-gray-5.truncate",
+            ".leading-5.gap-2[data-v-ecc98a44=\"\"]:nth-child(2) > .w-\\[106px\\].text-ink-gray-5[data-v-ecc98a44=\"\"]",
+            ".leading-5.gap-2[data-v-ecc98a44=\"\"]:nth-child(3) > .w-\\[106px\\].text-ink-gray-5[data-v-ecc98a44=\"\"]",
+            ".leading-5.gap-2[data-v-ecc98a44=\"\"]:nth-child(4) > .w-\\[106px\\].text-ink-gray-5[data-v-ecc98a44=\"\"]",
+            ".leading-5.gap-2[data-v-ecc98a44=\"\"]:nth-child(5) > .w-\\[106px\\].text-ink-gray-5[data-v-ecc98a44=\"\"]",
+            ".pt-0\\.5.w-\\[106px\\].text-ink-gray-5",
+            ".pb-2\\.5 > .font-medium.text-ink-gray-8.text-base"
+          ]
+        }
+      ],
+      "lighthouse": {
+        "scores": {
+          "accessibility": 85,
+          "best-practices": 100,
+          "seo": 100
+        },
+        "finalUrl": "http://127.0.0.1:8000/helpdesk/tickets/1457",
+        "failed": [
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "aria-allowed-attr",
+            "title": "`[aria-*]` attributes do not match their roles",
+            "weight": 10,
+            "elements": [
+              "div.space-y-2.5 > div.flex > div.-m-1 > div#reka-popover-trigger-v-0-0-55",
+              "div.space-y-2.5 > div.flex > div.min-w-0 > div#reka-popover-trigger-v-0-0-58"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "button-name",
+            "title": "Buttons do not have an accessible name",
+            "weight": 10,
+            "elements": [
+              "nav.flex > div.group/sidebar-item > div.flex > button#reka-dropdown-menu-trigger-v-0-0-2",
+              "nav.flex > div.group/sidebar-item > div.flex > button#reka-dropdown-menu-trigger-v-0-0-3",
+              "nav.flex > div.group/sidebar-item > div.flex > button#reka-dropdown-menu-trigger-v-0-0-4",
+              "nav.flex > div.group/sidebar-item > div.flex > button#reka-dropdown-menu-trigger-v-0-0-5",
+              "div.flex > div.flex > div.flex > button.inline-flex",
+              "div.flex > div.flex > div.flex > button.inline-flex",
+              "div.flex > div.flex > div.flex > button#reka-dropdown-menu-trigger-v-0-0-69"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "color-contrast",
+            "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+            "weight": 7,
+            "elements": [
+              "div.relative > h3.text-base > span.flex > span.truncate",
+              "div.flex > div.flex > a.flex > span",
+              "div.relative > button#reka-tabs-v-0-0-10-trigger-email > span.inline-flex > span.min-w-0",
+              "div.relative > button#reka-tabs-v-0-0-10-trigger-comment > span.inline-flex > span.min-w-0",
+              "div.relative > button#reka-tabs-v-0-0-10-trigger-analytics > span.inline-flex > span.min-w-0",
+              "div.ps-3 > div.flex > div.flex > span.whitespace-nowrap",
+              "div.space-y-0.5 > div.flex > div.w-[106px] > span",
+              "div.space-y-0.5 > div.flex > div.w-[106px] > span",
+              "div.space-y-2.5 > div.flex > div.w-[106px] > span",
+              "button.group > span.truncate > div.flex > span.text-ink-gray-4",
+              "div.space-y-2.5 > div.flex > div.w-[106px] > span",
+              "div.space-y-2.5 > div.flex > div.w-[106px] > span"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "accessibility",
+            "id": "landmark-one-main",
+            "title": "Document does not have a main landmark.",
+            "weight": 3,
+            "elements": [
+              "html"
+            ]
+          },
+          {
+            "tool": "lighthouse",
+            "category": "best-practices",
+            "id": "valid-source-maps",
+            "title": "Missing source maps for large first-party JavaScript",
+            "weight": 0,
+            "elements": []
+          }
+        ]
+      }
+    }
+  ]
+}

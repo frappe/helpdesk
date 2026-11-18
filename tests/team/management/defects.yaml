@@ -1,0 +1,531 @@
+# Defect log: the single source for DEFECT_LOG tables, the Pareto chart, the
+# GQM figures and the GitHub Issues (tools/defects_report.py, file_issues.sh).
+#
+# severity: Critical | Major | Minor | Trivial   (effect on users or data)
+# priority: P1 fix before release | P2 fix soon | P3 next cycle | P4 backlog
+# status:   New | Open | Fixed (verified locally, not merged) | Closed | Reopened | Rejected
+# triage:   Fix | Fix (CI demo) | Defer | Accept (won't fix) | Duplicate | Not a defect
+# category: the Pareto category (one per defect)
+# layer:    backend | frontend | dependency | configuration
+# file:     source file holding the root cause, when known (defect density)
+# risk:     risk-register IDs this defect materialises
+# issue:    GitHub Issue number on the group's fork, filled in when filed
+# reopened: number of times a fix failed re-test
+
+- id: DEF-01
+  ref: D-01
+  title: Auto-closed ticket gets no resolution date
+  category: Business rule / data integrity
+  severity: Major
+  priority: P1
+  status: Open
+  triage: Fix (CI demo)
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py
+  risk: [PR-02, PR-03]
+  found_by: API test test_auto_closed_ticket_gets_a_resolution_date_like_any_closed_ticket
+  found_on: 2026-11-17
+  rca: RCA.md#rca-1
+  steps: |
+    1. Set HD Settings auto_close_after_days = 7, auto_close_status = Replied.
+    2. Agent replies to a ticket and sets it to Replied; the last message is 8 days old.
+    3. Run close_tickets_after_n_days().
+  expected: Ticket Closed with a resolution date, as when an agent closes it.
+  actual: Ticket Closed, status category Resolved, resolution_date empty.
+  reopened: 0
+
+- id: DEF-02
+  ref: SEC-01 / W-API-05
+  title: Customer can assign an agent to their own ticket
+  category: Access control
+  severity: Major
+  priority: P1
+  status: Open
+  triage: Fix
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py
+  risk: [PR-05]
+  found_by: API test test_customer_cannot_assign_an_agent; Playwright AC-08
+  found_on: 2026-11-17
+  rca: RCA.md#rca-2
+  steps: |
+    1. Sign in as customer.a, raise a ticket.
+    2. POST /api/method/run_doc_method with dt=HD Ticket, method=assign_agent, args={"agent": "agent.one@sqe.test"}.
+  expected: 403, no assignment.
+  actual: 200; agent assigned and notified.
+  reopened: 0
+
+- id: DEF-03
+  ref: W-API-06
+  title: Ticket can be assigned to a customer account, which then reads it
+  category: Access control
+  severity: Major
+  priority: P1
+  status: Open
+  note: upstream test_non_agent_flow expects assignment to non-agent desk users; the defect is assignment to a portal customer
+  triage: Fix
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py
+  risk: [PR-05]
+  found_by: API test test_ticket_cannot_be_assigned_to_a_non_agent
+  found_on: 2026-11-17
+  steps: |
+    1. As an agent, assign customer A's ticket to customer.b@sqe.test.
+    2. Sign in as customer B and open the ticket.
+  expected: Assignment refused (not an agent); customer B gets 403.
+  actual: 200; the ticket is shared with customer B, who can read it.
+  reopened: 0
+
+- id: DEF-04
+  ref: W-API-07
+  title: Rating an open ticket locks the customer out of closing it
+  category: Business rule / data integrity
+  severity: Minor
+  priority: P2
+  status: Open
+  triage: Fix
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py
+  risk: [PR-01, PR-04]
+  found_by: API test test_rating_an_open_ticket_does_not_lock_the_customer_out
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-05
+  ref: W-API-08
+  title: Agent can overwrite the server-computed resolution date
+  category: Business rule / data integrity
+  severity: Minor
+  priority: P2
+  status: Open
+  triage: Fix
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+  risk: [PR-02]
+  found_by: API test test_resolution_date_cannot_be_written_directly
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-06
+  ref: W-API-02
+  title: Missing required argument returns 500 with a traceback
+  category: Error handling (5xx)
+  severity: Minor
+  priority: P3
+  status: Open
+  triage: Fix
+  layer: backend
+  file: frappe/handler.py (framework; not yet analysed)
+  risk: [PR-06]
+  found_by: generated EP cases; test_create_without_a_document_is_a_client_error
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-07
+  ref: W-API-03
+  title: Numeric feedback_extra returns 500 from the HTML sanitiser
+  category: Error handling (5xx)
+  severity: Minor
+  priority: P3
+  status: Open
+  triage: Fix
+  layer: backend
+  file: (not yet analysed)
+  risk: [PR-06]
+  found_by: generated EP case
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-08
+  ref: W-API-09
+  title: Routing a ticket to a team with no members returns 500 (IndexError)
+  category: Error handling (5xx)
+  severity: Minor
+  priority: P2
+  status: Open
+  triage: Fix
+  layer: backend
+  file: (not yet analysed)
+  risk: [PR-06]
+  found_by: API test test_agent_can_route_a_ticket_to_a_team
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-09
+  ref: W-API-01
+  title: A number is accepted and stored as a ticket subject
+  category: Input validation
+  severity: Trivial
+  priority: P4
+  status: Open
+  triage: Defer
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_ticket/api.py
+  risk: [PR-06]
+  found_by: generated EP cases
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-10
+  ref: W-API-04
+  title: Repeating an identical create request makes a second ticket
+  category: Input validation
+  severity: Trivial
+  priority: P4
+  status: Open
+  triage: Defer
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_ticket/api.py
+  risk: [PR-07]
+  found_by: API test test_repeating_a_create_request_does_not_duplicate_the_ticket
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-11
+  ref: W-API-10
+  title: A waiting ticket with no messages is never auto-closed
+  category: Business rule / data integrity
+  severity: Trivial
+  priority: P3
+  status: Open
+  triage: Defer
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py
+  risk: [PR-03]
+  found_by: API test test_inactive_ticket_without_any_message_is_closed
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-12
+  ref: OBS (USE_CASES.md)
+  title: Description is mandatory in the form but optional through the API
+  category: Input validation
+  severity: Trivial
+  priority: P4
+  status: Open
+  triage: Defer
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_ticket/api.py
+  risk: [PR-06]
+  found_by: UC-01 EF2 vs API EP cases
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-13
+  ref: SEC-05 / UX-03
+  title: Article search returns 500 with a stack trace when RediSearch is absent
+  category: Error handling (5xx)
+  severity: Minor
+  priority: P2
+  status: Open
+  triage: Fix
+  layer: backend
+  file: helpdesk/api/article.py
+  risk: [PR-06, PR-11]
+  found_by: ZAP 90022; UC-01 toast; server log
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-14
+  ref: SEC-02
+  title: Bundled DOMPurify 3.4.8 has published CVEs
+  category: Security configuration / dependencies
+  severity: Major
+  priority: P2
+  status: Open
+  triage: Fix
+  layer: dependency
+  file: yarn.lock
+  risk: [PR-10]
+  found_by: ZAP 10003
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-15
+  ref: SEC-03
+  title: No Content-Security-Policy header
+  category: Security configuration / dependencies
+  severity: Minor
+  priority: P3
+  status: Open
+  triage: Defer
+  layer: configuration
+  file: (bench nginx template)
+  risk: [PR-10]
+  found_by: ZAP 10038
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-16
+  ref: SEC-04
+  title: user_id and full_name cookies are readable by scripts
+  category: Security configuration / dependencies
+  severity: Minor
+  priority: P4
+  status: Open
+  triage: Accept (won't fix)
+  layer: configuration
+  file: frappe/auth.py
+  risk: [PR-10]
+  found_by: ZAP 10010
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-17
+  ref: A11Y-01
+  title: Icon-only buttons have no accessible name
+  category: Accessibility
+  severity: Major
+  priority: P1
+  status: Open
+  note: fixed on S2 (customer ticket page) only
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: axe button-name; Lighthouse
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-18
+  ref: A11Y-02
+  title: Description editor has no accessible name
+  category: Accessibility
+  severity: Major
+  priority: P1
+  status: Open
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: axe aria-input-field-name
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-19
+  ref: A11Y-03
+  title: Text below 4.5:1 contrast
+  category: Accessibility
+  severity: Major
+  priority: P1
+  status: Open
+  note: fixed on S2/S3 only
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: axe color-contrast; Lighthouse
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-20
+  ref: A11Y-04
+  title: Message iframes have no title
+  category: Accessibility
+  severity: Major
+  priority: P1
+  status: Fixed (verified locally, not merged)
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: axe frame-title; Lighthouse
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-21
+  ref: A11Y-05
+  title: ARIA state on a div popover trigger instead of a button
+  category: Accessibility
+  severity: Major
+  priority: P1
+  status: Open
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: axe aria-allowed-attr; Lighthouse
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-22
+  ref: A11Y-06
+  title: Filter button's accessible name does not contain its visible text
+  category: Accessibility
+  severity: Minor
+  priority: P2
+  status: Open
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: axe label-content-name-mismatch
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-23
+  ref: A11Y-07 (+ A11Y-09)
+  title: No main landmark; content outside landmarks
+  category: Accessibility
+  severity: Minor
+  priority: P2
+  status: Open
+  note: fixed on S2 only; A11Y-09 has the same root cause and is not counted separately
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: axe landmark-one-main, region
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-24
+  ref: A11Y-08
+  title: Pages have no level-one heading
+  category: Accessibility
+  severity: Minor
+  priority: P2
+  status: Open
+  note: fixed on S2 only
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: axe page-has-heading-one
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-25
+  ref: A11Y-10
+  title: Two unnamed nav landmarks
+  category: Accessibility
+  severity: Minor
+  priority: P2
+  status: Open
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: axe landmark-unique
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-26
+  ref: A11Y-11
+  title: No meta description
+  category: Accessibility
+  severity: Trivial
+  priority: P3
+  status: Fixed (verified locally, not merged)
+  triage: Fix
+  layer: frontend
+  risk: [PR-08]
+  found_by: Lighthouse meta-description
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-27
+  ref: A11Y-12
+  title: No source maps for large scripts
+  category: Accessibility
+  severity: Trivial
+  priority: P4
+  status: Rejected
+  triage: Not a defect
+  note: no user impact; build configuration choice
+  layer: frontend
+  risk: []
+  found_by: Lighthouse valid-source-maps
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-28
+  ref: UX-01
+  title: Customer ticket list hides resolved tickets by default
+  category: Usability
+  severity: Minor
+  priority: P2
+  status: Open
+  triage: Fix
+  layer: frontend
+  risk: [PR-11]
+  found_by: UC-06 AF2
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-29
+  ref: UX-02
+  title: Rating dialog does not explain why Submit is unavailable
+  category: Usability
+  severity: Minor
+  priority: P2
+  status: Open
+  triage: Fix
+  layer: frontend
+  risk: [PR-08, PR-11]
+  found_by: usability task B (keyboard)
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-30
+  ref: UX-04
+  title: Fifteen toolbar tab stops between description and Submit
+  category: Usability
+  severity: Trivial
+  priority: P3
+  status: Open
+  triage: Defer
+  layer: frontend
+  risk: [PR-08, PR-11]
+  found_by: usability task A probe
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-31
+  ref: OBS (USE_CASES.md)
+  title: Opening a missing ticket shows the not-found message several times
+  category: Usability
+  severity: Trivial
+  priority: P4
+  status: Open
+  triage: Defer
+  layer: frontend
+  risk: [PR-11]
+  found_by: UC-04 EF1
+  found_on: 2026-11-17
+  reopened: 0
+
+- id: DEF-32
+  ref: SonarQube python:S8904
+  title: Notification HTML with an img without src raises KeyError
+  category: Code quality (static)
+  severity: Minor
+  priority: P4
+  status: Open
+  triage: Defer
+  layer: backend
+  file: helpdesk/helpdesk/doctype/hd_notification/hd_notification.py
+  risk: [PR-06]
+  found_by: SonarQube
+  found_on: 2026-11-18
+  reopened: 0
+
+- id: DEF-33
+  ref: SonarQube python:S1763
+  title: Unreachable second return in helpdesk/api/knowledge_base.py
+  category: Code quality (static)
+  severity: Trivial
+  priority: P4
+  status: Open
+  triage: Defer
+  layer: backend
+  file: helpdesk/api/knowledge_base.py
+  risk: []
+  found_by: SonarQube
+  found_on: 2026-11-18
+  reopened: 0
+
+- id: DEF-34
+  ref: SonarQube typescript:S8982/S8984
+  title: v-for lists without a key binding (5 components)
+  category: Code quality (static)
+  severity: Minor
+  priority: P4
+  status: Open
+  triage: Defer
+  layer: frontend
+  risk: []
+  found_by: SonarQube
+  found_on: 2026-11-18
+  reopened: 0

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "CT-01",
+    "control": "session cookie",
+    "check": "sid is HttpOnly, SameSite=Lax, Secure",
+    "expected": "HttpOnly true, SameSite Lax, Secure true when served over HTTPS",
+    "observed": "HttpOnly true, SameSite Lax, Secure false (site served over plain HTTP), expires in 170 h",
+    "result": "pass (Secure not testable without HTTPS)",
+    "at": "2026-11-17T17:44:30.320Z"
+  },
+  {
+    "id": "CT-02",
+    "control": "CSRF token",
+    "check": "POST /api new ticket without, then with, X-Frappe-CSRF-Token",
+    "expected": "without token: rejected, nothing created; with token: created",
+    "observed": "without: HTTP 400 CSRFTokenError: Invalid Request; tickets 13 -> 13; with: HTTP 200",
+    "result": "pass",
+    "at": "2026-11-17T17:44:32.587Z"
+  },
+  {
+    "id": "CT-03",
+    "control": "session end",
+    "check": "replay the sid cookie after logout",
+    "expected": "old session id no longer grants access",
+    "observed": "before logout HTTP 200; replayed sid after logout HTTP 401",
+    "result": "pass",
+    "at": "2026-11-17T17:44:34.356Z"
+  },
+  {
+    "id": "CT-04",
+    "control": "sign-in errors",
+    "check": "wrong password for an existing account vs an unknown account",
+    "expected": "same status and same message",
+    "observed": "existing: HTTP 401 \"Invalid login credentials\"; unknown: HTTP 401 \"Invalid login credentials\"",
+    "result": "pass",
+    "at": "2026-11-17T17:44:34.721Z"
+  },
+  {
+    "id": "CT-05",
+    "control": "server-side role check",
+    "check": "customer sends a priority change the screen does not offer",
+    "expected": "no control on screen, and the direct request refused",
+    "observed": "priority control shown: 0; direct PUT HTTP 403 PermissionError: You do not have permission to change Priority; stored priority Medium",
+    "result": "pass",
+    "at": "2026-11-17T17:44:37.078Z"
+  }
+]

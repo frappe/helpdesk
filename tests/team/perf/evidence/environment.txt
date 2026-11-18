@@ -1,0 +1,11 @@
+date: 2026-11-17T17:58:33Z
+machine: 13th Gen Intel(R) Core(TM) i5-13420H, 12 logical CPUs, 7764 MB RAM (WSL2)
+os: Ubuntu 26.04.1 LTS, kernel 6.18.58.1-microsoft-standard-WSL2
+k6: k6 v2.4.0 (commit/dd9395906d, go1.26.11, linux/amd64)
+python: Python 3.14.4
+frappe: v16.56.0 49789a1
+helpdesk: e326986 (baseline e326986 plus the team's uncommitted changes)
+mariadb: 11.8.6-MariaDB
+redis: v=8.0.5
+web server: web: bench serve  --port 8000  (Werkzeug development server)
+site: helpdesk.localhost, developer_mode on

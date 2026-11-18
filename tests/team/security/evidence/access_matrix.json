@@ -1,0 +1,132 @@
+[
+  {
+    "id": "AC-01",
+    "role": "customerA",
+    "action": "raise a ticket",
+    "route": "POST /api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new",
+    "expected": "allowed",
+    "observed": "allowed",
+    "evidence": "HTTP 200",
+    "at": "2026-11-17T17:44:02.253Z"
+  },
+  {
+    "id": "AC-02",
+    "role": "customerA",
+    "action": "read own ticket",
+    "route": "GET /api/method/helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
+    "expected": "allowed",
+    "observed": "allowed",
+    "evidence": "HTTP 200",
+    "at": "2026-11-17T17:44:04.463Z"
+  },
+  {
+    "id": "AC-03",
+    "role": "customerB",
+    "action": "read another customer's ticket",
+    "route": "GET /helpdesk/my-tickets/1520; GET /api/method/helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
+    "expected": "denied",
+    "observed": "denied",
+    "evidence": "screen: \"Not allowed via controller permission check\", sent back to own list (screens/AC-03_customer_b_other_ticket.png); HTTP 403 PermissionError: Not allowed via controller permission check",
+    "at": "2026-11-17T17:44:08.330Z"
+  },
+  {
+    "id": "AC-04",
+    "role": "customerA",
+    "action": "set status to Resolved",
+    "route": "PUT /api/resource/HD Ticket/1521",
+    "expected": "denied",
+    "observed": "denied",
+    "evidence": "HTTP 403 PermissionError: You cannot change Status after the ticket is raised; stored status Open",
+    "at": "2026-11-17T17:44:10.134Z"
+  },
+  {
+    "id": "AC-05",
+    "role": "customerA",
+    "action": "change priority",
+    "route": "PUT /api/resource/HD Ticket/1522",
+    "expected": "denied",
+    "observed": "denied",
+    "evidence": "HTTP 403 PermissionError: You do not have permission to change Priority; stored priority Medium",
+    "at": "2026-11-17T17:44:11.641Z"
+  },
+  {
+    "id": "AC-06",
+    "role": "customerA",
+    "action": "open the agent ticket screen",
+    "route": "GET /helpdesk/tickets/1523",
+    "expected": "denied",
+    "observed": "denied",
+    "evidence": "landed on /helpdesk/my-tickets/1523; agent controls shown: 0 (screens/AC-06_customer_agent_desk.png)",
+    "at": "2026-11-17T17:44:14.810Z"
+  },
+  {
+    "id": "AC-07",
+    "role": "customerA",
+    "action": "open the back-office ticket list",
+    "route": "GET /app/hd-ticket",
+    "expected": "denied",
+    "observed": "denied",
+    "evidence": "HTTP 403, landed on /desk/hd-ticket (screens/AC-07_customer_back_office.png)",
+    "at": "2026-11-17T17:44:17.283Z"
+  },
+  {
+    "id": "AC-08",
+    "role": "customerA",
+    "action": "assign an agent to own ticket",
+    "route": "POST /api/method/run_doc_method (assign_agent)",
+    "expected": "denied",
+    "observed": "allowed",
+    "evidence": "HTTP 200; assignees [\"agent.one@sqe.test\"]",
+    "at": "2026-11-17T17:44:18.846Z"
+  },
+  {
+    "id": "AC-09",
+    "role": "agent",
+    "action": "read a customer's ticket",
+    "route": "GET /api/method/helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
+    "expected": "allowed",
+    "observed": "allowed",
+    "evidence": "HTTP 200",
+    "at": "2026-11-17T17:44:21.154Z"
+  },
+  {
+    "id": "AC-10",
+    "role": "agent",
+    "action": "set status to Resolved",
+    "route": "PUT /api/resource/HD Ticket/1526",
+    "expected": "allowed",
+    "observed": "allowed",
+    "evidence": "HTTP 200; stored status Resolved",
+    "at": "2026-11-17T17:44:23.138Z"
+  },
+  {
+    "id": "AC-11",
+    "role": "agent",
+    "action": "assign an agent",
+    "route": "POST /api/method/run_doc_method (assign_agent)",
+    "expected": "allowed",
+    "observed": "allowed",
+    "evidence": "HTTP 200; assignees [\"agent.one@sqe.test\"]",
+    "at": "2026-11-17T17:44:25.717Z"
+  },
+  {
+    "id": "AC-12",
+    "role": "agent",
+    "action": "delete a ticket",
+    "route": "DELETE /api/resource/HD Ticket/1528",
+    "expected": "denied",
+    "observed": "denied",
+    "evidence": "HTTP 403 PermissionError: User agent.one@sqe.test does not have doctype access via role permission for document HD Ticket; ticket still stored: true",
+    "at": "2026-11-17T17:44:27.527Z"
+  },
+  {
+    "id": "AC-13",
+    "role": "anonymous",
+    "action": "read a ticket",
+    "route": "GET /api/method/helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
+    "expected": "denied",
+    "observed": "denied",
+    "evidence": "HTTP 403 PermissionError: You are not permitted to access this resource. Login to accessFunction helpdesk.helpdesk.doctype.hd_ticket.api.get_one is not whitelisted.",
+    "at": "2026-11-17T17:44:29.121Z"
+  }
+]

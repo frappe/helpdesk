@@ -1,0 +1,4 @@
+-e file:///home/administrator/frappe-bench/apps/frappe
+-e file:///home/administrator/frappe-bench/apps/helpdesk
+-e file:///home/administrator/frappe-bench/apps/helpdesk/tests/team/mutation/operators
+-e file:///home/administrator/frappe-bench/apps/telephony

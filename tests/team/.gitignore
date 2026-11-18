@@ -1,0 +1,5 @@
+reports/
+__pycache__/
+.coverage
+.env
+.scannerwork/

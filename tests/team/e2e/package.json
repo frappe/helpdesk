@@ -1,0 +1,14 @@
+{
+  "name": "sqe-team-e2e",
+  "private": true,
+  "description": "Team browser tests (use cases, usability, accessibility, access checks) for the Helpdesk ticket workflows",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report ../reports/e2e/html"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.65.1",
+    "lighthouse": "13.6.0"
+  }
+}

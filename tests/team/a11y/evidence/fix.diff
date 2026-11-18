@@ -1,0 +1,112 @@
+diff --git a/desk/index.html b/desk/index.html
+index d6df272..ee8fd87 100644
+--- a/desk/index.html
++++ b/desk/index.html
+@@ -4,6 +4,10 @@
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Helpdesk</title>
++    <meta
++      name="description"
++      content="Raise and follow your support tickets with the help desk."
++    />
+     <meta name="mobile-web-app-capable" content="yes" />
+     <meta name="apple-mobile-web-app-capable" content="yes" />
+     <meta name="apple-mobile-web-app-title" content="Frappe Helpdesk" />
+diff --git a/desk/src/components/EmailContent.vue b/desk/src/components/EmailContent.vue
+index d386a6d..f7eb468 100644
+--- a/desk/src/components/EmailContent.vue
++++ b/desk/src/components/EmailContent.vue
+@@ -2,6 +2,7 @@
+   <iframe
+     ref="iframeRef"
+     :srcdoc="htmlContent"
++    :title="__('Message')"
+     class="prose-f block h-10 max-h-[500px] w-full"
+   />
+ </template>
+diff --git a/desk/src/components/ticket/TicketCustomerSidebar.vue b/desk/src/components/ticket/TicketCustomerSidebar.vue
+index c700885..41f5216 100644
+--- a/desk/src/components/ticket/TicketCustomerSidebar.vue
++++ b/desk/src/components/ticket/TicketCustomerSidebar.vue
+@@ -26,7 +26,11 @@
+             "
+           >
+             <Tooltip :text="ticket.data.contact.email_id">
+-              <Button class="h-7 w-7" @click="emit('open')">
++              <Button
++                class="h-7 w-7"
++                :aria-label="__('Write a reply')"
++                @click="emit('open')"
++              >
+                 <template #icon>
+                   <EmailIcon class="h-4 w-4" />
+                 </template>
+@@ -41,7 +45,7 @@
+         class="flex items-center text-base leading-5"
+         v-for="field in ticketBasicInfo"
+       >
+-        <span class="w-[126px] text-sm text-ink-gray-5">{{
++        <span class="w-[126px] text-sm text-ink-gray-7">{{
+           __(field.label)
+         }}</span>
+         <span
+@@ -58,7 +62,7 @@
+         :key="data.title"
+         class="flex items-center text-base"
+       >
+-        <div class="w-[126px] text-ink-gray-5 text-sm">{{ data.title }}</div>
++        <div class="w-[126px] text-ink-gray-7 text-sm">{{ data.title }}</div>
+         <div
+           class="break-words text-base text-ink-gray-8 flex items-center gap-2"
+         >
+@@ -98,7 +102,7 @@
+         v-for="field in ticketAdditionalInfo"
+         :key="field.fieldname"
+       >
+-        <span class="w-[126px] text-sm text-ink-gray-5">{{
++        <span class="w-[126px] text-sm text-ink-gray-7">{{
+           __(field.label)
+         }}</span>
+         <Tooltip :disabled="!storedStamp(field)" :text="storedStamp(field)">
+diff --git a/desk/src/pages/ticket/TicketCommunication.vue b/desk/src/pages/ticket/TicketCommunication.vue
+index a494ecb..809c8d2 100644
+--- a/desk/src/pages/ticket/TicketCommunication.vue
++++ b/desk/src/pages/ticket/TicketCommunication.vue
+@@ -7,7 +7,7 @@
+         <UserAvatar v-bind="user" size="lg" expand strong :hide-avatar="true" />
+         <LucideDot class="text-ink-gray-4 size-4" />
+         <Tooltip :text="dateFormat(date, dateTooltipFormat)">
+-          <span class="text-ink-gray-5">
++          <span class="text-ink-gray-7">
+             {{ timeAgo(date) }}
+           </span>
+         </Tooltip>
+diff --git a/desk/src/pages/ticket/TicketCustomer.vue b/desk/src/pages/ticket/TicketCustomer.vue
+index da41a67..eee8cda 100644
+--- a/desk/src/pages/ticket/TicketCustomer.vue
++++ b/desk/src/pages/ticket/TicketCustomer.vue
+@@ -1,8 +1,12 @@
+ <template>
+-  <div v-if="ticket.data" class="flex flex-col">
++  <main v-if="ticket.data" class="flex flex-col">
++    <h1 class="sr-only">{{ ticket.data.subject }}</h1>
+     <LayoutHeader>
+       <template #left-header>
+-        <Breadcrumbs :items="breadcrumbs" class="-ms-0.5" />
++        <Breadcrumbs
++          :items="breadcrumbs"
++          class="-ms-0.5 [&_a>span]:text-ink-gray-7"
++        />
+       </template>
+       <template #right-header>
+         <CustomActions
+@@ -103,7 +107,7 @@
+       <TicketCustomerSidebar v-if="!isMobileView" @open="isExpanded = true" />
+     </div>
+     <TicketFeedback v-model:open="showFeedbackDialog" />
+-  </div>
++  </main>
+ </template>
+ 
+ <script setup lang="ts">
