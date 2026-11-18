@@ -1,0 +1,21 @@
+# Title page of the final report. Fill in before building the PDF
+# (bash tests/team/report/build.sh). Members are listed in area order:
+# M1 = static analysis, white-box, mutation, CI; M2 = API testing and data
+# generation; M3 = use cases, usability, accessibility, security, performance.
+course: "SE3002 Software Quality Engineering"
+title: "Automated testing of Frappe Helpdesk: ticket workflows"
+subtitle: "Final project report"
+section: "[Section]"
+members:
+  - area: "M1"
+    name: "[Member 1 name]"
+    roll: "[Roll number]"
+  - area: "M2"
+    name: "[Member 2 name]"
+    roll: "[Roll number]"
+  - area: "M3"
+    name: "[Member 3 name]"
+    roll: "[Roll number]"
+date: "19 November 2026"
+repository: "https://github.com/ibbster05/helpdesk (branch team/sqe-tests)"
+upstream: "https://github.com/frappe/helpdesk, AGPL-3.0, baseline e326986329341c803dd4bf094322670ad0591ca5 (16.1.0)"

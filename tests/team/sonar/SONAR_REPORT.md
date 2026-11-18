@@ -7,7 +7,7 @@
 | Server | SonarQube Community Build 26.11.0.134175, local (`~/sonar/sonarqube`, embedded H2 database, port 9100 because Frappe's realtime server uses 9000) |
 | Scanner | SonarScanner CLI 8.4.0.16527 |
 | Downloads | from binaries.sonarsource.com, SHA-256 checked against the published `.sha256` files |
-| Code analysed | Helpdesk at baseline `e326986` (version-16), plus the team's uncommitted accessibility fix in five frontend files (see `a11y/evidence/fix.diff`) |
+| Code analysed | Helpdesk at baseline `e326986` (version-16), plus the team's accessibility fix in five frontend files, uncommitted at the time of this analysis (see `a11y/evidence/fix.diff`; merged later as PR #43) |
 | Sources | `helpdesk/` (Python backend) and `desk/src/` (Vue/TypeScript frontend) |
 | Excluded | `node_modules`, built assets (`helpdesk/public`), translations, `*.d.ts`, minified files; upstream test files are indexed as tests, not sources |
 | Rules | default "Sonar way" profiles for every language |
@@ -142,17 +142,28 @@ evaluated (`conditions: []` in `evidence/main/quality_gate.json`). The
 repository is a shallow clone, so Sonar also had no blame information to
 date lines.
 
-The team gate for the CI pipeline (section on CI) will therefore be explicit
-and scoped:
+The team therefore defined its own gate. *Update 18 Nov:* the conditions
+first planned here were on new code. They were changed when the CI pipeline
+was built, because the CI job starts a fresh SonarQube server for every run,
+so there is never a "new code" period. The gate in use, "SQE gate", is
+created by `sonar_admin.py gate`. It holds each overall count at its value
+in the 18 Nov baseline analysis ("no worse than today"):
 
-| Condition | Threshold | Source |
+| Condition (fails when) | Threshold | Baseline |
 |---|---|---|
-| Unit tests | all pass | junit |
-| Scope statement and branch coverage | 100 % | `tools/scoped_coverage.py` |
-| Mutation score on the scope | ≥ 95 % | `run_mutation.sh` |
-| Sonar: new bugs / new vulnerabilities on new code | 0 | Sonar gate "SQE gate" |
-| Sonar: coverage on new Python code | ≥ 80 % | Sonar gate |
-| Sonar: duplication on new code | ≤ 3 % | Sonar gate |
+| Reliability rating worse than | D | D |
+| Security rating worse than | D | D |
+| Maintainability rating worse than | A | A |
+| Bugs more than | 122 | 122 |
+| Vulnerabilities more than | 8 | 8 |
+| Security review rating worse than (unreviewed hotspots) | A | A (0 hotspots) |
+| Duplicated lines more than | 3 % | 1.6 % |
+| Failing / erroring tests in the imported report more than | 0 | 0 |
+
+The CI pipeline also fails on any failing unit test, on scope coverage below
+100 % (`tools/scoped_coverage.py`) and on a mutation score below 95 %
+(`run_mutation.sh`). Those are separate jobs, not Sonar conditions; see
+`.github/workflows/sqe-quality-gate.yml` and `README.md`.
 
 ## How to rerun
 

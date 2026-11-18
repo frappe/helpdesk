@@ -50,7 +50,7 @@ Environment (`perf/evidence/environment.txt`):
 | Machine | Intel Core i5-13420H, 12 logical CPUs, 7.6 GB RAM, Windows 11 + WSL2 |
 | OS | Ubuntu 26.04.1 LTS, kernel 6.18.58.1-microsoft-standard-WSL2 |
 | Server | `bench serve --port 8000` (Werkzeug development server), one site, developer mode on |
-| Versions | frappe v16.56.0 (49789a1), helpdesk e326986 (baseline + the team's uncommitted frontend accessibility fix, which does not touch this endpoint), Python 3.14.4, MariaDB 11.8.6, Redis 8.0.5 |
+| Versions | frappe v16.56.0 (49789a1), helpdesk e326986 (baseline + the team's frontend accessibility fix, uncommitted at the time of these runs and merged later as PR #43; it does not touch this endpoint), Python 3.14.4, MariaDB 11.8.6, Redis 8.0.5 |
 | Load generator | k6 on the same machine as the server |
 
 ## 3. Results
