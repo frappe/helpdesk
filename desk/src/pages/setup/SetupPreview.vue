@@ -76,7 +76,11 @@
               <span
                 v-else
                 class="flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-[4px] text-[9px] font-semibold"
-                :class="!setup.brandLogo && 'bg-surface-gray-9 text-ink-gray-1'"
+                :class="
+                  setup.brandLogo
+                    ? 'dark:bg-white'
+                    : 'bg-surface-gray-9 text-ink-gray-1'
+                "
               >
                 <img
                   v-if="setup.brandLogo"
@@ -222,7 +226,9 @@
                   <span
                     class="flex size-7 items-center justify-center overflow-hidden rounded-[7px] text-base-semibold"
                     :class="
-                      !setup.brandLogo && 'bg-surface-gray-9 text-ink-gray-1'
+                      setup.brandLogo
+                        ? 'dark:bg-white'
+                        : 'bg-surface-gray-9 text-ink-gray-1'
                     "
                   >
                     <img

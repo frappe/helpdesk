@@ -45,7 +45,7 @@
             class="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-4"
             :class="
               setup.brandLogo
-                ? 'ring-1 ring-outline-gray-2'
+                ? 'ring-1 ring-outline-gray-2 dark:bg-white'
                 : 'bg-surface-gray-2 text-ink-gray-5'
             "
           >

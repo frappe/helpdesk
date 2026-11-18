@@ -15,7 +15,11 @@
         >
           <span
             class="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[7px] text-base-semibold"
-            :class="!setup.brandLogo && 'bg-surface-gray-9 text-ink-gray-1'"
+            :class="
+              setup.brandLogo
+                ? 'dark:bg-white'
+                : 'bg-surface-gray-9 text-ink-gray-1'
+            "
           >
             <img
               v-if="setup.brandLogo"

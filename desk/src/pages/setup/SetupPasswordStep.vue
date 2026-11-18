@@ -144,11 +144,11 @@ watchDebounced(
 );
 
 const STRENGTH = computed(() => [
-  { label: __("Poor"), ink: "text-ink-red-8" },
-  { label: __("Poor"), ink: "text-ink-red-8" },
-  { label: __("Average"), ink: "text-ink-orange-8" },
-  { label: __("Good"), ink: "text-ink-blue-8" },
-  { label: __("Great"), ink: "text-ink-green-8" },
+  { label: __("Poor"), ink: "text-ink-red-6" },
+  { label: __("Poor"), ink: "text-ink-red-6" },
+  { label: __("Average"), ink: "text-ink-amber-6" },
+  { label: __("Good"), ink: "text-ink-green-6" },
+  { label: __("Great"), ink: "text-ink-green-6" },
 ]);
 const checked = computed(() => !!setup.password && !!score.data);
 const strength = computed(
