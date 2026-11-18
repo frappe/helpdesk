@@ -177,7 +177,7 @@ jobs:
           bench init --frappe-path "$GITHUB_WORKSPACE/.frappe-src" --python "$(which python)" frappe-bench
           cd ~/frappe-bench
           bench get-app --skip-assets https://github.com/frappe/telephony
-          git -C apps/telephony fetch -q --depth 1 origin "$TELEPHONY_SHA"
+          git -C apps/telephony fetch -q --depth 1 upstream "$TELEPHONY_SHA"   # bench names the remote "upstream"
           git -C apps/telephony checkout -q "$TELEPHONY_SHA"
           bench get-app helpdesk "$GITHUB_WORKSPACE"
           uv pip install --python env/bin/python $PY_TEST_DEPS
@@ -194,6 +194,7 @@ jobs:
           bench --site helpdesk.localhost set-config developer_mode 1
           bench use helpdesk.localhost
       - name: Start the site and seed the test data
+        id: seed
         run: |
           cd ~/frappe-bench
           nohup bench start > bench_start.log 2>&1 &
@@ -206,7 +207,8 @@ jobs:
       - name: API and integration tests
         run: cd ~/frappe-bench/apps/helpdesk && bash tests/team/run_api.sh
       - name: Playwright browser tests (use cases, usability, security)
-        if: success() || failure()
+        # runs even when the API tests fail, but only on a seeded, running site
+        if: ${{ !cancelled() && steps.seed.outcome == 'success' }}
         run: |
           cd ~/frappe-bench/apps/helpdesk/tests/team/e2e
           npm ci
