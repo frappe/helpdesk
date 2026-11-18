@@ -38,6 +38,7 @@ from helpdesk.helpdesk.utils.email import (
 from helpdesk.notifications import clear as clear_notifications
 from helpdesk.notifications import notify_ticket_reopened
 from helpdesk.utils import (
+    agent_only,
     capture_event,
     get_agents_team,
     get_customers,
@@ -483,7 +484,13 @@ class HDTicket(Document, CustomerEditController):
         return True
 
     @frappe.whitelist()
+    @agent_only  # DEF-02: assigning is an agent action, not the customer's
     def assign_agent(self, agent: str):
+        # DEF-03: an assignee can read the ticket, so only agents may be assigned
+        if not is_agent(agent):
+            frappe.throw(
+                _("Tickets can only be assigned to agents"), frappe.ValidationError
+            )
         # core assign_to notifies and emails the agent (self-assign suppressed);
         # its Notification Log row derives app="helpdesk" from the ticket
         assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})

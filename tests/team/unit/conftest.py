@@ -31,8 +31,9 @@ def make_fake_frappe(user="customer@example.com", roles=()):
     fake.ValidationError = frappe.ValidationError
     fake._dict = frappe._dict
 
-    def throw(message, exc=None, *args, **kwargs):
-        raise Thrown(message, exc)
+    def throw(message=None, exc=None, *args, msg=None, **kwargs):
+        # frappe.throw is called both positionally and as throw(msg=..., exc=...)
+        raise Thrown(message if message is not None else msg, exc)
 
     fake.throw.side_effect = throw
     return fake
