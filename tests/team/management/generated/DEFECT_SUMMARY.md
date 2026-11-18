@@ -20,16 +20,16 @@
 | DEF-14 | SEC-02 | Bundled DOMPurify 3.4.8 has published CVEs | Security configuration / dependencies | Major | P2 | Closed (fixed by PR #42: lock updated to DOMPurify 3.4.18 (OSV: 8 advisories for 3.4.8, fixed in 3.4.9 to 3.4.17; none for 3.4.18); Playwright CT-08 checks the served bundle) | Fix | PR-10 | #15 |
 | DEF-15 | SEC-03 | No Content-Security-Policy header | Security configuration / dependencies | Minor | P3 | Open | Defer | PR-10 | #16 |
 | DEF-16 | SEC-04 | user_id and full_name cookies are readable by scripts | Security configuration / dependencies | Minor | P4 | Open | Accept (won't fix) | PR-10 | #17 |
-| DEF-17 | A11Y-01 | Icon-only buttons have no accessible name | Accessibility | Major | P1 | Open (fixed on S2 (customer ticket page) only) | Fix | PR-08 | #18 |
+| DEF-17 | A11Y-01 | Icon-only buttons have no accessible name | Accessibility | Major | P1 | Open (fixed on S2 (customer ticket page) by PR #43; open on S1, S4, S5) | Fix | PR-08 | #18 |
 | DEF-18 | A11Y-02 | Description editor has no accessible name | Accessibility | Major | P1 | Open | Fix | PR-08 | #19 |
-| DEF-19 | A11Y-03 | Text below 4.5:1 contrast | Accessibility | Major | P1 | Open (fixed on S2/S3 only) | Fix | PR-08 | #20 |
-| DEF-20 | A11Y-04 | Message iframes have no title | Accessibility | Major | P1 | Fixed (verified locally, not merged) | Fix | PR-08 | #21 |
+| DEF-19 | A11Y-03 | Text below 4.5:1 contrast | Accessibility | Major | P1 | Open (fixed on S2/S3 by PR #43; open on S1, S5) | Fix | PR-08 | #20 |
+| DEF-20 | A11Y-04 | Message iframes have no title | Accessibility | Major | P1 | Closed (fixed by PR #43 (shared iframe component, so every screen); re-scanned with axe and Lighthouse) | Fix | PR-08 | #21 |
 | DEF-21 | A11Y-05 | ARIA state on a div popover trigger instead of a button | Accessibility | Major | P1 | Open | Fix | PR-08 | #22 |
 | DEF-22 | A11Y-06 | Filter button's accessible name does not contain its visible text | Accessibility | Minor | P2 | Open | Fix | PR-08 | #23 |
-| DEF-23 | A11Y-07 (+ A11Y-09) | No main landmark; content outside landmarks | Accessibility | Minor | P2 | Open (fixed on S2 only; A11Y-09 has the same root cause and is not counted separately) | Fix | PR-08 | #24 |
-| DEF-24 | A11Y-08 | Pages have no level-one heading | Accessibility | Minor | P2 | Open (fixed on S2 only) | Fix | PR-08 | #25 |
+| DEF-23 | A11Y-07 (+ A11Y-09) | No main landmark; content outside landmarks | Accessibility | Minor | P2 | Open (fixed on S2 by PR #43; open elsewhere. A11Y-09 has the same root cause and is not counted separately) | Fix | PR-08 | #24 |
+| DEF-24 | A11Y-08 | Pages have no level-one heading | Accessibility | Minor | P2 | Open (fixed on S2 by PR #43; open elsewhere) | Fix | PR-08 | #25 |
 | DEF-25 | A11Y-10 | Two unnamed nav landmarks | Accessibility | Minor | P2 | Open | Fix | PR-08 | #26 |
-| DEF-26 | A11Y-11 | No meta description | Accessibility | Trivial | P3 | Fixed (verified locally, not merged) | Fix | PR-08 | #27 |
+| DEF-26 | A11Y-11 | No meta description | Accessibility | Trivial | P3 | Closed (fixed by PR #43 (shared page shell, so every screen); re-scanned with axe and Lighthouse) | Fix | PR-08 | #27 |
 | DEF-27 | A11Y-12 | No source maps for large scripts | Accessibility | Trivial | P4 | Rejected (no user impact; build configuration choice) | Not a defect | - | #28 |
 | DEF-28 | UX-01 | Customer ticket list hides resolved tickets by default | Usability | Minor | P2 | Open | Fix | PR-11 | #29 |
 | DEF-29 | UX-02 | Rating dialog does not explain why Submit is unavailable | Usability | Minor | P2 | Open | Fix | PR-08, PR-11 | #30 |

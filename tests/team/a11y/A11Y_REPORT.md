@@ -117,10 +117,24 @@ carries no weight in the score).
 * No regression: all 32 use-case flows and both task tests pass against the
   fixed build (34 passed).
 
+### Merged through the CI gate (18 Nov 2026)
+
+The fix was first verified on a local build only. It was committed and
+merged through the required SQE gate as **PR #43**; the change is
+line-for-line the same as `evidence/fix.diff`. Before merging, the scan was
+repeated on the current code base, which also holds the DEF-01, DEF-02/03 and
+DEF-14 fixes: `evidence/after_merge/`. The scores are the same as in the
+table above (S2: Lighthouse 100, 0 axe violations; S1 94 / 6 rules, S4 85 /
+6, S5 85 / 7). The first attempt of that scan stopped with a Node error
+before writing a summary; the second, unchanged run completed. All browser
+suites pass on that build (54, plus the pinned DEF-35 test). A11Y-04 (DEF-20)
+and A11Y-11 (DEF-26) are closed. A11Y-01, -03, -07 and -08 stay open for the
+screens other than S2.
+
 ## How to rerun
 
 ```
 cd ~/frappe-bench/apps/helpdesk/tests/team/e2e
-node a11y/scan.mjs before     # or: after
+node a11y/scan.mjs before     # or: after, after_merge (any name: evidence/<name>/)
 npx playwright test usability
 ```

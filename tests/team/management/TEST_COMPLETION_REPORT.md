@@ -35,7 +35,7 @@ conditions in section 7**.
 | Security: 13 access decisions, 6 automated controls (CT-08 added with the DEF-14 fix), ZAP passive before and after the DEF-14 fix, pip-audit (178 packages) | Active scanning and penetration (out of scope by the brief) |
 | Performance: k6 1 and 5 users, twice each | Stress or soak testing; capacity limits |
 | Static: SonarQube on 73 KLOC; cyclomatic complexity by hand | |
-| CI: GitHub Actions gate (unit + coverage, mutation, SonarQube, API + browser on a live site) on every PR into `team/sqe-tests`; required by branch protection. Blocked PR #37 (deliberate BR3 regression); fix PRs #38 (DEF-01), #41 (DEF-02/03) and #42 (DEF-14) green and merged | k6, ZAP and Lighthouse/axe in CI (thresholds not meaningful on shared runners; run locally) |
+| CI: GitHub Actions gate (unit + coverage, mutation, SonarQube, API + browser on a live site) on every PR into `team/sqe-tests`; required by branch protection. Blocked PR #37 (deliberate BR3 regression); fix PRs #38 (DEF-01), #41 (DEF-02/03), #42 (DEF-14) and #43 (accessibility, customer ticket screen) green and merged | k6, ZAP and Lighthouse/axe in CI (thresholds not meaningful on shared runners; run locally) |
 
 ## 3. Deviations from the plan
 
@@ -73,7 +73,7 @@ DEF-03 and DEF-14 are closed. Those that bear on release:
 | PR-05 access control | 15 High | Low | DEF-02, DEF-03 fixed and re-tested; 13 / 13 access decisions as expected; the RCA-2 preventive test (every whitelisted method × role) is not yet written |
 | PR-06 input / 5xx | 8 Medium | Medium | Several 5xx with tracebacks open |
 | PR-07 duplicates / partial writes | 8 Medium | Low | Recovery verified; only DEF-10 (trivial) |
-| PR-08 accessibility | 15 High | Medium | One screen fixed (fix not yet merged); P1 issues elsewhere |
+| PR-08 accessibility | 15 High | Medium | Customer ticket screen fixed (PR #43, re-scanned on the merged code base); P1 issues open on S1, S4, S5 (DEF-17/18/19/21) |
 | PR-09 performance | 6 Low | Low | 3 % of the p95 limit |
 | PR-10 components | 12 Medium | Low | DEF-14 fixed (PR #42); CT-08 now guards the served sanitiser version; DEF-15 (no CSP) and DEF-16 (accepted) remain; the JavaScript dependencies are only checked by ZAP's library list, not by a full audit |
 | PR-11 usability | 9 Medium | Medium | DEF-28, DEF-29, DEF-35 open |

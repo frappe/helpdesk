@@ -30,8 +30,8 @@ machine and repository:
 - wrote and edited files: tests, scripts, configuration, reports and the
   management documents;
 - on GitHub, through the member's signed-in `gh` account (`ibbster05`):
-  created the 35 Issues, opened PRs #1 and #37–#42, merged all of them
-  except #37 (closed unmerged), closed Issues #2, #3, #4 and #15, and set
+  created the 35 Issues, opened PRs #1 and #37–#43, merged all of them
+  except #37 (closed unmerged), closed Issues #2, #3, #4, #15, #21 and #27, and set
   branch protection on `team/sqe-tests`;
 - queried the public OSV vulnerability database (package name and version
   only) to check the DOMPurify advisories for DEF-14.
@@ -85,7 +85,7 @@ generation; M3 = use cases, usability, accessibility, security, performance
 | 3 | Mutation (M1) | 16–17 Nov, Fable 5.2 | Cosmic Ray with custom operators; survivor analysis | `mutation/cosmic-ray.toml`, `mutation/operators/`, `mutation/SURVIVORS.md`, `run_mutation.sh`, `tools/mutation_*.py` | 86.9 % → 97.0 % after new tests; 31 survivors analysed (24 killed, 7 equivalent); 97.1 % after the DEF-01 fix | | |
 | 4 | API tests, OpenAPI, generator (M2) | 17 Nov, Fable 5.2 | EP/BVA from a spec; rule, transition, repeat and cross-workflow tests; endpoint weaknesses | `api/openapi.yaml`, `api/generate_testdata.py`, `api/test_*.py`, `api/demo_constraint_change.sh`, `api/WEAKNESSES.md`, `run_api.sh` | 127 tests: 114 pass, 13 pinned weaknesses (strict xfail); constraint change regenerated and shown; recovery tests R1/R2 | | |
 | 5 | Use cases and Playwright (M1, M2, M3: two each) | 17 Nov, Fable 5.2; DEF-35 change 18 Nov, Opus 5.5 | Write six use cases; automate every flow | `e2e/USE_CASES.md`, `e2e/usecases/*.spec.mjs`, `e2e/support/`, `run_e2e.sh` | 33 flows: 32 pass, 1 pinned expected failure reproducing DEF-35; green in CI | | |
-| 6 | Usability and accessibility (M3) | 17 Nov, Fable 5.2 then Opus 5.5 | Task tests incl. keyboard; Lighthouse + axe before and after; fix one screen | `e2e/usability/`, `e2e/a11y/scan.mjs`, `a11y/A11Y_REPORT.md`, `a11y/evidence/`; screen fix in `desk/src` (**not committed yet**) | Customer ticket screen: Lighthouse 82 → 100, axe 6 → 0 violations after the fix | | |
+| 6 | Usability and accessibility (M3) | 17 Nov, Fable 5.2 then Opus 5.5 | Task tests incl. keyboard; Lighthouse + axe before and after; fix one screen | `e2e/usability/`, `e2e/a11y/scan.mjs`, `a11y/A11Y_REPORT.md`, `a11y/evidence/`; screen fix in `desk/src` and `desk/index.html` (merged as PR #43 on 18 Nov) | Customer ticket screen: Lighthouse 82 → 100, axe 6 → 0 violations after the fix; same result re-scanned on the merged code base (`a11y/evidence/after_merge/`) | | |
 | 7 | Security (M3) | 17 Nov, Opus 5.5 | Access matrix, controls, ZAP passive, dependency audit | `e2e/security/`, `security/*.sh`, `security/SECURITY_REPORT.md`, `security/evidence/` | 13 access decisions (12 as expected; AC-08 = DEF-02); 5 controls; ZAP alerts and pip-audit (178 packages) reviewed against source | | |
 | 8 | Performance (M3) | 17 Nov, Opus 5.5 | k6 at 1 and 5 users, twice each, against limits set beforehand | `perf/read_ticket.js`, `perf/run_load.sh`, `perf/PERFORMANCE_REPORT.md`, `perf/evidence/` | 4 runs; p95 27.7 / 25.8 ms at 5 users against an 800 ms limit; 0 % unexpected failures | | |
 | 9 | SonarQube and cyclomatic complexity (M1) | 17–18 Nov, Opus 5.5 | Install and run SonarQube; report metrics; hand CC from a CFG | `sonar/` (scripts, `SONAR_REPORT.md`, `CYCLOMATIC_COMPLEXITY.md`, calibration, evidence) | Metrics exported from the server API; V(G) = 6 three ways; Sonar's counting rules checked with a calibration file | | |
@@ -127,8 +127,6 @@ wrong and evidence corrected it.
   including work that belongs to other members' areas (risk PJ-03). Members
   should commit their own reviewed changes, for example corrections they make
   while checking, so the history shows their work.
-- **Uncommitted fix.** The accessibility screen fix (area 6) is only on the
-  local machine; it needs a PR through the gate.
 - **Understanding.** The brief treats anything a member cannot explain as not
   their work. Section 8 is the team's check that this is covered.
 
