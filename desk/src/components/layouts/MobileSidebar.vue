@@ -117,6 +117,7 @@ const profileSettings = computed(() => [
     label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
+  themeMenuItem.value,
   {
     label: __("Log out"),
     icon: "lucide-log-out",
