@@ -1,0 +1,420 @@
+{
+  "score": 86.92,
+  "totals": {
+    "skipped": 746,
+    "killed": 206,
+    "survived": 31
+  },
+  "pending": 0,
+  "by_file": {
+    "hd_ticket.py": {
+      "killed": 72,
+      "survived": 10
+    },
+    "hd_ticket_status.py": {
+      "killed": 68,
+      "survived": 12
+    },
+    "customer_edit_controller.py": {
+      "killed": 66,
+      "survived": 9
+    }
+  },
+  "by_operator": {
+    "core/ReplaceComparisonOperator_Eq_NotEq": {
+      "killed": 9
+    },
+    "core/ReplaceComparisonOperator_Eq_Lt": {
+      "killed": 9
+    },
+    "core/ReplaceComparisonOperator_Eq_LtE": {
+      "survived": 8,
+      "killed": 1
+    },
+    "core/ReplaceComparisonOperator_Eq_Gt": {
+      "killed": 9
+    },
+    "core/ReplaceComparisonOperator_Eq_GtE": {
+      "killed": 9
+    },
+    "core/ReplaceComparisonOperator_NotEq_Eq": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_NotEq_Lt": {
+      "survived": 3,
+      "killed": 4
+    },
+    "core/ReplaceComparisonOperator_NotEq_LtE": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_NotEq_Gt": {
+      "killed": 3,
+      "survived": 4
+    },
+    "core/ReplaceComparisonOperator_NotEq_GtE": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_NotEq_Is": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_NotEq_IsNot": {
+      "survived": 7
+    },
+    "core/ReplaceComparisonOperator_Gt_Eq": {
+      "killed": 1
+    },
+    "core/ReplaceComparisonOperator_Gt_NotEq": {
+      "killed": 1
+    },
+    "core/ReplaceComparisonOperator_Gt_Lt": {
+      "killed": 1
+    },
+    "core/ReplaceComparisonOperator_Gt_LtE": {
+      "killed": 1
+    },
+    "core/ReplaceComparisonOperator_Gt_GtE": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_USub_UAdd": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_USub_Invert": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_USub_Not": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_Delete_USub": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_Delete_Not": {
+      "killed": 13
+    },
+    "core/AddNot": {
+      "killed": 36
+    },
+    "core/ReplaceTrueWithFalse": {
+      "killed": 3
+    },
+    "core/ReplaceFalseWithTrue": {
+      "killed": 1,
+      "survived": 1
+    },
+    "core/ReplaceAndWithOr": {
+      "killed": 8
+    },
+    "core/ReplaceOrWithAnd": {
+      "killed": 16
+    },
+    "core/ReplaceContinueWithBreak": {
+      "survived": 1
+    },
+    "core/ExceptionReplacer": {
+      "killed": 1
+    },
+    "core/NumberReplacer": {
+      "killed": 12
+    },
+    "core/ZeroIterationForLoop": {
+      "killed": 1
+    },
+    "sqe/SwapTicketStatus": {
+      "killed": 10
+    },
+    "sqe/RevokeAgentExemption": {
+      "killed": 4
+    },
+    "sqe/GrantAgentExemption": {
+      "killed": 4
+    },
+    "core/ReplaceComparisonOperator_Eq_Is": {
+      "survived": 6
+    },
+    "core/ReplaceComparisonOperator_Eq_IsNot": {
+      "killed": 6
+    },
+    "core/ReplaceBinaryOperator_BitOr_Add": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Sub": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Mul": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Div": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_FloorDiv": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Mod": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Pow": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_RShift": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_LShift": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_BitAnd": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_BitXor": {
+      "survived": 1
+    }
+  },
+  "survivors": [
+    {
+      "job_id": "160c405f0b284eb0828fd531cd7f0894",
+      "file": "customer_edit_controller.py",
+      "line": 23,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Gt",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n@@ -20,7 +20,7 @@\n         # a System Manager pulling emails is not the sender of the pulled tickets\n         if is_agent() or \"System Manager\" in frappe.get_roles():\n             return\n-        if frappe.session.user != \"Guest\":\n+        if frappe.session.user > \"Guest\":\n             self.raised_by = frappe.session.user\n         self.via_customer_portal = 1\n         self.flags.ignore_permlevel_for_fields = ["
+    },
+    {
+      "job_id": "1e8dfc903aaf493f90e79ec08a76874e",
+      "file": "customer_edit_controller.py",
+      "line": 23,
+      "operator": "core/ReplaceComparisonOperator_NotEq_IsNot",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n@@ -20,7 +20,7 @@\n         # a System Manager pulling emails is not the sender of the pulled tickets\n         if is_agent() or \"System Manager\" in frappe.get_roles():\n             return\n-        if frappe.session.user != \"Guest\":\n+        if frappe.session.user is not \"Guest\":\n             self.raised_by = frappe.session.user\n         self.via_customer_portal = 1\n         self.flags.ignore_permlevel_for_fields = ["
+    },
+    {
+      "job_id": "fdf9ceb6d983470ebe35ed8177e3d333",
+      "file": "customer_edit_controller.py",
+      "line": 39,
+      "operator": "core/ReplaceComparisonOperator_Eq_Is",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n@@ -36,7 +36,7 @@\n         # rating the ticket is the one thing a closing email asks the customer to do\n         if self.flags.get(\"ignore_closed_ticket_guard\"):\n             return\n-        is_closed = old_doc.status == \"Closed\"\n+        is_closed = old_doc.status is \"Closed\"\n         is_rated = bool(old_doc.feedback)\n         if is_closed or is_rated:\n             text = _(\"Closed or rated tickets cannot be updated by non-agents\")"
+    },
+    {
+      "job_id": "62d6e6aeca9a4002aa92f205003e8d81",
+      "file": "customer_edit_controller.py",
+      "line": 39,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n@@ -36,7 +36,7 @@\n         # rating the ticket is the one thing a closing email asks the customer to do\n         if self.flags.get(\"ignore_closed_ticket_guard\"):\n             return\n-        is_closed = old_doc.status == \"Closed\"\n+        is_closed = old_doc.status <= \"Closed\"\n         is_rated = bool(old_doc.feedback)\n         if is_closed or is_rated:\n             text = _(\"Closed or rated tickets cannot be updated by non-agents\")"
+    },
+    {
+      "job_id": "1b7d125d624f4b3e8ad001731a28ad94",
+      "file": "customer_edit_controller.py",
+      "line": 84,
+      "operator": "core/ReplaceBinaryOperator_BitOr_BitXor",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n@@ -81,7 +81,7 @@\n \n     def customer_writable_after_create(self) -> set[str]:\n         \"\"\"Close, rate, and what the template opens; replies reopen server-side.\"\"\"\n-        writable = set(CUSTOMER_ALWAYS_WRITABLE_FIELDS) | {\n+        writable = set(CUSTOMER_ALWAYS_WRITABLE_FIELDS) ^ {\n             row.fieldname\n             for row in self.customer_writable_rows()\n             if row.editable_after_creation"
+    },
+    {
+      "job_id": "56c1ac93f2f44fc7b4c52486cb8b0a0c",
+      "file": "customer_edit_controller.py",
+      "line": 90,
+      "operator": "core/ReplaceComparisonOperator_Eq_Is",
+      "occurrence": 1,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n@@ -87,7 +87,7 @@\n             if row.editable_after_creation\n         }\n         # the portal only closes; Resolved is the agent's call and stops the SLA\n-        if self.status == \"Closed\" or self.flags.get(\"customer_reply_reopen\"):\n+        if self.status is \"Closed\" or self.flags.get(\"customer_reply_reopen\"):\n             writable.add(\"status\")\n         return writable\n "
+    },
+    {
+      "job_id": "edea1b17e4644dabbc757919534ff33f",
+      "file": "customer_edit_controller.py",
+      "line": 90,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 1,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n@@ -87,7 +87,7 @@\n             if row.editable_after_creation\n         }\n         # the portal only closes; Resolved is the agent's call and stops the SLA\n-        if self.status == \"Closed\" or self.flags.get(\"customer_reply_reopen\"):\n+        if self.status <= \"Closed\" or self.flags.get(\"customer_reply_reopen\"):\n             writable.add(\"status\")\n         return writable\n "
+    },
+    {
+      "job_id": "94f0d128d96b42b8937b646b6fffc55b",
+      "file": "customer_edit_controller.py",
+      "line": 101,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Gt",
+      "occurrence": 1,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n@@ -98,7 +98,7 @@\n         return [\n             row\n             for row in TicketFields().template_rows\n-            if row.visible_to != \"Agents\"\n+            if row.visible_to > \"Agents\"\n             and row.fieldname in readable\n             and row.fieldname not in SERVER_COMPUTED_FIELDS\n         ]"
+    },
+    {
+      "job_id": "bf751b8274d44ae6aebcad3584bdc394",
+      "file": "customer_edit_controller.py",
+      "line": 101,
+      "operator": "core/ReplaceComparisonOperator_NotEq_IsNot",
+      "occurrence": 1,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py\n@@ -98,7 +98,7 @@\n         return [\n             row\n             for row in TicketFields().template_rows\n-            if row.visible_to != \"Agents\"\n+            if row.visible_to is not \"Agents\"\n             and row.fieldname in readable\n             and row.fieldname not in SERVER_COMPUTED_FIELDS\n         ]"
+    },
+    {
+      "job_id": "a4b8ad91a9ae4a0eac0fb14d9f22ced7",
+      "file": "hd_ticket.py",
+      "line": 414,
+      "operator": "core/ReplaceComparisonOperator_NotEq_IsNot",
+      "occurrence": 2,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -411,7 +411,7 @@\n         )\n         if (\n             self.feedback_rating\n-            or self.status_category != \"Resolved\"\n+            or self.status_category is not \"Resolved\"\n             or is_agent()\n             or not self.has_agent_replied\n             or not is_feedback_mandatory"
+    },
+    {
+      "job_id": "c10efa9512b1466cbfc49506a8fdf288",
+      "file": "hd_ticket.py",
+      "line": 414,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Lt",
+      "occurrence": 2,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -411,7 +411,7 @@\n         )\n         if (\n             self.feedback_rating\n-            or self.status_category != \"Resolved\"\n+            or self.status_category < \"Resolved\"\n             or is_agent()\n             or not self.has_agent_replied\n             or not is_feedback_mandatory"
+    },
+    {
+      "job_id": "b2785d92185f46509328eeccd9ae5817",
+      "file": "hd_ticket.py",
+      "line": 951,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Gt",
+      "occurrence": 3,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -948,7 +948,7 @@\n         \"\"\"Closing an already-resolved ticket wraps up an outcome, it is not a new one.\"\"\"\n         if self.is_new() or not self.has_value_changed(\"status\"):\n             return False\n-        if self.status != \"Closed\":\n+        if self.status > \"Closed\":\n             return True\n         previous = self.get_doc_before_save()\n         return not previous or previous.status_category != \"Resolved\""
+    },
+    {
+      "job_id": "295976fa61eb4a4c8c9dbf607262ac56",
+      "file": "hd_ticket.py",
+      "line": 951,
+      "operator": "core/ReplaceComparisonOperator_NotEq_IsNot",
+      "occurrence": 3,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -948,7 +948,7 @@\n         \"\"\"Closing an already-resolved ticket wraps up an outcome, it is not a new one.\"\"\"\n         if self.is_new() or not self.has_value_changed(\"status\"):\n             return False\n-        if self.status != \"Closed\":\n+        if self.status is not \"Closed\":\n             return True\n         previous = self.get_doc_before_save()\n         return not previous or previous.status_category != \"Resolved\""
+    },
+    {
+      "job_id": "252af0a48d6a43888f401b0293b9c688",
+      "file": "hd_ticket.py",
+      "line": 954,
+      "operator": "core/ReplaceComparisonOperator_NotEq_IsNot",
+      "occurrence": 4,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -951,7 +951,7 @@\n         if self.status != \"Closed\":\n             return True\n         previous = self.get_doc_before_save()\n-        return not previous or previous.status_category != \"Resolved\"\n+        return not previous or previous.status_category is not \"Resolved\"\n \n     def set_resolution_date(self):\n         \"\"\"Stamp when the ticket was resolved. Runs for every ticket, with or"
+    },
+    {
+      "job_id": "2684a3dde1b54ab39126dce3d4139d9f",
+      "file": "hd_ticket.py",
+      "line": 954,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Lt",
+      "occurrence": 4,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -951,7 +951,7 @@\n         if self.status != \"Closed\":\n             return True\n         previous = self.get_doc_before_save()\n-        return not previous or previous.status_category != \"Resolved\"\n+        return not previous or previous.status_category < \"Resolved\"\n \n     def set_resolution_date(self):\n         \"\"\"Stamp when the ticket was resolved. Runs for every ticket, with or"
+    },
+    {
+      "job_id": "1eb7a7f3b99141d6b2a911cd369af58a",
+      "file": "hd_ticket.py",
+      "line": 962,
+      "operator": "core/ReplaceComparisonOperator_NotEq_IsNot",
+      "occurrence": 5,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -959,7 +959,7 @@\n         if not self.is_valid_status_transition():\n             return\n \n-        if self.status_category != \"Resolved\":\n+        if self.status_category is not \"Resolved\":\n             self.resolution_date = None\n             self.resolution_time = None  # apply_sla() won't run to clear it if no SLA is attached, so clear it here\n             return"
+    },
+    {
+      "job_id": "390c096ee5e54184a357b75cbb67005c",
+      "file": "hd_ticket.py",
+      "line": 962,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Lt",
+      "occurrence": 5,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -959,7 +959,7 @@\n         if not self.is_valid_status_transition():\n             return\n \n-        if self.status_category != \"Resolved\":\n+        if self.status_category < \"Resolved\":\n             self.resolution_date = None\n             self.resolution_time = None  # apply_sla() won't run to clear it if no SLA is attached, so clear it here\n             return"
+    },
+    {
+      "job_id": "13543284c0ef4d1a813b678023b1132f",
+      "file": "hd_ticket.py",
+      "line": 1493,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 18,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -1490,7 +1490,7 @@\n \n \n def close_tickets_after_n_days():\n-    if frappe.db.get_single_value(\"HD Settings\", \"auto_close_tickets\") == 0:\n+    if frappe.db.get_single_value(\"HD Settings\", \"auto_close_tickets\") <= 0:\n         return\n \n     status, days_threshold = frappe.db.get_value("
+    },
+    {
+      "job_id": "a5b6f3c1e5fb4120834a9b89d473f91b",
+      "file": "hd_ticket.py",
+      "line": 1544,
+      "operator": "core/ReplaceContinueWithBreak",
+      "occurrence": 1,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -1541,7 +1541,7 @@\n                 message=f\"Failed to auto close ticket {doc.name} after {days_threshold} days. Error: {e}\",\n                 title=\"Auto Close Ticket Failed\",\n             )\n-            continue\n+            break\n \n         frappe.db.commit()  # nosemgrep\n "
+    },
+    {
+      "job_id": "e686d6cd295148da8cdefe94be9f9419",
+      "file": "hd_ticket_status.py",
+      "line": 10,
+      "operator": "core/ReplaceFalseWithTrue",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -7,7 +7,7 @@\n \n \n class HDTicketStatus(Document):\n-    def before_rename(self, old, new, merge=False):\n+    def before_rename(self, old, new, merge=True):\n         if old == \"Closed\":\n             frappe.throw(_(\"The 'Closed' status cannot be renamed.\"))\n "
+    },
+    {
+      "job_id": "11a42f6917104e909de23c738c4a99a3",
+      "file": "hd_ticket_status.py",
+      "line": 11,
+      "operator": "core/ReplaceComparisonOperator_Eq_Is",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -8,7 +8,7 @@\n \n class HDTicketStatus(Document):\n     def before_rename(self, old, new, merge=False):\n-        if old == \"Closed\":\n+        if old is \"Closed\":\n             frappe.throw(_(\"The 'Closed' status cannot be renamed.\"))\n \n     def validate(self):"
+    },
+    {
+      "job_id": "2ebe206cf12c4b86821a1d01fd296ca5",
+      "file": "hd_ticket_status.py",
+      "line": 11,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -8,7 +8,7 @@\n \n class HDTicketStatus(Document):\n     def before_rename(self, old, new, merge=False):\n-        if old == \"Closed\":\n+        if old <= \"Closed\":\n             frappe.throw(_(\"The 'Closed' status cannot be renamed.\"))\n \n     def validate(self):"
+    },
+    {
+      "job_id": "f1a2c049a0ce4ad3b487838ba0506b9b",
+      "file": "hd_ticket_status.py",
+      "line": 25,
+      "operator": "core/ReplaceComparisonOperator_Eq_Is",
+      "occurrence": 1,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -22,7 +22,7 @@\n         old_name = (\n             self.get_doc_before_save().name if self.get_doc_before_save() else None\n         )\n-        if old_name == \"Closed\" and not (\n+        if old_name is \"Closed\" and not (\n             self.has_value_changed(\"order\") or self.has_value_changed(\"color\")\n         ):\n             frappe.throw("
+    },
+    {
+      "job_id": "acd38f61408348d0aa869e0cc84b94ab",
+      "file": "hd_ticket_status.py",
+      "line": 47,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Gt",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -44,7 +44,7 @@\n             return\n \n         # If category is being changed, check if we're removing the last status of a required category\n-        if old_category != self.category:\n+        if old_category > self.category:\n             count = frappe.db.count(\n                 \"HD Ticket Status\",\n                 {\"category\": old_category, \"name\": [\"!=\", self.name]},"
+    },
+    {
+      "job_id": "57ebcd14980f44fba5b86fe50b4e0d7a",
+      "file": "hd_ticket_status.py",
+      "line": 47,
+      "operator": "core/ReplaceComparisonOperator_NotEq_IsNot",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -44,7 +44,7 @@\n             return\n \n         # If category is being changed, check if we're removing the last status of a required category\n-        if old_category != self.category:\n+        if old_category is not self.category:\n             count = frappe.db.count(\n                 \"HD Ticket Status\",\n                 {\"category\": old_category, \"name\": [\"!=\", self.name]},"
+    },
+    {
+      "job_id": "6067922736e34e3ca181e69df9a5fb11",
+      "file": "hd_ticket_status.py",
+      "line": 53,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 2,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -50,7 +50,7 @@\n                 {\"category\": old_category, \"name\": [\"!=\", self.name]},\n             )\n \n-            if count == 0:\n+            if count <= 0:\n                 frappe.throw(\n                     _(\n                         f\"At least one ticket status with category '{old_category}' must exist in the system.\""
+    },
+    {
+      "job_id": "7e7400cb01174e48b5b862528d9ad732",
+      "file": "hd_ticket_status.py",
+      "line": 71,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 3,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -68,7 +68,7 @@\n                 \"category\": self.category,\n             },\n         )\n-        if count == 0:\n+        if count <= 0:\n             frappe.throw(\n                 _(\n                     \"At least one enabled status for <u>{0}</u> category must be enabled.\""
+    },
+    {
+      "job_id": "10efb79c888745589fc78c3828925558",
+      "file": "hd_ticket_status.py",
+      "line": 113,
+      "operator": "core/ReplaceComparisonOperator_Eq_Is",
+      "occurrence": 2,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -110,7 +110,7 @@\n             message = _(\n                 \"Cannot disable this status as it is linked in HD Settings:<br><br>\"\n             )\n-            if self.name == settings_default_status:\n+            if self.name is settings_default_status:\n                 message += _(\"- Default Ticket Status<br>\")\n             if self.name == settings_reopen_status:\n                 message += _(\"- Ticket Reopen Status<br>\")"
+    },
+    {
+      "job_id": "0e2ae912d70542149b392d85ce7fd20a",
+      "file": "hd_ticket_status.py",
+      "line": 113,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 4,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -110,7 +110,7 @@\n             message = _(\n                 \"Cannot disable this status as it is linked in HD Settings:<br><br>\"\n             )\n-            if self.name == settings_default_status:\n+            if self.name <= settings_default_status:\n                 message += _(\"- Default Ticket Status<br>\")\n             if self.name == settings_reopen_status:\n                 message += _(\"- Ticket Reopen Status<br>\")"
+    },
+    {
+      "job_id": "8cd0a8a0408e4ec1b6c73eb2f8946db8",
+      "file": "hd_ticket_status.py",
+      "line": 115,
+      "operator": "core/ReplaceComparisonOperator_Eq_Is",
+      "occurrence": 3,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -112,7 +112,7 @@\n             )\n             if self.name == settings_default_status:\n                 message += _(\"- Default Ticket Status<br>\")\n-            if self.name == settings_reopen_status:\n+            if self.name is settings_reopen_status:\n                 message += _(\"- Ticket Reopen Status<br>\")\n             message += _(\n                 \"<br>Please update HD Settings to use a different status before disabling this status.\""
+    },
+    {
+      "job_id": "587773c51f824cb18ae5ff4b23c84ce7",
+      "file": "hd_ticket_status.py",
+      "line": 115,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 5,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -112,7 +112,7 @@\n             )\n             if self.name == settings_default_status:\n                 message += _(\"- Default Ticket Status<br>\")\n-            if self.name == settings_reopen_status:\n+            if self.name <= settings_reopen_status:\n                 message += _(\"- Ticket Reopen Status<br>\")\n             message += _(\n                 \"<br>Please update HD Settings to use a different status before disabling this status.\""
+    }
+  ]
+}

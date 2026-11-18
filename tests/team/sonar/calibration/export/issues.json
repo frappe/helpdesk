@@ -1,0 +1,623 @@
+[
+ {
+  "key": "ef603a18-9f9c-4af8-ad95-ce6fea676dfa",
+  "rule": "python:FunctionComplexity",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 11,
+  "hash": "4868ee66f5d7107c33d834672003623f",
+  "textRange": {
+   "startLine": 11,
+   "endLine": 11,
+   "startOffset": 4,
+   "endOffset": 10
+  },
+  "flows": [],
+  "status": "OPEN",
+  "message": "Function has a complexity of 2 which is greater than 1 authorized.",
+  "effort": "11min",
+  "debt": "11min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "58af04aa-299b-4914-8eb2-85d8a1721051",
+  "rule": "python:FunctionComplexity",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 17,
+  "hash": "da45d38c9b690ca12b4d80cb564bc641",
+  "textRange": {
+   "startLine": 17,
+   "endLine": 17,
+   "startOffset": 4,
+   "endOffset": 10
+  },
+  "flows": [],
+  "status": "OPEN",
+  "message": "Function has a complexity of 2 which is greater than 1 authorized.",
+  "effort": "11min",
+  "debt": "11min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "2fafd736-4774-4b50-8e77-0786392721e6",
+  "rule": "python:FunctionComplexity",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 21,
+  "hash": "e69a12d1589d5062d218a5f3ac5dd023",
+  "textRange": {
+   "startLine": 21,
+   "endLine": 21,
+   "startOffset": 4,
+   "endOffset": 11
+  },
+  "flows": [],
+  "status": "OPEN",
+  "message": "Function has a complexity of 2 which is greater than 1 authorized.",
+  "effort": "11min",
+  "debt": "11min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "16734ca1-811a-40b0-9ece-113091e27c43",
+  "rule": "python:FunctionComplexity",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 25,
+  "hash": "5c7858c690e8b2007feeb24f9a7eea9c",
+  "textRange": {
+   "startLine": 25,
+   "endLine": 25,
+   "startOffset": 4,
+   "endOffset": 30
+  },
+  "flows": [],
+  "status": "OPEN",
+  "message": "Function has a complexity of 2 which is greater than 1 authorized.",
+  "effort": "11min",
+  "debt": "11min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "181f75f9-2a32-4783-8d1e-e461f9aa375c",
+  "rule": "python:FunctionComplexity",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 29,
+  "hash": "03dbba783d5d7941d1cea430a8e5e1cb",
+  "textRange": {
+   "startLine": 29,
+   "endLine": 29,
+   "startOffset": 4,
+   "endOffset": 11
+  },
+  "flows": [],
+  "status": "OPEN",
+  "message": "Function has a complexity of 2 which is greater than 1 authorized.",
+  "effort": "11min",
+  "debt": "11min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "db19c1de-0187-47eb-9a54-ae285d9ad3e1",
+  "rule": "python:S3776",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 44,
+  "hash": "8b58965389e3e6076a7f2867d4deb224",
+  "textRange": {
+   "startLine": 44,
+   "endLine": 44,
+   "startOffset": 4,
+   "endOffset": 15
+  },
+  "flows": [
+   {
+    "locations": [
+     {
+      "component": "sqe-cc-calibration:cc_calibration.py",
+      "textRange": {
+       "startLine": 47,
+       "endLine": 47,
+       "startOffset": 4,
+       "endOffset": 10
+      },
+      "msg": "+1",
+      "msgFormattings": []
+     }
+    ]
+   },
+   {
+    "locations": [
+     {
+      "component": "sqe-cc-calibration:cc_calibration.py",
+      "textRange": {
+       "startLine": 49,
+       "endLine": 49,
+       "startOffset": 4,
+       "endOffset": 10
+      },
+      "msg": "+1",
+      "msgFormattings": []
+     }
+    ]
+   }
+  ],
+  "status": "OPEN",
+  "message": "Refactor this function to reduce its Cognitive Complexity from 2 to the 1 allowed.",
+  "effort": "6min",
+  "debt": "6min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "67e3753d-c9f1-43f2-b3f8-db9939894e47",
+  "rule": "python:FunctionComplexity",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 54,
+  "hash": "68618f29c1c988297b46bc1787597af9",
+  "textRange": {
+   "startLine": 54,
+   "endLine": 54,
+   "startOffset": 4,
+   "endOffset": 13
+  },
+  "flows": [],
+  "status": "OPEN",
+  "message": "Function has a complexity of 2 which is greater than 1 authorized.",
+  "effort": "11min",
+  "debt": "11min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "7b13415a-3efa-4b85-8da7-177e0315a73b",
+  "rule": "python:S3776",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 60,
+  "hash": "e7ba052a76d5074ba3557eee2abde715",
+  "textRange": {
+   "startLine": 60,
+   "endLine": 60,
+   "startOffset": 4,
+   "endOffset": 12
+  },
+  "flows": [
+   {
+    "locations": [
+     {
+      "component": "sqe-cc-calibration:cc_calibration.py",
+      "textRange": {
+       "startLine": 61,
+       "endLine": 61,
+       "startOffset": 4,
+       "endOffset": 6
+      },
+      "msg": "+1",
+      "msgFormattings": []
+     }
+    ]
+   },
+   {
+    "locations": [
+     {
+      "component": "sqe-cc-calibration:cc_calibration.py",
+      "textRange": {
+       "startLine": 63,
+       "endLine": 63,
+       "startOffset": 4,
+       "endOffset": 8
+      },
+      "msg": "+1",
+      "msgFormattings": []
+     }
+    ]
+   }
+  ],
+  "status": "OPEN",
+  "message": "Refactor this function to reduce its Cognitive Complexity from 2 to the 1 allowed.",
+  "effort": "6min",
+  "debt": "6min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "cd561403-fb67-419d-a2bd-7bffe6c6f36b",
+  "rule": "python:FunctionComplexity",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 60,
+  "hash": "e7ba052a76d5074ba3557eee2abde715",
+  "textRange": {
+   "startLine": 60,
+   "endLine": 60,
+   "startOffset": 4,
+   "endOffset": 12
+  },
+  "flows": [],
+  "status": "OPEN",
+  "message": "Function has a complexity of 2 which is greater than 1 authorized.",
+  "effort": "11min",
+  "debt": "11min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "6724fbc3-ee02-4050-bf4d-505208141c12",
+  "rule": "python:FunctionComplexity",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 68,
+  "hash": "2c8c909003f508666432db4d1edaece1",
+  "textRange": {
+   "startLine": 68,
+   "endLine": 68,
+   "startOffset": 4,
+   "endOffset": 24
+  },
+  "flows": [],
+  "status": "OPEN",
+  "message": "Function has a complexity of 2 which is greater than 1 authorized.",
+  "effort": "11min",
+  "debt": "11min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "7ad395f8-9a31-450f-b2d1-9ff576ad5f67",
+  "rule": "python:S3776",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 72,
+  "hash": "c8b457b379f8d4fdafef51d26cb41383",
+  "textRange": {
+   "startLine": 72,
+   "endLine": 72,
+   "startOffset": 4,
+   "endOffset": 24
+  },
+  "flows": [
+   {
+    "locations": [
+     {
+      "component": "sqe-cc-calibration:cc_calibration.py",
+      "textRange": {
+       "startLine": 73,
+       "endLine": 73,
+       "startOffset": 4,
+       "endOffset": 7
+      },
+      "msg": "+1",
+      "msgFormattings": []
+     }
+    ]
+   },
+   {
+    "locations": [
+     {
+      "component": "sqe-cc-calibration:cc_calibration.py",
+      "textRange": {
+       "startLine": 74,
+       "endLine": 74,
+       "startOffset": 8,
+       "endOffset": 10
+      },
+      "msg": "+2 (incl 1 for nesting)",
+      "msgFormattings": []
+     }
+    ]
+   }
+  ],
+  "status": "OPEN",
+  "message": "Refactor this function to reduce its Cognitive Complexity from 3 to the 1 allowed.",
+  "effort": "7min",
+  "debt": "7min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ },
+ {
+  "key": "a59cd992-d89c-499a-87f5-f52f2c9b82f0",
+  "rule": "python:FunctionComplexity",
+  "severity": "CRITICAL",
+  "component": "sqe-cc-calibration:cc_calibration.py",
+  "project": "sqe-cc-calibration",
+  "line": 72,
+  "hash": "c8b457b379f8d4fdafef51d26cb41383",
+  "textRange": {
+   "startLine": 72,
+   "endLine": 72,
+   "startOffset": 4,
+   "endOffset": 24
+  },
+  "flows": [],
+  "status": "OPEN",
+  "message": "Function has a complexity of 3 which is greater than 1 authorized.",
+  "effort": "12min",
+  "debt": "12min",
+  "author": "",
+  "tags": [
+   "brain-overload"
+  ],
+  "creationDate": "2026-11-18T01:16:24+0500",
+  "updateDate": "2026-11-18T01:16:24+0500",
+  "type": "CODE_SMELL",
+  "scope": "MAIN",
+  "quickFixAvailable": false,
+  "messageFormattings": [],
+  "codeVariants": [],
+  "cleanCodeAttribute": "FOCUSED",
+  "cleanCodeAttributeCategory": "ADAPTABLE",
+  "impacts": [
+   {
+    "softwareQuality": "MAINTAINABILITY",
+    "severity": "HIGH"
+   }
+  ],
+  "issueStatus": "OPEN",
+  "prioritizedRule": false,
+  "fromSonarQubeUpdate": false,
+  "internalTags": [],
+  "linkedTicketStatus": "NOT_LINKED"
+ }
+]

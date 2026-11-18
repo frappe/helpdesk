@@ -1,0 +1,135 @@
+{
+ "component": {
+  "key": "sqe-cc-calibration",
+  "name": "Helpdesk business-rule files (complexity probe)",
+  "qualifier": "TRK",
+  "measures": [
+   {
+    "metric": "complexity",
+    "value": "22"
+   },
+   {
+    "metric": "duplicated_lines_density",
+    "value": "0.0",
+    "bestValue": true
+   },
+   {
+    "metric": "duplicated_lines",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "functions",
+    "value": "12"
+   },
+   {
+    "metric": "classes",
+    "value": "0"
+   },
+   {
+    "metric": "statements",
+    "value": "49"
+   },
+   {
+    "metric": "sqale_index",
+    "value": "119",
+    "bestValue": false
+   },
+   {
+    "metric": "sqale_rating",
+    "value": "2.0",
+    "bestValue": false
+   },
+   {
+    "metric": "bugs",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "lines_to_cover",
+    "value": "48"
+   },
+   {
+    "metric": "ncloc",
+    "value": "48"
+   },
+   {
+    "metric": "line_coverage",
+    "value": "0.0",
+    "bestValue": false
+   },
+   {
+    "metric": "lines",
+    "value": "77"
+   },
+   {
+    "metric": "coverage",
+    "value": "0.0",
+    "bestValue": false
+   },
+   {
+    "metric": "reliability_rating",
+    "value": "1.0",
+    "bestValue": true
+   },
+   {
+    "metric": "code_smells",
+    "value": "12",
+    "bestValue": false
+   },
+   {
+    "metric": "security_rating",
+    "value": "1.0",
+    "bestValue": true
+   },
+   {
+    "metric": "sqale_debt_ratio",
+    "value": "8.3",
+    "bestValue": false
+   },
+   {
+    "metric": "comment_lines_density",
+    "value": "25.0",
+    "bestValue": false
+   },
+   {
+    "metric": "security_hotspots",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "security_review_rating",
+    "value": "1.0",
+    "bestValue": true
+   },
+   {
+    "metric": "alert_status",
+    "value": "OK"
+   },
+   {
+    "metric": "uncovered_lines",
+    "value": "48",
+    "bestValue": false
+   },
+   {
+    "metric": "cognitive_complexity",
+    "value": "14",
+    "bestValue": false
+   },
+   {
+    "metric": "duplicated_blocks",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "files",
+    "value": "1"
+   },
+   {
+    "metric": "vulnerabilities",
+    "value": "0",
+    "bestValue": true
+   }
+  ]
+ }
+}

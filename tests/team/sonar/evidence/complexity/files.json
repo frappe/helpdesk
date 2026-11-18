@@ -1,0 +1,95 @@
+[
+ {
+  "key": "helpdesk-complexity:helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py",
+  "name": "customer_edit_controller.py",
+  "qualifier": "FIL",
+  "path": "helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py",
+  "language": "py",
+  "measures": [
+   {
+    "metric": "cognitive_complexity",
+    "value": "19",
+    "bestValue": false
+   },
+   {
+    "metric": "complexity",
+    "value": "32"
+   },
+   {
+    "metric": "coverage",
+    "value": "100.0",
+    "bestValue": true
+   },
+   {
+    "metric": "functions",
+    "value": "5"
+   },
+   {
+    "metric": "ncloc",
+    "value": "80"
+   }
+  ]
+ },
+ {
+  "key": "helpdesk-complexity:helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py",
+  "name": "hd_ticket.py",
+  "qualifier": "FIL",
+  "path": "helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py",
+  "language": "py",
+  "measures": [
+   {
+    "metric": "cognitive_complexity",
+    "value": "252",
+    "bestValue": false
+   },
+   {
+    "metric": "complexity",
+    "value": "298"
+   },
+   {
+    "metric": "coverage",
+    "value": "17.6",
+    "bestValue": false
+   },
+   {
+    "metric": "functions",
+    "value": "81"
+   },
+   {
+    "metric": "ncloc",
+    "value": "1250"
+   }
+  ]
+ },
+ {
+  "key": "helpdesk-complexity:helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py",
+  "name": "hd_ticket_status.py",
+  "qualifier": "FIL",
+  "path": "helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py",
+  "language": "py",
+  "measures": [
+   {
+    "metric": "cognitive_complexity",
+    "value": "27",
+    "bestValue": false
+   },
+   {
+    "metric": "complexity",
+    "value": "27"
+   },
+   {
+    "metric": "coverage",
+    "value": "100.0",
+    "bestValue": true
+   },
+   {
+    "metric": "functions",
+    "value": "5"
+   },
+   {
+    "metric": "ncloc",
+    "value": "101"
+   }
+  ]
+ }
+]

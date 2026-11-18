@@ -1,0 +1,14 @@
+# Mutation testing of the business-rule scope. Run with tests/team/run_mutation.sh,
+# which executes this from a sandbox copy so the running bench is never mutated.
+[cosmic-ray]
+module-path = [
+    "helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py",
+    "helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py",
+    "helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py",
+]
+timeout = 60.0
+excluded-modules = []
+test-command = "python -m pytest tests/team/unit -x -q -p no:cacheprovider"
+
+[cosmic-ray.distributor]
+name = "local"

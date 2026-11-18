@@ -1,0 +1,226 @@
+{
+  "score": 97.05,
+  "totals": {
+    "skipped": 746,
+    "killed": 230,
+    "survived": 7
+  },
+  "pending": 0,
+  "by_file": {
+    "hd_ticket.py": {
+      "killed": 78,
+      "survived": 4
+    },
+    "hd_ticket_status.py": {
+      "killed": 77,
+      "survived": 3
+    },
+    "customer_edit_controller.py": {
+      "killed": 75
+    }
+  },
+  "by_operator": {
+    "core/ReplaceComparisonOperator_Eq_NotEq": {
+      "killed": 9
+    },
+    "core/ReplaceComparisonOperator_Eq_Lt": {
+      "killed": 9
+    },
+    "core/ReplaceComparisonOperator_Eq_LtE": {
+      "survived": 3,
+      "killed": 6
+    },
+    "core/ReplaceComparisonOperator_Eq_Gt": {
+      "killed": 9
+    },
+    "core/ReplaceComparisonOperator_Eq_GtE": {
+      "killed": 9
+    },
+    "core/ReplaceComparisonOperator_NotEq_Eq": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_NotEq_Lt": {
+      "survived": 3,
+      "killed": 4
+    },
+    "core/ReplaceComparisonOperator_NotEq_LtE": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_NotEq_Gt": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_NotEq_GtE": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_NotEq_Is": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_NotEq_IsNot": {
+      "killed": 7
+    },
+    "core/ReplaceComparisonOperator_Gt_Eq": {
+      "killed": 1
+    },
+    "core/ReplaceComparisonOperator_Gt_NotEq": {
+      "killed": 1
+    },
+    "core/ReplaceComparisonOperator_Gt_Lt": {
+      "killed": 1
+    },
+    "core/ReplaceComparisonOperator_Gt_LtE": {
+      "killed": 1
+    },
+    "core/ReplaceComparisonOperator_Gt_GtE": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_USub_UAdd": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_USub_Invert": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_USub_Not": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_Delete_USub": {
+      "killed": 1
+    },
+    "core/ReplaceUnaryOperator_Delete_Not": {
+      "killed": 13
+    },
+    "core/AddNot": {
+      "killed": 36
+    },
+    "core/ReplaceTrueWithFalse": {
+      "killed": 3
+    },
+    "core/ReplaceFalseWithTrue": {
+      "killed": 1,
+      "survived": 1
+    },
+    "core/ReplaceAndWithOr": {
+      "killed": 8
+    },
+    "core/ReplaceOrWithAnd": {
+      "killed": 16
+    },
+    "core/ReplaceContinueWithBreak": {
+      "killed": 1
+    },
+    "core/ExceptionReplacer": {
+      "killed": 1
+    },
+    "core/NumberReplacer": {
+      "killed": 12
+    },
+    "core/ZeroIterationForLoop": {
+      "killed": 1
+    },
+    "sqe/SwapTicketStatus": {
+      "killed": 10
+    },
+    "sqe/RevokeAgentExemption": {
+      "killed": 4
+    },
+    "sqe/GrantAgentExemption": {
+      "killed": 4
+    },
+    "core/ReplaceComparisonOperator_Eq_Is": {
+      "killed": 6
+    },
+    "core/ReplaceComparisonOperator_Eq_IsNot": {
+      "killed": 6
+    },
+    "core/ReplaceBinaryOperator_BitOr_Add": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Sub": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Mul": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Div": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_FloorDiv": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Mod": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_Pow": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_RShift": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_LShift": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_BitAnd": {
+      "killed": 1
+    },
+    "core/ReplaceBinaryOperator_BitOr_BitXor": {
+      "killed": 1
+    }
+  },
+  "survivors": [
+    {
+      "job_id": "a816a3f208c5423f8539043c8261d773",
+      "file": "hd_ticket.py",
+      "line": 414,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Lt",
+      "occurrence": 2,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -411,7 +411,7 @@\n         )\n         if (\n             self.feedback_rating\n-            or self.status_category != \"Resolved\"\n+            or self.status_category < \"Resolved\"\n             or is_agent()\n             or not self.has_agent_replied\n             or not is_feedback_mandatory"
+    },
+    {
+      "job_id": "f1d91159ba8a4d6a9af64ae8562e11d8",
+      "file": "hd_ticket.py",
+      "line": 954,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Lt",
+      "occurrence": 4,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -951,7 +951,7 @@\n         if self.status != \"Closed\":\n             return True\n         previous = self.get_doc_before_save()\n-        return not previous or previous.status_category != \"Resolved\"\n+        return not previous or previous.status_category < \"Resolved\"\n \n     def set_resolution_date(self):\n         \"\"\"Stamp when the ticket was resolved. Runs for every ticket, with or"
+    },
+    {
+      "job_id": "d839e03d3de6459ba6bab3d24a492f53",
+      "file": "hd_ticket.py",
+      "line": 962,
+      "operator": "core/ReplaceComparisonOperator_NotEq_Lt",
+      "occurrence": 5,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -959,7 +959,7 @@\n         if not self.is_valid_status_transition():\n             return\n \n-        if self.status_category != \"Resolved\":\n+        if self.status_category < \"Resolved\":\n             self.resolution_date = None\n             self.resolution_time = None  # apply_sla() won't run to clear it if no SLA is attached, so clear it here\n             return"
+    },
+    {
+      "job_id": "c674eb09fb3f495ca20c4953c69410b6",
+      "file": "hd_ticket.py",
+      "line": 1493,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 18,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py\n@@ -1490,7 +1490,7 @@\n \n \n def close_tickets_after_n_days():\n-    if frappe.db.get_single_value(\"HD Settings\", \"auto_close_tickets\") == 0:\n+    if frappe.db.get_single_value(\"HD Settings\", \"auto_close_tickets\") <= 0:\n         return\n \n     status, days_threshold = frappe.db.get_value("
+    },
+    {
+      "job_id": "9fc1ca2e507149e59afbbe3a95fe8605",
+      "file": "hd_ticket_status.py",
+      "line": 10,
+      "operator": "core/ReplaceFalseWithTrue",
+      "occurrence": 0,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -7,7 +7,7 @@\n \n \n class HDTicketStatus(Document):\n-    def before_rename(self, old, new, merge=False):\n+    def before_rename(self, old, new, merge=True):\n         if old == \"Closed\":\n             frappe.throw(_(\"The 'Closed' status cannot be renamed.\"))\n "
+    },
+    {
+      "job_id": "6691c9247dd5497587b2ea6a2afa7ebd",
+      "file": "hd_ticket_status.py",
+      "line": 53,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 2,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -50,7 +50,7 @@\n                 {\"category\": old_category, \"name\": [\"!=\", self.name]},\n             )\n \n-            if count == 0:\n+            if count <= 0:\n                 frappe.throw(\n                     _(\n                         f\"At least one ticket status with category '{old_category}' must exist in the system.\""
+    },
+    {
+      "job_id": "4a38bc9b1f044dbabe0c40cf3fe5b794",
+      "file": "hd_ticket_status.py",
+      "line": 71,
+      "operator": "core/ReplaceComparisonOperator_Eq_LtE",
+      "occurrence": 3,
+      "diff": "--- mutation diff ---\n--- a/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n+++ b/helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py\n@@ -68,7 +68,7 @@\n                 \"category\": self.category,\n             },\n         )\n-        if count == 0:\n+        if count <= 0:\n             frappe.throw(\n                 _(\n                     \"At least one enabled status for <u>{0}</u> category must be enabled.\""
+    }
+  ]
+}

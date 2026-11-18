@@ -1,0 +1,163 @@
+{
+ "component": {
+  "key": "helpdesk",
+  "name": "Frappe Helpdesk (SE3002 SUT)",
+  "qualifier": "TRK",
+  "measures": [
+   {
+    "metric": "complexity",
+    "value": "10230"
+   },
+   {
+    "metric": "duplicated_lines_density",
+    "value": "1.6",
+    "bestValue": false
+   },
+   {
+    "metric": "duplicated_lines",
+    "value": "1355",
+    "bestValue": false
+   },
+   {
+    "metric": "functions",
+    "value": "4491"
+   },
+   {
+    "metric": "classes",
+    "value": "50"
+   },
+   {
+    "metric": "statements",
+    "value": "20081"
+   },
+   {
+    "metric": "sqale_index",
+    "value": "252",
+    "bestValue": false
+   },
+   {
+    "metric": "sqale_rating",
+    "value": "1.0",
+    "bestValue": true
+   },
+   {
+    "metric": "bugs",
+    "value": "122",
+    "bestValue": false
+   },
+   {
+    "metric": "test_failures",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "lines_to_cover",
+    "value": "18586"
+   },
+   {
+    "metric": "uncovered_conditions",
+    "value": "340",
+    "bestValue": false
+   },
+   {
+    "metric": "branch_coverage",
+    "value": "16.3",
+    "bestValue": false
+   },
+   {
+    "metric": "ncloc",
+    "value": "73337"
+   },
+   {
+    "metric": "line_coverage",
+    "value": "1.4",
+    "bestValue": false
+   },
+   {
+    "metric": "lines",
+    "value": "84948"
+   },
+   {
+    "metric": "test_errors",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "coverage",
+    "value": "1.7",
+    "bestValue": false
+   },
+   {
+    "metric": "reliability_rating",
+    "value": "4.0",
+    "bestValue": false
+   },
+   {
+    "metric": "code_smells",
+    "value": "59",
+    "bestValue": false
+   },
+   {
+    "metric": "security_rating",
+    "value": "4.0",
+    "bestValue": false
+   },
+   {
+    "metric": "sqale_debt_ratio",
+    "value": "0.0",
+    "bestValue": true
+   },
+   {
+    "metric": "comment_lines_density",
+    "value": "4.1",
+    "bestValue": false
+   },
+   {
+    "metric": "security_hotspots",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "security_review_rating",
+    "value": "1.0",
+    "bestValue": true
+   },
+   {
+    "metric": "alert_status",
+    "value": "OK"
+   },
+   {
+    "metric": "tests",
+    "value": "159"
+   },
+   {
+    "metric": "uncovered_lines",
+    "value": "18322",
+    "bestValue": false
+   },
+   {
+    "metric": "cognitive_complexity",
+    "value": "6226",
+    "bestValue": false
+   },
+   {
+    "metric": "duplicated_blocks",
+    "value": "36",
+    "bestValue": false
+   },
+   {
+    "metric": "files",
+    "value": "706"
+   },
+   {
+    "metric": "vulnerabilities",
+    "value": "8",
+    "bestValue": false
+   },
+   {
+    "metric": "conditions_to_cover",
+    "value": "406"
+   }
+  ]
+ }
+}

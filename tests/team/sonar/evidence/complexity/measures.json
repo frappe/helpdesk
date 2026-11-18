@@ -1,0 +1,149 @@
+{
+ "component": {
+  "key": "helpdesk-complexity",
+  "name": "Helpdesk business-rule files (complexity probe)",
+  "qualifier": "TRK",
+  "measures": [
+   {
+    "metric": "complexity",
+    "value": "357"
+   },
+   {
+    "metric": "duplicated_lines_density",
+    "value": "0.0",
+    "bestValue": true
+   },
+   {
+    "metric": "duplicated_lines",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "functions",
+    "value": "91"
+   },
+   {
+    "metric": "classes",
+    "value": "3"
+   },
+   {
+    "metric": "statements",
+    "value": "812"
+   },
+   {
+    "metric": "sqale_index",
+    "value": "1452",
+    "bestValue": false
+   },
+   {
+    "metric": "sqale_rating",
+    "value": "1.0",
+    "bestValue": true
+   },
+   {
+    "metric": "bugs",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "lines_to_cover",
+    "value": "804"
+   },
+   {
+    "metric": "uncovered_conditions",
+    "value": "278",
+    "bestValue": false
+   },
+   {
+    "metric": "branch_coverage",
+    "value": "19.2",
+    "bestValue": false
+   },
+   {
+    "metric": "ncloc",
+    "value": "1431"
+   },
+   {
+    "metric": "line_coverage",
+    "value": "32.8",
+    "bestValue": false
+   },
+   {
+    "metric": "lines",
+    "value": "1804"
+   },
+   {
+    "metric": "coverage",
+    "value": "28.7",
+    "bestValue": false
+   },
+   {
+    "metric": "reliability_rating",
+    "value": "1.0",
+    "bestValue": true
+   },
+   {
+    "metric": "code_smells",
+    "value": "121",
+    "bestValue": false
+   },
+   {
+    "metric": "security_rating",
+    "value": "1.0",
+    "bestValue": true
+   },
+   {
+    "metric": "sqale_debt_ratio",
+    "value": "3.4",
+    "bestValue": false
+   },
+   {
+    "metric": "comment_lines_density",
+    "value": "10.0",
+    "bestValue": false
+   },
+   {
+    "metric": "security_hotspots",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "security_review_rating",
+    "value": "1.0",
+    "bestValue": true
+   },
+   {
+    "metric": "alert_status",
+    "value": "OK"
+   },
+   {
+    "metric": "uncovered_lines",
+    "value": "540",
+    "bestValue": false
+   },
+   {
+    "metric": "cognitive_complexity",
+    "value": "298",
+    "bestValue": false
+   },
+   {
+    "metric": "duplicated_blocks",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "files",
+    "value": "3"
+   },
+   {
+    "metric": "vulnerabilities",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "conditions_to_cover",
+    "value": "344"
+   }
+  ]
+ }
+}

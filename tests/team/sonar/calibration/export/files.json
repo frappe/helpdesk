@@ -1,0 +1,33 @@
+[
+ {
+  "key": "sqe-cc-calibration:cc_calibration.py",
+  "name": "cc_calibration.py",
+  "qualifier": "FIL",
+  "path": "cc_calibration.py",
+  "language": "py",
+  "measures": [
+   {
+    "metric": "cognitive_complexity",
+    "value": "14",
+    "bestValue": false
+   },
+   {
+    "metric": "complexity",
+    "value": "22"
+   },
+   {
+    "metric": "coverage",
+    "value": "0.0",
+    "bestValue": false
+   },
+   {
+    "metric": "functions",
+    "value": "12"
+   },
+   {
+    "metric": "ncloc",
+    "value": "48"
+   }
+  ]
+ }
+]

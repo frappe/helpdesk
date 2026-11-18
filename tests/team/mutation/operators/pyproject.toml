@@ -1,0 +1,16 @@
+[project]
+name = "sqe-operators"
+version = "0.1.0"
+description = "Custom Cosmic Ray mutation operators for the Helpdesk ticket business rules"
+requires-python = ">=3.10"
+dependencies = ["cosmic-ray>=8.9,<9"]
+
+[project.entry-points."cosmic_ray.operator_providers"]
+sqe = "sqe_operators:OperatorProvider"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["sqe_operators"]
