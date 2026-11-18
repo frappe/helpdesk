@@ -25,24 +25,16 @@ export const nameOf = (email: string) => {
   return local.charAt(0).toUpperCase() + local.slice(1);
 };
 
-const SAMPLE_DOMAIN = "@example.com";
-const AVATAR_BACKGROUNDS = "b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf";
+const avatar = (name: string) => `/assets/helpdesk/desk/demo/${name}.svg`;
 
-/** A DiceBear avatar; anyone but the made-up sample people is hashed, so no real name or address leaves the browser. */
-export function avatarUrl(person: string) {
-  const sample =
-    person.endsWith(SAMPLE_DOMAIN) || person === SAMPLE_TICKET.customer;
-  const seed = sample ? person : `hd-${fnv1a(person.toLowerCase())}`;
-  return `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(
-    seed
-  )}&backgroundColor=${AVATAR_BACKGROUNDS}`;
-}
+/** The sample people's avatars, made once with DiceBear Notionists (CC0) and committed, like Gameplan's demo. */
+const SAMPLE_AVATARS: Record<string, string> = {
+  [SAMPLE_TICKET.customer]: avatar("daniel"),
+  "sam@example.com": avatar("sam"),
+  "maya@example.com": avatar("maya"),
+  "priya@example.com": avatar("priya"),
+  "leo@example.com": avatar("leo"),
+};
 
-function fnv1a(text: string) {
-  let hash = 0x811c9dc5;
-  for (const char of text) {
-    hash ^= char.codePointAt(0)!;
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0).toString(36);
-}
+/** A sample person's avatar; real people have none here, so their initials show. */
+export const avatarUrl = (person: string) => SAMPLE_AVATARS[person];
