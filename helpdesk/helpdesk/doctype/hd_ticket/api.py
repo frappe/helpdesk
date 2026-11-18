@@ -290,11 +290,6 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: str, cont
 @frappe.whitelist()
 @agent_only
 def split_ticket(subject: str, communication_id: str):
-<<<<<<< HEAD
-    communicaton_creation_time = frappe.db.get_value(
-        "Communication", communication_id, "creation"
-    )
-=======
     """Split a ticket at an email into a new ticket and return the new ticket's name.
     The new ticket copies the original with `subject`, status Open and no SLA, and
     takes that email and every later email, comment and file. Posts a reply on
@@ -308,7 +303,6 @@ def split_ticket(subject: str, communication_id: str):
     if reference_doctype != "HD Ticket" or not ticket_id:
         frappe.throw(_("Email is not part of a ticket"), frappe.DoesNotExistError)
     frappe.has_permission("HD Ticket", "write", doc=ticket_id, throw=True)
->>>>>>> 2285c38 (fix: split tickets perms)
 
     ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
     new_ticket = duplicate_ticket(ticket_doc, subject)
