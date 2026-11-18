@@ -30,7 +30,7 @@ machine and repository:
 - wrote and edited files: tests, scripts, configuration, reports and the
   management documents;
 - on GitHub, through the member's signed-in `gh` account (`ibbster05`):
-  created the 35 Issues, opened PRs #1 and #37–#43, merged all of them
+  created the 35 Issues, opened PRs #1 and #37–#44, merged all of them
   except #37 (closed unmerged), closed Issues #2, #3, #4, #15, #21 and #27, and set
   branch protection on `team/sqe-tests`;
 - queried the public OSV vulnerability database (package name and version
@@ -83,7 +83,7 @@ generation; M3 = use cases, usability, accessibility, security, performance
 | 1 | Repository, environment, scope (all) | 16 Nov, Fable 5.2 | Pick a Frappe app that fits the brief; install; define workflows, FRs, rules, roles | Choice of frappe/helpdesk; bench install steps; `seed.sh`, `seed/seed.py`; scope in `management/TEST_PLAN.md`, `e2e/USE_CASES.md`, `unit/README.md`; `README.md` | Site runs; seed and reset run; rules traced to source lines | | |
 | 2 | Unit tests, MCC, MC/DC (M1) | 16 Nov, Fable 5.2 | White-box tests of BR1–BR4 with test doubles; 100 % coverage gate | `unit/*.py`, `unit/conftest.py`, `run_unit.sh`, `tools/scoped_coverage.py` | 167 tests pass; 100 % statements (144) and branches (68) of the rule scope, locally and in CI | | |
 | 3 | Mutation (M1) | 16–17 Nov, Fable 5.2 | Cosmic Ray with custom operators; survivor analysis | `mutation/cosmic-ray.toml`, `mutation/operators/`, `mutation/SURVIVORS.md`, `run_mutation.sh`, `tools/mutation_*.py` | 86.9 % → 97.0 % after new tests; 31 survivors analysed (24 killed, 7 equivalent); 97.1 % after the DEF-01 fix | | |
-| 4 | API tests, OpenAPI, generator (M2) | 17 Nov, Fable 5.2 | EP/BVA from a spec; rule, transition, repeat and cross-workflow tests; endpoint weaknesses | `api/openapi.yaml`, `api/generate_testdata.py`, `api/test_*.py`, `api/demo_constraint_change.sh`, `api/WEAKNESSES.md`, `run_api.sh` | 127 tests: 114 pass, 13 pinned weaknesses (strict xfail); constraint change regenerated and shown; recovery tests R1/R2 | | |
+| 4 | API tests, OpenAPI, generator (M2) | 17 Nov, Fable 5.2 | EP/BVA from a spec; rule, transition, repeat and cross-workflow tests; endpoint weaknesses | `api/openapi.yaml`, `api/generate_testdata.py`, `api/test_*.py`, `api/demo_constraint_change.sh`, `api/WEAKNESSES.md`, `run_api.sh` | 132 tests: 121 pass, 11 pinned weaknesses (strict xfail); constraint change regenerated and shown; recovery tests R1/R2; DEF-01 data repair tool (`tools/repair_auto_close_dates.py`) with 5 tests | | |
 | 5 | Use cases and Playwright (M1, M2, M3: two each) | 17 Nov, Fable 5.2; DEF-35 change 18 Nov, Opus 5.5 | Write six use cases; automate every flow | `e2e/USE_CASES.md`, `e2e/usecases/*.spec.mjs`, `e2e/support/`, `run_e2e.sh` | 33 flows: 32 pass, 1 pinned expected failure reproducing DEF-35; green in CI | | |
 | 6 | Usability and accessibility (M3) | 17 Nov, Fable 5.2 then Opus 5.5 | Task tests incl. keyboard; Lighthouse + axe before and after; fix one screen | `e2e/usability/`, `e2e/a11y/scan.mjs`, `a11y/A11Y_REPORT.md`, `a11y/evidence/`; screen fix in `desk/src` and `desk/index.html` (merged as PR #43 on 18 Nov) | Customer ticket screen: Lighthouse 82 → 100, axe 6 → 0 violations after the fix; same result re-scanned on the merged code base (`a11y/evidence/after_merge/`) | | |
 | 7 | Security (M3) | 17 Nov, Opus 5.5 | Access matrix, controls, ZAP passive, dependency audit | `e2e/security/`, `security/*.sh`, `security/SECURITY_REPORT.md`, `security/evidence/` | 13 access decisions (12 as expected; AC-08 = DEF-02); 5 controls; ZAP alerts and pip-audit (178 packages) reviewed against source | | |
@@ -113,6 +113,7 @@ wrong and evidence corrected it.
 | 11 | First version of the assignment unit tests had a check that could never fail (the mock it inspected was not the one called) | Reviewing the test before running it | Rewritten so the helper returns the mock it used; each check shown to fail when the fix is removed |
 | 12 | Wrote in the security report that DOMPurify's eight CVEs were "fixed by 3.4.16" | OSV query while fixing DEF-14: three are fixed only in 3.4.17 | Report corrected; the fix uses 3.4.18 and CT-08 requires at least 3.4.17 |
 | 13 | Assumed `bench build` would install the new DOMPurify version | The rebuilt bundle still said "DOMPurify 3.4.8" | Ran `yarn install` before the build; the bundle then said 3.4.18 |
+| 14 | The data repair tool opened its `--report` path after changing into `sites/`, so a relative path failed | First run on the local site | Path made absolute before the directory change |
 
 ## 6. What the agent did not do
 

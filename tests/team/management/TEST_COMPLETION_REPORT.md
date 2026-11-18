@@ -17,10 +17,15 @@ fixed and were re-tested through the gate:
 - DEF-01 by PR #38;
 - DEF-02 and DEF-03 by PR #41.
 
-DEF-14, the bundled sanitiser library with published CVEs (Major), was the
-main condition attached to release. It is fixed by PR #42. All three release
-criteria are met, so **the recommendation is RELEASE, with the remaining
-conditions in section 7**.
+The two conditions attached to release are also done:
+
+- DEF-14, the bundled sanitiser library with published CVEs (Major), is
+  fixed by PR #42;
+- the RCA-1 data repair is available as a tested tool (PR #44); it found
+  no affected ticket on this site.
+
+All three release criteria are met, so **the recommendation is RELEASE**,
+with the known issues in section 7.
 
 ## 2. What was tested and what was not
 
@@ -29,7 +34,7 @@ conditions in section 7**.
 | FR-A1…A4, FR-B1…B6, BR1–BR4 (`TRACEABILITY.md`) | Email channel and email-to-ticket (out of scope) |
 | Unit: 167 tests, 100 % statement and branch coverage of the rule scope; MCC + MC/DC on BR2; decision table on assignment | SLA computation beyond what the rules touch (out of scope) |
 | Mutation: 238 mutants, 97.1 % | Upstream test suites (not counted, per the brief; used only as a regression check for the fixes) |
-| API: 127 tests incl. 58 generated EP/BVA cases, repeated requests, recovery R1/R2 | Production stack: nginx, gunicorn, HTTPS; Secure cookie and HSTS observed only in the config template |
+| API: 132 tests incl. 58 generated EP/BVA cases, repeated requests, recovery R1/R2, DEF-01 data repair (5) | Production stack: nginx, gunicorn, HTTPS; Secure cookie and HSTS observed only in the config template |
 | Browser: 33 use-case flows (one pins DEF-35), 2 usability tasks incl. keyboard | Browsers other than Chromium; mobile layouts |
 | Accessibility: axe + Lighthouse on 5 screens, before/after on 1 | Manual screen-reader testing (not required) |
 | Security: 13 access decisions, 6 automated controls (CT-08 added with the DEF-14 fix), ZAP passive before and after the DEF-14 fix, pip-audit (178 packages) | Active scanning and penetration (out of scope by the brief) |
@@ -67,7 +72,7 @@ DEF-03 and DEF-14 are closed. Those that bear on release:
 | Risk | Inherent | Residual | Why |
 |---|---|---|---|
 | PR-01 BR2 feedback rule | 15 High | Low | MCC/MC/DC complete; mutants killed; only DEF-04 (minor) |
-| PR-02 BR3 resolution date | 16 High | Low | DEF-01 fixed and re-tested; DEF-05 (minor) open; tickets closed by the job before the fix still need the RCA-1 data repair |
+| PR-02 BR3 resolution date | 16 High | Low | DEF-01 fixed and re-tested; RCA-1 data repair tool tested (PR #44), 0 affected tickets here; DEF-05 (minor) open |
 | PR-03 BR1 boundary | 12 Medium | Low | Boundary correct; DEF-01 fixed; DEF-11 (minor) open |
 | PR-04 BR4 customer lock | 12 Medium | Low | No defect |
 | PR-05 access control | 15 High | Low | DEF-02, DEF-03 fixed and re-tested; 13 / 13 access decisions as expected; the RCA-2 preventive test (every whitelisted method × role) is not yet written |
@@ -91,18 +96,22 @@ accessibility **met**; EC-6 requirements traced **met**.
 
 ## 7. Recommendation
 
-**RELEASE, with conditions.** All three release criteria are met. The
+**RELEASE.** All three release criteria are met. The
 highest risks (PR-02 resolution date, PR-05 access control) went from High
 to Low through fixes that were pinned by failing tests first, then merged
 only after the required gate passed.
 
-Conditions and known issues for the release notes:
+Former conditions (both met) and known issues for the release notes:
 
 1. ~~**DEF-14**: upgrade DOMPurify before deployment~~. Done in PR #42
    (3.4.18). The served bundle was checked by CT-08 and by ZAP: 0
    vulnerable-library alerts, against 1 on the baseline.
-2. **Data repair (RCA-1)**: back-fill the resolution date of tickets the job
-   closed before PR #38.
+2. ~~**Data repair (RCA-1)**: back-fill the resolution date of tickets the
+   job closed before PR #38~~. Done with `tools/repair_auto_close_dates.py`
+   (PR #44, five integration tests). On this site it found 0 affected
+   tickets; any other copy that ran the old job must run it once with
+   `--execute` when deploying. SLA figures of repaired tickets are listed
+   for review, not recomputed.
 3. **Behaviour change (DEF-03)**: tickets can now be assigned only to agents.
    Upstream's `test_non_agent_flow`, which assigns a ticket to a portal user
    with no roles, fails by design. This needs to be stated if the fix is
@@ -111,5 +120,7 @@ Conditions and known issues for the release notes:
    and the remaining minor defects are released with, and tracked as
    Issues.
 
-If condition 2 cannot be met before deployment, the recommendation reverts
-to HOLD for that reason.
+The recommendation would revert to HOLD if the gate turned red on
+`team/sqe-tests`, or if the repair tool, run on a copy that ran the old job,
+reported tickets it cannot date (`not_repairable`) that the team cannot
+explain.

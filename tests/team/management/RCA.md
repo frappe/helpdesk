@@ -65,8 +65,27 @@ because the test site has no outgoing mail account).
 An alternative first considered, calling `doc.set_resolution_date()` before
 `save`, was rejected while writing the fix: at that point `before_validate`
 has not yet run, so `status_category` still holds the old value and the date
-would be cleared instead of set. The data repair and the two preventive
-actions are still open.
+would be cleared instead of set.
+
+**Data repair (19 Nov).** The second corrective action is done with
+`tools/repair_auto_close_dates.py`, PR #44. It dates each affected ticket
+from the job's own "automatically closed the ticket" comment, leaves
+`modified` unchanged and adds an audit comment.
+
+- **Tests:** five integration tests in `api/test_data_repair.py`. They
+  reproduce the pre-fix job exactly, then check the dry run, the repair,
+  a second run and a control ticket closed without the job's comment.
+  Dating from "now" instead of the comment, or updating `modified`, each
+  fail a test.
+- **Local site:** dry run and `--execute` found 0 affected tickets, because
+  every suite's reset deletes its test tickets. The verification query
+  ("Resolved-category tickets with an empty date") returns 0. Reports:
+  `api/evidence/data_repair_*.json`.
+- **Not repaired:** the SLA figures the old job also skipped (resolution
+  time, last hold period) depend on business hours at the original close
+  time. The tool lists tickets with an SLA for review instead of guessing.
+
+The two preventive actions are still open.
 
 <a id="rca-2"></a>
 ## RCA-2: DEF-02, a customer can assign an agent to their own ticket
