@@ -1,6 +1,8 @@
-import { createHmac } from "node:crypto";
-import { createServer, type Server } from "node:http";
+import { execFileSync } from "node:child_process";
+import { createHash, createHmac } from "node:crypto";
+import { createServer, type Server, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
+import { resolve } from "node:path";
 import { expect, request } from "@playwright/test";
 import type { Api } from "./api";
 import { uid } from "./factories";
@@ -160,4 +162,136 @@ export function whatsAppMessagesOf(api: Api, ticket: string, fields: string[]) {
     fields,
     filters: { reference_doctype: "HD Ticket", reference_docname: ticket },
   });
+}
+
+/**
+ * Stands in for Frappe Cloud in Meta's sign-in: the site's Pilot, which passes central.api.oauth.*
+ * on to Central, and Meta's sign-in page, which sends the browser back to the site with a code.
+ * The next sign-in relays `account`.
+ */
+export class FakeCentral {
+  readonly token = `e2e-${uid()}`;
+  url = "";
+  account = { waba_id: "", phone_id: "" };
+  /** central.api.oauth methods the site called, in order */
+  asked: string[] = [];
+  private signIns = new Map<string, { returnUrl: string; challenge: string }>();
+  private codes = new Map<string, string>();
+  private server: Server = createServer((incoming, response) => {
+    let body = "";
+    incoming.on("data", (chunk) => (body += chunk));
+    incoming.on("end", () => {
+      const url = new URL(incoming.url ?? "/", this.url);
+      if (url.pathname === "/dialog/oauth") return this.signInPage(url, response);
+      const method = url.pathname.match(/\/central\/central\.api\.oauth\.(\w+)$/)?.[1];
+      let status = 404;
+      let reply: unknown = { error: "not_found" };
+      if (method && incoming.headers.authorization !== `Bearer ${this.token}`) {
+        [status, reply] = [401, { error: "unauthorized" }];
+      } else if (method) {
+        this.asked.push(method);
+        [status, reply] = this.answer(method, JSON.parse(body || "{}"));
+      }
+      response.writeHead(status, { "content-type": "application/json" });
+      response.end(JSON.stringify(reply));
+    });
+  });
+
+  private answer(method: string, data: Record<string, any>): [number, unknown] {
+    if (method === "get_active_providers") return [200, { meta: null }];
+    if (method === "start") {
+      this.signIns.set(data.state, {
+        returnUrl: data.return_url,
+        challenge: data.code_challenge,
+      });
+      const link = `${this.url}/dialog/oauth?${new URLSearchParams({ state: data.state })}`;
+      return [200, { authorize_url: link, client_id: "e2e-app", scopes: [] }];
+    }
+    if (method === "relay_token") {
+      const challenge = this.codes.get(data.code);
+      this.codes.delete(data.code);
+      // PKCE: only the site that started this sign-in has the verifier of its challenge
+      const verified = createHash("sha256")
+        .update(data.code_verifier ?? "")
+        .digest("base64url");
+      if (!challenge || verified !== challenge) return [400, { error: "invalid_grant" }];
+      return [
+        200,
+        {
+          access_token: `e2e-token-${uid()}`,
+          app_id: "e2e-app",
+          ...this.account,
+          pin: "123456",
+          webhook_secret: `e2e-secret-${uid()}`,
+        },
+      ];
+    }
+    if (method === "disconnect") return [200, null];
+    return [404, { error: "not_found" }];
+  }
+
+  /** Meta's sign-in. Continue goes back to the site, the way Central's callback sends it. */
+  private signInPage(url: URL, response: ServerResponse) {
+    const state = url.searchParams.get("state") ?? "";
+    const signIn = this.signIns.get(state);
+    if (!signIn) {
+      response.writeHead(400).end("Unknown sign-in");
+      return;
+    }
+    const code = uid();
+    this.codes.set(code, signIn.challenge);
+    const back = new URL(signIn.returnUrl);
+    back.search = new URLSearchParams({ state, code }).toString();
+    response.writeHead(200, { "content-type": "text/html" });
+    response.end(`<h1>Meta sign-in</h1><a href="${back.href}">Continue</a>`);
+  }
+
+  async start(): Promise<string> {
+    await new Promise<void>((resolve) => this.server.listen(0, "127.0.0.1", resolve));
+    this.url = `http://127.0.0.1:${(this.server.address() as AddressInfo).port}`;
+    return this.url;
+  }
+
+  stop() {
+    this.server.close();
+  }
+}
+
+/**
+ * Make the test site a Frappe Cloud v2 site whose Pilot is `central`, and return what makes it a
+ * self-hosted site again. Both wait until the web server sees the change: it caches the site
+ * config for up to a minute. Other specs that run on the site meanwhile see a v2 site.
+ */
+export async function becomeFrappeCloudSite(api: Api, central: FakeCentral) {
+  setSiteConfig({
+    pilot_endpoint: central.url,
+    pilot_auth_token: central.token,
+  });
+  await waitForFrappeCloud(api, true);
+  return async () => {
+    // "None" removes the key
+    setSiteConfig({ pilot_endpoint: "None", pilot_auth_token: "None" });
+    await waitForFrappeCloud(api, false);
+  };
+}
+
+function setSiteConfig(values: Record<string, string>) {
+  const site = process.env.SITE_NAME;
+  if (!site) throw new Error("SITE_NAME names the bench site to change");
+  const bench = process.env.BENCH_PATH || resolve(__dirname, "../../../..");
+  for (const [key, value] of Object.entries(values)) {
+    execFileSync("bench", ["--site", site, "set-config", key, value], {
+      cwd: bench,
+      stdio: "pipe",
+    });
+  }
+}
+
+function waitForFrappeCloud(api: Api, on: boolean) {
+  return expect
+    .poll(() => api.call<boolean>("whatsapp.whatsapp.oauth.can_connect_with_meta"), {
+      timeout: 90_000,
+      intervals: [2_000],
+    })
+    .toBe(on);
 }
