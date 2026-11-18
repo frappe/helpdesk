@@ -267,13 +267,21 @@ export async function becomeFrappeCloudSite(api: Api, central: FakeCentral) {
     pilot_endpoint: central.url,
     pilot_auth_token: central.token,
   });
-  await waitForFrappeCloud(api, true);
+  try {
+    await waitForFrappeCloud(api, true);
+  } catch (error) {
+    // the caller gets no restore function, so never leave the site pointing at a fake Central
+    becomeSelfHostedConfig();
+    throw error;
+  }
   return async () => {
-    // "None" removes the key
-    setSiteConfig({ pilot_endpoint: "None", pilot_auth_token: "None" });
+    becomeSelfHostedConfig();
     await waitForFrappeCloud(api, false);
   };
 }
+
+// "None" removes the key
+const becomeSelfHostedConfig = () => setSiteConfig({ pilot_endpoint: "None", pilot_auth_token: "None" });
 
 function setSiteConfig(values: Record<string, string>) {
   const site = process.env.SITE_NAME;

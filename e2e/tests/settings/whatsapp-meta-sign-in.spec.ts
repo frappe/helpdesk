@@ -8,6 +8,7 @@ import { becomeFrappeCloudSite, FakeCentral, FakeMeta } from "../../helpers/what
 // link and the token, and a fake Meta sign-in page sends the browser back with a code. The site is
 // a Frappe Cloud v2 site only while this file runs.
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin";
+const SETTINGS = "WA Settings";
 // the phone layout of Helpdesk has no settings modal, so phone size is its narrowest width that has one
 const PHONE = { width: 640, height: 844 };
 
@@ -16,24 +17,30 @@ usePersona("admin");
 const central = new FakeCentral();
 const meta = new FakeMeta();
 let becomeSelfHosted: () => Promise<void>;
+let settings: { whatsapp_api_url?: string; default_account?: string };
+let admin: Api;
 
 test.beforeAll(async () => {
   test.setTimeout(180_000);
-  const api = await Api.login(
+  admin = await Api.login(
     process.env.BASE_URL || "http://localhost:8000",
     "Administrator",
     ADMIN_PASSWORD,
   );
+  settings = await admin.get(SETTINGS, SETTINGS);
   // deleting a Meta account unsubscribes Meta's app from it, which goes to the fake Graph API
-  await api.update("WA Settings", "WA Settings", {
+  await admin.update(SETTINGS, SETTINGS, {
     whatsapp_api_url: await meta.start(),
   });
   await central.start();
-  becomeSelfHosted = await becomeFrappeCloudSite(api, central);
+  becomeSelfHosted = await becomeFrappeCloudSite(admin, central);
 });
 
 test.afterAll(async () => {
   test.setTimeout(180_000);
+  if (settings) {
+    await admin.update(SETTINGS, SETTINGS, { whatsapp_api_url: settings.whatsapp_api_url ?? "" });
+  }
   await becomeSelfHosted?.();
   central.stop();
   meta.stop();
@@ -73,7 +80,7 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
         });
         expect(central.asked).toEqual(expect.arrayContaining(["start", "relay_token"]));
       } finally {
-        await api.delete("WA Account", account).catch(() => {});
+        await deleteAccount(api, account);
       }
     });
 
@@ -115,7 +122,7 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
           app_id: "e2e-app",
         });
       } finally {
-        await api.delete("WA Account", account).catch(() => {});
+        await deleteAccount(api, account);
       }
     });
   });
@@ -139,4 +146,10 @@ async function openAccounts(page: Page, phoneId: string) {
   const dialog = await openSettings(page, "WhatsApp");
   await dialog.getByRole("tab", { name: "Accounts" }).click();
   return dialog;
+}
+
+/** Delete the test's account. A new account becomes the default when the site has none, and the default can't be deleted. */
+async function deleteAccount(api: Api, account: string) {
+  await api.update(SETTINGS, SETTINGS, { default_account: settings.default_account ?? "" });
+  await api.delete("WA Account", account).catch(() => {});
 }
