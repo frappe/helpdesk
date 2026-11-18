@@ -72,6 +72,7 @@ bash apps/helpdesk/tests/team/seed.sh reset    # delete test tickets, restore se
 | Performance | `bash tests/team/perf/run_load.sh` | `perf/PERFORMANCE_REPORT.md` |
 | SonarQube | `bash tests/team/sonar/server.sh start`; `bash tests/team/sonar/run_sonar.sh` | `sonar/SONAR_REPORT.md` |
 | Defect summary, Pareto, GQM | `python tests/team/tools/defects_report.py` | `management/generated/` |
+| DEF-01 data repair (dry run; add `--execute` to write) | `../../env/bin/python tests/team/tools/repair_auto_close_dates.py --site helpdesk.localhost` | `management/RCA.md` (RCA-1), `api/evidence/data_repair_*.json` |
 
 ## CI quality gate
 
