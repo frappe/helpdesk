@@ -39,10 +39,9 @@ jobs:
         with:
           python-version: '3.14'
 
-      # pre-commit's own Node needs libatomic, which frappe-arc runners lack; it uses this one instead.
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
+      # pre-commit's own Node (for prettier) needs libatomic, which frappe-arc runners lack.
+      - name: Install libatomic
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends libatomic1
 
       - name: Install and Run Pre-commit
         uses: pre-commit/action@v3.0.1
