@@ -80,9 +80,15 @@ running app with its own session cookie and CSRF token. Raw records:
 | AC-12 | Agent | delete a ticket | denied | denied | HTTP 403 "does not have doctype access via role permission"; ticket still stored |
 | AC-13 | Not signed in | read a ticket | denied | denied | HTTP 403 "Login to access" |
 
-12 of 13 decisions match. AC-08 is recorded as an expected failure, so the
-suite stays green while the finding is open and starts failing the day it is
-fixed (the test must then be updated).
+On the baseline, 12 of 13 decisions matched. AC-08 was recorded as an
+expected failure, so the suite stayed green while the finding was open.
+
+**Update 18 Nov 2026:** SEC-01 (DEF-02) and the related W-API-06 (DEF-03)
+are fixed by PR #41. `assign_agent` is now `agent_only` and accepts only
+agents as targets. AC-08 is now an ordinary passing check, observed as
+"denied" with HTTP 403 and no assignee. **13 of 13 decisions match.** The
+table above keeps the baseline observation as evidence; the CI run of
+PR #41 holds the new one.
 
 ## 3. Security controls reviewed
 

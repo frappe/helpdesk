@@ -166,3 +166,17 @@ https://github.com/ibbster05/helpdesk
 ```text
 AI-use record
 ```
+
+## 26. 2026-11-18 12:41 (prompt)
+
+```text
+Fix DEF-02/03
+```
+
+## 27. 2026-11-18 17:00 (choice)
+
+```text
+For DEF-03, who may a ticket be assigned to? Upstream's test_non_agent_flow assigns a ticket to a portal (Website) user with no roles and expects that to work, so the stricter rule will make that one upstream test fail.
+
+Chosen: Agents only (Recommended)
+```
