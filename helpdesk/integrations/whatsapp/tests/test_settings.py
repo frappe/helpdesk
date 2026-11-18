@@ -1,5 +1,6 @@
 import frappe
 from frappe.tests import IntegrationTestCase
+from frappe.utils import random_string
 
 from helpdesk.integrations.whatsapp.account import add_ticket_action, creates_tickets
 from helpdesk.integrations.whatsapp.test_utils import (
@@ -52,6 +53,21 @@ class TestWhatsAppAppendActions(IntegrationTestCase):
         add_ticket_action(account)
         rows = frappe.get_doc("WA Account", account).append_actions
         self.assertEqual([row.append_to for row in rows], ["Contact", "HD Ticket"])
+
+    def test_an_account_connected_with_meta_creates_tickets(self) -> None:
+        from whatsapp.whatsapp.oauth import _save_account
+
+        phone_id = random_string(10)
+        token = {
+            "access_token": "meta-token",
+            "app_id": "fc-app",
+            "waba_id": random_string(10),
+            "phone_id": phone_id,
+            "pin": "123456",
+            "webhook_secret": "route-secret",
+        }
+        self.assertEqual(_save_account(token, None), ("connected", phone_id))
+        self.assertTrue(creates_tickets(phone_id))
 
 
 def append_action(doctype: str, sender_field: str, sender_name_field: str) -> dict:
