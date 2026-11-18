@@ -15,11 +15,7 @@
         >
           <span
             class="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[7px] text-base-semibold"
-            :class="
-              setup.brandLogo
-                ? 'dark:bg-white'
-                : 'bg-surface-gray-9 text-ink-gray-1'
-            "
+            :class="setup.brandLogo ? 'dark:bg-white' : ''"
           >
             <img
               v-if="setup.brandLogo"
@@ -27,7 +23,7 @@
               alt=""
               class="size-full object-cover"
             />
-            <template v-else>{{ brand[0] }}</template>
+            <HDLogo v-else class="size-full" />
           </span>
           <template v-if="!rail">
             <div class="ms-2 flex min-w-0 flex-1 flex-col pe-2">
@@ -595,6 +591,7 @@
 </template>
 
 <script setup lang="ts">
+import HDLogo from "@/assets/logos/HDLogo.vue";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import { Avatar, Badge, Button, Sidebar, SidebarItem } from "frappe-ui";

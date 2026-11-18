@@ -72,15 +72,9 @@
               :key="t.key"
               class="relative flex h-9 w-[240px] items-center gap-2 px-3"
             >
-              <HDLogo v-if="t.desk" class="size-4 shrink-0 rounded-[4px]" />
               <span
-                v-else
                 class="flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-[4px] text-[9px] font-semibold"
-                :class="
-                  setup.brandLogo
-                    ? 'dark:bg-white'
-                    : 'bg-surface-gray-9 text-ink-gray-1'
-                "
+                :class="setup.brandLogo ? 'dark:bg-white' : ''"
               >
                 <img
                   v-if="setup.brandLogo"
@@ -88,7 +82,7 @@
                   alt=""
                   class="size-full object-cover"
                 />
-                <template v-else>{{ brand[0] }}</template>
+                <HDLogo v-else class="size-full" />
               </span>
               <Transition v-bind="fade">
                 <span
@@ -225,11 +219,7 @@
                 >
                   <span
                     class="flex size-7 items-center justify-center overflow-hidden rounded-[7px] text-base-semibold"
-                    :class="
-                      setup.brandLogo
-                        ? 'dark:bg-white'
-                        : 'bg-surface-gray-9 text-ink-gray-1'
-                    "
+                    :class="setup.brandLogo ? 'dark:bg-white' : ''"
                   >
                     <img
                       v-if="setup.brandLogo"
@@ -237,7 +227,7 @@
                       alt=""
                       class="size-full object-cover"
                     />
-                    <template v-else>{{ brand[0] }}</template>
+                    <HDLogo v-else class="size-full" />
                   </span>
                   <span class="text-lg-medium text-ink-gray-9">{{
                     brand
