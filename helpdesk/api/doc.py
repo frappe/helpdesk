@@ -549,6 +549,7 @@ def get_grouped_list(
     filters = frappe.parse_json(filters) or []
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
+    handle_category_filter(filters, doctype)
     return frappe.get_list(
         doctype,
         fields=frappe.parse_json(fields),
@@ -569,6 +570,7 @@ def export_grouped_list(doctype: str, filters: str | list | dict | None = None):
     filters = frappe.parse_json(filters) or []
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
+    handle_category_filter(filters, doctype)
     frappe.form_dict.update(doctype=doctype, filters=filters)
     return export_query()
 
