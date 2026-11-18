@@ -68,7 +68,7 @@ async function setPasswordIfAsked(page: Page) {
   if (!(await heading.isVisible())) return;
   const password = `Bright-Harbor-${uid()}-Lantern`;
   await page.getByLabel("New password", { exact: true }).fill(password);
-  await expect(page.getByText("Strong")).toBeVisible();
+  await expect(page.getByText("Great")).toBeVisible();
   await page.getByLabel("Confirm new password").fill(password);
   await page.getByRole("button", { name: "Confirm" }).click();
 }

@@ -14,7 +14,8 @@
           :class="rail ? 'justify-center' : 'px-2'"
         >
           <span
-            class="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[7px] bg-surface-gray-9 text-base-semibold text-ink-gray-1"
+            class="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[7px] text-base-semibold"
+            :class="!setup.brandLogo && 'bg-surface-gray-9 text-ink-gray-1'"
           >
             <img
               v-if="setup.brandLogo"

@@ -32,15 +32,14 @@
       <div class="space-y-3">
         <p class="text-sm text-ink-gray-6">{{ __("Logo") }}</p>
         <div
-          class="flex items-center gap-4 rounded-5 border border-dashed p-4 transition-colors"
+          ref="dropZone"
+          class="flex cursor-pointer items-center gap-4 rounded-5 border border-dashed p-4 transition-colors"
           :class="
-            dragging
+            isOverDropZone
               ? 'border-outline-gray-5 bg-surface-gray-2'
-              : 'border-outline-gray-3'
+              : 'border-outline-gray-3 hover:bg-surface-gray-1'
           "
-          @dragover.prevent="dragging = true"
-          @dragleave="onDragLeave"
-          @drop.prevent="uploadLogo($event.dataTransfer?.files?.[0])"
+          @click="fileDialog.open()"
         >
           <span
             class="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-4"
@@ -74,7 +73,6 @@
               <button
                 type="button"
                 class="text-ink-gray-9 underline underline-offset-2"
-                @click="fileInput?.click()"
               >
                 {{ __("browse") }}
               </button>
@@ -89,15 +87,7 @@
             size="sm"
             icon="lucide-x"
             :aria-label="__('Remove logo')"
-            @click="setup.brandLogo = ''"
-          />
-          <input
-            ref="fileInput"
-            type="file"
-            accept="image/*"
-            class="hidden"
-            :aria-label="__('Upload logo')"
-            @change="onPick"
+            @click.stop="setup.brandLogo = ''"
           />
         </div>
       </div>
@@ -138,7 +128,7 @@
 import { useConfigStore } from "@/stores/config";
 import { BRAND_NAME_MAX_LENGTH } from "@/utils";
 import { __ } from "@/translation";
-import { useEventListener } from "@vueuse/core";
+import { useDropZone, useEventListener, useFileDialog } from "@vueuse/core";
 import {
   Button,
   call,
@@ -153,12 +143,20 @@ import { brand, next, setup } from "./setup";
 
 const portal = `${window.location.host}/help`;
 
-const fileInput = ref<HTMLInputElement | null>(null);
-const dragging = ref(false);
 const logoUpload = useFileUpload();
+const dropZone = ref<HTMLElement | null>(null);
+const { isOverDropZone } = useDropZone(dropZone, {
+  onDrop: (files) => uploadLogo(files?.[0]),
+  multiple: false,
+});
+const fileDialog = useFileDialog({
+  accept: "image/*",
+  multiple: false,
+  reset: true,
+});
+fileDialog.onChange((files) => uploadLogo(files?.[0]));
 
 async function uploadLogo(file?: File) {
-  dragging.value = false;
   if (!file) return;
   if (!file.type.startsWith("image/")) {
     toast.error(__("Choose an image file"));
@@ -172,12 +170,6 @@ async function uploadLogo(file?: File) {
   }
 }
 
-function onPick(event: Event) {
-  const input = event.target as HTMLInputElement;
-  uploadLogo(input.files?.[0]);
-  input.value = "";
-}
-
 useEventListener(document, "paste", (event: ClipboardEvent) => {
   const file = Array.from(event.clipboardData?.files ?? []).find((f) =>
     f.type.startsWith("image/")
@@ -186,11 +178,6 @@ useEventListener(document, "paste", (event: ClipboardEvent) => {
   event.preventDefault();
   uploadLogo(file);
 });
-
-function onDragLeave(event: DragEvent) {
-  const zone = event.currentTarget as HTMLElement;
-  if (!zone.contains(event.relatedTarget as Node)) dragging.value = false;
-}
 
 const configStore = useConfigStore();
 watch(

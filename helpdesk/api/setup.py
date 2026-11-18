@@ -1,7 +1,5 @@
 import frappe
 from frappe import _
-from frappe.utils import cint
-from frappe.utils.password_strength import test_password_strength
 
 SETUP_ROLE = "System Manager"
 
@@ -21,23 +19,6 @@ def is_setup_pending() -> bool:
         and is_v2_site()
         and not frappe.db.get_single_value("HD Settings", "setup_complete")
     )
-
-
-@frappe.whitelist(methods=["POST"])
-def get_password_score(password: str) -> dict:
-    """zxcvbn score (0-4) of `password`, and the lowest score the password policy accepts (0 when off)."""
-    frappe.only_for(SETUP_ROLE)
-    user_data = frappe.db.get_value(
-        "User",
-        frappe.session.user,
-        ["first_name", "middle_name", "last_name", "email", "birth_date"],
-    )
-    score = test_password_strength(password, user_inputs=user_data)["score"]
-    policy_on = cint(frappe.get_system_settings("enable_password_policy"))
-    minimum = (
-        cint(frappe.get_system_settings("minimum_password_score")) if policy_on else 0
-    )
-    return {"score": score, "minimum": minimum}
 
 
 @frappe.whitelist(methods=["GET"])
@@ -67,7 +48,9 @@ def reset_setup():
             _("Setup can only be reset in developer mode."), frappe.PermissionError
         )
     frappe.qb.update("Installed Application").set("is_setup_complete", 0).run()
-    frappe.db.set_single_value("System Settings", "setup_complete", 0)
+    frappe.db.set_single_value(
+        "System Settings", {"setup_complete": 0, "enable_telemetry": 1}
+    )
     frappe.db.set_single_value("HD Settings", "setup_complete", 0)
     frappe.clear_cache()
 

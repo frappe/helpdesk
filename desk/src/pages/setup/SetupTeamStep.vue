@@ -147,7 +147,12 @@
 <script setup lang="ts">
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { type AgentRole, getInviteByEmailRoles } from "@/utils";
+import {
+  AGENT_ROLES,
+  type AgentRole,
+  getInviteByEmailRoles,
+  validateEmailWithZod,
+} from "@/utils";
 import { useOnboarding } from "@framework/ui";
 import {
   Alert,
@@ -162,7 +167,6 @@ import {
 import { computed, nextTick, ref } from "vue";
 import {
   back,
-  EMAIL,
   invited,
   newRow,
   next,
@@ -173,11 +177,10 @@ import {
 
 const MAX_ROWS = 20;
 const NEXT_STEP_DELAY_MS = 1800;
-const ROLE_OPTIONS = [
-  { label: __("Agent"), value: "Agent" },
-  { label: __("Agent Manager"), value: "Agent Manager" },
-  { label: __("System Manager"), value: "System Manager" },
-];
+const ROLE_OPTIONS = AGENT_ROLES.map((role) => ({
+  label: __(role),
+  value: role,
+}));
 
 const canSendEmail = createResource({
   url: "helpdesk.api.setup.can_send_email",
@@ -203,7 +206,7 @@ const rowErrors = computed(() => {
     }
     if (seen.has(email))
       errors[row.id] = __("This email is already in the list");
-    else if (attempted.value && !EMAIL.test(email))
+    else if (attempted.value && !validateEmailWithZod(email))
       errors[row.id] = __("Enter a valid email address");
     seen.add(email);
   }
@@ -214,7 +217,8 @@ const pendingRows = computed(() =>
 );
 const hasValidEmail = computed(() =>
   pendingRows.value.some(
-    (r) => EMAIL.test(normalizeEmail(r.email)) && !rowErrors.value[r.id]
+    (r) =>
+      validateEmailWithZod(normalizeEmail(r.email)) && !rowErrors.value[r.id]
   )
 );
 const unsentCount = computed(() => pendingRows.value.length);
@@ -222,7 +226,8 @@ const unsentCount = computed(() => pendingRows.value.length);
 function addRow() {
   const unfinished = setup.rows.find(
     (r) =>
-      !r.sent && (!EMAIL.test(normalizeEmail(r.email)) || rowErrors.value[r.id])
+      !r.sent &&
+      (!validateEmailWithZod(normalizeEmail(r.email)) || rowErrors.value[r.id])
   );
   if (unfinished) {
     attempted.value = true;
@@ -246,19 +251,26 @@ function removeRow(id: number) {
 
 function onEnter(i: number) {
   const last = i === setup.rows.length - 1;
-  if (last && EMAIL.test(normalizeEmail(setup.rows[i].email))) addRow();
+  if (last && validateEmailWithZod(normalizeEmail(setup.rows[i].email)))
+    addRow();
 }
 
 async function sendInvites() {
   attempted.value = true;
   const rows = pendingRows.value;
   if (Object.keys(rowErrors.value).length) return;
-  if (!rows.length || rows.some((r) => !EMAIL.test(normalizeEmail(r.email))))
+  if (
+    !rows.length ||
+    rows.some((r) => !validateEmailWithZod(normalizeEmail(r.email)))
+  )
     return;
   sending.value = true;
   failed.value = [];
   try {
-    for (const [role, group] of groupByRole(rows)) await invite(role, group);
+    for (const role of AGENT_ROLES) {
+      const group = rows.filter((r) => r.role === role);
+      if (group.length) await invite(role, group);
+    }
   } catch (e) {
     toast.error(e.messages?.join(" ") || __("Could not send invites"));
   }
@@ -278,15 +290,6 @@ async function sendInvites() {
     sending.value = false;
     next();
   }, NEXT_STEP_DELAY_MS);
-}
-
-function groupByRole(rows: InviteRow[]) {
-  const groups = new Map<AgentRole, InviteRow[]>();
-  for (const row of rows) {
-    const role = row.role as AgentRole;
-    groups.set(role, [...(groups.get(role) ?? []), row]);
-  }
-  return groups;
 }
 
 async function invite(role: AgentRole, rows: InviteRow[]) {

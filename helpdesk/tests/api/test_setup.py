@@ -6,12 +6,11 @@ from frappe.tests import IntegrationTestCase
 from helpdesk.api.setup import (
     can_send_email,
     complete_setup,
-    get_password_score,
     is_setup_pending,
     reset_setup,
 )
 from helpdesk.patches.mark_existing_sites_set_up import execute as mark_existing_sites
-from helpdesk.test_utils import as_v2_site, create_agent, password_policy, unique_email
+from helpdesk.test_utils import as_v2_site, create_agent, unique_email
 
 FRAMEWORK_SETUP = "frappe.desk.page.setup_wizard.setup_wizard.setup_complete"
 
@@ -117,20 +116,6 @@ class TestSetup(IntegrationTestCase):
         with self.set_user(self.agent), self.assertRaises(frappe.PermissionError):
             complete_setup()
 
-    def test_password_score(self) -> None:
-        self.assertLess(get_password_score("password")["score"], 2)
-        self.assertEqual(get_password_score("Bright-Harbor-42-Lantern")["score"], 4)
-
-    def test_password_minimum_follows_policy(self) -> None:
-        with password_policy(False):
-            self.assertEqual(get_password_score("anything")["minimum"], 0)
-        with password_policy(True, minimum_score=3):
-            self.assertEqual(get_password_score("anything")["minimum"], 3)
-
-    def test_agent_cannot_score_passwords(self) -> None:
-        with self.set_user(self.agent), self.assertRaises(frappe.PermissionError):
-            get_password_score("anything")
-
     def test_can_send_email_follows_outgoing_account(self) -> None:
         find = "frappe.email.doctype.email_account.email_account.EmailAccount.find_default_outgoing"
         with patch(find, return_value=None):
@@ -152,9 +137,13 @@ class TestResetSetup(IntegrationTestCase):
         return patch.dict(frappe.local.conf, {"developer_mode": int(on)})
 
     def test_reset_shows_setup_again(self) -> None:
+        frappe.db.set_single_value("System Settings", "enable_telemetry", 0)
         with self.developer_mode(True):
             reset_setup()
         self.assertFalse(frappe.db.get_single_value("HD Settings", "setup_complete"))
+        self.assertTrue(
+            frappe.db.get_single_value("System Settings", "enable_telemetry")
+        )
         self.assertFalse(frappe.is_setup_complete())
         with as_v2_site():
             self.assertTrue(is_setup_pending())

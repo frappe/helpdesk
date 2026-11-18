@@ -75,7 +75,8 @@
               <HDLogo v-if="t.desk" class="size-4 shrink-0 rounded-[4px]" />
               <span
                 v-else
-                class="flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-[4px] bg-surface-gray-9 text-[9px] font-semibold text-ink-gray-1"
+                class="flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-[4px] text-[9px] font-semibold"
+                :class="!setup.brandLogo && 'bg-surface-gray-9 text-ink-gray-1'"
               >
                 <img
                   v-if="setup.brandLogo"
@@ -87,7 +88,7 @@
               </span>
               <Transition v-bind="fade">
                 <span
-                  :key="t.title"
+                  :key="t.desk ? t.title : t.key"
                   class="min-w-0 flex-1 truncate text-sm transition-colors duration-500"
                   :class="t.active ? 'text-ink-gray-8' : 'text-ink-gray-5'"
                 >
@@ -219,7 +220,10 @@
                   class="flex h-14 shrink-0 items-center gap-2.5 border-b border-outline-gray-1 px-8"
                 >
                   <span
-                    class="flex size-7 items-center justify-center overflow-hidden rounded-[7px] bg-surface-gray-9 text-base-semibold text-ink-gray-1"
+                    class="flex size-7 items-center justify-center overflow-hidden rounded-[7px] text-base-semibold"
+                    :class="
+                      !setup.brandLogo && 'bg-surface-gray-9 text-ink-gray-1'
+                    "
                   >
                     <img
                       v-if="setup.brandLogo"
@@ -229,11 +233,9 @@
                     />
                     <template v-else>{{ brand[0] }}</template>
                   </span>
-                  <Transition v-bind="fade">
-                    <span :key="brand" class="text-lg-medium text-ink-gray-9">{{
-                      brand
-                    }}</span>
-                  </Transition>
+                  <span class="text-lg-medium text-ink-gray-9">{{
+                    brand
+                  }}</span>
                   <div class="ms-auto flex items-center gap-5 text-base">
                     <span class="text-ink-gray-7">{{
                       __("Knowledge base")
@@ -274,10 +276,7 @@
                               "Explore answers to frequently asked questions about"
                             )
                           }}
-                          <Transition v-bind="fade">
-                            <span :key="brand" class="text-ink-gray-9">{{
-                              brand
-                            }}</span> </Transition
+                          <span class="text-ink-gray-9">{{ brand }}</span
                           >.
                         </p>
                         <div

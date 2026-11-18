@@ -22,7 +22,11 @@ export {
 } from "@helpdesk/shared/utils";
 
 export type AgentRole = "Agent" | "Agent Manager" | "System Manager";
-const AGENT_ROLES: AgentRole[] = ["Agent", "Agent Manager", "System Manager"];
+export const AGENT_ROLES: AgentRole[] = [
+  "Agent",
+  "Agent Manager",
+  "System Manager",
+];
 
 /** The roles `invite_by_email` grants for `role`: it and every agent role below it. */
 export const BRAND_NAME_MAX_LENGTH = 30;

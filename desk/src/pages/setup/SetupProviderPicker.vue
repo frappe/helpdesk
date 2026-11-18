@@ -36,6 +36,7 @@
           variant="outline"
           class="[height:auto] [justify-content:start] px-3 py-2.5 hover:border-outline-gray-4"
           :loading="connecting === p.service"
+          :disabled="!!connecting && connecting !== p.service"
           @click="choose(p)"
         >
           <span class="flex w-full min-w-0 items-center gap-3 text-left">
@@ -307,10 +308,12 @@ import type {
   OneClickService,
 } from "@framework/ui/EmailAccounts";
 import { Alert, Button, ErrorMessage, FormControl, toast } from "frappe-ui";
+import { useEventListener } from "@vueuse/core";
 import { computed, onUnmounted, ref, watch } from "vue";
 import {
   emptyForm,
   errorText,
+  oauthMessage,
   services,
   validate,
 } from "@framework/ui/components/EmailAccounts/services";
@@ -321,7 +324,8 @@ import type {
   EmailService,
   FieldError,
 } from "@framework/ui/components/EmailAccounts/types";
-import { EMAIL, type Mailbox, normalizeEmail, setStepBack } from "./setup";
+import { validateEmailWithZod } from "@/utils";
+import { type Mailbox, normalizeEmail, setStepBack } from "./setup";
 
 const props = defineProps<{
   controller: EmailAccountsController;
@@ -401,7 +405,7 @@ const checked = ref("");
 const wrongMailbox = ref(false);
 function kindOf(value: string) {
   const address = normalizeEmail(value);
-  if (!EMAIL.test(address)) return null;
+  if (!validateEmailWithZod(address)) return null;
   return /@(gmail|googlemail)\.com$/.test(address) ? "personal" : "company";
 }
 const gmailKind = computed(() => kindOf(checked.value));
@@ -467,6 +471,10 @@ function manual(address: string) {
   fromGmail.value = true;
   open(GMAIL, address);
 }
+
+useEventListener(window, "pageshow", (event: PageTransitionEvent) => {
+  if (event.persisted) connecting.value = null;
+});
 
 setStepBack(() => {
   if (screen.value === "picker") return false;
@@ -540,18 +548,16 @@ function connectExisting(address: string, created = false) {
 }
 
 /** Shows a one-click sign-in this page came back from that did not connect. */
-function showSignInFailure(result: string, mailbox: string | null) {
+function showSignInFailure(
+  result: string,
+  mailbox: string | null,
+  provider: string | null
+) {
   if (result === "wrong_mailbox" && mailbox) return openGmail(mailbox, true);
   const adminApproval = result === "admin_approval";
-  const messages: Record<string, string> = {
-    cancelled: __("The sign-in was cancelled. Nothing was added."),
-    admin_approval: __(
-      "Your admin hasn't allowed Frappe to access this mailbox yet."
-    ),
-  };
   failure.value = {
     mailbox,
-    message: messages[result] ?? __("Couldn't connect. Please try again."),
+    message: oauthMessage(result, provider),
     cancelled: result === "cancelled",
     adminApproval: adminApproval && !!mailbox && kindOf(mailbox) === "company",
   };

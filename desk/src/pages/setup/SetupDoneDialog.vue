@@ -248,7 +248,6 @@ const PLACES = [
   [318, 48],
   [352, 84],
   [318, 120],
-  [284, 150],
 ];
 const people = computed(() =>
   props.agents.slice(0, PLACES.length).map((email, n) => {
