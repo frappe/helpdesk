@@ -17,6 +17,7 @@ export const TemplateSelector = Empty;
 export const TemplateBodyEditor = Empty;
 export const MediaPreviewDialog = Empty;
 export const ReactionPicker = Empty;
+export const ConnectWithMetaButton = Empty;
 
 export function useMessages() {
   return reactive({
@@ -62,6 +63,14 @@ export function useAccount() {
     save: nothing,
     reload: nothing,
   });
+}
+
+export function useMetaConnect() {
+  return reactive({ canConnect: false, connecting: false, connect: nothing });
+}
+
+export function readMetaConnectResult() {
+  return null;
 }
 
 export function useAppendToggle() {
