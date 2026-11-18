@@ -57,10 +57,16 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
       api,
     }) => {
       const tag = uid();
-      central.account = { waba_id: `waba-${tag}`, phone_id: `phone-${tag}` };
-      const account = central.account.phone_id;
+      central.account = {
+        waba_id: `waba-${tag}`,
+        phone_id: `phone-${tag}`,
+        verified_name: `E2E Store ${tag}`,
+        display_phone_number: "+1 555-0100",
+      };
+      // named after the business and the number Meta shows
+      const account = `E2E Store ${tag} (+1 555-0100)`;
       try {
-        const dialog = await openAccounts(page, account);
+        const dialog = await openAccounts(page, central.account.phone_id);
         await dialog.getByRole("button", { name: "Connect with Meta" }).click();
         await signInWithMeta(page);
 
@@ -73,7 +79,7 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
 
         expect(await api.get("WA Account", account)).toMatchObject({
           business_id: central.account.waba_id,
-          phone_id: account,
+          phone_id: central.account.phone_id,
           app_id: "e2e-app",
           connected_with_meta: 1,
           status: "Active",
@@ -86,7 +92,12 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
 
     test("a Disconnected account shows the badge and reconnects with Meta", async ({ page, api }) => {
       const tag = uid();
-      central.account = { waba_id: `waba-${tag}`, phone_id: `phone-${tag}` };
+      central.account = {
+        waba_id: `waba-${tag}`,
+        phone_id: `phone-${tag}`,
+        verified_name: `E2E Store ${tag}`,
+        display_phone_number: "+1 555-0100",
+      };
       const account = (
         await api.insert("WA Account", {
           account_name: `E2E Meta ${tag}`,
@@ -117,10 +128,14 @@ for (const viewport of [{ width: 1440, height: 900 }, PHONE]) {
             .filter({ hasText: account })
             .getByText("Active", { exact: true }),
         ).toBeVisible();
+        // a reconnect keeps the account's name
         expect(await api.get("WA Account", account)).toMatchObject({
           status: "Active",
           app_id: "e2e-app",
         });
+        expect(await api.list("WA Account", { filters: { business_id: central.account.waba_id } })).toEqual([
+          { name: account },
+        ]);
       } finally {
         await deleteAccount(api, account);
       }

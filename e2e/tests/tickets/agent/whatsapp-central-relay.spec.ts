@@ -96,5 +96,14 @@ for (const viewport of [
       expect(status).toBe(403);
       expect(await storedMessage(api, id)).toBeUndefined();
     });
+
+    test("a message relayed for a WABA no account here uses is gone", async ({ api }) => {
+      // Central drops its route for this WABA and site when the site answers 410
+      const gone = { phone_id: `phone-${uid()}`, business_id: `waba-gone-${uid()}` };
+
+      const { status, id } = await relay(gone, `secret-${uid()}`, `Gone ${uid()}`);
+      expect(status).toBe(410);
+      expect(await storedMessage(api, id)).toBeUndefined();
+    });
   });
 }

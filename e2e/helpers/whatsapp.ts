@@ -172,7 +172,8 @@ export function whatsAppMessagesOf(api: Api, ticket: string, fields: string[]) {
 export class FakeCentral {
   readonly token = `e2e-${uid()}`;
   url = "";
-  account = { waba_id: "", phone_id: "" };
+  account: { waba_id: string; phone_id: string; verified_name?: string; display_phone_number?: string } =
+    { waba_id: "", phone_id: "" };
   /** central.api.oauth methods the site called, in order */
   asked: string[] = [];
   private signIns = new Map<string, { returnUrl: string; challenge: string }>();
