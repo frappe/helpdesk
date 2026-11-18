@@ -92,7 +92,7 @@ jobs:
       - name: Install System Packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends build-essential pkg-config libmariadb-dev mariadb-client libffi-dev libssl-dev libjpeg-dev libcairo2-dev libpango1.0-dev
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libmariadb-dev mariadb-client libffi-dev libssl-dev libjpeg-dev libcairo2-dev libpango1.0-dev cron
           # Ubuntu 26.04's mariadb-client (11.8) requires SSL; the mariadb:10.6 service has none.
           printf '[client]\nskip-ssl\n' > ~/.my.cnf
 
