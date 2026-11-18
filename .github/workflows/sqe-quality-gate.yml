@@ -181,7 +181,10 @@ jobs:
           git -C apps/telephony checkout -q "$TELEPHONY_SHA"
           bench get-app helpdesk "$GITHUB_WORKSPACE"
           uv pip install --python env/bin/python $PY_TEST_DEPS
-          sed -i -E 's/^(watch|schedule|socketio):/# \1:/' Procfile
+          # no file watcher and no scheduler (the tests run the auto-close job
+          # themselves); socketio stays on: the ticket activity feed is pushed
+          # over it, and UC-04 checks that feed
+          sed -i -E 's/^(watch|schedule):/# \1:/' Procfile
       - name: Site
         run: |
           cd ~/frappe-bench
