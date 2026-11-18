@@ -48,13 +48,11 @@ def test_three_point_boundary_on_days_of_inactivity(customer_a, agent, site, day
         assert site.auto_close_comments(name) == []
 
 
-@weakness(
-    "D-01",
-    "a ticket closed by the auto-close job has no resolution date, although the same "
-    "change made through the API stamps one (BR3)",
-)
 def test_auto_closed_ticket_gets_a_resolution_date_like_any_closed_ticket(customer_a, agent, site):
-    """Cross-rule check: BR1's job changes the status that BR3 reacts to."""
+    """Cross-rule check: BR1's job changes the status that BR3 reacts to.
+
+    Was pinned as weakness D-01 (DEF-01, strict xfail) until the fix PR.
+    """
     name = waiting_ticket(customer_a, agent)
     site.age_conversation(name, N + 1)
 

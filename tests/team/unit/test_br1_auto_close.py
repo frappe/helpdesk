@@ -13,6 +13,7 @@ communications is covered again at the API and integration level.
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 
+import frappe
 import pytest
 from conftest import make_fake_frappe
 
@@ -33,6 +34,7 @@ def run(enabled=1, status="Replied", days=7, due=(), save_error=None):
     def get_doc(doctype, name):
         doc = MagicMock(name=name)
         doc.name = name
+        doc.flags = frappe._dict()  # unset flags read as None, as on a real document
         doc.status = status
         if save_error and name in save_error:
             doc.save.side_effect = save_error[name]
@@ -106,7 +108,10 @@ def test_each_due_ticket_is_closed_saved_commented_and_committed():
     assert set(docs) == {"101", "102"}
     for doc in docs.values():
         assert doc.status == "Closed"
-        assert doc.flags.ignore_validate is True
+        # DEF-01: only the feedback rule is skipped; validate and before_save
+        # (resolution date, SLA) must still run
+        assert doc.flags.skip_feedback_rule is True
+        assert doc.flags.ignore_validate is None
         doc.save.assert_called_once_with(ignore_permissions=True)
         doc.add_comment.assert_called_once_with(
             "Info", "automatically closed the ticket after 7 days of inactivity"
