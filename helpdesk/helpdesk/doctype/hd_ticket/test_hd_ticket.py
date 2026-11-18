@@ -989,6 +989,63 @@ class TestHDTicket(IntegrationTestCase):
             ticket2_doc.name,
         )
 
+    def test_split_needs_write_on_the_ticket(self):
+        make_team("Split Team A", members=[agent])
+        make_team("Split Team B", members=[agent2])
+        frappe.db.set_single_value("HD Settings", "restrict_tickets_by_agent_group", 1)
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "restrict_tickets_by_agent_group",
+            0,
+        )
+
+        ticket = make_ticket(agent_group="Split Team B", raised_by=non_agent)
+        ticket.reply_via_agent(message="Reply to split")
+        email = get_latest_ticket_communication(ticket.name).name
+
+        frappe.set_user(agent)
+        with self.assertRaises(frappe.PermissionError):
+            split_ticket(subject="Split", communication_id=email)
+        frappe.set_user("Administrator")
+
+        self.assertEqual(
+            frappe.db.get_value("Communication", email, "reference_name"), ticket.name
+        )
+        self.assertFalse(
+            frappe.db.exists("HD Ticket", {"ticket_split_from": ticket.name})
+        )
+
+        frappe.set_user(agent2)
+        new_ticket = split_ticket(subject="Split", communication_id=email)
+        frappe.set_user("Administrator")
+        self.assertEqual(
+            frappe.db.get_value("Communication", email, "reference_name"), new_ticket
+        )
+
+    def test_split_rejects_an_email_outside_tickets(self):
+        ticket = make_ticket()
+        # another doctype's record that happens to share the ticket's name
+        email = frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "subject": "Not a ticket",
+                "content": "Not a ticket",
+            }
+        ).insert(ignore_permissions=True)
+        email.db_set({"reference_doctype": "Contact", "reference_name": ticket.name})
+
+        frappe.set_user(agent)
+        with self.assertRaises(frappe.DoesNotExistError):
+            split_ticket(subject="Split", communication_id=email.name)
+        with self.assertRaises(frappe.DoesNotExistError):
+            split_ticket(subject="Split", communication_id="no-such-email")
+        frappe.set_user("Administrator")
+        self.assertFalse(
+            frappe.db.exists("HD Ticket", {"ticket_split_from": ticket.name})
+        )
+
     def test_parse_content_embeds_site_files_only(self):
         """
         Site file images must swap src for embed (so the framework inlines them
