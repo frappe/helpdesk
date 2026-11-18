@@ -21,15 +21,6 @@ def is_setup_pending() -> bool:
     )
 
 
-@frappe.whitelist(methods=["GET"])
-def can_send_email() -> bool:
-    """Whether outgoing mail, such as agent invites, has an email account or site mail settings to go out through."""
-    from frappe.email.doctype.email_account.email_account import EmailAccount
-
-    frappe.only_for(SETUP_ROLE)
-    return bool(EmailAccount.find_default_outgoing())
-
-
 @frappe.whitelist(methods=["POST"])
 def complete_setup():
     """Ends the first-run setup, on Finish or Skip. A second call is a no-op."""

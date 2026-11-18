@@ -43,13 +43,6 @@ test.describe("first-run setup", () => {
       await page.getByRole("button", { name: "Set up later" }).click();
       await page.getByRole("dialog").getByRole("button", { name: "Set up later" }).click();
 
-      const agent = `e2e-setup-agent-${uid()}@example.com`;
-      await expect(page.getByRole("heading", { name: "Invite your agents" })).toBeVisible();
-      await page.getByLabel("Email 1").fill(agent);
-      await page.getByRole("button", { name: "Send invite" }).click();
-      await expect(page.getByText("Sent", { exact: true })).toBeVisible();
-      expect(await api.exists("User Invitation", { email: agent, app_name: "helpdesk" })).toBeTruthy();
-
       await expect(page.getByRole("heading", { name: "You're all set" })).toBeVisible();
       await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).setup_complete).toBe(1);
       await page.getByRole("button", { name: /Go to Helpdesk|Not now/ }).click();
