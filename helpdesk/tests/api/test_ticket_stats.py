@@ -1,4 +1,5 @@
 import frappe
+from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.ticket_stats import (

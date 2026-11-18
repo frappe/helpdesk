@@ -2,6 +2,7 @@
 # See license.txt
 
 import frappe
+from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.contact import create_contact as create_contact_api
