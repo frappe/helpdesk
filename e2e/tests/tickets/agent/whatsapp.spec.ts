@@ -372,6 +372,8 @@ test("saved replies insert WhatsApp text and templates send from the picker", as
   await composerBox(page).press("Enter");
   await expect.poll(async () => (await api.get("HD Ticket", ticket)).priority).toBe("Urgent");
   await expect(composerBox(page)).toHaveValue("");
+  // the actions toast would otherwise sit in the picker's screenshot
+  await expect(page.getByText("Applied 1 saved reply action(s)")).toBeHidden({ timeout: 15_000 });
 
   await composer(page).getByRole("button", { name: "Templates" }).click();
   const modal = page.getByRole("dialog", { name: "WhatsApp Templates" });
