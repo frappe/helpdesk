@@ -11,10 +11,11 @@
 set -euo pipefail
 TEAM="$(cd "$(dirname "$0")/.." && pwd)"
 APP="$(cd "$TEAM/../.." && pwd)"
-PY="$APP/../../env/bin/python"
+PY="${BENCH_PYTHON:-$APP/../../env/bin/python}"
 SCANNER="${SCANNER:-$HOME/sonar/sonar-scanner/bin/sonar-scanner}"
 export SONAR_URL="${SONAR_URL:-http://127.0.0.1:9100}"
 OUT="$TEAM/sonar/evidence"
+[ -f "$HOME/.sqe-env" ] || "$PY" "$TEAM/sonar/sonar_admin.py" init
 set -a; . "$HOME/.sqe-env"; set +a
 mkdir -p "$OUT"
 cd "$APP"
@@ -37,8 +38,11 @@ scan() {  # scan NAME extra-args...
   "$PY" "$TEAM/sonar/sonar_admin.py" wait-task .scannerwork/report-task.txt
 }
 
+"$PY" "$TEAM/sonar/sonar_admin.py" gate
 scan main
 "$PY" "$TEAM/sonar/sonar_admin.py" export helpdesk "$OUT/main"
+GATE_RESULT=0
+"$PY" "$TEAM/sonar/sonar_admin.py" check-gate helpdesk || GATE_RESULT=$?
 
 # complexity probe: only the business-rule files, analysed with the probe profile
 RULE_FILES="helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py,helpdesk/helpdesk/doctype/hd_ticket/customer_edit_controller.py,helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py"
@@ -50,3 +54,4 @@ scan complexity -Dsonar.projectKey=helpdesk-complexity \
 "$PY" "$TEAM/sonar/sonar_admin.py" export helpdesk-complexity "$OUT/complexity"
 "$PY" "$TEAM/sonar/summarise.py" "$OUT"
 rm -rf .scannerwork
+exit "$GATE_RESULT"

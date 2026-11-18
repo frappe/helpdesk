@@ -1,8 +1,76 @@
 {
  "projectStatus": {
   "status": "OK",
-  "conditions": [],
+  "conditions": [
+   {
+    "status": "OK",
+    "metricKey": "reliability_rating",
+    "comparator": "GT",
+    "errorThreshold": "4",
+    "actualValue": "4"
+   },
+   {
+    "status": "OK",
+    "metricKey": "security_rating",
+    "comparator": "GT",
+    "errorThreshold": "4",
+    "actualValue": "4"
+   },
+   {
+    "status": "OK",
+    "metricKey": "sqale_rating",
+    "comparator": "GT",
+    "errorThreshold": "1",
+    "actualValue": "1"
+   },
+   {
+    "status": "OK",
+    "metricKey": "duplicated_lines_density",
+    "comparator": "GT",
+    "errorThreshold": "3",
+    "actualValue": "1.6"
+   },
+   {
+    "status": "OK",
+    "metricKey": "bugs",
+    "comparator": "GT",
+    "errorThreshold": "122",
+    "actualValue": "122"
+   },
+   {
+    "status": "OK",
+    "metricKey": "security_review_rating",
+    "comparator": "GT",
+    "errorThreshold": "1",
+    "actualValue": "1"
+   },
+   {
+    "status": "OK",
+    "metricKey": "test_errors",
+    "comparator": "GT",
+    "errorThreshold": "0",
+    "actualValue": "0"
+   },
+   {
+    "status": "OK",
+    "metricKey": "test_failures",
+    "comparator": "GT",
+    "errorThreshold": "0",
+    "actualValue": "0"
+   },
+   {
+    "status": "OK",
+    "metricKey": "vulnerabilities",
+    "comparator": "GT",
+    "errorThreshold": "8",
+    "actualValue": "8"
+   }
+  ],
   "ignoredConditions": false,
-  "caycStatus": "compliant"
+  "period": {
+   "mode": "PREVIOUS_VERSION",
+   "date": "2026-11-18T01:13:12+0500"
+  },
+  "caycStatus": "non-compliant"
  }
 }

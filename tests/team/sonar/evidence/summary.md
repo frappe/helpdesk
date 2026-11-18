@@ -108,6 +108,15 @@
 
 Quality gate status: **OK**
 
+* `reliability_rating` GT 4: actual 4 -> OK
+* `security_rating` GT 4: actual 4 -> OK
+* `sqale_rating` GT 1: actual 1 -> OK
+* `duplicated_lines_density` GT 3: actual 1.6 -> OK
+* `bugs` GT 122: actual 122 -> OK
+* `security_review_rating` GT 1: actual 1 -> OK
+* `test_errors` GT 0: actual 0 -> OK
+* `test_failures` GT 0: actual 0 -> OK
+* `vulnerabilities` GT 8: actual 8 -> OK
 
 ## Per-function complexity of the business-rule files (`helpdesk-complexity`)
 

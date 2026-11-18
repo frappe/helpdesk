@@ -7,7 +7,7 @@ _______________ coverage: platform linux, python 3.14.4-final-0 ________________
 Coverage HTML written to dir /home/administrator/frappe-bench/apps/helpdesk/tests/team/reports/unit/html
 Coverage XML written to file /home/administrator/frappe-bench/apps/helpdesk/tests/team/reports/unit/coverage.xml
 Coverage JSON written to file /home/administrator/frappe-bench/apps/helpdesk/tests/team/reports/unit/coverage.json
-159 passed in 1.99s
+159 passed in 1.01s
 scope item                                                     stmts  miss   stmt%   br  miss     br%
 customer_edit_controller.py (whole file)                          50     0   100.0   18     0   100.0
 hd_ticket_status.py (whole file)                                  55     0   100.0   32     0   100.0

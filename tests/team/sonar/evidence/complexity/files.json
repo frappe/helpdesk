@@ -7,12 +7,129 @@
   "language": "py",
   "measures": [
    {
+    "metric": "code_smells",
+    "value": "9",
+    "bestValue": false
+   },
+   {
     "metric": "cognitive_complexity",
     "value": "19",
     "bestValue": false
    },
    {
     "metric": "complexity",
+    "value": "32"
+   },
+   {
+    "metric": "conditions_to_cover",
+    "value": "18"
+   },
+   {
+    "metric": "coverage",
+    "value": "100.0",
+    "bestValue": true
+   },
+   {
+    "metric": "functions",
+    "value": "5"
+   },
+   {
+    "metric": "lines_to_cover",
+    "value": "50"
+   },
+   {
+    "metric": "ncloc",
+    "value": "80"
+   },
+   {
+    "metric": "uncovered_conditions",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "uncovered_lines",
+    "value": "0",
+    "bestValue": true
+   }
+  ]
+ },
+ {
+  "key": "helpdesk-complexity:helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py",
+  "name": "hd_ticket.py",
+  "qualifier": "FIL",
+  "path": "helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py",
+  "language": "py",
+  "measures": [
+   {
+    "metric": "code_smells",
+    "value": "105",
+    "bestValue": false
+   },
+   {
+    "metric": "cognitive_complexity",
+    "value": "252",
+    "bestValue": false
+   },
+   {
+    "metric": "complexity",
+    "value": "298"
+   },
+   {
+    "metric": "conditions_to_cover",
+    "value": "294"
+   },
+   {
+    "metric": "coverage",
+    "value": "17.6",
+    "bestValue": false
+   },
+   {
+    "metric": "functions",
+    "value": "81"
+   },
+   {
+    "metric": "lines_to_cover",
+    "value": "699"
+   },
+   {
+    "metric": "ncloc",
+    "value": "1250"
+   },
+   {
+    "metric": "uncovered_conditions",
+    "value": "278",
+    "bestValue": false
+   },
+   {
+    "metric": "uncovered_lines",
+    "value": "540",
+    "bestValue": false
+   }
+  ]
+ },
+ {
+  "key": "helpdesk-complexity:helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py",
+  "name": "hd_ticket_status.py",
+  "qualifier": "FIL",
+  "path": "helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py",
+  "language": "py",
+  "measures": [
+   {
+    "metric": "code_smells",
+    "value": "7",
+    "bestValue": false
+   },
+   {
+    "metric": "cognitive_complexity",
+    "value": "27",
+    "bestValue": false
+   },
+   {
+    "metric": "complexity",
+    "value": "27"
+   },
+   {
+    "metric": "conditions_to_cover",
     "value": "32"
    },
    {
@@ -25,70 +142,22 @@
     "value": "5"
    },
    {
-    "metric": "ncloc",
-    "value": "80"
-   }
-  ]
- },
- {
-  "key": "helpdesk-complexity:helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py",
-  "name": "hd_ticket.py",
-  "qualifier": "FIL",
-  "path": "helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py",
-  "language": "py",
-  "measures": [
-   {
-    "metric": "cognitive_complexity",
-    "value": "252",
-    "bestValue": false
-   },
-   {
-    "metric": "complexity",
-    "value": "298"
-   },
-   {
-    "metric": "coverage",
-    "value": "17.6",
-    "bestValue": false
-   },
-   {
-    "metric": "functions",
-    "value": "81"
-   },
-   {
-    "metric": "ncloc",
-    "value": "1250"
-   }
-  ]
- },
- {
-  "key": "helpdesk-complexity:helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py",
-  "name": "hd_ticket_status.py",
-  "qualifier": "FIL",
-  "path": "helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py",
-  "language": "py",
-  "measures": [
-   {
-    "metric": "cognitive_complexity",
-    "value": "27",
-    "bestValue": false
-   },
-   {
-    "metric": "complexity",
-    "value": "27"
-   },
-   {
-    "metric": "coverage",
-    "value": "100.0",
-    "bestValue": true
-   },
-   {
-    "metric": "functions",
-    "value": "5"
+    "metric": "lines_to_cover",
+    "value": "55"
    },
    {
     "metric": "ncloc",
     "value": "101"
+   },
+   {
+    "metric": "uncovered_conditions",
+    "value": "0",
+    "bestValue": true
+   },
+   {
+    "metric": "uncovered_lines",
+    "value": "0",
+    "bestValue": true
    }
   ]
  }
