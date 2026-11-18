@@ -28,9 +28,9 @@ export const AGENT_ROLES: AgentRole[] = [
   "System Manager",
 ];
 
-/** The roles `invite_by_email` grants for `role`: it and every agent role below it. */
 export const BRAND_NAME_MAX_LENGTH = 30;
 
+/** The roles `invite_by_email` grants for `role`: it and every agent role below it. */
 export function getInviteByEmailRoles(role: AgentRole): AgentRole[] {
   return AGENT_ROLES.slice(0, AGENT_ROLES.indexOf(role) + 1);
 }

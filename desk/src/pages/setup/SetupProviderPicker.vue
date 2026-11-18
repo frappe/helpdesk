@@ -9,19 +9,15 @@
             ? __('Couldn\'t connect {0}', [failure.mailbox])
             : __('Couldn\'t connect your mailbox')
         "
+        :description="failure.message"
         dismissible
         @dismiss="failure = null"
       >
-        <template #description>
-          {{ failure.message }}
-          <button
-            v-if="failure.adminApproval"
-            type="button"
-            class="text-ink-gray-9 underline"
+        <template v-if="failure.adminApproval" #actions>
+          <Button
+            :label="__('Show what your admin needs')"
             @click="openGmail(failure.mailbox || '')"
-          >
-            {{ __("Show what your admin needs") }}
-          </button>
+          />
         </template>
       </Banner>
 
@@ -323,7 +319,9 @@ import type {
   FieldError,
 } from "@framework/ui/components/EmailAccounts/types";
 import { validateEmailWithZod } from "@/utils";
-import { type Mailbox, normalizeEmail, setStepBack } from "./setup";
+import { type Mailbox, normalizeEmail, useSetupFlow } from "./setup";
+
+const { setStepBack } = useSetupFlow();
 
 const props = defineProps<{
   controller: EmailAccountsController;

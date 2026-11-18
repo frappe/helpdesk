@@ -140,6 +140,7 @@ import {
   AGENT_ROLES,
   type AgentRole,
   getInviteByEmailRoles,
+  handleInviteUserSuccess,
   validateEmailWithZod,
 } from "@/utils";
 import { useOnboarding } from "@framework/ui";
@@ -152,15 +153,13 @@ import {
   toast,
   Tooltip,
 } from "frappe-ui";
+import { useTimeoutFn } from "@vueuse/core";
 import { computed, nextTick, ref } from "vue";
-import {
-  invited,
-  newRow,
-  next,
-  normalizeEmail,
-  setup,
-  type InviteRow,
-} from "./setup";
+import { normalizeEmail, type InviteRow, useSetupFlow } from "./setup";
+
+const { invited, newRow, next, setup } = useSetupFlow();
+
+type InviteResult = Parameters<typeof handleInviteUserSuccess>[0];
 
 const MAX_ROWS = 20;
 const NEXT_STEP_DELAY_MS = 1800;
@@ -174,6 +173,14 @@ const attempted = ref(false);
 const blocked = ref<number | null>(null);
 const sending = ref(false);
 const failed = ref<string[]>([]);
+const moveOn = useTimeoutFn(
+  () => {
+    sending.value = false;
+    next();
+  },
+  NEXT_STEP_DELAY_MS,
+  { immediate: false }
+);
 
 const rowErrors = computed(() => {
   const seen = new Set<string>();
@@ -251,46 +258,57 @@ async function sendInvites() {
   )
     return;
   sending.value = true;
-  failed.value = [];
+  const summary: InviteResult = {
+    disabled_user_emails: [],
+    accepted_invite_emails: [],
+    pending_invite_emails: [],
+    invited_emails: [],
+  };
   try {
     for (const role of AGENT_ROLES) {
       const group = rows.filter((r) => r.role === role);
-      if (group.length) await invite(role, group);
+      if (!group.length) continue;
+      const result = await invite(role, group);
+      for (const key of Object.keys(summary) as (keyof InviteResult)[])
+        summary[key].push(...result[key]);
     }
   } catch (e) {
     toast.error(e.messages?.join(" ") || __("Could not send invites"));
   }
-  setup.rows = setup.rows.filter((r) => r.sent || normalizeEmail(r.email));
+  handleInviteUserSuccess(summary);
+  failed.value = summary.disabled_user_emails;
+  const members = new Set(summary.accepted_invite_emails);
+  setup.rows = setup.rows.filter(
+    (r) =>
+      (r.sent || normalizeEmail(r.email)) &&
+      !members.has(normalizeEmail(r.email))
+  );
+  if (!setup.rows.length) setup.rows = [newRow()];
   const sent = rows.filter((r) => r.sent).length;
-  if (sent) {
-    toast.success(
-      sent === 1 ? __("1 invite sent") : __("{0} invites sent", [sent])
-    );
-    updateOnboardingStep?.("invite_agents");
-  }
+  if (sent) updateOnboardingStep?.("invite_agents");
   if (failed.value.length || !sent) {
     sending.value = false;
     return;
   }
-  setTimeout(() => {
-    sending.value = false;
-    next();
-  }, NEXT_STEP_DELAY_MS);
+  moveOn.start();
 }
 
-async function invite(role: AgentRole, rows: InviteRow[]) {
+async function invite(
+  role: AgentRole,
+  rows: InviteRow[]
+): Promise<InviteResult> {
   const result = await call("frappe.core.api.user_invitation.invite_by_email", {
     emails: rows.map((r) => normalizeEmail(r.email)).join(","),
     roles: getInviteByEmailRoles(role),
     redirect_to_path: "/helpdesk",
     app_name: "helpdesk",
   });
-  const disabled = new Set<string>(result.disabled_user_emails);
-  for (const row of rows) {
-    const email = normalizeEmail(row.email);
-    if (disabled.has(email)) failed.value.push(email);
-    else row.sent = true;
-  }
+  const sentTo = new Set([
+    ...result.invited_emails,
+    ...result.pending_invite_emails,
+  ]);
+  for (const row of rows) row.sent ||= sentTo.has(normalizeEmail(row.email));
   capture("agents_invited", { data: { role, source: "setup" } });
+  return result;
 }
 </script>

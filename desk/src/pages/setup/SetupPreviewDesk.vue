@@ -609,7 +609,9 @@ import {
 } from "frappe-ui/list";
 import { computed, defineComponent, h } from "vue";
 import { SAMPLE_TICKET, avatarUrl, nameOf } from "./preview";
-import { brand, invitees, setup } from "./setup";
+import { useSetupFlow } from "./setup";
+
+const { brand, invitees, setup } = useSetupFlow();
 
 const props = defineProps<{ page: "desk-list" | "desk-ticket" }>();
 const rail = computed(() => props.page === "desk-ticket");

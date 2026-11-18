@@ -111,7 +111,16 @@ import SetupPasswordStep from "./SetupPasswordStep.vue";
 import SetupPreview from "./SetupPreview.vue";
 import SetupTeamStep from "./SetupTeamStep.vue";
 import SetupWorkspaceStep from "./SetupWorkspaceStep.vue";
-import {
+import { provideSetupFlow } from "./setup";
+
+const STEP_VIEWS = {
+  password: SetupPasswordStep,
+  workspace: SetupWorkspaceStep,
+  email: SetupEmailStep,
+  team: SetupTeamStep,
+};
+
+const {
   back,
   canGoBack,
   currentStep,
@@ -123,14 +132,7 @@ import {
   startSetup,
   stepIndex,
   steps,
-} from "./setup";
-
-const STEP_VIEWS = {
-  password: SetupPasswordStep,
-  workspace: SetupWorkspaceStep,
-  email: SetupEmailStep,
-  team: SetupTeamStep,
-};
+} = provideSetupFlow();
 
 useEventListener(window, "keydown", holdEnter, { capture: true });
 

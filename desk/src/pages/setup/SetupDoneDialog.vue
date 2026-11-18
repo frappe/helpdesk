@@ -203,6 +203,7 @@ import { capture } from "@/telemetry";
 import { avatarUrl } from "./preview";
 import { __ } from "@/translation";
 import { Avatar, Button, Dialog, FormControl, Rating, toast } from "frappe-ui";
+import { usePreferredReducedMotion } from "@vueuse/core";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 const props = defineProps<{
@@ -216,12 +217,12 @@ const emit = defineEmits<{ close: [] }>();
 const MAX_COMMENT = 500;
 const rating = ref(0);
 const comment = ref("");
-const reducedMotion = !!window.matchMedia?.("(prefers-reduced-motion: reduce)")
-  .matches;
+const motion = usePreferredReducedMotion();
+const reducedMotion = computed(() => motion.value === "reduce");
 
-const drawn = ref(reducedMotion);
+const drawn = ref(reducedMotion.value);
 function play() {
-  if (reducedMotion) return;
+  if (reducedMotion.value) return;
   drawn.value = false;
   nextTick(() =>
     requestAnimationFrame(() =>
