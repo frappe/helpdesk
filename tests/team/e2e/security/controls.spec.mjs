@@ -97,3 +97,40 @@ test("CT-05 role checks are enforced by the server, not only by hiding controls"
   expect(direct.status).toBe(403);
   expect(stored).toBe("Medium");
 });
+
+// DEF-14 (SEC-02): the HTML sanitiser in the served bundle must have no
+// published advisory. OSV lists eight advisories for DOMPurify 3.4.8; the last
+// of them is fixed in 3.4.17, so that is the lowest acceptable version.
+const DOMPURIFY_MIN = [3, 4, 17];
+const atLeast = (version, min) => {
+  const parts = version.split(".").map(Number);
+  for (let i = 0; i < min.length; i++) if (parts[i] !== min[i]) return parts[i] > min[i];
+  return true;
+};
+
+test("CT-08 the HTML sanitiser served to the browser has no known advisory", async ({ app }) => {
+  const page = await app.pageAs("customerA");
+  const scripts = new Set();
+  page.on("response", (response) => {
+    if (response.request().resourceType() === "script" && response.url().includes("/assets/helpdesk/")) {
+      scripts.add(response.url());
+    }
+  });
+  await page.goto("/helpdesk/my-tickets");
+  await page.waitForLoadState("networkidle");
+  const versions = new Set();
+  for (const url of scripts) {
+    const body = await (await page.request.get(url)).text();
+    for (const match of body.matchAll(/DOMPurify ([0-9]+\.[0-9]+\.[0-9]+)/g)) versions.add(match[1]);
+  }
+  const found = [...versions];
+  const ok = found.length > 0 && found.every((v) => atLeast(v, DOMPURIFY_MIN));
+  evidence.add({
+    id: "CT-08", control: "vulnerable components", check: "DOMPurify version embedded in the served Helpdesk scripts",
+    expected: `DOMPurify ${DOMPURIFY_MIN.join(".")} or later (no OSV advisory)`,
+    observed: `${scripts.size} Helpdesk scripts loaded; DOMPurify ${found.join(", ") || "not found"}`,
+    result: ok ? "pass" : "fail: SEC-02",
+  });
+  expect(found.length, "DOMPurify was not found in the served scripts").toBeGreaterThan(0);
+  for (const version of found) expect(atLeast(version, DOMPURIFY_MIN), `DOMPurify ${version}`).toBe(true);
+});

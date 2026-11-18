@@ -60,7 +60,7 @@ passing. Minor defects remain open on several rows.
 | API and integration | 127 (incl. 58 generated EP/BVA cases, 2 recovery) | 116 pass, 11 expected failures (known weaknesses); D-01 passes since PR #38, W-API-05/06 since PR #41 | `api/`, `run_api.sh` |
 | Use cases (Playwright) | 33 flows, 6 use cases | 32 pass; 1 pinned expected failure reproduces DEF-35 | `e2e/usecases/` |
 | Usability tasks | 2 (one with keyboard navigation) | pass | `e2e/usability/` |
-| Security (Playwright) | 13 access decisions + 5 controls | 13 / 13 decisions as expected since PR #41 (AC-08 failed on the baseline: DEF-02); 5 controls pass | `security/evidence/` |
+| Security (Playwright) | 13 access decisions + 5 controls | 13 / 13 decisions as expected since PR #41 (AC-08 failed on the baseline: DEF-02); 6 automated controls pass (CT-08 added with PR #42; it failed on the baseline: DEF-14) | `security/evidence/` |
 | Performance | 4 k6 runs | all within limits | `perf/evidence/` |
 | Static analysis | SonarQube, 706 files | 189 issues, triaged | `sonar/` |
 

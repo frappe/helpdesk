@@ -17,9 +17,10 @@ fixed and were re-tested through the gate:
 - DEF-01 by PR #38;
 - DEF-02 and DEF-03 by PR #41.
 
-All three release criteria are met, so **the recommendation is RELEASE,
-with the conditions in section 7**. In particular, DEF-14 (a library with
-published CVEs, Major) must be upgraded before deployment.
+DEF-14, the bundled sanitiser library with published CVEs (Major), was the
+main condition attached to release. It is fixed by PR #42. All three release
+criteria are met, so **the recommendation is RELEASE, with the remaining
+conditions in section 7**.
 
 ## 2. What was tested and what was not
 
@@ -31,33 +32,33 @@ published CVEs, Major) must be upgraded before deployment.
 | API: 127 tests incl. 58 generated EP/BVA cases, repeated requests, recovery R1/R2 | Production stack: nginx, gunicorn, HTTPS; Secure cookie and HSTS observed only in the config template |
 | Browser: 33 use-case flows (one pins DEF-35), 2 usability tasks incl. keyboard | Browsers other than Chromium; mobile layouts |
 | Accessibility: axe + Lighthouse on 5 screens, before/after on 1 | Manual screen-reader testing (not required) |
-| Security: 13 access decisions, 5 controls, ZAP passive, pip-audit (178 packages) | Active scanning and penetration (out of scope by the brief) |
+| Security: 13 access decisions, 6 automated controls (CT-08 added with the DEF-14 fix), ZAP passive before and after the DEF-14 fix, pip-audit (178 packages) | Active scanning and penetration (out of scope by the brief) |
 | Performance: k6 1 and 5 users, twice each | Stress or soak testing; capacity limits |
 | Static: SonarQube on 73 KLOC; cyclomatic complexity by hand | |
-| CI: GitHub Actions gate (unit + coverage, mutation, SonarQube, API + browser on a live site) on every PR into `team/sqe-tests`; required by branch protection. Blocked PR #37 (deliberate BR3 regression); fix PRs #38 (DEF-01) and #41 (DEF-02/03) green and merged | k6, ZAP and Lighthouse/axe in CI (thresholds not meaningful on shared runners; run locally) |
+| CI: GitHub Actions gate (unit + coverage, mutation, SonarQube, API + browser on a live site) on every PR into `team/sqe-tests`; required by branch protection. Blocked PR #37 (deliberate BR3 regression); fix PRs #38 (DEF-01), #41 (DEF-02/03) and #42 (DEF-14) green and merged | k6, ZAP and Lighthouse/axe in CI (thresholds not meaningful on shared runners; run locally) |
 
 ## 3. Deviations from the plan
 
 See `PROGRESS_WEEK1.md` §3. The main ones:
 
 - Estimates for areas already done are not blind.
-- CI, the GitHub Issues and the fixes for DEF-01/02/03 were done on 18 Nov,
-  ahead of the week-2 plan.
+- CI, the GitHub Issues and the fixes for DEF-01/02/03 and DEF-14 were done
+  on 18 Nov, ahead of the week-2 plan.
 - The commit history does not yet show each member's own work (PJ-03).
 - The DEF-03 fix makes one upstream test fail on purpose (section 7).
 
 ## 4. Open defects (18 Nov)
 
-29 open of 34 counted: 5 Major, 17 Minor, 7 Trivial
-(`generated/DEFECT_SUMMARY.md`; GitHub Issues #2–#36). DEF-01, DEF-02 and
-DEF-03 are closed. Those that bear on release:
+28 open of 34 counted: 4 Major, 17 Minor, 7 Trivial
+(`generated/DEFECT_SUMMARY.md`; GitHub Issues #2–#36). DEF-01, DEF-02,
+DEF-03 and DEF-14 are closed. Those that bear on release:
 
 | Defect | Severity | Risk | Release impact |
 |---|---|---|---|
 | DEF-01 auto-closed ticket has no resolution date | Major | PR-02, PR-03 | **Closed** by PR #38; re-tested in CI |
 | DEF-02 customer can assign an agent | Major | PR-05 | **Closed** by PR #41; re-tested in CI |
 | DEF-03 ticket can be assigned to, and read by, another customer | Major | PR-05 | **Closed** by PR #41; re-tested in CI |
-| DEF-14 DOMPurify 3.4.8 with published CVEs | Major | PR-10 | **Condition**: upgrade before deployment (lock-file update) |
+| DEF-14 DOMPurify 3.4.8 with published CVEs | Major | PR-10 | **Closed** by PR #42 (3.4.18); CT-08 and ZAP re-checked |
 | DEF-17, -18, -19, -21 accessibility P1 issues on screens other than S2 | Major | PR-08 | Known issues; not a release criterion; next cycle |
 | DEF-35 closed ticket shown as open when the status list loads late | Minor | PR-11 | Known issue; customer may be offered a message box on a closed ticket |
 
@@ -74,7 +75,7 @@ DEF-03 are closed. Those that bear on release:
 | PR-07 duplicates / partial writes | 8 Medium | Low | Recovery verified; only DEF-10 (trivial) |
 | PR-08 accessibility | 15 High | Medium | One screen fixed (fix not yet merged); P1 issues elsewhere |
 | PR-09 performance | 6 Low | Low | 3 % of the p95 limit |
-| PR-10 components | 12 Medium | Medium | DEF-14 open |
+| PR-10 components | 12 Medium | Low | DEF-14 fixed (PR #42); CT-08 now guards the served sanitiser version; DEF-15 (no CSP) and DEF-16 (accepted) remain; the JavaScript dependencies are only checked by ZAP's library list, not by a full audit |
 | PR-11 usability | 9 Medium | Medium | DEF-28, DEF-29, DEF-35 open |
 
 ## 6. Release criteria: actual against target
@@ -97,8 +98,9 @@ only after the required gate passed.
 
 Conditions and known issues for the release notes:
 
-1. **DEF-14**: upgrade DOMPurify (published CVEs) before deployment. It is
-   Major and on PR-10, though not one of the three release criteria.
+1. ~~**DEF-14**: upgrade DOMPurify before deployment~~. Done in PR #42
+   (3.4.18). The served bundle was checked by CT-08 and by ZAP: 0
+   vulnerable-library alerts, against 1 on the baseline.
 2. **Data repair (RCA-1)**: back-fill the resolution date of tickets the job
    closed before PR #38.
 3. **Behaviour change (DEF-03)**: tickets can now be assigned only to agents.
@@ -109,5 +111,5 @@ Conditions and known issues for the release notes:
    and the remaining minor defects are released with, and tracked as
    Issues.
 
-If any condition cannot be met, for example DEF-14 cannot be upgraded
-without regressions, the recommendation reverts to HOLD for that reason.
+If condition 2 cannot be met before deployment, the recommendation reverts
+to HOLD for that reason.

@@ -33,14 +33,14 @@ view of the release decision, so the team can recommend release or hold.
 | | Defect density, `hd_ticket.py` | 5 / 1.25 = **4.0 per KLOC** | The file that holds BR1–BR3 and assignment is about four times as defect-dense as the backend average. It is also Sonar's most complex file (cyclomatic 298). That supports putting the High risks there. |
 | Q2 How completely are the requirements tested? | Requirements coverage, tested | 14 / 14 = **100 %** | Every requirement and rule has tests at two or more levels. |
 | | Requirements coverage, passing | 14 / 14 = **100 %** (64 % on the baseline, 86 % after PR #38) | The DEF-01 fix (PR #38) moved FR-B6, BR1 and BR3 to passing, the DEF-02/03 fix (PR #41) FR-A4 and FR-B1. Minor defects remain open on several rows. |
-| Q3 Are fixes holding? | Reopen rate: reopenings / fixed defects | 0 / 5 = **0 %** | Five fixes so far: DEF-01, DEF-02 and DEF-03 through the CI gate, and two accessibility fixes re-scanned locally. Every CI run since re-tests the three gated fixes; the rate still says little after one day. |
+| Q3 Are fixes holding? | Reopen rate: reopenings / fixed defects | 0 / 6 = **0 %** | Six fixes so far: DEF-01, DEF-02, DEF-03 and DEF-14 through the CI gate, and two accessibility fixes re-scanned locally. Every CI run since re-tests the gated fixes; the rate still says little after one day. |
 
-Supporting figures: 34 defects counted (9 Major, 17 Minor, 8 Trivial), 29
-open (5 Major); Pareto: accessibility 29 %, then business rule, error
-handling and usability at 12 % each. By count, accessibility dominates,
-partly because each axe rule is logged separately. By severity, the Majors
-that blocked release were in business rules and access control; all three
-are now fixed.
+Supporting figures: 34 defects counted (9 Major, 17 Minor, 8 Trivial), 28
+open (4 Major, all accessibility); Pareto: accessibility 29 %, then business
+rule, error handling and usability at 12 % each. By count, accessibility
+dominates, partly because each axe rule is logged separately. By severity,
+the Majors that blocked release were in business rules, access control and
+a vulnerable library; all four are now fixed.
 
 ## 3. Deviations from the plan
 
@@ -50,7 +50,7 @@ are now fixed.
 | Test management drafted in week 1 | Needed to steer the remaining work | Estimates for done areas are not blind (stated in `ESTIMATION.md`) |
 | Environment problems: Playwright upgrade, missing RediSearch, port clash between Sonar and Frappe realtime | PJ-01 | About half a day lost in total (team to confirm from their logs) |
 | All commits under one member's name | The area commits were made from one machine and account; the CI and fix PRs too | Commit history (a viva check) does not yet show who did what (PJ-03) |
-| CI, Issues and the DEF-01, DEF-02 and DEF-03 fixes done in week 1 | Fork available on 18 Nov | Week 2 frees up for members' own checks and commits, DEF-14 and the accessibility fix PR |
+| CI, Issues and the DEF-01, DEF-02, DEF-03 and DEF-14 fixes done in week 1 | Fork available on 18 Nov | Week 2 frees up for members' own checks and commits and the accessibility fix PR |
 | DEF-03 fix breaks one upstream test | Upstream `test_non_agent_flow` asserts that tickets can be assigned to a portal user | Decided "agents only"; documented in RCA-2 and the completion report |
 | A new defect, DEF-35, found by CI | UC-05 tests failed at random on the slower runner | Tests now fix the response order; DEF-35 pinned and filed as #36 |
 

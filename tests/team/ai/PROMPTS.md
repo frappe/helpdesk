@@ -180,3 +180,9 @@ For DEF-03, who may a ticket be assigned to? Upstream's test_non_agent_flow assi
 
 Chosen: Agents only (Recommended)
 ```
+
+## 28. 2026-11-18 17:56 (prompt)
+
+```text
+Fix DEF-14
+```
