@@ -90,7 +90,7 @@
       :open="setup.showDone"
       :connected="!!setup.mailbox"
       :agents="invited"
-      :ask-feedback="telemetry.isEnabled.value"
+      :ask-feedback="telemetry.isEnabled"
       @close="goToHelpdesk"
     />
   </div>

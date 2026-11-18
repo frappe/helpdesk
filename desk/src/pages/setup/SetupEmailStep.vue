@@ -162,7 +162,14 @@ import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { useOnboarding } from "@framework/ui";
 import { useEmailAccounts, useOneClick } from "@framework/ui/EmailAccounts";
-import { Badge, Button, createListResource, dialog, toast } from "frappe-ui";
+import {
+  Badge,
+  Button,
+  createListResource,
+  dialog,
+  Spinner,
+  toast,
+} from "frappe-ui";
 import { computed, onMounted, ref, watch } from "vue";
 import Banner from "@framework/ui/components/EmailAccounts/Banner.vue";
 import SetupProviderPicker from "./SetupProviderPicker.vue";
