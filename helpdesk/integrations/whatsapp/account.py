@@ -31,7 +31,7 @@ def add_ticket_action(account: str) -> None:
 def default_ticket_action(doc, method=None) -> None:
     """WA Account before_insert: an account added with Connect with Meta creates tickets, like one
     added by hand."""
-    if doc.connected_with_meta and not any(
+    if doc.get("connected_with_meta") and not any(
         row.append_to == TICKET_DOCTYPE for row in doc.append_actions
     ):
         doc.append("append_actions", TICKET_ACTION)
