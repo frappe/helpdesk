@@ -30,7 +30,7 @@
               </span>
               <Badge
                 variant="subtle"
-                :theme="account.status === 'Active' ? 'green' : 'gray'"
+                :theme="STATUS_THEME[account.status] || 'gray'"
                 :label="__(account.status)"
               />
               <Badge
@@ -88,8 +88,13 @@ interface Account {
   name: string;
   account_name: string;
   phone_id: string | null;
-  status: "Active" | "Inactive";
+  status: "Active" | "Inactive" | "Disconnected";
 }
+
+const STATUS_THEME: Record<string, "green" | "red"> = {
+  Active: "green",
+  Disconnected: "red",
+};
 
 const props = defineProps<{ settings: any }>();
 const emit = defineEmits<{ open: [name: string] }>();
