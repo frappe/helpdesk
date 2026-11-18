@@ -10,7 +10,7 @@ on:
 jobs:
   commit-lint:
     name: Semantic Commits
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
     steps:
       - uses: actions/checkout@v3
         with:
@@ -28,7 +28,7 @@ jobs:
 
   linter:
     name: 'Frappe Linter'
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
     if: github.event_name == 'pull_request'
 
     steps:
@@ -53,7 +53,7 @@ jobs:
 
   deps-vulnerable-check:
     name: 'Vulnerable Dependency Check'
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
 
     steps:
       - uses: actions/checkout@v6
