@@ -1,0 +1,175 @@
+openapi: 3.0.3
+info:
+  title: Helpdesk ticket workflows (team test contract)
+  version: 1.0.0
+  description: >
+    Contract for the HTTP endpoints used by the two workflows under test:
+    A "raise a ticket" and B "handle a ticket". Upstream publishes no OpenAPI
+    document, so this was written by the team from the baseline source
+    (helpdesk 16.1.0, commit e326986) and confirmed against the running system.
+    Constraints come from the HD Ticket DocType (subject: mandatory Data field,
+    140 characters) and from the seeded master data (statuses, priorities,
+    ticket types, feedback options).
+
+    Extensions read by tests/team/api/generate_testdata.py:
+      x-test-role    which seeded account calls the operation in generated tests
+      x-fixture      a value the test must supply at run time (not a literal)
+      x-reject-status  status code expected when an input is invalid
+servers:
+  - url: http://127.0.0.1:8000
+paths:
+  /api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new:
+    post:
+      operationId: createTicket
+      summary: Workflow A - a customer raises a ticket
+      x-test-role: customer
+      x-reject-status: 417
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [doc]
+              properties:
+                doc:
+                  $ref: "#/components/schemas/NewTicket"
+      responses:
+        "200": {description: Ticket created; the ticket as the caller may read it}
+        "403": {description: Not logged in}
+        "417": {description: A value is missing, too long or not a known option}
+  /api/method/helpdesk.helpdesk.doctype.hd_ticket.api.get_one:
+    get:
+      operationId: getTicket
+      summary: Read one ticket as the caller may see it (shared record read-back)
+      x-test-role: customer
+      x-reject-status: 404
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            x-fixture: ticket_name
+            x-invalid-example: "999999"
+      responses:
+        "200": {description: The ticket, its conversation and template}
+        "403": {description: Not logged in, or not the caller's ticket}
+        "404": {description: No such ticket}
+  /api/resource/HD Ticket/{name}:
+    put:
+      operationId: updateTicket
+      summary: Workflow B - change status, triage fields or feedback
+      x-test-role: agent
+      x-reject-status: 417
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            x-fixture: ticket_name
+            x-invalid-example: "999999"
+            x-reject-status: 404
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketUpdate"
+      responses:
+        "200": {description: Ticket updated; the stored ticket is returned}
+        "403": {description: The caller may not make this change}
+        "404": {description: No such ticket}
+        "417": {description: A value is missing, too long or not a known option}
+  /api/method/run_doc_method:
+    post:
+      operationId: assignAgent
+      summary: Workflow B - assign the ticket to an agent
+      x-test-role: agent
+      x-reject-status: 417
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [dt, dn, method, args]
+              properties:
+                dt:
+                  type: string
+                  enum: [HD Ticket]
+                  x-fixed: true
+                dn:
+                  type: string
+                  minLength: 1
+                  x-fixture: ticket_name
+                  x-invalid-example: "999999"
+                  x-reject-status: 404
+                method:
+                  type: string
+                  enum: [assign_agent]
+                  x-fixed: true
+                args:
+                  type: object
+                  required: [agent]
+                  properties:
+                    agent:
+                      type: string
+                      format: email
+                      x-fixture: agent_email
+                      x-invalid-example: nobody@sqe.test
+      responses:
+        "200": {description: Agent assigned (repeating the call does not assign twice)}
+        "403": {description: The caller may not act on this ticket}
+        "404": {description: No such ticket}
+        "417": {description: Unknown user}
+components:
+  schemas:
+    NewTicket:
+      type: object
+      required: [subject]
+      properties:
+        subject:
+          type: string
+          minLength: 1
+          maxLength: 140
+          example: Printer on floor 2 is jammed
+        description:
+          type: string
+          example: "<p>Paper is stuck in tray 1.</p>"
+    TicketUpdate:
+      type: object
+      properties:
+        subject:
+          type: string
+          minLength: 1
+          maxLength: 140
+          example: Printer on floor 2 is jammed again
+        status:
+          type: string
+          enum: [Open, Replied, Resolved, Closed]
+        priority:
+          type: string
+          enum: [Low, Medium, High, Urgent]
+        ticket_type:
+          type: string
+          enum: [Unspecified, Question, Bug, Incident]
+        feedback:
+          type: string
+          enum:
+            - Instant, top-notch help
+            - Exceptional support experience
+            - Prompt, informative support
+            - Quick and precise solutions
+            - Helpful answers, reasonable wait
+            - Clear guidance given
+            - Adequate help, bit slow
+            - Delayed response time
+            - No resolution provided
+            - Response did not help
+        feedback_extra:
+          type: string
+          example: The agent explained the fix clearly.

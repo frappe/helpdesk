@@ -1,0 +1,25 @@
+# Endpoint weaknesses found by the API tests.
+# Each entry is an observed difference between the contract (openapi.yaml /
+# business rules) and the running baseline. The matching test is a strict
+# expected failure. Keys under `generated` are "operationId | input | class".
+generated:
+  "createTicket | body:doc.subject | wrong type (number)":
+    id: W-API-01
+    expected: 417, the subject is declared as text
+    observed: 200, a numeric subject is accepted and stored without type validation
+  "updateTicket | body:subject | wrong type (number)":
+    id: W-API-01
+    expected: 417, the subject is declared as text
+    observed: 200, a numeric subject is accepted and stored without type validation
+  "getTicket | query:name | missing required input":
+    id: W-API-02
+    expected: a 4xx client error naming the missing parameter
+    observed: 500 TypeError with a server traceback in the response body
+  "assignAgent | body:args.agent | missing required input":
+    id: W-API-02
+    expected: a 4xx client error naming the missing parameter
+    observed: 500 TypeError with a server traceback in the response body
+  "updateTicket | body:feedback_extra | wrong type (number)":
+    id: W-API-03
+    expected: 417, or the number stored as text
+    observed: 500 TypeError (expected string, got int) from the HTML sanitiser

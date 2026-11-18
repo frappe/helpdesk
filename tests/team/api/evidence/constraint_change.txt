@@ -1,0 +1,71 @@
+== spec diff (original -> changed)
+4c4
+<   version: 1.0.0
+---
+>   version: 1.1.0
+138c138
+<           maxLength: 140
+---
+>           maxLength: 100
+149c149
+<           maxLength: 140
+---
+>           maxLength: 100
+156c156
+<           enum: [Low, Medium, High, Urgent]
+---
+>           enum: [Low, Medium, High, Urgent, Critical]
+
+== generator on the original spec
+spec version 1.0.0: 58 cases
+  createTicket  body:doc.subject           EP  3  BVA  6  valid  5  invalid  4
+  createTicket  body:doc.description       EP  2  BVA  0  valid  1  invalid  1
+  getTicket     query:name                 EP  3  BVA  0  valid  1  invalid  2
+  updateTicket  path:name                  EP  2  BVA  0  valid  1  invalid  1
+  updateTicket  body:subject               EP  2  BVA  6  valid  5  invalid  3
+  updateTicket  body:status                EP  5  BVA  0  valid  4  invalid  1
+  updateTicket  body:priority              EP  5  BVA  0  valid  4  invalid  1
+  updateTicket  body:ticket_type           EP  5  BVA  0  valid  4  invalid  1
+  updateTicket  body:feedback              EP 11  BVA  0  valid 10  invalid  1
+  updateTicket  body:feedback_extra        EP  2  BVA  0  valid  1  invalid  1
+  assignAgent   body:dn                    EP  3  BVA  0  valid  1  invalid  2
+  assignAgent   body:args.agent            EP  3  BVA  0  valid  1  invalid  2
+written: /home/administrator/frappe-bench/apps/helpdesk/tests/team/api/generated/testdata.json
+
+== generator on the changed spec
+spec version 1.1.0: 59 cases
+  createTicket  body:doc.subject           EP  3  BVA  6  valid  5  invalid  4
+  createTicket  body:doc.description       EP  2  BVA  0  valid  1  invalid  1
+  getTicket     query:name                 EP  3  BVA  0  valid  1  invalid  2
+  updateTicket  path:name                  EP  2  BVA  0  valid  1  invalid  1
+  updateTicket  body:subject               EP  2  BVA  6  valid  5  invalid  3
+  updateTicket  body:status                EP  5  BVA  0  valid  4  invalid  1
+  updateTicket  body:priority              EP  6  BVA  0  valid  5  invalid  1
+  updateTicket  body:ticket_type           EP  5  BVA  0  valid  4  invalid  1
+  updateTicket  body:feedback              EP 11  BVA  0  valid 10  invalid  1
+  updateTicket  body:feedback_extra        EP  2  BVA  0  valid  1  invalid  1
+  assignAgent   body:dn                    EP  3  BVA  0  valid  1  invalid  2
+  assignAgent   body:args.agent            EP  3  BVA  0  valid  1  invalid  2
+written: /home/administrator/frappe-bench/apps/helpdesk/tests/team/api/evidence/testdata_changed.json
+
+== cases that differ
+  removed: createTicket | body:doc.subject | length 139 (maxLength 140) -> valid
+  removed: createTicket | body:doc.subject | length 140 (maxLength 140) -> valid
+  removed: createTicket | body:doc.subject | length 141 (maxLength 140) -> invalid
+  removed: updateTicket | body:subject | length 139 (maxLength 140) -> valid
+  removed: updateTicket | body:subject | length 140 (maxLength 140) -> valid
+  removed: updateTicket | body:subject | length 141 (maxLength 140) -> invalid
+  added:   createTicket | body:doc.subject | length 100 (maxLength 100) -> valid
+  added:   createTicket | body:doc.subject | length 101 (maxLength 100) -> invalid
+  added:   createTicket | body:doc.subject | length 99 (maxLength 100) -> valid
+  added:   updateTicket | body:priority | valid member 'Critical' -> valid
+  added:   updateTicket | body:subject | length 100 (maxLength 100) -> valid
+  added:   updateTicket | body:subject | length 101 (maxLength 100) -> invalid
+  added:   updateTicket | body:subject | length 99 (maxLength 100) -> valid
+  total cases: 58 -> 59
+
+== generated tests run with the changed data (system unchanged)
+FAILED tests/team/api/test_generated_inputs.py::test_create_ticket_input[createTicket/doc.subject/BVA08]
+FAILED tests/team/api/test_generated_inputs.py::test_update_ticket_input[updateTicket/subject/BVA08]
+FAILED tests/team/api/test_generated_inputs.py::test_update_ticket_input[updateTicket/priority/EP05]
+3 failed, 52 passed, 5 xfailed in 20.89s

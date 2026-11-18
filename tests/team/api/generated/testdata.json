@@ -1,0 +1,641 @@
+{
+  "spec_version": "1.0.0",
+  "operations": [
+    {
+      "operationId": "createTicket",
+      "method": "POST",
+      "path": "/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new",
+      "role": "customer",
+      "responses": [
+        "200",
+        "403",
+        "417"
+      ]
+    },
+    {
+      "operationId": "getTicket",
+      "method": "GET",
+      "path": "/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
+      "role": "customer",
+      "responses": [
+        "200",
+        "403",
+        "404"
+      ]
+    },
+    {
+      "operationId": "updateTicket",
+      "method": "PUT",
+      "path": "/api/resource/HD Ticket/{name}",
+      "role": "agent",
+      "responses": [
+        "200",
+        "403",
+        "404",
+        "417"
+      ]
+    },
+    {
+      "operationId": "assignAgent",
+      "method": "POST",
+      "path": "/api/method/run_doc_method",
+      "role": "agent",
+      "responses": [
+        "200",
+        "403",
+        "404",
+        "417"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "createTicket/doc.subject/EP01",
+      "operationId": "createTicket",
+      "input": "body:doc.subject",
+      "technique": "EP",
+      "class": "typical valid string",
+      "value": "Printer on floor 2 is jammed",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "createTicket/doc.subject/EP02",
+      "operationId": "createTicket",
+      "input": "body:doc.subject",
+      "technique": "EP",
+      "class": "wrong type (number)",
+      "value": 12345,
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "createTicket/doc.subject/BVA03",
+      "operationId": "createTicket",
+      "input": "body:doc.subject",
+      "technique": "BVA",
+      "class": "length 0 (minLength 1)",
+      "value": "",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "createTicket/doc.subject/BVA04",
+      "operationId": "createTicket",
+      "input": "body:doc.subject",
+      "technique": "BVA",
+      "class": "length 1 (minLength 1)",
+      "value": "x",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "createTicket/doc.subject/BVA05",
+      "operationId": "createTicket",
+      "input": "body:doc.subject",
+      "technique": "BVA",
+      "class": "length 2 (minLength 1)",
+      "value": "xx",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "createTicket/doc.subject/BVA06",
+      "operationId": "createTicket",
+      "input": "body:doc.subject",
+      "technique": "BVA",
+      "class": "length 139 (maxLength 140)",
+      "value": "Ticket xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "createTicket/doc.subject/BVA07",
+      "operationId": "createTicket",
+      "input": "body:doc.subject",
+      "technique": "BVA",
+      "class": "length 140 (maxLength 140)",
+      "value": "Ticket xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "createTicket/doc.subject/BVA08",
+      "operationId": "createTicket",
+      "input": "body:doc.subject",
+      "technique": "BVA",
+      "class": "length 141 (maxLength 140)",
+      "value": "Ticket xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "createTicket/doc.subject/EP09",
+      "operationId": "createTicket",
+      "input": "body:doc.subject",
+      "technique": "EP",
+      "class": "missing required input",
+      "value": "__MISSING__",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "createTicket/doc.description/EP01",
+      "operationId": "createTicket",
+      "input": "body:doc.description",
+      "technique": "EP",
+      "class": "typical valid string",
+      "value": "<p>Paper is stuck in tray 1.</p>",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "createTicket/doc.description/EP02",
+      "operationId": "createTicket",
+      "input": "body:doc.description",
+      "technique": "EP",
+      "class": "wrong type (number)",
+      "value": 12345,
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "getTicket/name/EP01",
+      "operationId": "getTicket",
+      "input": "query:name",
+      "technique": "EP",
+      "class": "existing value",
+      "value": {
+        "fixture": "ticket_name"
+      },
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "getTicket/name/EP02",
+      "operationId": "getTicket",
+      "input": "query:name",
+      "technique": "EP",
+      "class": "unknown value",
+      "value": "999999",
+      "valid": false,
+      "expect_status": 404
+    },
+    {
+      "id": "getTicket/name/EP03",
+      "operationId": "getTicket",
+      "input": "query:name",
+      "technique": "EP",
+      "class": "missing required input",
+      "value": "__MISSING__",
+      "valid": false,
+      "expect_status": 404
+    },
+    {
+      "id": "updateTicket/name/EP01",
+      "operationId": "updateTicket",
+      "input": "path:name",
+      "technique": "EP",
+      "class": "existing value",
+      "value": {
+        "fixture": "ticket_name"
+      },
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/name/EP02",
+      "operationId": "updateTicket",
+      "input": "path:name",
+      "technique": "EP",
+      "class": "unknown value",
+      "value": "999999",
+      "valid": false,
+      "expect_status": 404
+    },
+    {
+      "id": "updateTicket/subject/EP01",
+      "operationId": "updateTicket",
+      "input": "body:subject",
+      "technique": "EP",
+      "class": "typical valid string",
+      "value": "Printer on floor 2 is jammed again",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/subject/EP02",
+      "operationId": "updateTicket",
+      "input": "body:subject",
+      "technique": "EP",
+      "class": "wrong type (number)",
+      "value": 12345,
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "updateTicket/subject/BVA03",
+      "operationId": "updateTicket",
+      "input": "body:subject",
+      "technique": "BVA",
+      "class": "length 0 (minLength 1)",
+      "value": "",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "updateTicket/subject/BVA04",
+      "operationId": "updateTicket",
+      "input": "body:subject",
+      "technique": "BVA",
+      "class": "length 1 (minLength 1)",
+      "value": "x",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/subject/BVA05",
+      "operationId": "updateTicket",
+      "input": "body:subject",
+      "technique": "BVA",
+      "class": "length 2 (minLength 1)",
+      "value": "xx",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/subject/BVA06",
+      "operationId": "updateTicket",
+      "input": "body:subject",
+      "technique": "BVA",
+      "class": "length 139 (maxLength 140)",
+      "value": "Ticket xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/subject/BVA07",
+      "operationId": "updateTicket",
+      "input": "body:subject",
+      "technique": "BVA",
+      "class": "length 140 (maxLength 140)",
+      "value": "Ticket xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/subject/BVA08",
+      "operationId": "updateTicket",
+      "input": "body:subject",
+      "technique": "BVA",
+      "class": "length 141 (maxLength 140)",
+      "value": "Ticket xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "updateTicket/status/EP01",
+      "operationId": "updateTicket",
+      "input": "body:status",
+      "technique": "EP",
+      "class": "valid member 'Open'",
+      "value": "Open",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/status/EP02",
+      "operationId": "updateTicket",
+      "input": "body:status",
+      "technique": "EP",
+      "class": "valid member 'Replied'",
+      "value": "Replied",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/status/EP03",
+      "operationId": "updateTicket",
+      "input": "body:status",
+      "technique": "EP",
+      "class": "valid member 'Resolved'",
+      "value": "Resolved",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/status/EP04",
+      "operationId": "updateTicket",
+      "input": "body:status",
+      "technique": "EP",
+      "class": "valid member 'Closed'",
+      "value": "Closed",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/status/EP05",
+      "operationId": "updateTicket",
+      "input": "body:status",
+      "technique": "EP",
+      "class": "not a member of the enum",
+      "value": "Not-A-Listed-Value",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "updateTicket/priority/EP01",
+      "operationId": "updateTicket",
+      "input": "body:priority",
+      "technique": "EP",
+      "class": "valid member 'Low'",
+      "value": "Low",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/priority/EP02",
+      "operationId": "updateTicket",
+      "input": "body:priority",
+      "technique": "EP",
+      "class": "valid member 'Medium'",
+      "value": "Medium",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/priority/EP03",
+      "operationId": "updateTicket",
+      "input": "body:priority",
+      "technique": "EP",
+      "class": "valid member 'High'",
+      "value": "High",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/priority/EP04",
+      "operationId": "updateTicket",
+      "input": "body:priority",
+      "technique": "EP",
+      "class": "valid member 'Urgent'",
+      "value": "Urgent",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/priority/EP05",
+      "operationId": "updateTicket",
+      "input": "body:priority",
+      "technique": "EP",
+      "class": "not a member of the enum",
+      "value": "Not-A-Listed-Value",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "updateTicket/ticket_type/EP01",
+      "operationId": "updateTicket",
+      "input": "body:ticket_type",
+      "technique": "EP",
+      "class": "valid member 'Unspecified'",
+      "value": "Unspecified",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/ticket_type/EP02",
+      "operationId": "updateTicket",
+      "input": "body:ticket_type",
+      "technique": "EP",
+      "class": "valid member 'Question'",
+      "value": "Question",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/ticket_type/EP03",
+      "operationId": "updateTicket",
+      "input": "body:ticket_type",
+      "technique": "EP",
+      "class": "valid member 'Bug'",
+      "value": "Bug",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/ticket_type/EP04",
+      "operationId": "updateTicket",
+      "input": "body:ticket_type",
+      "technique": "EP",
+      "class": "valid member 'Incident'",
+      "value": "Incident",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/ticket_type/EP05",
+      "operationId": "updateTicket",
+      "input": "body:ticket_type",
+      "technique": "EP",
+      "class": "not a member of the enum",
+      "value": "Not-A-Listed-Value",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "updateTicket/feedback/EP01",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'Instant, top-notch help'",
+      "value": "Instant, top-notch help",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP02",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'Exceptional support experience'",
+      "value": "Exceptional support experience",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP03",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'Prompt, informative support'",
+      "value": "Prompt, informative support",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP04",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'Quick and precise solutions'",
+      "value": "Quick and precise solutions",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP05",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'Helpful answers, reasonable wait'",
+      "value": "Helpful answers, reasonable wait",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP06",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'Clear guidance given'",
+      "value": "Clear guidance given",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP07",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'Adequate help, bit slow'",
+      "value": "Adequate help, bit slow",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP08",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'Delayed response time'",
+      "value": "Delayed response time",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP09",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'No resolution provided'",
+      "value": "No resolution provided",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP10",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "valid member 'Response did not help'",
+      "value": "Response did not help",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback/EP11",
+      "operationId": "updateTicket",
+      "input": "body:feedback",
+      "technique": "EP",
+      "class": "not a member of the enum",
+      "value": "Not-A-Listed-Value",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "updateTicket/feedback_extra/EP01",
+      "operationId": "updateTicket",
+      "input": "body:feedback_extra",
+      "technique": "EP",
+      "class": "typical valid string",
+      "value": "The agent explained the fix clearly.",
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "updateTicket/feedback_extra/EP02",
+      "operationId": "updateTicket",
+      "input": "body:feedback_extra",
+      "technique": "EP",
+      "class": "wrong type (number)",
+      "value": 12345,
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "assignAgent/dn/EP01",
+      "operationId": "assignAgent",
+      "input": "body:dn",
+      "technique": "EP",
+      "class": "existing value",
+      "value": {
+        "fixture": "ticket_name"
+      },
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "assignAgent/dn/EP02",
+      "operationId": "assignAgent",
+      "input": "body:dn",
+      "technique": "EP",
+      "class": "unknown value",
+      "value": "999999",
+      "valid": false,
+      "expect_status": 404
+    },
+    {
+      "id": "assignAgent/dn/EP03",
+      "operationId": "assignAgent",
+      "input": "body:dn",
+      "technique": "EP",
+      "class": "missing required input",
+      "value": "__MISSING__",
+      "valid": false,
+      "expect_status": 404
+    },
+    {
+      "id": "assignAgent/args.agent/EP01",
+      "operationId": "assignAgent",
+      "input": "body:args.agent",
+      "technique": "EP",
+      "class": "existing value",
+      "value": {
+        "fixture": "agent_email"
+      },
+      "valid": true,
+      "expect_status": 200
+    },
+    {
+      "id": "assignAgent/args.agent/EP02",
+      "operationId": "assignAgent",
+      "input": "body:args.agent",
+      "technique": "EP",
+      "class": "unknown value",
+      "value": "nobody@sqe.test",
+      "valid": false,
+      "expect_status": 417
+    },
+    {
+      "id": "assignAgent/args.agent/EP03",
+      "operationId": "assignAgent",
+      "input": "body:args.agent",
+      "technique": "EP",
+      "class": "missing required input",
+      "value": "__MISSING__",
+      "valid": false,
+      "expect_status": 417
+    }
+  ]
+}
