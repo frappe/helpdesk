@@ -124,13 +124,6 @@
           >
             <Avatar :label="p.email" :image="avatarUrl(p.email)" size="xl" />
           </span>
-          <span
-            v-if="extra"
-            class="absolute left-[362px] top-[136px] flex size-7 items-center justify-center rounded-full bg-surface-gray-3 text-xs tabular-nums text-ink-gray-7"
-            :style="pop(1900)"
-          >
-            +{{ extra }}
-          </span>
         </div>
       </div>
 
@@ -244,24 +237,16 @@ onMounted(() => props.open && play());
 
 const RIBBON = "M 70 84 C 104 56, 132 112, 176 84";
 
-const PLACES = [
-  [318, 48],
-  [352, 84],
-  [318, 120],
+const PEOPLE = [
+  { email: "sam@example.com", x: 318, y: 48 },
+  { email: "maya@example.com", x: 352, y: 84 },
+  { email: "priya@example.com", x: 318, y: 120 },
 ];
-const people = computed(() =>
-  props.agents.slice(0, PLACES.length).map((email, n) => {
-    const [x, y] = PLACES[n];
-    return {
-      email,
-      x,
-      y,
-      d: `M 224 84 C 258 84, ${x - 44} ${y}, ${x} ${y}`,
-      delay: 1250 + n * 150,
-    };
-  })
-);
-const extra = computed(() => Math.max(0, props.agents.length - PLACES.length));
+const people = PEOPLE.map((p, n) => ({
+  ...p,
+  d: `M 224 84 C 258 84, ${p.x - 44} ${p.y}, ${p.x} ${p.y}`,
+  delay: 1250 + n * 150,
+}));
 
 const RAYS = Array.from({ length: 12 }, (_, n) => {
   const angle = (n / 12) * Math.PI * 2 + Math.PI / 12;

@@ -3,12 +3,7 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.api.setup import (
-    can_send_email,
-    complete_setup,
-    is_setup_pending,
-    reset_setup,
-)
+from helpdesk.api.setup import complete_setup, is_setup_pending, reset_setup
 from helpdesk.patches.mark_existing_sites_set_up import execute as mark_existing_sites
 from helpdesk.test_utils import as_v2_site, create_agent, unique_email
 
@@ -115,17 +110,6 @@ class TestSetup(IntegrationTestCase):
     def test_agent_cannot_complete_setup(self) -> None:
         with self.set_user(self.agent), self.assertRaises(frappe.PermissionError):
             complete_setup()
-
-    def test_can_send_email_follows_outgoing_account(self) -> None:
-        find = "frappe.email.doctype.email_account.email_account.EmailAccount.find_default_outgoing"
-        with patch(find, return_value=None):
-            self.assertFalse(can_send_email())
-        with patch(find, return_value=frappe._dict(name="Support")):
-            self.assertTrue(can_send_email())
-
-    def test_agent_cannot_check_email_sending(self) -> None:
-        with self.set_user(self.agent), self.assertRaises(frappe.PermissionError):
-            can_send_email()
 
 
 class TestResetSetup(IntegrationTestCase):

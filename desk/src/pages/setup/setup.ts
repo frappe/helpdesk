@@ -44,7 +44,11 @@ export const setup = reactive({
 });
 
 export const steps = computed(() =>
-  setup.askPassword ? ALL_STEPS : ALL_STEPS.filter((s) => s.key !== "password")
+  ALL_STEPS.filter(
+    (s) =>
+      (s.key !== "password" || setup.askPassword) &&
+      (s.key !== "team" || setup.mailbox)
+  )
 );
 export const stepIndex = computed(() =>
   steps.value.findIndex((s) => s.key === setup.step)

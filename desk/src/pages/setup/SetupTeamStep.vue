@@ -10,18 +10,6 @@
     </div>
 
     <Alert
-      v-if="canSendEmail.data === false"
-      theme="amber"
-      :title="__('Connect an email for invites to go out')"
-      :description="
-        __(
-          'Invites are saved, but they can\'t be emailed until Helpdesk has an email account to send from.'
-        )
-      "
-      :primary-action="{ label: __('Connect email'), onClick: back }"
-    />
-
-    <Alert
       v-if="failed.length"
       theme="red"
       :title="
@@ -159,14 +147,12 @@ import {
   Badge,
   Button,
   call,
-  createResource,
   FormControl,
   toast,
   Tooltip,
 } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
 import {
-  back,
   invited,
   newRow,
   next,
@@ -182,11 +168,6 @@ const ROLE_OPTIONS = AGENT_ROLES.map((role) => ({
   value: role,
 }));
 
-const canSendEmail = createResource({
-  url: "helpdesk.api.setup.can_send_email",
-  method: "GET",
-  auto: true,
-});
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const attempted = ref(false);
 const blocked = ref<number | null>(null);
