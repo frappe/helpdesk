@@ -485,13 +485,15 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
-import { useElementSize } from "@vueuse/core";
+import { useElementSize, usePreferredReducedMotion } from "@vueuse/core";
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Avatar, Button } from "frappe-ui";
 import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
 import SetupPreviewDesk from "./SetupPreviewDesk.vue";
 import { SAMPLE_TICKET, nameOf } from "./preview";
-import { brand, invitees, setup } from "./setup";
+import { useSetupFlow } from "./setup";
+
+const { brand, invitees, setup } = useSetupFlow();
 
 type Page = "login" | "home" | "desk-list" | "desk-ticket" | "portal-ticket";
 type Point = { x: number; y: number };
@@ -527,8 +529,8 @@ const target = computed<Page>(() => {
 });
 const isPortalPage = (p: Page) => p === "home" || p === "portal-ticket";
 
-const reducedMotion = !!window.matchMedia?.("(prefers-reduced-motion: reduce)")
-  .matches;
+const motion = usePreferredReducedMotion();
+const reducedMotion = computed(() => motion.value === "reduce");
 const page = ref<Page>(target.value);
 const TAB_POINTS: Record<"desk" | "portal", Point> = {
   desk: { x: 204, y: 26 },
@@ -582,7 +584,7 @@ watch(target, (to) => {
   timers.forEach(clearTimeout);
   timers = [];
   const point = clickPoint(page.value, to);
-  if (reducedMotion || !point) {
+  if (reducedMotion.value || !point) {
     page.value = to;
     Object.assign(cursor, rest(to));
     return;

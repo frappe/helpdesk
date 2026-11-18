@@ -33,13 +33,12 @@
         <p class="text-sm text-ink-gray-6">{{ __("Logo") }}</p>
         <div
           ref="dropZone"
-          class="flex cursor-pointer items-center gap-4 rounded-5 border border-dashed p-4 transition-colors"
+          class="flex items-center gap-4 rounded-5 border border-dashed p-4 transition-colors"
           :class="
             isOverDropZone
               ? 'border-outline-gray-5 bg-surface-gray-2'
-              : 'border-outline-gray-3 hover:bg-surface-gray-1'
+              : 'border-outline-gray-3'
           "
-          @click="fileDialog.open()"
         >
           <span
             class="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-4"
@@ -67,27 +66,25 @@
             <p class="text-sm text-ink-gray-8">
               {{
                 setup.brandLogo
-                  ? __("Drop a new image to replace, or")
-                  : __("Drop your logo here, or")
+                  ? __("Drop or paste a new image to replace it")
+                  : __("Drop or paste your logo here")
               }}
-              <button
-                type="button"
-                class="text-ink-gray-9 underline underline-offset-2"
-              >
-                {{ __("browse") }}
-              </button>
             </p>
             <p class="text-xs text-ink-gray-5">
               {{ __("Square, at least 128 × 128 px. PNG, JPG or SVG.") }}
             </p>
           </div>
           <Button
+            :label="__('Browse')"
+            :disabled="logoUpload.isUploading.value"
+            @click="fileDialog.open()"
+          />
+          <Button
             v-if="setup.brandLogo"
             variant="ghost"
-            size="sm"
             icon="lucide-x"
             :aria-label="__('Remove logo')"
-            @click.stop="setup.brandLogo = ''"
+            @click="setup.brandLogo = ''"
           />
         </div>
       </div>
@@ -139,7 +136,9 @@ import {
   useFileUpload,
 } from "frappe-ui";
 import { ref, watch } from "vue";
-import { brand, next, setup } from "./setup";
+import { useSetupFlow } from "./setup";
+
+const { brand, next, setup } = useSetupFlow();
 
 const portal = `${window.location.host}/help`;
 

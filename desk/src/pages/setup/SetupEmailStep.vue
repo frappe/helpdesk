@@ -139,49 +139,26 @@
   </section>
 </template>
 
-<script lang="ts">
-import { __ } from "@/translation";
-import { useIntervalFn } from "@vueuse/core";
-import { computed, ref, watch } from "vue";
-import { setup } from "./setup";
-
-const PHASE_SECONDS = 5;
-const PHASES = [
-  __("Knocking on your inbox…"),
-  __("Turning emails into tickets…"),
-  __("Starting the SLA clocks…"),
-];
-const waited = ref(0);
-const clock = useIntervalFn(() => waited.value++, 1000, { immediate: false });
-const phase = computed(() => Math.floor(waited.value / PHASE_SECONDS));
-const ready = computed(() => phase.value >= PHASES.length);
-watch(ready, (done) => {
-  if (!done) return;
-  clock.pause();
-  setup.ticketArrived = true;
-});
-let startedFor: string | null = null;
-</script>
-
 <script setup lang="ts">
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { useOnboarding } from "@framework/ui";
 import { useEmailAccounts, useOneClick } from "@framework/ui/EmailAccounts";
-import {
-  Badge,
-  Button,
-  createListResource,
-  dialog,
-  Spinner,
-  toast,
-} from "frappe-ui";
+import { Badge, Button, dialog, Spinner, toast } from "frappe-ui";
 import { computed, onMounted, ref, watch } from "vue";
 import Banner from "@framework/ui/components/EmailAccounts/Banner.vue";
 import { serviceOf } from "@framework/ui/components/EmailAccounts/services";
 import SetupProviderPicker from "./SetupProviderPicker.vue";
-import { type Mailbox, next, setup } from "./setup";
+import { IMPORT_PHASES, type Mailbox, useSetupFlow } from "./setup";
 
+const PHASES = [
+  __("Knocking on your inbox…"),
+  __("Turning emails into tickets…"),
+  __("Starting the SLA clocks…"),
+];
+
+const { importPhase: phase, next, setup } = useSetupFlow();
+const ready = computed(() => phase.value >= IMPORT_PHASES);
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const controller = useEmailAccounts("HD Ticket");
 const mailboxLogo = computed(() => {
@@ -198,16 +175,6 @@ const reveal = {
   enterFromClass: "opacity-0 translate-y-1",
   leaveActiveClass: "hidden",
 };
-watch(
-  () => setup.mailbox?.name,
-  (mailbox) => {
-    if (!mailbox || startedFor === mailbox) return;
-    startedFor = mailbox;
-    waited.value = 0;
-    clock.resume();
-  },
-  { immediate: true }
-);
 const picker = ref<InstanceType<typeof SetupProviderPicker> | null>(null);
 const receiveOnly = ref(false);
 const defaultOutgoing = computed(
