@@ -42,6 +42,17 @@ for (const viewport of [
         // The list view may add its saved filters; only the sign-in result must leave the URL.
         await expect(page).toHaveURL(/\/wa-account(\?(?!.*whatsapp_)[^#]*)?$/);
       });
+
+      for (const [code, message] of [
+        ["phone_number_unclear", "has more than one new phone number"],
+        ["pin_changed", "two-step verification PIN was changed"],
+      ]) {
+        test(`a ${code} refusal from Frappe Cloud says what to do`, async ({ page }) => {
+          await page.goto(`/desk/wa-account?whatsapp_connect=${code}`);
+
+          await expect(page.locator(".msgprint-dialog")).toContainText(message);
+        });
+      }
     });
 
     test("a guest is asked to log in first", async ({ page }) => {
