@@ -7,7 +7,7 @@
         <UserAvatar v-bind="user" size="lg" expand strong :hide-avatar="true" />
         <LucideDot class="text-ink-gray-4 size-4" />
         <Tooltip :text="dateFormat(date, dateTooltipFormat)">
-          <span class="text-ink-gray-5">
+          <span class="text-ink-gray-7">
             {{ timeAgo(date) }}
           </span>
         </Tooltip>

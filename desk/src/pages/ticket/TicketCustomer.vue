@@ -1,8 +1,12 @@
 <template>
-  <div v-if="ticket.data" class="flex flex-col">
+  <main v-if="ticket.data" class="flex flex-col">
+    <h1 class="sr-only">{{ ticket.data.subject }}</h1>
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" class="-ms-0.5" />
+        <Breadcrumbs
+          :items="breadcrumbs"
+          class="-ms-0.5 [&_a>span]:text-ink-gray-7"
+        />
       </template>
       <template #right-header>
         <CustomActions
@@ -103,7 +107,7 @@
       <TicketCustomerSidebar v-if="!isMobileView" @open="isExpanded = true" />
     </div>
     <TicketFeedback v-model:open="showFeedbackDialog" />
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
