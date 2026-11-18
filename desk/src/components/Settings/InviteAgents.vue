@@ -108,6 +108,7 @@ import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import {
+  AGENT_ROLES,
   type AgentRole,
   getInviteByEmailRoles,
   handleInviteUserSuccess,
@@ -132,14 +133,13 @@ const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const emails = ref("");
 
-type Role = AgentRole;
 type RoleOption = {
   label: string;
-  value: Role;
+  value: AgentRole;
   description: string;
 };
 
-const roleToLabel = (role: Role) => {
+const roleToLabel = (role: AgentRole) => {
   switch (role) {
     case "Agent":
       return "Agent";
@@ -237,9 +237,7 @@ const pendingInvitesResource = createResource({
   method: "GET",
   transform: (data) =>
     data.filter((invite) =>
-      invite.roles.some((role) =>
-        ["Agent", "Agent Manager", "System Manager"].includes(role)
-      )
+      invite.roles.some((role) => AGENT_ROLES.includes(role))
     ),
 });
 
@@ -252,7 +250,7 @@ const cancelInviteResource = createResource({
   },
 });
 
-const rolesToLabel = (roles: readonly Role[]) => {
+const rolesToLabel = (roles: readonly AgentRole[]) => {
   const rolesSt = new Set(roles);
   if (rolesSt.has("System Manager")) {
     return roleToLabel("System Manager");

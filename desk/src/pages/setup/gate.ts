@@ -1,22 +1,16 @@
+import { userStorage } from "@/composables/userStorage";
 import { __ } from "@/translation";
 import { call, toast } from "frappe-ui";
 
-const DONE_KEY = "helpdesk_setup_completed";
+const setupDone = userStorage("helpdesk_setup_completed", false);
 
 /** Boot flags setup for a System Manager on a v2 site; a local mark keeps a failed save from bringing it back. */
 export function isSetupPending(): boolean {
-  if (!window.setup_pending) return false;
-  try {
-    return localStorage.getItem(DONE_KEY) !== "1";
-  } catch {
-    return true;
-  }
+  return !!window.setup_pending && !setupDone.value;
 }
 
 export function markSetupDoneLocally() {
-  try {
-    localStorage.setItem(DONE_KEY, "1");
-  } catch {}
+  setupDone.value = true;
 }
 
 /** Developer mode: `?reset_setup` on any desk page starts the first-run setup over, with this browser's storage cleared. */

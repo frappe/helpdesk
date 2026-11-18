@@ -1,5 +1,4 @@
 import json
-from contextlib import contextmanager
 from datetime import datetime
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -1171,36 +1170,6 @@ def as_v2_site():
         frappe.local.conf,
         {"pilot_endpoint": "https://pilot.example.com", "pilot_auth_token": "test"},
     )
-
-
-@contextmanager
-def password_policy(enabled: bool, minimum_score: int = 0):
-    """Turn the password policy on or off without saving System Settings, which a site
-    before the setup wizard cannot do (no language or time zone)."""
-    from frappe.core.doctype.system_settings.system_settings import (
-        clear_system_settings_cache,
-    )
-
-    fields = ["enable_password_policy", "minimum_password_score"]
-    previous = {
-        field: frappe.db.get_single_value("System Settings", field) for field in fields
-    }
-
-    def apply(values: dict):
-        frappe.db.set_single_value("System Settings", values)
-        clear_system_settings_cache()
-        frappe.local.system_settings = None
-
-    apply(
-        {
-            "enable_password_policy": int(enabled),
-            "minimum_password_score": minimum_score,
-        }
-    )
-    try:
-        yield
-    finally:
-        apply(previous)
 
 
 def clear_trial_cache(user: str) -> None:

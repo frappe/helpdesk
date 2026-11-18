@@ -131,8 +131,8 @@ const authStore = useAuthStore();
 const site = window.location.host;
 
 const score = createResource({
-  url: "helpdesk.api.setup.get_password_score",
-  makeParams: () => ({ password: setup.password }),
+  url: "frappe.core.doctype.user.user.test_password_strength",
+  makeParams: () => ({ new_password: setup.password }),
 });
 watchDebounced(
   () => setup.password,
@@ -144,28 +144,28 @@ watchDebounced(
 );
 
 const STRENGTH = computed(() => [
-  { label: __("Too weak"), ink: "text-ink-red-6" },
-  { label: __("Too weak"), ink: "text-ink-red-6" },
-  { label: __("Okay"), ink: "text-ink-amber-6" },
-  { label: __("Good"), ink: "text-ink-green-6" },
-  { label: __("Strong"), ink: "text-ink-green-6" },
+  { label: __("Poor"), ink: "text-ink-red-8" },
+  { label: __("Poor"), ink: "text-ink-red-8" },
+  { label: __("Average"), ink: "text-ink-orange-8" },
+  { label: __("Good"), ink: "text-ink-blue-8" },
+  { label: __("Great"), ink: "text-ink-green-8" },
 ]);
-const currentScore = computed<number | null>(() =>
-  setup.password && score.data ? score.data.score : null
-);
+const checked = computed(() => !!setup.password && !!score.data);
 const strength = computed(
-  () => STRENGTH.value[currentScore.value ?? -1] ?? { label: "", ink: "" }
+  () =>
+    (checked.value && STRENGTH.value[score.data.score]) || {
+      label: "",
+      ink: "",
+    }
 );
 const acceptable = computed(
   () =>
+    checked.value &&
     setup.password.length >= MIN_LENGTH &&
-    currentScore.value !== null &&
-    currentScore.value >= score.data.minimum
+    (!("score" in score.data) ||
+      score.data.feedback.password_policy_validation_passed)
 );
-
-const showHint = computed(
-  () => !!setup.password && currentScore.value !== null && !acceptable.value
-);
+const showHint = computed(() => checked.value && !acceptable.value);
 
 const confirmPassword = ref("");
 const settledConfirm = refDebounced(confirmPassword, 500);

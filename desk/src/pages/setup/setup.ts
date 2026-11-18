@@ -1,4 +1,5 @@
 import { capture } from "@/telemetry";
+import { validateEmailWithZod } from "@/utils";
 import { call } from "frappe-ui";
 import { computed, reactive } from "vue";
 import { markSetupDoneLocally } from "./gate";
@@ -20,7 +21,6 @@ const ALL_STEPS: Step[] = [
   { key: "email" },
   { key: "team" },
 ];
-export const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 let nextRowId = 1;
@@ -59,7 +59,7 @@ export const invitees = computed(() => {
   const seen = new Set<string>();
   return setup.rows.flatMap((row) => {
     const email = normalizeEmail(row.email);
-    if (!EMAIL.test(email) || seen.has(email)) return [];
+    if (!validateEmailWithZod(email) || seen.has(email)) return [];
     seen.add(email);
     return [{ email, sent: row.sent }];
   });
@@ -95,12 +95,17 @@ function track(event: string, data: Record<string, string | number> = {}) {
   });
 }
 
+const STEP_KEY = "helpdesk-setup-step";
+
 function goTo(step: StepKey) {
   setup.step = step;
+  sessionStorage.setItem(STEP_KEY, step);
   funnel.stepStartedAt = Date.now();
 }
 
+/** Opens `step`, else the step this tab was on before it left, e.g. for a sign-in page. */
 export function startSetup(step?: StepKey) {
+  step ??= (sessionStorage.getItem(STEP_KEY) as StepKey | null) ?? undefined;
   if (step && steps.value.some((s) => s.key === step)) goTo(step);
   track("started_setup");
 }
