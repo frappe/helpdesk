@@ -28,14 +28,16 @@
         icon-left="lucide-plus"
         @click="open('template', '')"
       />
-      <Button
-        v-else-if="tab === 'accounts'"
-        :label="__('New account')"
-        theme="gray"
-        variant="solid"
-        icon-left="lucide-plus"
-        @click="open('account', '')"
-      />
+      <div v-else-if="tab === 'accounts'" class="flex gap-2">
+        <ConnectWithMetaButton theme="gray" variant="solid" />
+        <Button
+          :label="__('New account')"
+          theme="gray"
+          :variant="meta.canConnect ? 'subtle' : 'solid'"
+          icon-left="lucide-plus"
+          @click="open('account', '')"
+        />
+      </div>
       <Button
         v-else-if="webhook?.isDirty"
         :label="__('Save')"
@@ -73,6 +75,11 @@
 <script setup lang="ts">
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
+import {
+  ConnectWithMetaButton,
+  readMetaConnectResult,
+  useMetaConnect,
+} from "@whatsapp/ui";
 import { Button, createDocumentResource, Tabs, toast } from "frappe-ui";
 import { computed, ref, useTemplateRef } from "vue";
 import WhatsAppAccountPage from "./WhatsAppAccountPage.vue";
@@ -95,6 +102,10 @@ const page = ref<"tabs" | "template" | "account">("tabs");
 const record = ref("");
 const tab = ref<Tab>("templates");
 const webhook = useTemplateRef("webhook");
+// Connect with Meta is the main way to add an account where the site can use it
+const meta = useMetaConnect();
+// back from Meta's sign-in, which the sidebar opened this panel for: the result toasts itself
+if (readMetaConnectResult()) tab.value = "accounts";
 
 // One copy for both tabs, so setting the default account never goes stale in the webhook form
 const settings = createDocumentResource({
