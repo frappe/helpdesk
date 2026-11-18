@@ -13,6 +13,7 @@ export const AccountForm = Empty;
 export const AppendActionsTable = Empty;
 export const TemplateForm = Empty;
 export const TemplatePreview = Empty;
+export const TemplateSelector = Empty;
 export const TemplateBodyEditor = Empty;
 export const MediaPreviewDialog = Empty;
 export const ReactionPicker = Empty;

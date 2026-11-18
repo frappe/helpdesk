@@ -78,7 +78,7 @@
     <WhatsAppTemplatePicker
       v-if="whatsapp.enabled"
       v-model="showTemplates"
-      :ticket="ticket?.doc ?? {}"
+      :ticket="whatsapp.ticketName"
       :to="whatsapp.conversation?.to"
       :allowed="whatsapp.conversation?.templates ?? []"
       @sent="onTemplateSent"
@@ -97,18 +97,17 @@ import SavedRepliesSelectorModal from "@/components/SavedRepliesSelectorModal.vu
 import SavedReplyActions from "@/components/SavedReplyActions/SavedReplyActions.vue";
 import { replyComposer } from "@/pages/ticket/modalStates";
 import { __ } from "@/translation";
-import { TicketSymbol, type RenderedSavedReply } from "@/types";
+import type { RenderedSavedReply } from "@/types";
 import { getErrorMessage } from "@helpdesk/shared/utils";
 import { MessageInput } from "@whatsapp/ui";
 import { Button, call } from "frappe-ui";
-import { inject, onBeforeUnmount, onMounted, ref, useTemplateRef } from "vue";
+import { onBeforeUnmount, onMounted, ref, useTemplateRef } from "vue";
 import type { TicketWhatsApp } from "./useTicketWhatsApp";
 import WhatsAppIcon from "./WhatsAppIcon.vue";
 import WhatsAppTemplatePicker from "./WhatsAppTemplatePicker.vue";
 
 const props = defineProps<{ whatsapp: TicketWhatsApp }>();
 const emit = defineEmits<{ sent: [] }>();
-const ticket = inject(TicketSymbol, null);
 
 const input = useTemplateRef<{ focus: () => void }>("input");
 const savedReplyActions =
