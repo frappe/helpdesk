@@ -137,7 +137,18 @@
                 <div class="w-[840px] pt-[60px]">
                   <div class="mx-auto flex w-[400px] flex-col gap-5 p-6">
                     <div class="flex flex-col items-start gap-4">
-                      <img :src="FRAPPE_LOGO" alt="" class="size-8" />
+                      <span
+                        class="flex size-8 items-center justify-center overflow-hidden rounded-[7px]"
+                        :class="setup.brandLogo ? 'dark:bg-white' : ''"
+                      >
+                        <img
+                          v-if="setup.brandLogo"
+                          :src="setup.brandLogo"
+                          alt=""
+                          class="size-full object-cover"
+                        />
+                        <HDLogo v-else class="size-full" />
+                      </span>
                       <div class="flex flex-col gap-1.5">
                         <p class="text-3xl font-bold text-ink-gray-9">
                           {{ __("Sign In") }}
@@ -481,8 +492,6 @@ import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
 import SetupPreviewDesk from "./SetupPreviewDesk.vue";
 import { SAMPLE_TICKET, avatarUrl, nameOf } from "./preview";
 import { brand, invitees, setup } from "./setup";
-
-const FRAPPE_LOGO = "/assets/frappe/images/frappe-framework-logo.svg";
 
 type Page = "login" | "home" | "desk-list" | "desk-ticket" | "portal-ticket";
 type Point = { x: number; y: number };
