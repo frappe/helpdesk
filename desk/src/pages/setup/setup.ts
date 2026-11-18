@@ -100,7 +100,20 @@ function track(event: string, data: Record<string, string | number> = {}) {
 
 const STEP_KEY = "helpdesk-setup-step";
 
+const SETTLE_MS = 500;
+let movedAt = 0;
+
+/** Drops an Enter that lands while a step or the done dialog is still coming in: it was meant for what was there before. */
+export function holdEnter(event: KeyboardEvent) {
+  if (event.key !== "Enter" || event.target instanceof HTMLTextAreaElement)
+    return;
+  if (!event.repeat && performance.now() - movedAt >= SETTLE_MS) return;
+  event.preventDefault();
+  event.stopPropagation();
+}
+
 function goTo(step: StepKey) {
+  movedAt = performance.now();
   setup.step = step;
   sessionStorage.setItem(STEP_KEY, step);
   funnel.stepStartedAt = Date.now();
@@ -149,6 +162,7 @@ function finishSetup() {
     data: { completed_steps: funnel.completed, skipped_steps: funnel.skipped },
   });
   completing = call("helpdesk.api.setup.complete_setup").catch(() => null);
+  movedAt = performance.now();
   setup.showDone = true;
 }
 
