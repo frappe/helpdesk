@@ -21,7 +21,7 @@ concurrency:
 jobs:
   tests:
     name: Python Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
     timeout-minutes: 60
 
     services:
@@ -118,7 +118,7 @@ jobs:
   coverage:
     name: Coverage Wrap Up
     needs: tests
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
     steps:
       - name: Clone
         uses: actions/checkout@v6
