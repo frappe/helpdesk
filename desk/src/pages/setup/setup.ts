@@ -148,14 +148,14 @@ function finishSetup() {
   capture("setup_completed", {
     data: { completed_steps: funnel.completed, skipped_steps: funnel.skipped },
   });
-  completing = call("helpdesk.api.setup.complete_setup").catch(() => {});
+  completing = call("helpdesk.api.setup.complete_setup").catch(() => null);
   setup.showDone = true;
 }
 
-let completing: Promise<unknown> = Promise.resolve();
+let completing: Promise<string | null> = Promise.resolve(null);
 
-/** Opens the desk once the server has ended setup, with a fresh boot: finishing can make the admin an agent. */
+/** Opens the welcome ticket once the server has ended setup, with a fresh boot: finishing can make the admin an agent. */
 export async function openDesk() {
-  await completing;
-  window.location.replace("/helpdesk/home");
+  const ticket = await completing;
+  window.location.replace(`/helpdesk/tickets/${ticket ?? ""}`);
 }

@@ -54,7 +54,7 @@
               type="text"
               :aria-label="__('Email {0}', [i + 1])"
               placeholder="name@company.com"
-              :disabled="row.sent"
+              :disabled="row.sent || sending"
               :error="rowErrors[row.id]"
               :title="row.email"
               @keydown.enter="onEnter(i)"
@@ -66,7 +66,7 @@
               type="select"
               :aria-label="__('Role {0}', [i + 1])"
               :options="ROLE_OPTIONS"
-              :disabled="row.sent"
+              :disabled="row.sent || sending"
             />
           </div>
           <div class="flex h-7 w-16 shrink-0 items-center justify-end">
@@ -81,6 +81,7 @@
                 variant="ghost"
                 icon="lucide-x"
                 :aria-label="__('Remove row')"
+                :disabled="sending"
                 @click="removeRow(row.id)"
               />
             </Tooltip>
@@ -93,7 +94,7 @@
           variant="outline"
           icon-left="lucide-plus"
           :label="__('Add another')"
-          :disabled="setup.rows.length >= MAX_ROWS"
+          :disabled="sending || setup.rows.length >= MAX_ROWS || !lastRowFilled"
           @click="addRow"
         />
         <span
@@ -203,6 +204,10 @@ const hasValidEmail = computed(() =>
   )
 );
 const unsentCount = computed(() => pendingRows.value.length);
+const lastRowFilled = computed(() => {
+  const last = setup.rows[setup.rows.length - 1];
+  return last.sent || !!normalizeEmail(last.email);
+});
 
 function addRow() {
   const unfinished = setup.rows.find(

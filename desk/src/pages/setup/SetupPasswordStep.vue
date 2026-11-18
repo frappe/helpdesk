@@ -37,6 +37,7 @@
           placeholder="••••••••"
           autocomplete="new-password"
           autofocus
+          @focusout="passwordLeft = true"
         />
         <div
           class="grid transition-[grid-template-rows,opacity] duration-200 ease-out motion-reduce:transition-none"
@@ -68,6 +69,7 @@
           class="mt-1.5"
           placeholder="••••••••"
           autocomplete="new-password"
+          @focusout="confirmLeft = true"
         />
         <div
           class="grid transition-[grid-template-rows,opacity] duration-200 ease-out motion-reduce:transition-none"
@@ -115,7 +117,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
-import { refDebounced, watchDebounced } from "@vueuse/core";
+import { watchDebounced } from "@vueuse/core";
 import {
   Button,
   call,
@@ -150,10 +152,13 @@ const STRENGTH = computed(() => [
   { label: __("Good"), ink: "text-ink-green-6" },
   { label: __("Great"), ink: "text-ink-green-6" },
 ]);
+const passwordLeft = ref(false);
 const checked = computed(() => !!setup.password && !!score.data);
 const strength = computed(
   () =>
-    (checked.value && STRENGTH.value[score.data.score]) || {
+    (checked.value &&
+      (passwordLeft.value || acceptable.value) &&
+      STRENGTH.value[score.data.score]) || {
       label: "",
       ink: "",
     }
@@ -165,12 +170,16 @@ const acceptable = computed(
     (!("score" in score.data) ||
       score.data.feedback.password_policy_validation_passed)
 );
-const showHint = computed(() => checked.value && !acceptable.value);
+const showHint = computed(
+  () => passwordLeft.value && checked.value && !acceptable.value
+);
 
 const confirmPassword = ref("");
-const settledConfirm = refDebounced(confirmPassword, 500);
+const confirmLeft = ref(false);
 const matches = computed(() => confirmPassword.value === setup.password);
-const mismatch = computed(() => !!settledConfirm.value && !matches.value);
+const mismatch = computed(
+  () => confirmLeft.value && !!confirmPassword.value && !matches.value
+);
 const canSave = computed(
   () => acceptable.value && !!confirmPassword.value && matches.value
 );

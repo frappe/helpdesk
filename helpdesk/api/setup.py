@@ -1,6 +1,8 @@
 import frappe
 from frappe import _
 
+from helpdesk.setup.welcome_ticket import AUTHOR_EMAIl as WELCOME_TICKET_AUTHOR
+
 SETUP_ROLE = "System Manager"
 
 
@@ -22,11 +24,18 @@ def is_setup_pending() -> bool:
 
 
 @frappe.whitelist(methods=["POST"])
-def complete_setup():
-    """Ends the first-run setup, on Finish or Skip. A second call is a no-op."""
+def complete_setup() -> str | None:
+    """Ends the first-run setup, on Finish or Skip. A second call is a no-op.
+    Returns the welcome ticket, for the desk to open first."""
     frappe.only_for(SETUP_ROLE)
     finish_frappe_setup()
     frappe.db.set_single_value("HD Settings", "setup_complete", 1)
+    return frappe.db.get_value(
+        "HD Ticket",
+        {"raised_by": WELCOME_TICKET_AUTHOR},
+        "name",
+        order_by="creation asc",
+    )
 
 
 @frappe.whitelist(methods=["POST"])

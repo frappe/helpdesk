@@ -5,7 +5,8 @@ from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.setup import complete_setup, is_setup_pending, reset_setup
 from helpdesk.patches.mark_existing_sites_set_up import execute as mark_existing_sites
-from helpdesk.test_utils import as_v2_site, create_agent, unique_email
+from helpdesk.setup.welcome_ticket import AUTHOR_EMAIl
+from helpdesk.test_utils import as_v2_site, create_agent, make_ticket, unique_email
 
 FRAMEWORK_SETUP = "frappe.desk.page.setup_wizard.setup_wizard.setup_complete"
 
@@ -56,6 +57,11 @@ class TestSetup(IntegrationTestCase):
         framework_setup.assert_called_once()
         self.assertIn("timezone", framework_setup.call_args.args[0])
         self.assertTrue(frappe.db.get_single_value("HD Settings", "setup_complete"))
+
+    def test_complete_returns_welcome_ticket(self) -> None:
+        welcome = make_ticket(raised_by=AUTHOR_EMAIl).name
+        with self.not_v2_site():
+            self.assertEqual(complete_setup(), welcome)
 
     def test_complete_leaves_finished_framework_setup(self) -> None:
         with (
