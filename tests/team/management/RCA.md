@@ -48,10 +48,25 @@ flowchart LR
 
 | Type | Action | Owner | Verification |
 |---|---|---|---|
-| Corrective | In the job, replace `flags.ignore_validate` with a narrow flag that only `validate_feedback` honours (for example `doc.flags.skip_feedback_rule = True`), so `validate` and `before_save` run; or, as the smallest change, call `doc.set_resolution_date()` before `save`. | M1 (CI fix PR) | `test_auto_closed_ticket_…` turns from expected failure to pass (strict xfail makes CI fail until the marker is removed); unit tests for BR1 and BR3 and the mutation gate still pass |
+| Corrective | In the job, replace `flags.ignore_validate` with a narrow flag that only `validate_feedback` honours (`doc.flags.skip_feedback_rule = True`), so `validate` and `before_save` run. | M1 (CI fix PR) | `test_auto_closed_ticket_…` turns from expected failure to pass (strict xfail makes CI fail until the marker is removed); unit tests for BR1 and BR3 and the mutation gate still pass |
 | Corrective | Data repair: back-fill `resolution_date` of tickets closed by the job from the time of their "automatically closed the ticket" comment. | M2 | Query: Resolved-category tickets with an empty date = 0 |
 | Preventive | Add an invariant test that drives every status-changing path (agent UI, customer close, API, auto-close job) and asserts "category Resolved ⇔ resolution date set". | M2 | Test in `api/`, part of the CI gate |
 | Preventive | Review checklist and a Semgrep/Sonar custom rule: any `flags.ignore_validate` in Helpdesk code must state which `before_save` effects it gives up. | M1 | Rule runs in CI; existing uses listed and reviewed |
+
+**Status (18 Nov 2026).** The first corrective action is done:
+[PR #38](https://github.com/ibbster05/helpdesk/pull/38) was merged into
+`team/sqe-tests` after the required SQE gate passed (run 44295797221), and
+Issue #2 is closed. With the fix in place and the strict-xfail marker still
+present, the API test reported `XPASS(strict)`, so the gate made the marker's
+removal part of the fix. Upstream's 129 `test_hd_ticket` tests gave the same
+result with and without the fix (118 pass; the same 11 error in both runs
+because the test site has no outgoing mail account).
+
+An alternative first considered, calling `doc.set_resolution_date()` before
+`save`, was rejected while writing the fix: at that point `before_validate`
+has not yet run, so `status_category` still holds the old value and the date
+would be cleared instead of set. The data repair and the two preventive
+actions are still open.
 
 <a id="rca-2"></a>
 ## RCA-2: DEF-02, a customer can assign an agent to their own ticket

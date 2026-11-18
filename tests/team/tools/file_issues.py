@@ -12,6 +12,7 @@ issue number, or are in issue_map.json, are skipped, so reruns are safe.
 import argparse
 import json
 import subprocess
+import time
 from pathlib import Path
 
 import yaml
@@ -81,6 +82,7 @@ def main():
         if d["status"] in ("Rejected",):
             subprocess.run(["gh", "issue", "close", url, "--reason", "not planned"], check=True)
         print(f"created {url}  {title}")
+        time.sleep(3)  # stay under GitHub's secondary rate limit for content creation
     print(f"{len(todo)} defects {'filed' if args.execute else 'to file'}")
 
 

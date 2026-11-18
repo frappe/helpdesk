@@ -64,7 +64,7 @@ performance (k6). Each executable case is counted once within its level.
 | Stack | Python 3.14.4, Node 24, MariaDB 11.8.6, Redis 8.0.5 (no RediSearch), bench 5.31.1 |
 | Site | `helpdesk.localhost` on `bench serve` port 8000, developer mode |
 | Tools | pytest 9.2, coverage.py 7.17.3, Cosmic Ray 8.9.0, Playwright 1.65.1 (Chromium), @axe-core/playwright 4.14.0, Lighthouse 13.6.0, OWASP ZAP 2.17.0, pip-audit 2.10.1, k6 2.4.0, SonarQube Community Build 26.11 + SonarScanner 8.4 |
-| CI | GitHub Actions on the group's public fork (to be set up; see schedule) |
+| CI | GitHub Actions on the group's public fork https://github.com/ibbster05/helpdesk: `.github/workflows/sqe-quality-gate.yml` on every PR into `team/sqe-tests` (unit + coverage, mutation, SonarQube gate, API + browser on a live site); the "SQE gate" check is required by branch protection |
 
 Set-up, start, seed and reset commands are in `tests/team/README.md` and
 the scripts `seed.sh` and `run_*.sh`.
@@ -85,7 +85,7 @@ come from `api/generated/testdata.json`, produced by
 | Week | Dates | Planned | Status (18 Nov) |
 |---|---|---|---|
 | 1 | 16–22 Nov 2026 | Environment and baseline; scope and test basis; unit + MCC/MC/DC; mutation; OpenAPI + generator + API tests; use cases + Playwright; usability/accessibility; security; performance; SonarQube | Done except the items below |
-| 2 | 23–29 Nov 2026 | Public fork; members commit their own areas; GitHub Issues for the defect log; CI pipeline; blocked PR; documented fix PR (DEF-01 or DEF-02); RCA; risk review | Not started |
+| 2 | 23–29 Nov 2026 | Public fork; members commit their own areas; GitHub Issues for the defect log; CI pipeline; blocked PR; documented fix PR (DEF-01 or DEF-02); RCA; risk review | Started early (18 Nov): fork, Issues #2–#36, CI gate (PR #1), blocked PR #37, fix PR #38 done; members' own commits and risk review open |
 | 3 | 30 Nov–6 Dec 2026 | Regression on fixes; final weekly report; completion report; AI-use record; PDF and zip; viva rehearsal (each member reruns a test) | Not started |
 
 The submission deadline is set by the course; the team adjusts weeks 2–3
@@ -102,7 +102,7 @@ the requirements it covers are in the traceability matrix.
 | ID | Criterion | Target | Risks | Actual (18 Nov) | Met? |
 |---|---|---|---|---|---|
 | EC-1 | Unit tests on the business-rule scope | all pass; 100 % statement and branch coverage; mutation score ≥ 95 % | PR-01, PR-02, PR-03, PR-04 | 159 pass; 100 % / 100 %; 97.0 % | **Yes** |
-| EC-2 | Open Major or Critical defects against BR1–BR4 | 0 | PR-02, PR-03 | 1 (DEF-01) | **No** |
+| EC-2 | Open Major or Critical defects against BR1–BR4 | 0 | PR-02, PR-03 | 0 (DEF-01 fixed by PR #38) | **Yes** |
 | EC-3 | Access decisions and access-control defects | 13 / 13 decisions as expected and 0 open Major access-control defects | PR-05 | 12 / 13; 2 open (DEF-02, DEF-03) | **No** |
 | EC-4 | Performance of opening a ticket | p95 ≤ 800 ms at 5 users and < 1 % unexpected failures, in both runs | PR-09 | 27.7 / 25.8 ms; 0 % | **Yes** |
 | EC-5 | Accessibility of the fixed key screen (customer ticket page) | Lighthouse accessibility ≥ 90 and 0 critical/serious axe violations | PR-08 | 100; 0 | **Yes** |
@@ -138,3 +138,4 @@ weekly progress reports, test completion report, AI-use record.
 |---|---|---|
 | 1.0 | 2026-11-16 | Scope, workflows, rules and roles agreed; test levels chosen |
 | 1.1 | 2026-11-18 | Plan written up with risks, estimates, criteria and week-1 status; recovery test and calibration added; SonarQube moved to port 9100 |
+| 1.2 | 2026-11-18 | CI gate on the public fork; EC-2 met after the DEF-01 fix |

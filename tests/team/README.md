@@ -73,6 +73,24 @@ bash apps/helpdesk/tests/team/seed.sh reset    # delete test tickets, restore se
 | SonarQube | `bash tests/team/sonar/server.sh start`; `bash tests/team/sonar/run_sonar.sh` | `sonar/SONAR_REPORT.md` |
 | Defect summary, Pareto, GQM | `python tests/team/tools/defects_report.py` | `management/generated/` |
 
+## CI quality gate
+
+Public fork: https://github.com/ibbster05/helpdesk, integration branch
+`team/sqe-tests`. Every pull request into that branch runs
+`.github/workflows/sqe-quality-gate.yml`; branch protection requires its final
+**SQE gate** check, so a red run blocks the merge.
+
+| Job | Fails when |
+|---|---|
+| Unit tests + coverage gate | a unit test fails, or statement/branch coverage of the rule scope is below 100 % |
+| Mutation score >= 95 % | the Cosmic Ray score of the rule scope is below 95 % |
+| SonarQube quality gate | the "SQE gate" (`sonar/sonar_admin.py gate`) fails; counts are held at the 18 Nov baseline because the CI server is new for every run |
+| API + browser tests on a live site | an API or Playwright test fails, or a pinned weakness (strict xfail) passes unexpectedly |
+
+k6, ZAP and the Lighthouse/axe scans run locally only: their limits are not
+meaningful on shared runners. Defects are GitHub Issues #2–#35
+(`management/defects.yaml`, field `issue`).
+
 ## Tool versions
 
 pytest 9.2, coverage.py 7.17.3, Cosmic Ray 8.9.0, Playwright 1.65.1
