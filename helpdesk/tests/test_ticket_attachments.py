@@ -13,7 +13,7 @@ class TestTicketAttachments(FrappeTestCase):
 
     def upload_as(self, user, ticket=None):
         with self.set_user(user):
-            file_name = upload_test_file("outlook.png")
+            file_name = upload_test_file("article.png")
         if ticket:
             frappe.db.set_value(
                 "File",

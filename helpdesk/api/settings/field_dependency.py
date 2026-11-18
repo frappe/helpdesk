@@ -41,6 +41,10 @@ def create_update_field_dependency(
     enabled: bool,
     fields_criteria: str,
 ):
+    """Limit a ticket field's options by another field's value (a field dependency).
+    Writes HD Form Script "Field Dependency-<parent>-<child>". `parent_child_mapping`
+    is JSON {parent value: [child options]}; `fields_criteria` can set the child's
+    display and mandatory depends-on. Needs create permission on HD Form Script."""
     frappe.has_permission("HD Form Script", "create", throw=True)
     if not parent_field or not child_field or not parent_child_mapping:
         frappe.throw(

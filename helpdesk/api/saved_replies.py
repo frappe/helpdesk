@@ -15,6 +15,9 @@ from helpdesk.utils import agent_only
 @frappe.whitelist()
 @agent_only
 def get_rendered_saved_reply(ticket_id: str, saved_reply_id: str | None = None):
+    """Render a saved reply for a ticket; returns its title, message and valid actions.
+    The message is Jinja rendered with the ticket's and the current user's fields.
+    Each action is {action_type, value, label}. For agents who can read both."""
     if not saved_reply_id:
         frappe.throw(_("Please provide saved_reply_id"))
     saved_reply = frappe.get_doc("HD Saved Reply", saved_reply_id)
