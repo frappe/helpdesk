@@ -6,7 +6,7 @@ cd ~ || ex
 
 sudo apt update
 sudo apt remove -y mysql-server mysql-client
-sudo apt install -y libcups2-dev redis-server mariadb-client libmariadb-dev wget
+sudo apt install -y build-essential pkg-config libcups2-dev redis-server mariadb-client libmariadb-dev libffi-dev libssl-dev libjpeg-dev libcairo2-dev libpango1.0-dev wget
 
 # Ubuntu 26.04's mariadb-client (11.8) requires SSL; the mariadb:10.6 service has none.
 printf '[client]\nskip-ssl\n' > ~/.my.cnf
