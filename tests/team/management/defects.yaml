@@ -302,7 +302,7 @@
   severity: Major
   priority: P1
   status: Open
-  note: fixed on S2 (customer ticket page) only
+  note: "fixed on S2 (customer ticket page) by PR #43; open on S1, S4, S5"
   triage: Fix
   layer: frontend
   risk: [PR-08]
@@ -333,7 +333,7 @@
   severity: Major
   priority: P1
   status: Open
-  note: fixed on S2/S3 only
+  note: "fixed on S2/S3 by PR #43; open on S1, S5"
   triage: Fix
   layer: frontend
   risk: [PR-08]
@@ -348,7 +348,9 @@
   category: Accessibility
   severity: Major
   priority: P1
-  status: Fixed (verified locally, not merged)
+  status: Closed
+  fixed_on: 2026-11-18
+  note: "fixed by PR #43 (shared iframe component, so every screen); re-scanned with axe and Lighthouse"
   triage: Fix
   layer: frontend
   risk: [PR-08]
@@ -394,7 +396,7 @@
   severity: Minor
   priority: P2
   status: Open
-  note: fixed on S2 only; A11Y-09 has the same root cause and is not counted separately
+  note: "fixed on S2 by PR #43; open elsewhere. A11Y-09 has the same root cause and is not counted separately"
   triage: Fix
   layer: frontend
   risk: [PR-08]
@@ -410,7 +412,7 @@
   severity: Minor
   priority: P2
   status: Open
-  note: fixed on S2 only
+  note: "fixed on S2 by PR #43; open elsewhere"
   triage: Fix
   layer: frontend
   risk: [PR-08]
@@ -440,7 +442,9 @@
   category: Accessibility
   severity: Trivial
   priority: P3
-  status: Fixed (verified locally, not merged)
+  status: Closed
+  fixed_on: 2026-11-18
+  note: "fixed by PR #43 (shared page shell, so every screen); re-scanned with axe and Lighthouse"
   triage: Fix
   layer: frontend
   risk: [PR-08]

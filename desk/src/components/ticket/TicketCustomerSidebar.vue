@@ -26,7 +26,11 @@
             "
           >
             <Tooltip :text="ticket.data.contact.email_id">
-              <Button class="h-7 w-7" @click="emit('open')">
+              <Button
+                class="h-7 w-7"
+                :aria-label="__('Write a reply')"
+                @click="emit('open')"
+              >
                 <template #icon>
                   <EmailIcon class="h-4 w-4" />
                 </template>
@@ -41,7 +45,7 @@
         class="flex items-center text-base leading-5"
         v-for="field in ticketBasicInfo"
       >
-        <span class="w-[126px] text-sm text-ink-gray-5">{{
+        <span class="w-[126px] text-sm text-ink-gray-7">{{
           __(field.label)
         }}</span>
         <span
@@ -58,7 +62,7 @@
         :key="data.title"
         class="flex items-center text-base"
       >
-        <div class="w-[126px] text-ink-gray-5 text-sm">{{ data.title }}</div>
+        <div class="w-[126px] text-ink-gray-7 text-sm">{{ data.title }}</div>
         <div
           class="break-words text-base text-ink-gray-8 flex items-center gap-2"
         >
@@ -98,7 +102,7 @@
         v-for="field in ticketAdditionalInfo"
         :key="field.fieldname"
       >
-        <span class="w-[126px] text-sm text-ink-gray-5">{{
+        <span class="w-[126px] text-sm text-ink-gray-7">{{
           __(field.label)
         }}</span>
         <Tooltip :disabled="!storedStamp(field)" :text="storedStamp(field)">
