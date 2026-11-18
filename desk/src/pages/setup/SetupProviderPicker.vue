@@ -286,7 +286,6 @@
         class="[&>div:last-child]:hidden"
         :service="selected"
         :error="invalid"
-        :lock-email="fromGmail"
       />
       <Transition
         enter-active-class="overflow-hidden transition-all duration-200 ease-out motion-reduce:transition-none"
