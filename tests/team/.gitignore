@@ -3,3 +3,4 @@ __pycache__/
 .coverage
 .env
 .scannerwork/
+report/report.pdf

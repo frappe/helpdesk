@@ -42,6 +42,10 @@ for line in src.read_text(encoding="utf-8").splitlines():
             if m:
                 rows.append((ts, "setting", m.group(1).strip()))
                 continue
+            if t.startswith("<command-"):
+                continue  # the app's own record of a slash command; its result is the "setting" row
+            if "<pasted_content" in t:
+                t = re.sub(r"</?pasted_content[^>]*>", "", t).strip()
             rows.append((ts, "prompt", t))
 
 lines = [

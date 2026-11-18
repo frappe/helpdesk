@@ -114,6 +114,9 @@ wrong and evidence corrected it.
 | 12 | Wrote in the security report that DOMPurify's eight CVEs were "fixed by 3.4.16" | OSV query while fixing DEF-14: three are fixed only in 3.4.17 | Report corrected; the fix uses 3.4.18 and CT-08 requires at least 3.4.17 |
 | 13 | Assumed `bench build` would install the new DOMPurify version | The rebuilt bundle still said "DOMPurify 3.4.8" | Ran `yarn install` before the build; the bundle then said 3.4.18 |
 | 14 | The data repair tool opened its `--report` path after changing into `sites/`, so a relative path failed | First run on the local site | Path made absolute before the directory change |
+| 15 | First draft of the final report swapped the two usability tasks (which one has the rejected value, which one is keyboard-only) and overstated three facts (the API coverage criteria, Sonar's Python bugs, pip-audit "none on the request path") | Checking each claim against the test files and reports before building the PDF | Corrected in `report/REPORT.md` |
+| 16 | `sonar/SONAR_REPORT.md` §5 still described the CI gate as planned ("will be"), with new-code conditions the built gate does not use | Reading the rendered appendix | §5 rewritten from `sonar_admin.py`'s actual conditions |
+| 17 | The prompt extractor copied the app's own markup for the `/model` command into `PROMPTS.md` | Reading the rendered appendix | Extractor skips that markup; the setting row records the change |
 
 ## 6. What the agent did not do
 

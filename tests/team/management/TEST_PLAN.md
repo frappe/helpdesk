@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Plan version | 1.1 (see change log at the end) |
+| Plan version | 1.3 (see change log at the end) |
 | System under test | frappe/helpdesk, https://github.com/frappe/helpdesk, AGPL-3.0, branch `version-16`, baseline commit `e326986329341c803dd4bf094322670ad0591ca5` (16.1.0), on Frappe Framework v16.56.0 (`49789a1`) |
 | Team | three members (M1, M2, M3: replace with names and roll numbers) |
 

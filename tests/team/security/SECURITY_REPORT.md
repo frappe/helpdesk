@@ -146,8 +146,11 @@ distinct advisories in 3 packages**.
 
 ## 6. Findings
 
-Severity is the team's proposal for triage; each finding still needs a
-GitHub Issue and an entry in the risk register.
+Each finding is a GitHub Issue: SEC-01 = DEF-02 (#3), SEC-02 = DEF-14 (#15),
+SEC-03 = DEF-15 (#16), SEC-04 = DEF-16 (#17), SEC-05 = DEF-13 (#14), with
+severity, priority and triage in `management/defects.yaml`. They are linked
+to risks PR-05 (access control) and PR-10 (components) in the risk register.
+SEC-01 and SEC-02 are fixed (PRs #41 and #42).
 
 | ID | Finding | Evidence | Root cause | Severity | Likely impact | Recommended correction |
 |---|---|---|---|---|---|---|
