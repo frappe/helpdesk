@@ -237,17 +237,7 @@
       class="space-y-6"
       @submit.prevent="create"
     >
-      <div class="flex items-center justify-between gap-2">
-        <h2 class="text-md-semibold text-ink-gray-7">{{ formTitle }}</h2>
-        <Button
-          v-if="fromGmail"
-          variant="ghost"
-          size="sm"
-          class="-me-2"
-          :label="__('Change email')"
-          @click="back"
-        />
-      </div>
+      <h2 class="text-md-semibold text-ink-gray-7">{{ formTitle }}</h2>
       <Transition v-bind="swap">
         <div
           v-if="shortcut"
