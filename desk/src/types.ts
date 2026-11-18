@@ -348,21 +348,23 @@ export interface RootCategory {
 export interface Article {
   name: string;
   title: string;
+  title_slug: string;
   category_name: string;
-  category_id: string;
+  parent_category_name?: string | null;
+  category: string;
   published_on: string;
   author: Author;
   subtitle: string;
   article_image: string | null;
   _user_tags: string | null;
   status: string;
+  visibility: string;
   creation: string;
   content: string;
   modified: string;
-  feedback: FeedbackAction;
+  weight: number;
+  pinned: 0 | 1;
 }
-
-export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
 
 export interface Author {
   name: string;
@@ -394,6 +396,7 @@ export interface View {
   pinned?: boolean;
   public?: boolean;
   group_by_field?: string;
+  list_group_by?: string;
   name: string;
   is_customer_portal?: boolean;
 }
@@ -564,7 +567,6 @@ export interface HDSettings {
   isFeedbackMandatory: boolean;
   allowAnyoneToCreateTickets: boolean;
   defaultTicketType: string;
-  preferKnowledgeBase: boolean;
   skipEmailWorkflow: boolean;
   disableSavedRepliesGlobalScope: boolean;
   enableOutsideHoursBanner: boolean;
@@ -701,6 +703,7 @@ declare global {
     default_country: string;
     apps: string[];
     cloud_settings?: { enabled: boolean };
+    customer_home_page: string;
   }
 }
 

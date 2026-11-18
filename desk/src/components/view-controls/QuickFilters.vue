@@ -12,6 +12,7 @@
       <QuickFilterField
         :filter="filter"
         :value="getValue(filter, list.params?.filters)"
+        :link-title="listViewData.quickFilterTitles[filter.name]"
         @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
       />
     </div>
@@ -21,7 +22,7 @@
 <script setup>
 import { FadedScrollableDiv } from "@/components";
 import { inject } from "vue";
-import { normalizeFilters } from "./filter";
+import { normalizeFilters } from "@helpdesk/shared/filter";
 import QuickFilterField from "./QuickFilterField.vue";
 
 const listViewData = inject("listViewData");

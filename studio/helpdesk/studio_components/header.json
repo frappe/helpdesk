@@ -1,0 +1,277 @@
+{
+ "block": {
+  "baseStyles": {
+   "alignItems": "center",
+   "display": "flex",
+   "justifyContent": "space-between",
+   "width": "100%",
+   "minWidth": "0",
+   "gap": "12px",
+   "flexShrink": 0
+  },
+  "children": [
+   {
+    "baseStyles": {
+     "alignItems": "center",
+     "display": "flex",
+     "flexDirection": "row",
+     "flexShrink": 1,
+     "gap": "8px",
+     "height": "fit-content",
+     "justifyContent": "flex-start",
+     "width": "fit-content",
+     "minWidth": "0"
+    },
+    "blockName": "container",
+    "children": [
+     {
+      "baseStyles": {
+       "display": "flex",
+       "width": "fit-content"
+      },
+      "blockName": "topbar-left",
+      "componentId": "KbNavMenu-topbar",
+      "componentName": "PortalNavMenu",
+      "componentProps": {
+       "logo": "{{ brandLogo }}",
+       "name": "{{ brandName }}",
+       "options": "{{ accountMenuOptions }}"
+      },
+      "componentSlots": {},
+      "isCustomVueComponent": true
+     },
+     {
+      "baseStyles": {
+       "alignItems": "center",
+       "display": "flex",
+       "height": "28px"
+      },
+      "componentId": "Breadcrumbs-header",
+      "componentName": "Breadcrumbs",
+      "componentProps": {
+       "items": "{{ (inputs.parentCrumb ? [{ label: inputs.parentCrumb, route: inputs.parentRoute }] : []).concat(inputs.crumb ? [{ label: inputs.crumb }] : []) }}"
+      },
+      "componentSlots": {},
+      "visibilityCondition": "{{ !inputs.currentView }}"
+     },
+     {
+      "baseStyles": {
+       "alignItems": "center",
+       "display": "flex",
+       "height": "28px"
+      },
+      "componentId": "KbViewBreadcrumbs-header",
+      "componentName": "PortalViewBreadcrumbs",
+      "componentProps": {
+       "currentView": "{{ inputs.currentView }}",
+       "label": "{{ inputs.viewLabel || t('Tickets') }}",
+       "options": "{{ inputs.viewOptions }}",
+       "viewActions": "{{ inputs.viewActions }}"
+      },
+      "componentSlots": {},
+      "isCustomVueComponent": true,
+      "visibilityCondition": "{{ inputs.currentView }}"
+     }
+    ],
+    "componentId": "container-xy0t2y8tg",
+    "componentName": "container",
+    "componentProps": {},
+    "componentSlots": {},
+    "originalElement": "div"
+   },
+   {
+    "baseStyles": {
+     "alignItems": "center",
+     "display": "flex",
+     "flexDirection": "row",
+     "gap": "12px",
+     "flexShrink": 0
+    },
+    "blockName": "header-right",
+    "children": [
+     {
+      "componentId": "CustomActions-header",
+      "componentName": "CustomActions",
+      "componentProps": {
+       "actions": "{{ customActions }}"
+      },
+      "componentSlots": {},
+      "isCustomVueComponent": true,
+      "visibilityCondition": "{{ customActions.length }}"
+     },
+     {
+      "baseStyles": {
+       "alignItems": "center",
+       "display": "flex",
+       "gap": "4px"
+      },
+      "blockName": "header-tail",
+      "children": [
+       {
+        "componentId": "PortalHeaderLinks-header",
+        "componentName": "PortalHeaderLinks",
+        "componentProps": {
+         "links": "{{ headerLinks }}"
+        },
+        "isCustomVueComponent": true
+       },
+       {
+        "componentEvents": {
+         "click": {
+          "action": "Run Script",
+          "event": "click",
+          "script": "toggleTheme()"
+         }
+        },
+        "componentId": "Button-theme",
+        "componentName": "Button",
+        "componentProps": {
+         "aria-label": "{{ t('Toggle theme') }}",
+         "icon": "{{ themeIcon }}",
+         "variant": "ghost"
+        },
+        "componentSlots": {},
+        "visibilityCondition": "{{ themeIcon }}"
+       }
+      ],
+      "componentId": "container-header-tail",
+      "componentName": "container",
+      "originalElement": "div",
+      "visibilityCondition": "{{ headerLinks.length || themeIcon }}"
+     },
+     {
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "signIn()"
+       }
+      },
+      "componentId": "Button-login",
+      "componentName": "Button",
+      "componentProps": {
+       "label": "{{ t('Log in') }}",
+       "variant": "solid"
+      },
+      "visibilityCondition": "{{ showLogin }}",
+      "componentSlots": {}
+     },
+     {
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "onPageAction()"
+       }
+      },
+      "componentId": "Button-page-action",
+      "componentName": "Button",
+      "componentProps": {
+       "iconLeft": "{{ pageActionIcon }}",
+       "label": "{{ pageActionLabel }}",
+       "variant": "solid"
+      },
+      "componentSlots": {},
+      "visibilityCondition": "{{ pageActionLabel }}"
+     },
+     {
+      "classes": [
+       "lg:hidden",
+       "shrink-0"
+      ],
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "drawer.toggle()"
+       }
+      },
+      "componentId": "Button-drawer-end",
+      "componentName": "Button",
+      "componentProps": {
+       "aria-label": "{{ inputs.drawerLabel }}",
+       "icon": "lucide-panel-right",
+       "variant": "ghost"
+      },
+      "visibilityCondition": "{{ inputs.drawerToggle === 'end' }}"
+     }
+    ],
+    "componentId": "container-header-right",
+    "componentName": "container",
+    "originalElement": "div"
+   }
+  ],
+  "componentId": "container-v2fhlmh1f",
+  "componentName": "container",
+  "componentProps": {},
+  "componentSlots": {},
+  "originalElement": "div",
+  "classes": [
+   "h-[43px]",
+   "bg-surface-base",
+   "border-b",
+   "border-outline-gray-2",
+   "px-3",
+   "sm:px-5",
+   "max-md:ps-4"
+  ]
+ },
+ "component_id": "header",
+ "component_name": "Header",
+ "creation": "2026-09-01 23:00:19.470034",
+ "docstatus": 0,
+ "doctype": "Studio Component",
+ "idx": 0,
+ "inputs": [
+  {
+   "input_name": "crumb",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "parentCrumb",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "parentRoute",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "currentView",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "viewOptions",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "viewActions",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "viewLabel",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "drawerToggle",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "drawerLabel",
+   "required": 0,
+   "type": "Data"
+  }
+ ],
+ "is_disabled": 0,
+ "modified": "2026-10-22 21:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "header",
+ "owner": "Administrator"
+}

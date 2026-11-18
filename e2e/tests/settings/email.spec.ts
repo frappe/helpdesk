@@ -115,7 +115,7 @@ test("each notification saves its content and switch, and share feedback its sta
       // The DB can update before the client clears its unsaved flag; going back early opens the unsaved-changes confirm.
       await expect(dialog.getByRole("button", { name: "Save", exact: true })).toBeDisabled();
       expect(await setting(api, notification.enabled)).toBe(before[notification.enabled] ? 0 : 1);
-      await dialog.getByRole("button", { name: "back to email event list" }).click();
+      await dialog.getByRole("button", { name: notification.label, exact: true }).click();
     }
     expect(await setting(api, "send_email_feedback_on_status")).toBe("Resolved");
   } finally {
@@ -138,7 +138,7 @@ test("notification content resets to the default, and leaving unsaved edits asks
   await expect(content).not.toHaveValue("<p>E2E draft that is never saved</p>");
 
   await content.fill("<p>E2E second draft</p>");
-  await dialog.getByRole("button", { name: "back to email event list" }).click();
+  await dialog.getByRole("button", { name: "Reply from agent", exact: true }).click();
   await page.getByRole("dialog", { name: "Unsaved changes" }).getByRole("button", { name: "Confirm" }).click();
   await expect(dialog.getByRole("heading", { name: "Reply from agent", level: 2 })).toBeVisible();
   expect(await setting(api, "reply_via_agent_email_content")).not.toContain("E2E second draft");
@@ -161,8 +161,7 @@ test("an admin links and unlinks an outgoing email account", async ({ page, api 
   }
 });
 
-test.fixme("a plain agent links an outgoing email account", async ({ page, api }) => {
-  // User.user_emails is permlevel 1, so an Agent's save silently drops the row.
+test("a plain agent links an outgoing email account", async ({ page, api }) => {
   const email = `e2e-link-${uid()}@example.com`;
   await createThrowawayAgent(api, email, PASSWORD);
   await page.context().clearCookies();
@@ -197,7 +196,7 @@ async function fillServers(dialog: Locator, incomingPort: string, outgoingPort: 
 
 async function openNotification(dialog: Locator, label: string) {
   await dialog.getByRole("listitem").filter({ hasText: label }).click();
-  await expect(dialog.getByRole("heading", { name: label, level: 1 })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: label, exact: true })).toBeVisible();
 }
 
 async function setting(api: Api, field: string) {

@@ -1332,6 +1332,14 @@
   version "1.2.75"
   resolved "https://registry.yarnpkg.com/@iconify-json/simple-icons/-/simple-icons-1.2.75.tgz#357d17780162e29e887a7acfc678eb0c57d3c513"
   integrity sha512-KvcCUbvcBWb0sbqLIxHoY8z5/piXY08wcY9gfMhF+ph3AfzGMaSmZFkUY71HSXAljQngXkgs4bdKdekO0HQWvg==
+"@helpdesk/shared@link:./shared":
+  version "0.0.0"
+  uid ""
+
+"@histoire/app@^0.17.17":
+  version "0.17.17"
+  resolved "https://registry.yarnpkg.com/@histoire/app/-/app-0.17.17.tgz#3aa6fbb7be516c865480b5a2cf2cfad07e230af0"
+  integrity sha512-2i1V38o08V+eaR0d3L0/EA6AYG14xyQBJbyYv0Hz3r4sH3Elj1FoJiwolbCfTDmkOnSgwWTc7+JoCqkLIbxfhA==
   dependencies:
     "@iconify/types" "*"
 

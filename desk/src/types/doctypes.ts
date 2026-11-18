@@ -38,7 +38,7 @@ export interface HDTicket extends DocType {
   /** Raised By (Email): Data */
   raised_by?: string;
   /** Status: Link (HD Ticket Status) */
-  status?: string;
+  status: string;
   /** Priority: Link (HD Ticket Priority) */
   priority?: string;
   /** Ticket Type: Link (HD Ticket Type) */
@@ -99,6 +99,14 @@ export interface HDTicket extends DocType {
   feedback_rating?: any;
   /** Summary: Text Editor */
   summary?: string;
+  /** Entry Point: Select */
+  entry_point?: '' | 'Article' | 'Search' | 'Ticket List' | 'Closed Ticket' | 'Direct' | 'External';
+  /** Source Article: Link (HD Article) */
+  source_article?: string;
+  /** Source Search: Data */
+  source_search?: string;
+  /** UTM Source: Data */
+  utm_source?: string;
   /** Ticket Merged: Check */
   is_merged: 0 | 1;
   /** Merged With: Link (HD Ticket) */
@@ -289,7 +297,7 @@ export interface HDServiceLevelAgreement extends DocType {
   default_ticket_status?: string;
 }
 
-// Last updated: 2026-09-02 19:00:00.000000
+// Last updated: 2026-09-28 12:00:00.000000
 export interface HDAgent extends DocType {
   /** User: Link (User) */
   user: string;
@@ -329,7 +337,7 @@ export interface HDTeamMember extends ChildDocType {
   user?: string;
 }
 
-// Last updated: 2026-05-11 13:28:58.204342
+// Last updated: 2026-10-14 15:52:16.630884
 export interface HDTeam extends DocType {
   /** Name: Data */
   team_name: string;
@@ -351,7 +359,7 @@ export interface HDCustomerMember extends ChildDocType {
   contact_name: string;
 }
 
-// Last updated: 2026-06-20 15:34:00.998330
+// Last updated: 2026-10-09 12:00:00.000000
 export interface HDCustomer extends DocType {
   /** Image: Attach Image */
   image?: string;

@@ -7,7 +7,8 @@ export async function raiseTicket(customer: Api, subject = `E2E ticket ${uid()}`
   });
 }
 
-/** Short unique suffix so specs never collide with each other or old runs. */
+/** Short unique suffix so specs never collide with each other or old runs.
+ * No "x": the editor's typography turns "2x4" into "2×4". */
 export function uid() {
-  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`.replaceAll("x", "y");
 }

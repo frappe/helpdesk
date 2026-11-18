@@ -17,9 +17,16 @@ from helpdesk.integrations.erpnext.utils import (
     sync_related_fields,
     validate_rename_conflict,
 )
-from helpdesk.utils import agent_only, get_customers, is_agent
+from helpdesk.utils import (
+    CUSTOMER_PORTAL_ROOT,
+    agent_manager_only,
+    agent_only,
+    get_customers,
+    is_agent,
+)
 
-CUSTOMER_ROLES = ("HD Customer", "HD Customer Manager")
+MANAGER_ROLE = "HD Customer Manager"
+CUSTOMER_ROLES = ("HD Customer", MANAGER_ROLE)
 
 
 class HDCustomer(Document):
@@ -109,6 +116,13 @@ class HDCustomer(Document):
             if contact.is_manager == was_manager.get(contact.contact_name):
                 continue
             self.sync_contact_role(contact)
+        # demote removed managers too
+        remaining = {contact.contact_name for contact in self.contacts}
+        for contact_name, is_manager in was_manager.items():
+            if is_manager and contact_name not in remaining:
+                self.sync_contact_role(
+                    frappe._dict(contact_name=contact_name, is_manager=0)
+                )
 
     def sync_contact_role(self, contact):
         """Grant the manager/member role to a single contact's user in one save."""
@@ -118,13 +132,13 @@ class HDCustomer(Document):
         user_doc = frappe.get_doc("User", user)
         roles_before = {r.role for r in user_doc.roles}
         if contact.is_manager:
-            user_doc.append_roles("HD Customer Manager", "HD Customer")
+            user_doc.append_roles(MANAGER_ROLE, "HD Customer")
         else:
             user_doc.append_roles("HD Customer")
             if not self.is_manager_in_other_customers(contact.contact_name):
                 user_doc.set(
                     "roles",
-                    [r for r in user_doc.roles if r.role != "HD Customer Manager"],
+                    [r for r in user_doc.roles if r.role != MANAGER_ROLE],
                 )
         # skip the costly user save when roles are already in sync
         if {r.role for r in user_doc.roles} != roles_before:
@@ -205,7 +219,15 @@ class HDCustomer(Document):
         rows = frappe.get_all(
             "Contact",
             filters={"name": ["in", contact_names]},
-            fields=["name", "email_id", "mobile_no", "phone", "image", "user"],
+            fields=[
+                "name",
+                "full_name",
+                "email_id",
+                "mobile_no",
+                "phone",
+                "image",
+                "user",
+            ],
         )
         return {row.name: row for row in rows}
 
@@ -290,7 +312,7 @@ class HDCustomer(Document):
             "contacts",
             {
                 "contact_name": contact_name,
-                "is_manager": role == "HD Customer Manager",
+                "is_manager": role == MANAGER_ROLE,
             },
         )
         return True
@@ -303,7 +325,7 @@ class HDCustomer(Document):
 
     def set_primary(self, contact_name: str) -> None:
         """Make a contact the primary contact, ensuring it is a manager member."""
-        self.add_contact(contact_name, "HD Customer Manager")
+        self.add_contact(contact_name, MANAGER_ROLE)
         self.primary_contact = contact_name
 
     def clear_primary(self) -> None:
@@ -326,7 +348,7 @@ class HDCustomer(Document):
             response = invite_by_email(
                 item["email"],
                 roles=[role],
-                redirect_to_path="/helpdesk",
+                redirect_to_path=CUSTOMER_PORTAL_ROOT,
                 app_name="helpdesk",
                 **params,
             )
@@ -335,12 +357,11 @@ class HDCustomer(Document):
         return result
 
     @frappe.whitelist()
+    @agent_manager_only
     def get_pending_invites(self):
-        if "Agent Manager" not in frappe.get_roles():
-            frappe.throw(
-                _("You do not have permission to access this resource"),
-                frappe.PermissionError,
-            )
+        return self.list_pending_invitations()
+
+    def list_pending_invitations(self) -> list[dict]:
         pending_invites = frappe.db.get_all(
             "User Invitation",
             filters={
@@ -355,23 +376,27 @@ class HDCustomer(Document):
                 "creation",
             ],
         )
-        res = []
-        for pending_invitation in pending_invites:
-            roles = frappe.db.get_all(
+        roles = {invitation.name: [] for invitation in pending_invites}
+        if roles:
+            for row in frappe.db.get_all(
                 "User Role",
-                fields=["role"],
-                filters={"parent": pending_invitation.name},
-            )
-            res.append(
-                {
-                    "name": pending_invitation.name,
-                    "email": pending_invitation.email,
-                    "invited_by": pending_invitation.invited_by,
-                    "invited_on": pending_invitation.creation,
-                    "roles": [r.role for r in roles],
-                }
-            )
-        return res
+                fields=["parent", "role"],
+                filters={
+                    "parenttype": "User Invitation",
+                    "parent": ["in", list(roles)],
+                },
+            ):
+                roles[row.parent].append(row.role)
+        return [
+            {
+                "name": invitation.name,
+                "email": invitation.email,
+                "invited_by": invitation.invited_by,
+                "invited_on": invitation.creation,
+                "roles": roles[invitation.name],
+            }
+            for invitation in pending_invites
+        ]
 
     def after_insert(self):
         if should_sync_with_erpnext() and not self.flags.get("ignore_erpnext_sync"):
@@ -472,20 +497,12 @@ def permission_query(user: str) -> str:
 
 
 def has_permission(doc: Document, ptype: str, user: str) -> bool:
-    """Per-record access for HD Customer.
-
-    Members of a customer can read it; only managers can write or delete it.
-    Agents are unrestricted; non-members are denied.
-    """
+    """Members only read; managers write through `helpdesk.api.customer`."""
     if is_agent(user):
         return True
-
-    membership = get_customer_membership(doc.name, user)
-    if not membership:
-        return False
     if ptype in ("write", "delete"):
-        return bool(membership.get("is_manager"))
-    return True
+        return False
+    return bool(get_customer_membership(doc.name, user))
 
 
 def get_customer_membership(customer: str, user: str) -> dict | None:
@@ -494,3 +511,10 @@ def get_customer_membership(customer: str, user: str) -> dict | None:
         if member.get("name") == customer:
             return member
     return None
+
+
+def is_customer_manager(customer: str | None, user: str | None = None) -> bool:
+    if not customer:
+        return False
+    membership = get_customer_membership(customer, user or frappe.session.user)
+    return bool(membership and membership.get("is_manager"))

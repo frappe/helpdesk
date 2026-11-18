@@ -31,7 +31,9 @@ test("an SLA policy is created with targets and working hours, then made default
 
     await expect.poll(() => api.exists(SLA, { name })).toBeTruthy();
     const sla = await api.get(SLA, name);
-    expect(sla.priorities.map((row) => row.priority).sort()).toEqual(["High", "Low", "Medium", "Urgent"]);
+    // Not a fixed list: other runs may have added priorities.
+    const priorities = await api.list("HD Ticket Priority", { fields: ["name"], limit: 0 });
+    expect(sla.priorities.map((row) => row.priority).sort()).toEqual(priorities.map((row) => row.name).sort());
     expect(sla.support_and_resolution).toHaveLength(5);
 
     await dialog.getByRole("checkbox", { name: "Set as default SLA" }).check();

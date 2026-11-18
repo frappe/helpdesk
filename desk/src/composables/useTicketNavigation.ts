@@ -1,4 +1,4 @@
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { router } from "@/router";
 import { createResource } from "frappe-ui";
 import { ref } from "vue";

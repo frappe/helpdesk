@@ -38,13 +38,11 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 import { computed, h, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 import { useAuthStore } from "@/stores/auth";
-import { isCustomerPortal } from "@/utils";
-import { useColorScheme } from "frappe-ui";
-import LucideMoon from "~icons/lucide/moon";
-import LucideSun from "~icons/lucide/sun";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
+import { useThemeMenuItem } from "@helpdesk/shared/themeMenu";
 
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { useApps } from "@/composables/useApps";
@@ -53,10 +51,8 @@ import AppSidebar from "./AppSidebar.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import AvailabilityDialog from "../AvailabilityDialog.vue";
 
-const { colorScheme, toggleColorScheme } = useColorScheme();
 const { appsMenuOption } = useApps();
 const route = useRoute();
-const router = useRouter();
 const authStore = useAuthStore();
 
 const agentStatusStore = useAgentStatusStore();
@@ -101,30 +97,15 @@ function onSidebarClosed() {
   availabilityDialogOpen.value = true;
 }
 
-const themeMenuItem = computed(() => ({
-  label: __("Toggle theme"),
-  icon: colorScheme.value === "dark" ? LucideSun : LucideMoon,
-  onClick: () => toggleColorScheme(),
-}));
+const themeMenuItem = useThemeMenuItem();
 
-const customerPortalDropdown = computed(() => [
-  {
-    label: __("Log out"),
-    icon: "lucide-log-out",
-    onClick: () => authStore.logout(),
-  },
-]);
-
-const agentPortalDropdown = computed(() => [
+const profileSettings = computed(() => [
   appsMenuOption.value,
   ...(authStore.hasAgentRecord ? [availabilityMenuOption.value] : []),
   {
     label: __("Customer portal"),
     icon: "lucide-users",
-    onClick: () => {
-      const path = router.resolve({ name: "TicketsCustomer" });
-      window.open(path.href);
-    },
+    onClick: () => window.open(CUSTOMER_PORTAL_ROOT),
   },
   {
     icon: "lucide-life-buoy",
@@ -136,18 +117,13 @@ const agentPortalDropdown = computed(() => [
     label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
+  themeMenuItem.value,
   {
     label: __("Log out"),
     icon: "lucide-log-out",
     onClick: () => authStore.logout(),
   },
 ]);
-
-const profileSettings = computed(() => {
-  return isCustomerPortal.value
-    ? customerPortalDropdown.value
-    : agentPortalDropdown.value;
-});
 
 watch(
   () => route.fullPath,

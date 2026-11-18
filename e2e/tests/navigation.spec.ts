@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../helpers/api";
+import { runScheduledJob, type Api } from "../helpers/api";
 import { raiseTicket } from "../helpers/factories";
 import { expect, test, uid, usePersona } from "../helpers/fixtures";
 import { TicketList } from "../helpers/list";
@@ -127,6 +127,17 @@ test("the command palette finds a ticket and opens it", async ({ page, api, apiA
   await palette.getByRole("combobox").fill(token);
   await palette.getByRole("option", { name: new RegExp(`${token} subject`) }).click();
   await expect(page).toHaveURL(new RegExp(`/helpdesk/tickets/${ticket.name}`));
+});
+
+test("the command palette does not open over the settings dialog", async ({ page }) => {
+  await new TicketList(page).goto();
+  await page.keyboard.press("Control+,");
+  const settings = page.getByRole("dialog");
+  await expect(settings).toBeVisible();
+
+  await page.keyboard.press("Control+k");
+  await expect(page.getByRole("dialog", { name: "Command Palette" })).toBeHidden();
+  await expect(settings).toBeVisible();
 });
 
 test("search finds a ticket by text that is only in a comment", async ({
@@ -339,15 +350,6 @@ async function indexForSearch(api: Api, token: string) {
       { timeout: 30_000, intervals: [1_000] }
     )
     .toBeGreaterThan(0);
-}
-
-async function runScheduledJob(api: Api, method: string) {
-  const [job] = await api.list("Scheduled Job Type", { filters: { method } });
-  // index_docs_in_queue is frappe develop only; v16 indexes on save
-  if (!job) return;
-  await api.call("frappe.core.doctype.scheduled_job_type.scheduled_job_type.execute_event", {
-    doc: JSON.stringify({ name: job.name }),
-  });
 }
 
 // The browser runs in UTC (see playwright.config.ts), so the date is computed in UTC too.

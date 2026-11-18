@@ -51,11 +51,12 @@
 </template>
 
 <script setup lang="ts">
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { useTelephonyStore } from "@/stores/telephony";
 import { useUserStore } from "@/stores/user";
 import { TicketContactSymbol, TicketSymbol } from "@/types";
-import { copyToClipboard, openContact } from "@/utils";
+import { openContact } from "@/utils";
+import { copyToClipboard } from "@helpdesk/shared/utils";
 import { Avatar, Button, Tooltip } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, inject, ref } from "vue";
