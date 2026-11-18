@@ -187,14 +187,7 @@
         </section>
       </Transition>
 
-      <Transition
-        enter-active-class="overflow-hidden transition-all duration-200 ease-out motion-reduce:transition-none"
-        enter-from-class="!mt-0 max-h-0 opacity-0"
-        enter-to-class="max-h-24"
-        leave-active-class="overflow-hidden transition-all duration-150 ease-in motion-reduce:transition-none"
-        leave-from-class="max-h-24"
-        leave-to-class="!mt-0 max-h-0 opacity-0"
-      >
+      <Transition v-bind="grow">
         <ErrorMessage :message="error" />
       </Transition>
 
@@ -238,7 +231,7 @@
       @submit.prevent="create"
     >
       <h2 class="text-md-semibold text-ink-gray-7">{{ formTitle }}</h2>
-      <Transition v-bind="swap">
+      <Transition v-bind="grow">
         <div
           v-if="shortcut"
           class="flex items-center gap-3 rounded-5 border border-outline-gray-2 p-3"
@@ -250,17 +243,27 @@
           />
           <div class="min-w-0 flex-1">
             <p class="text-base-medium text-ink-gray-8">
-              {{ __("Skip the app password") }}
+              {{
+                workspaceGmail
+                  ? __("This is a Google Workspace address")
+                  : __("Sign in instead")
+              }}
             </p>
             <p class="text-p-sm text-ink-gray-6">
               {{
-                selected.service === "GMail"
-                  ? __("Needs your Workspace admin to allow Frappe once.")
+                workspaceGmail
+                  ? __("It connects with Google sign-in, not an app password.")
                   : __("No password to create.")
               }}
             </p>
           </div>
           <Button
+            v-if="workspaceGmail"
+            :label="__('Continue')"
+            @click="openGmail(normalizeEmail(form.email_id))"
+          />
+          <Button
+            v-else
             :label="hint(selected)"
             icon-right="lucide-arrow-up-right"
             :loading="connecting === selected.service"
@@ -274,17 +277,11 @@
       <AccountFields
         v-model:form="form"
         class="[&>div:last-child]:hidden"
+        @focusout="formEmail = form.email_id"
         :service="selected"
         :error="invalid"
       />
-      <Transition
-        enter-active-class="overflow-hidden transition-all duration-200 ease-out motion-reduce:transition-none"
-        enter-from-class="!mt-0 max-h-0 opacity-0"
-        enter-to-class="max-h-24"
-        leave-active-class="overflow-hidden transition-all duration-150 ease-in motion-reduce:transition-none"
-        leave-from-class="max-h-24"
-        leave-to-class="!mt-0 max-h-0 opacity-0"
-      >
+      <Transition v-bind="grow">
         <ErrorMessage :message="error" />
       </Transition>
       <div class="flex justify-end">
@@ -294,6 +291,7 @@
           theme="gray"
           size="md"
           :label="__('Create')"
+          :disabled="workspaceGmail"
           :loading="creating"
         />
       </div>
@@ -425,11 +423,15 @@ const adminStepsText = computed(() =>
     .join("\n")
 );
 
+const formEmail = ref("");
 const shortcut = computed(() => {
   const p = selected.value;
   if (!p || !canSignIn(p)) return false;
-  return p.service !== "GMail" || kindOf(form.value.email_id) === "company";
+  return p.service !== "GMail" || kindOf(formEmail.value) === "company";
 });
+const workspaceGmail = computed(
+  () => shortcut.value && selected.value?.service === "GMail"
+);
 const formTitle = computed(() =>
   selected.value?.kind === "custom"
     ? __("New custom email account")
@@ -453,6 +455,7 @@ function choose(p: EmailService) {
 function open(p: EmailService, email = "") {
   selected.value = p;
   form.value = { ...emptyForm(), email_id: email };
+  formEmail.value = email;
   invalid.value = undefined;
   error.value = "";
   screen.value = "form";
@@ -532,7 +535,12 @@ async function create() {
       await props.controller.load();
       if (connectExisting(address)) return;
     }
-    error.value = errorText(e);
+    error.value = /AUTHENTICATIONFAILED|Invalid credentials/i.test(errorText(e))
+      ? __(
+          "{0} didn't accept this email and password. Check them and try again.",
+          [p.label]
+        )
+      : errorText(e);
   } finally {
     creating.value = false;
   }
@@ -579,5 +587,15 @@ const swap = {
     "transition duration-300 ease-out motion-reduce:transition-none",
   enterFromClass: "opacity-0",
   leaveActiveClass: "hidden",
+};
+const grow = {
+  enterActiveClass:
+    "overflow-hidden transition-all duration-200 ease-out motion-reduce:transition-none",
+  enterFromClass: "!mt-0 max-h-0 opacity-0",
+  enterToClass: "max-h-40",
+  leaveActiveClass:
+    "overflow-hidden transition-all duration-150 ease-in motion-reduce:transition-none",
+  leaveFromClass: "max-h-40",
+  leaveToClass: "!mt-0 max-h-0 opacity-0",
 };
 </script>
