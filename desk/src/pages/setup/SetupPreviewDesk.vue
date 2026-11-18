@@ -240,7 +240,11 @@
                           >
                             <Avatar
                               :label="item.assigned"
-                              :image="avatarUrl(item.assigned)"
+                              :image="
+                                item.assigned === authStore.userId
+                                  ? authStore.userImage
+                                  : avatarUrl(item.assigned)
+                              "
                               size="sm"
                             />
                             <span class="truncate">{{

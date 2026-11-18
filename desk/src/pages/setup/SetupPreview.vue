@@ -121,7 +121,7 @@
             </div>
             <Avatar
               :label="authStore.userName"
-              :image="avatarUrl(authStore.userId)"
+              :image="authStore.userImage"
               size="sm"
             />
             <span class="lucide-ellipsis-vertical size-4 text-ink-gray-5" />
@@ -490,7 +490,7 @@ import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Avatar, Button } from "frappe-ui";
 import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
 import SetupPreviewDesk from "./SetupPreviewDesk.vue";
-import { SAMPLE_TICKET, avatarUrl, nameOf } from "./preview";
+import { SAMPLE_TICKET, nameOf } from "./preview";
 import { brand, invitees, setup } from "./setup";
 
 type Page = "login" | "home" | "desk-list" | "desk-ticket" | "portal-ticket";
