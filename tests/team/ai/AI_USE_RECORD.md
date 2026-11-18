@@ -30,9 +30,13 @@ machine and repository:
 - wrote and edited files: tests, scripts, configuration, reports and the
   management documents;
 - on GitHub, through the member's signed-in `gh` account (`ibbster05`):
-  created the 35 Issues, opened PRs #1, #37, #38 and #39, merged #1, #38
-  and #39, closed #37, closed Issue #2, and set branch protection on
-  `team/sqe-tests`.
+  created the 35 Issues, opened PRs #1, #37, #38, #39, #40 and #41, merged
+  all of them except #37 (closed unmerged), closed Issues #2, #3 and #4, and
+  set branch protection on `team/sqe-tests`.
+
+One product decision was put to the team rather than made by the agent:
+the assignment rule for DEF-03 ("agents only", chosen 18 Nov, even though
+it makes one upstream test fail).
 
 What the team did itself, according to the prompts and the session:
 
@@ -75,7 +79,7 @@ generation; M3 = use cases, usability, accessibility, security, performance
 | # | Area (owner) | When, model | Purpose | AI output | What the agent verified | Checked by the team | Changed by the team |
 |---|---|---|---|---|---|---|---|
 | 1 | Repository, environment, scope (all) | 16 Nov, Fable 5.2 | Pick a Frappe app that fits the brief; install; define workflows, FRs, rules, roles | Choice of frappe/helpdesk; bench install steps; `seed.sh`, `seed/seed.py`; scope in `management/TEST_PLAN.md`, `e2e/USE_CASES.md`, `unit/README.md`; `README.md` | Site runs; seed and reset run; rules traced to source lines | | |
-| 2 | Unit tests, MCC, MC/DC (M1) | 16 Nov, Fable 5.2 | White-box tests of BR1–BR4 with test doubles; 100 % coverage gate | `unit/*.py`, `unit/conftest.py`, `run_unit.sh`, `tools/scoped_coverage.py` | 160 tests pass; 100 % statements (144) and branches (68) of the rule scope, locally and in CI | | |
+| 2 | Unit tests, MCC, MC/DC (M1) | 16 Nov, Fable 5.2 | White-box tests of BR1–BR4 with test doubles; 100 % coverage gate | `unit/*.py`, `unit/conftest.py`, `run_unit.sh`, `tools/scoped_coverage.py` | 167 tests pass; 100 % statements (144) and branches (68) of the rule scope, locally and in CI | | |
 | 3 | Mutation (M1) | 16–17 Nov, Fable 5.2 | Cosmic Ray with custom operators; survivor analysis | `mutation/cosmic-ray.toml`, `mutation/operators/`, `mutation/SURVIVORS.md`, `run_mutation.sh`, `tools/mutation_*.py` | 86.9 % → 97.0 % after new tests; 31 survivors analysed (24 killed, 7 equivalent); 97.1 % after the DEF-01 fix | | |
 | 4 | API tests, OpenAPI, generator (M2) | 17 Nov, Fable 5.2 | EP/BVA from a spec; rule, transition, repeat and cross-workflow tests; endpoint weaknesses | `api/openapi.yaml`, `api/generate_testdata.py`, `api/test_*.py`, `api/demo_constraint_change.sh`, `api/WEAKNESSES.md`, `run_api.sh` | 127 tests: 114 pass, 13 pinned weaknesses (strict xfail); constraint change regenerated and shown; recovery tests R1/R2 | | |
 | 5 | Use cases and Playwright (M1, M2, M3: two each) | 17 Nov, Fable 5.2; DEF-35 change 18 Nov, Opus 5.5 | Write six use cases; automate every flow | `e2e/USE_CASES.md`, `e2e/usecases/*.spec.mjs`, `e2e/support/`, `run_e2e.sh` | 33 flows: 32 pass, 1 pinned expected failure reproducing DEF-35; green in CI | | |
@@ -84,7 +88,7 @@ generation; M3 = use cases, usability, accessibility, security, performance
 | 8 | Performance (M3) | 17 Nov, Opus 5.5 | k6 at 1 and 5 users, twice each, against limits set beforehand | `perf/read_ticket.js`, `perf/run_load.sh`, `perf/PERFORMANCE_REPORT.md`, `perf/evidence/` | 4 runs; p95 27.7 / 25.8 ms at 5 users against an 800 ms limit; 0 % unexpected failures | | |
 | 9 | SonarQube and cyclomatic complexity (M1) | 17–18 Nov, Opus 5.5 | Install and run SonarQube; report metrics; hand CC from a CFG | `sonar/` (scripts, `SONAR_REPORT.md`, `CYCLOMATIC_COMPLEXITY.md`, calibration, evidence) | Metrics exported from the server API; V(G) = 6 three ways; Sonar's counting rules checked with a calibration file | | |
 | 10 | Test management (all) | 17–18 Nov, Opus 5.5 | Plan, estimates, risks, traceability, defect log, RCA, Pareto, GQM, progress, completion report | `management/*`, `tools/defects_report.py`, `tools/file_issues.py` | Figures regenerated from `defects.yaml` and the traceability rows; RCA "whys" checked against Frappe and Helpdesk source | | |
-| 11 | CI gate, Issues, blocked PR, fix PR (M1) | 18 Nov, Opus 5.5 | GitHub Actions gate; file defects; one blocked and one fix PR | `.github/workflows/sqe-quality-gate.yml`; `sonar_admin.py gate` / `check-gate`; Issues #2–#36; PRs #1, #37, #38, #39; DEF-01 fix in `helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py` | Gate green on #1, #38, #39; #37 blocked by unit, API, mutation and Sonar jobs; upstream `test_hd_ticket` results unchanged by the fix | | |
+| 11 | CI gate, Issues, blocked PR, fix PR (M1) | 18 Nov, Opus 5.5 | GitHub Actions gate; file defects; one blocked and two fix PRs | `.github/workflows/sqe-quality-gate.yml`; `sonar_admin.py gate` / `check-gate`; Issues #2–#36; PRs #1, #37, #38, #39, #41; DEF-01 and DEF-02/03 fixes in `helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py`; `unit/test_assignment_access.py` | Gate green on #1, #38, #39, #41; #37 blocked by unit, API, mutation and Sonar jobs; upstream suites compared with and without each fix (only `test_non_agent_flow` changes, by design, with the DEF-03 fix) | | |
 | 12 | AI-use record (all) | 18 Nov, Opus 5.5 | This record and the prompt extract | `ai/AI_USE_RECORD.md`, `ai/PROMPTS.md`, `tools/extract_prompts.py` | Prompts compared with the transcript; model names and times read from it | | |
 
 ## 5. Mistakes the AI made, and how they were caught
@@ -103,6 +107,8 @@ wrong and evidence corrected it.
 | 7 | At first suspected the UC-05 failures in CI were runner slowness | Screenshot from the run, then the source of `TicketCustomer.vue:174` | A real product race, logged as DEF-35 (#36); the tests now fix the response order and one test reproduces it |
 | 8 | Used a SonarQube metric that cannot be a gate condition (`security_hotspots`) | Server API error | Replaced with `security_review_rating` |
 | 9 | Wrote a YAML note containing `#38`, which YAML read as a comment | The generated defect summary cut the note short | Quoted the value |
+| 10 | Read upstream's `test_non_agent_flow` as allowing assignment to non-agent *desk* users, and narrowed DEF-03 and RCA-2 on that basis | Checking the test user's account type in the database while writing the DEF-03 fix: `non_agent@test.com` is a Website User with no roles | DEF-03 note and RCA-2 corrected; the team chose the "agents only" rule, and the upstream test's conflict is documented |
+| 11 | First version of the assignment unit tests had a check that could never fail (the mock it inspected was not the one called) | Reviewing the test before running it | Rewritten so the helper returns the mock it used; each check shown to fail when the fix is removed |
 
 ## 6. What the agent did not do
 

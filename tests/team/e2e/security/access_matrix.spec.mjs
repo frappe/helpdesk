@@ -122,8 +122,8 @@ test("AC-07 customer may not open the Frappe back office", async ({ app }) => {
   expect(observed).toBe("denied");
 });
 
-test("AC-08 customer may not assign an agent [finding W-API-05]", async ({ app }) => {
-  test.fail(true, "W-API-05: the ticket's own customer can assign an agent");
+// was finding W-API-05 (DEF-02), an expected failure until the fix PR
+test("AC-08 customer may not assign an agent", async ({ app }) => {
   const name = await app.newTicket(app.subject("AC-08"));
   const { observed } = await decide(app, {
     id: "AC-08", role: "customerA", action: "assign an agent to own ticket", route: "POST /api/method/run_doc_method (assign_agent)",
@@ -134,6 +134,7 @@ test("AC-08 customer may not assign an agent [finding W-API-05]", async ({ app }
     verify: async () => `assignees ${JSON.stringify(await app.assignees(name))}`,
   });
   expect(observed).toBe("denied");
+  expect(await app.assignees(name)).toEqual([]);
 });
 
 // --- Agent ---------------------------------------------------------------------

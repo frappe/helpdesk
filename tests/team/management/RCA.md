@@ -74,7 +74,7 @@ actions are still open.
 **Symptom.** Signed in as the ticket's customer, `run_doc_method` with
 `assign_agent` returns 200; the agent is assigned and notified. Evidence:
 API test `test_customer_cannot_assign_an_agent`, Playwright access check
-AC-08 (both pinned as expected failures). DEF-03 (assigning a ticket to a
+AC-08 (both pinned as expected failures until the fix). DEF-03 (assigning a ticket to a
 customer account) shares the same missing check.
 
 **Impact.** A customer can pick or pester agents, bypass team routing and
@@ -113,9 +113,29 @@ flowchart LR
 
 | Type | Action | Owner | Verification |
 |---|---|---|---|
-| Corrective | Decorate `assign_agent` with `agent_only` (a `PermissionError`, 403, for non-agents) and reject a target that is not a desk user (portal customer), which also fixes DEF-03 within upstream's intent (assignment to non-agent desk users stays allowed). | M2 | `test_customer_cannot_assign_an_agent` and `test_ticket_cannot_be_assigned_to_a_non_agent` pass; AC-08 denied; AC-11 (agent allowed) still passes |
+| Corrective | Decorate `assign_agent` with `agent_only` (a `PermissionError`, 403, for non-agents) and reject a target that is not an agent (`ValidationError`, 417, "Tickets can only be assigned to agents"), which also fixes DEF-03. | M2 | `test_customer_cannot_assign_an_agent` and `test_ticket_cannot_be_assigned_to_a_non_agent` pass; AC-08 denied; AC-11 (agent allowed) still passes |
 | Preventive | Add a test that lists every `@frappe.whitelist()` method on `HDTicket` and calls each as the ticket's own customer; anything not on an explicit allow-list must return 403. | M2, M3 | New methods without a decision fail CI |
 | Preventive | Code review checklist: a whitelisted document method states its role rule; access-matrix checks (AC-xx) are added for every new agent action. | All | Checklist in the PR template |
+
+**Status (18 Nov 2026).** The corrective action is done in
+[PR #41](https://github.com/ibbster05/helpdesk/pull/41), merged through the
+required SQE gate; Issues #3 and #4 are closed.
+
+- **Unit:** a decision table (caller is an agent × target is an agent) covers all
+  four combinations (`unit/test_assignment_access.py`). Removing either check,
+  or calling `is_agent()` without the target, makes it fail.
+- **API and browser:** the two pinned API tests and AC-08 now pass as normal
+  tests.
+- **Upstream conflict, decided on purpose:** an earlier note said upstream
+  allows assignment to non-agent *desk* users. That was wrong. The user in
+  upstream's `test_non_agent_flow` (`non_agent@test.com`) is a Website User
+  with no roles, the same account type as a customer, so that test asserts
+  the behaviour DEF-03 reports. The team chose "agents only", in line with
+  `api/ticket.py` ("Tickets can only be assigned to agents") and upstream's
+  own TODOs in `get_assigned_agent`. With the fix, that one upstream test
+  errors with the new message. The other upstream suites that call
+  `assign_agent` (core comments, HD Agent, agent home) give the same results
+  as before.
 
 ## Lessons for the test process
 

@@ -44,13 +44,15 @@
   category: Access control
   severity: Major
   priority: P1
-  status: Open
+  status: Closed
   triage: Fix
   layer: backend
   file: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py
   risk: [PR-05]
   found_by: API test test_customer_cannot_assign_an_agent; Playwright AC-08
   found_on: 2026-11-17
+  fixed_on: 2026-11-18
+  note: "fixed by PR #41 (assign_agent is agent_only) through the CI gate"
   rca: RCA.md#rca-2
   steps: |
     1. Sign in as customer.a, raise a ticket.
@@ -66,8 +68,9 @@
   category: Access control
   severity: Major
   priority: P1
-  status: Open
-  note: upstream test_non_agent_flow expects assignment to non-agent desk users; the defect is assignment to a portal customer
+  status: Closed
+  note: "fixed by PR #41: only agents can be assigned. Upstream test_non_agent_flow assigns a ticket to a portal (Website) user with no roles and expects success; it now fails by design (an earlier note here wrongly called that user a desk user)"
+  fixed_on: 2026-11-18
   triage: Fix
   layer: backend
   file: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py

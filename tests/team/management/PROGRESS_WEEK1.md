@@ -32,14 +32,15 @@ view of the release decision, so the team can recommend release or hold.
 | Q1 How defect-prone is the code under test? | Defect density, backend: defects rooted in Python code / Python KLOC | 15 / 13.9 = **1.08 per KLOC** | Most backend defects come from the targeted tests, not a uniform sweep, so this is a lower bound for the app and not comparable to industry averages. |
 | | Defect density, `hd_ticket.py` | 5 / 1.25 = **4.0 per KLOC** | The file that holds BR1–BR3 and assignment is about four times as defect-dense as the backend average. It is also Sonar's most complex file (cyclomatic 298). That supports putting the High risks there. |
 | Q2 How completely are the requirements tested? | Requirements coverage, tested | 14 / 14 = **100 %** | Every requirement and rule has tests at two or more levels. |
-| | Requirements coverage, passing | 12 / 14 = **86 %** (9 / 14 = 64 % before PR #38) | The DEF-01 fix moved FR-B6, BR1 and BR3 to passing. The two rows still failing trace to DEF-02 / DEF-03; the gap is concentrated, not spread. |
-| Q3 Are fixes holding? | Reopen rate: reopenings / fixed defects | 0 / 3 = **0 %** | Three fixes so far (DEF-01 through the CI gate; A11Y-04 and A11Y-11, re-scanned locally), so the rate says little yet. |
+| | Requirements coverage, passing | 14 / 14 = **100 %** (64 % on the baseline, 86 % after PR #38) | The DEF-01 fix (PR #38) moved FR-B6, BR1 and BR3 to passing, the DEF-02/03 fix (PR #41) FR-A4 and FR-B1. Minor defects remain open on several rows. |
+| Q3 Are fixes holding? | Reopen rate: reopenings / fixed defects | 0 / 5 = **0 %** | Five fixes so far: DEF-01, DEF-02 and DEF-03 through the CI gate, and two accessibility fixes re-scanned locally. Every CI run since re-tests the three gated fixes; the rate still says little after one day. |
 
-Supporting figures: 34 defects counted (9 Major, 17 Minor, 8 Trivial), 31
-open; Pareto: accessibility 29 %, then business rule, error handling and
-usability at 12 % each. By count, accessibility dominates. That is partly
-because each axe rule is logged separately. By severity, the Majors that
-block release are in business rules and access control.
+Supporting figures: 34 defects counted (9 Major, 17 Minor, 8 Trivial), 29
+open (5 Major); Pareto: accessibility 29 %, then business rule, error
+handling and usability at 12 % each. By count, accessibility dominates,
+partly because each axe rule is logged separately. By severity, the Majors
+that blocked release were in business rules and access control; all three
+are now fixed.
 
 ## 3. Deviations from the plan
 
@@ -49,7 +50,8 @@ block release are in business rules and access control.
 | Test management drafted in week 1 | Needed to steer the remaining work | Estimates for done areas are not blind (stated in `ESTIMATION.md`) |
 | Environment problems: Playwright upgrade, missing RediSearch, port clash between Sonar and Frappe realtime | PJ-01 | About half a day lost in total (team to confirm from their logs) |
 | All commits under one member's name | The area commits were made from one machine and account; the CI and fix PRs too | Commit history (a viva check) does not yet show who did what (PJ-03) |
-| CI, Issues and the DEF-01 fix done in week 1 | Fork available on 18 Nov | Week 2 frees up for DEF-02/03 and members' own work |
+| CI, Issues and the DEF-01, DEF-02 and DEF-03 fixes done in week 1 | Fork available on 18 Nov | Week 2 frees up for members' own checks and commits, DEF-14 and the accessibility fix PR |
+| DEF-03 fix breaks one upstream test | Upstream `test_non_agent_flow` asserts that tickets can be assigned to a portal user | Decided "agents only"; documented in RCA-2 and the completion report |
 | A new defect, DEF-35, found by CI | UC-05 tests failed at random on the slower runner | Tests now fix the response order; DEF-35 pinned and filed as #36 |
 
 ## 4. Control actions for week 2
@@ -59,7 +61,7 @@ block release are in business rules and access control.
 | 1 | Create the public fork; each member commits their own area from `tests/team/` (one commit series per area, own name) | All | 23 Nov | PJ-03, PJ-04 |
 | 2 | ~~File the defect log as GitHub Issues~~ done 18 Nov (#2–#36); still to do: triage them together in a short meeting | All | 24 Nov | defect management |
 | 3 | ~~Build the CI pipeline; blocked PR; fix PR for DEF-01~~ done 18 Nov (PR #1, #37, #38); the member who owns CI must be able to explain the workflow and both PRs | M1 | 27 Nov | PJ-04, PR-02, EC-2 |
-| 4 | Fix PR for DEF-02 / DEF-03 (`agent_only` + target check); rerun the access matrix | M2, M3 | 28 Nov | PR-05, EC-3 |
+| 4 | ~~Fix PR for DEF-02 / DEF-03; rerun the access matrix~~ done 18 Nov (PR #41, 13 / 13 decisions); still to do: the RCA-2 preventive test (every whitelisted method × role) | M2, M3 | 28 Nov | PR-05, EC-3 |
 | 5 | Each member starts a time log and fills Actual for their areas | All | ongoing | estimation comparison |
 | 6 | Each member reruns one of their tests and explains the assertions to the others | All | 29 Nov | PJ-03 (viva) |
 | 7 | Start the AI-use record from the prompts kept so far | All | 29 Nov | PJ-03 |

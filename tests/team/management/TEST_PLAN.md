@@ -101,9 +101,9 @@ the requirements it covers are in the traceability matrix.
 
 | ID | Criterion | Target | Risks | Actual (18 Nov) | Met? |
 |---|---|---|---|---|---|
-| EC-1 | Unit tests on the business-rule scope | all pass; 100 % statement and branch coverage; mutation score ≥ 95 % | PR-01, PR-02, PR-03, PR-04 | 159 pass; 100 % / 100 %; 97.0 % | **Yes** |
+| EC-1 | Unit tests on the business-rule scope | all pass; 100 % statement and branch coverage; mutation score ≥ 95 % | PR-01, PR-02, PR-03, PR-04 | 167 pass; 100 % / 100 %; 97.1 % | **Yes** |
 | EC-2 | Open Major or Critical defects against BR1–BR4 | 0 | PR-02, PR-03 | 0 (DEF-01 fixed by PR #38) | **Yes** |
-| EC-3 | Access decisions and access-control defects | 13 / 13 decisions as expected and 0 open Major access-control defects | PR-05 | 12 / 13; 2 open (DEF-02, DEF-03) | **No** |
+| EC-3 | Access decisions and access-control defects | 13 / 13 decisions as expected and 0 open Major access-control defects | PR-05 | 13 / 13; 0 open (DEF-02, DEF-03 fixed by PR #41) | **Yes** |
 | EC-4 | Performance of opening a ticket | p95 ≤ 800 ms at 5 users and < 1 % unexpected failures, in both runs | PR-09 | 27.7 / 25.8 ms; 0 % | **Yes** |
 | EC-5 | Accessibility of the fixed key screen (customer ticket page) | Lighthouse accessibility ≥ 90 and 0 critical/serious axe violations | PR-08 | 100; 0 | **Yes** |
 | EC-6 | Requirements coverage | 100 % of requirements and rules traced to executed tests | all | 14 / 14 | **Yes** |
@@ -139,3 +139,4 @@ weekly progress reports, test completion report, AI-use record.
 | 1.0 | 2026-11-16 | Scope, workflows, rules and roles agreed; test levels chosen |
 | 1.1 | 2026-11-18 | Plan written up with risks, estimates, criteria and week-1 status; recovery test and calibration added; SonarQube moved to port 9100 |
 | 1.2 | 2026-11-18 | CI gate on the public fork; EC-2 met after the DEF-01 fix |
+| 1.3 | 2026-11-18 | EC-3 met after the DEF-02/03 fix (PR #41); assignment rule decided as "agents only" |

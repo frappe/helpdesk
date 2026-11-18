@@ -312,17 +312,19 @@ def test_repeating_a_create_request_does_not_duplicate_the_ticket(customer_a, si
 # === Endpoint weaknesses ========================================================
 
 
-@weakness("W-API-05", "the ticket's customer can assign an agent to it (200); assignment is an agent action")
 def test_customer_cannot_assign_an_agent(customer_a, agent, ticket):
+    """Was weakness W-API-05 (DEF-02), pinned as an expected failure until the fix PR."""
     response = customer_a.assign_agent(assign_body(ticket, agent.email))
     assert response.status_code == 403
     assert agent.assignees(ticket) == []
 
 
-@weakness("W-API-06", "a ticket can be assigned to a customer account, which then gains read access to it")
 def test_ticket_cannot_be_assigned_to_a_non_agent(customer_b, agent, ticket):
+    """Was weakness W-API-06 (DEF-03), pinned as an expected failure until the fix PR."""
     response = agent.assign_agent(assign_body(ticket, customer_b.email))
-    assert response.status_code in (403, 417)
+    assert response.status_code == 417
+    assert "Tickets can only be assigned to agents" in error_text(response)
+    assert agent.assignees(ticket) == []
     assert customer_b.get_ticket({"name": ticket}).status_code == 403
 
 

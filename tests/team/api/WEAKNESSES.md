@@ -3,14 +3,15 @@
 Baseline: helpdesk 16.1.0 (commit e326986) on frappe 16.56.0. Every entry was
 observed on the running system and is pinned by a strict expected-failure
 test, so it is re-checked on every run. All are GitHub Issues on the fork
-(defect IDs and Issue numbers in `management/defects.yaml`). D-01 is fixed
-(PR #38); its test is no longer pinned and now passes.
+(defect IDs and Issue numbers in `management/defects.yaml`). D-01 (PR #38),
+W-API-05 and W-API-06 (PR #41) are fixed; their tests are no longer pinned
+and now pass.
 
 | ID | Endpoint | Expected | Observed | Proposed severity | Test |
 |---|---|---|---|---|---|
 | D-01 | daily auto-close job (BR1 x BR3) | an auto-closed ticket gets a resolution date, like any closed ticket | status Closed, category Resolved, `resolution_date` empty; the same change through the API stamps it | Major: resolution analytics miss every auto-closed ticket. **Fixed by PR #38 (DEF-01, Issue #2 closed)** | `test_auto_closed_ticket_gets_a_resolution_date_like_any_closed_ticket` (passes) |
-| W-API-05 | assignAgent | only agents assign tickets (403 for a customer) | the ticket's own customer gets 200 and the agent is assigned | Major: role check missing on an agent action | `test_customer_cannot_assign_an_agent` |
-| W-API-06 | assignAgent | a ticket can only be assigned to an agent | assigning to a customer account returns 200 and shares the ticket; that customer can then read another customer's ticket | Major: data disclosure through a mis-assignment | `test_ticket_cannot_be_assigned_to_a_non_agent` |
+| W-API-05 | assignAgent | only agents assign tickets (403 for a customer) | the ticket's own customer gets 200 and the agent is assigned | Major: role check missing on an agent action. **Fixed by PR #41 (DEF-02, Issue #3 closed)** | `test_customer_cannot_assign_an_agent` (passes) |
+| W-API-06 | assignAgent | a ticket can only be assigned to an agent | assigning to a customer account returns 200 and shares the ticket; that customer can then read another customer's ticket | Major: data disclosure through a mis-assignment. **Fixed by PR #41 (DEF-03, Issue #4 closed)**: now 417 "Tickets can only be assigned to agents" | `test_ticket_cannot_be_assigned_to_a_non_agent` (passes) |
 | W-API-07 | updateTicket (feedback) | rating belongs to a resolved ticket; rating must not block closing | a customer can rate an Open ticket and is then refused when closing it | Minor | `test_rating_an_open_ticket_does_not_lock_the_customer_out` |
 | W-API-08 | updateTicket | `resolution_date` is server-computed | an agent can overwrite it with any date | Minor: reporting data can be falsified | `test_resolution_date_cannot_be_written_directly` |
 | W-API-02 | createTicket, getTicket, assignAgent | a missing required argument is a 4xx naming the argument | 500 TypeError with a server traceback in the body | Minor: wrong status class, internals leaked | generated cases + `test_create_without_a_document_is_a_client_error` |

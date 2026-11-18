@@ -5,8 +5,8 @@
 | ID | Ref | Title | Category | Severity | Priority | Status | Triage | Risk | Issue |
 |---|---|---|---|---|---|---|---|---|---|
 | DEF-01 | D-01 | Auto-closed ticket gets no resolution date | Business rule / data integrity | Major | P1 | Closed (fixed by PR #38 through the CI gate; re-tested in CI run 44295797221) | Fix (CI demo) | PR-02, PR-03 | #2 |
-| DEF-02 | SEC-01 / W-API-05 | Customer can assign an agent to their own ticket | Access control | Major | P1 | Open | Fix | PR-05 | #3 |
-| DEF-03 | W-API-06 | Ticket can be assigned to a customer account, which then reads it | Access control | Major | P1 | Open (upstream test_non_agent_flow expects assignment to non-agent desk users; the defect is assignment to a portal customer) | Fix | PR-05 | #4 |
+| DEF-02 | SEC-01 / W-API-05 | Customer can assign an agent to their own ticket | Access control | Major | P1 | Closed (fixed by PR #41 (assign_agent is agent_only) through the CI gate) | Fix | PR-05 | #3 |
+| DEF-03 | W-API-06 | Ticket can be assigned to a customer account, which then reads it | Access control | Major | P1 | Closed (fixed by PR #41: only agents can be assigned. Upstream test_non_agent_flow assigns a ticket to a portal (Website) user with no roles and expects success; it now fails by design (an earlier note here wrongly called that user a desk user)) | Fix | PR-05 | #4 |
 | DEF-04 | W-API-07 | Rating an open ticket locks the customer out of closing it | Business rule / data integrity | Minor | P2 | Open | Fix | PR-01, PR-04 | #5 |
 | DEF-05 | W-API-08 | Agent can overwrite the server-computed resolution date | Business rule / data integrity | Minor | P2 | Open | Fix | PR-02 | #6 |
 | DEF-06 | W-API-02 | Missing required argument returns 500 with a traceback | Error handling (5xx) | Minor | P3 | Open | Fix | PR-06 | #7 |
@@ -44,10 +44,10 @@
 
 | Severity | Open | Fixed / closed | Total |
 |---|---|---|---|
-| Major | 7 | 2 | 9 |
+| Major | 5 | 4 | 9 |
 | Minor | 17 | 0 | 17 |
 | Trivial | 7 | 1 | 8 |
-| **All** | 31 | 3 | 34 |
+| **All** | 29 | 5 | 34 |
 
 Excluded: 1 rejected (not a defect).
 
@@ -74,5 +74,5 @@ Excluded: 1 rejected (not a defect).
 | Defect density, backend | backend defects / Python KLOC (13.9) | 15 / 13.9 = **1.08 per KLOC** |
 | Defect density, `hd_ticket.py` | defects rooted in the file / its KLOC (1.25) | 5 / 1.25 = **4.0 per KLOC** |
 | Requirements coverage (tested) | requirements with at least one executed test / all | 14 / 14 = **100 %** |
-| Requirements coverage (passing) | requirements with no failing test and no open Major defect / all | 12 / 14 = **86 %** |
-| Reopen rate | reopenings / defects fixed | 0 / 3 = **0 %** |
+| Requirements coverage (passing) | requirements with no failing test and no open Major defect / all | 14 / 14 = **100 %** |
+| Reopen rate | reopenings / defects fixed | 0 / 5 = **0 %** |
