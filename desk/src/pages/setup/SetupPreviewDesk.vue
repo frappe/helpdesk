@@ -748,7 +748,7 @@ const SAMPLE_ROWS = [
   ),
 ];
 const rows = computed(() => {
-  if (!setup.ticket) return SAMPLE_ROWS;
+  if (!setup.ticketArrived) return SAMPLE_ROWS;
   const fresh = {
     ...row(
       SAMPLE_TICKET.id,

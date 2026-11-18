@@ -13,7 +13,6 @@ export type InviteRow = {
   sent: boolean;
 };
 export type Mailbox = { name: string; address: string };
-export type FirstTicket = { name: string; subject: string };
 
 const ALL_STEPS: Step[] = [
   { key: "password", required: true },
@@ -38,7 +37,7 @@ export const setup = reactive({
   brandName: "",
   brandLogo: "",
   mailbox: null as Mailbox | null,
-  ticket: null as FirstTicket | null,
+  ticketArrived: false,
   rows: [newRow()],
   showDone: false,
 });
