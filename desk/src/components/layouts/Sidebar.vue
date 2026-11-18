@@ -86,7 +86,7 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
+import { call, SidebarItem, toast } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -99,12 +99,13 @@ import {
 
 import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
+import { useThemeMenuItem } from "@helpdesk/shared/themeMenu";
 import { useRouter } from "vue-router";
 import AppSidebar from "./AppSidebar.vue";
 import TrialCard from "./TrialCard.vue";
 import { showShortcutsModal } from "./layoutSettings";
 
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { __ } from "@/translation";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
@@ -130,17 +131,12 @@ const authStore = useAuthStore();
 const { isVisible: isBannerVisible } = useBanners();
 
 const { appsMenuOption } = useApps();
-const { colorScheme, toggleColorScheme } = useColorScheme();
-
-const themeMenuItem = computed(() => ({
-  label: __("Toggle theme"),
-  icon: colorScheme.value === "dark" ? LucideSun : LucideMoon,
-  onClick: () => toggleColorScheme(),
-}));
+const themeMenuItem = useThemeMenuItem();
 
 const isFCSite = ref(window.is_fc_site);
 
 const customerPortalDropdown = computed(() => [
+  themeMenuItem.value,
   {
     group: __("Danger"),
     hideLabel: true,
@@ -196,6 +192,7 @@ const agentPortalDropdown = computed(() => [
     icon: "lucide-settings",
     onClick: () => (showSettingsModal.value = true),
   },
+  themeMenuItem.value,
   {
     group: __("Danger"),
     hideLabel: true,

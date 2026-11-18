@@ -10,6 +10,7 @@ export default {
     // still renders it, so its classes have to be scanned here.
     "./node_modules/frappe-ui/experimental/ListView/**/*.{vue,js,ts,jsx,tsx}",
     "../../frappe/ui/src/**/*.{vue,js,ts,jsx,tsx}",
+    "../shared/src/**/*.{vue,js,ts}",
   ],
   plugins: [
     require("@tailwindcss/typography"),

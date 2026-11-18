@@ -1,7 +1,8 @@
-import Icon from "@/components/Icon.vue";
+import Icon from "@helpdesk/shared/Icon.vue";
 import { Field } from "@/types";
 import { toast } from "frappe-ui";
 import { h, isVNode, type Component } from "vue";
+import { parseLinkFilters } from "@helpdesk/shared/utils";
 
 type ToastType = "success" | "error" | "warning" | "info";
 
@@ -160,18 +161,6 @@ export function parseField(field, doc) {
  * // in:  '[["User", "name", "in", ["a@x.com", "b@x.com"]]]'
  * // out: { name: ["in", ["a@x.com", "b@x.com"]] }
  */
-export function parseLinkFilters(linkFilters: string) {
-  const conditions = JSON.parse(linkFilters);
-  if (!Array.isArray(conditions)) return conditions;
-  return Object.fromEntries(
-    conditions.map((condition) => {
-      const [fieldname, operator, value] =
-        condition.length === 4 ? condition.slice(1) : condition;
-      return [fieldname, operator === "=" ? value : [operator, value]];
-    })
-  );
-}
-
 export function evaluateDependsOnValue(expression, doc) {
   if (!expression) return true;
   let out = null;

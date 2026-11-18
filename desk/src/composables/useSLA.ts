@@ -1,4 +1,5 @@
-import { dayjs, dayjsLocal } from "frappe-ui";
+import { isSlaMissed, twoUnitDuration } from "@helpdesk/shared/utils";
+import { dayjsLocal } from "frappe-ui";
 import { computed, type ComputedRef, type Ref } from "vue";
 
 export type SLAState = "due" | "fulfilled" | "overdue" | "failed" | "hold";
@@ -65,10 +66,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
     if (!d.sla) return null; // nothing promised, so nothing to report against
 
     if (d.first_responded_on) {
-      const inTime =
-        !d.response_by ||
-        dayjsLocal(d.first_responded_on).isBefore(dayjsLocal(d.response_by));
-      if (inTime) {
+      if (!isSlaMissed(d.first_responded_on, d.response_by)) {
         return {
           ...metric("fulfilled", "", "green", {
             dueBy: d.response_by,
@@ -133,10 +131,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
     }
 
     if (d.resolution_date) {
-      const inTime =
-        !d.resolution_by ||
-        dayjsLocal(d.resolution_date).isBefore(dayjsLocal(d.resolution_by));
-      if (inTime) {
+      if (!isSlaMissed(d.resolution_date, d.resolution_by)) {
         return {
           ...metric("fulfilled", "", "green", {
             dueBy: d.resolution_by,
@@ -212,29 +207,4 @@ function coarseDuration(date: string): string {
     .startOf("minute")
     .diff(dayjsLocal().startOf("minute"));
   return twoUnitDuration(Math.abs(diff));
-}
-
-/** Format a duration using its two most significant units, e.g. "1d 9h" */
-function twoUnitDuration(milliseconds: number): string {
-  const duration = dayjs.duration(milliseconds);
-
-  const years = duration.years();
-  const months = duration.months();
-  const days = duration.days();
-  const hours = duration.hours();
-  const minutes = duration.minutes();
-  const seconds = duration.seconds();
-
-  if (years > 0) {
-    return `${years}y ${months}mo`;
-  } else if (months > 0) {
-    return `${months}mo ${days}d`;
-  } else if (days > 0) {
-    return `${days}d ${hours}h`;
-  } else if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  } else if (minutes > 0) {
-    return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
-  }
-  return `${seconds}s`;
 }
