@@ -290,11 +290,20 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: str, cont
 @frappe.whitelist()
 @agent_only
 def split_ticket(subject: str, communication_id: str):
-    communicaton_creation_time = frappe.db.get_value(
-        "Communication", communication_id, "creation"
-    )
+    """Split a ticket at an email into a new ticket and return the new ticket's name.
+    The new ticket copies the original with `subject`, status Open and no SLA, and
+    takes that email and every later email, comment and file. Posts a reply on
+    the original pointing to it, emailed to its customer. Agents with write on
+    the original."""
+    reference_doctype, ticket_id, communicaton_creation_time = frappe.db.get_value(
+        "Communication",
+        communication_id,
+        ["reference_doctype", "reference_name", "creation"],
+    ) or (None, None, None)
+    if reference_doctype != "HD Ticket" or not ticket_id:
+        frappe.throw(_("Email is not part of a ticket"), frappe.DoesNotExistError)
+    frappe.has_permission("HD Ticket", "write", doc=ticket_id, throw=True)
 
-    ticket_id = frappe.db.get_value("Communication", communication_id, "reference_name")
     ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
     new_ticket = duplicate_ticket(ticket_doc, subject)
 
