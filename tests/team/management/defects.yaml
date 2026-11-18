@@ -14,17 +14,20 @@
 
 - id: DEF-01
   ref: D-01
+  issue: 2
   title: Auto-closed ticket gets no resolution date
   category: Business rule / data integrity
   severity: Major
   priority: P1
-  status: Open
+  status: Closed
   triage: Fix (CI demo)
   layer: backend
   file: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py
   risk: [PR-02, PR-03]
   found_by: API test test_auto_closed_ticket_gets_a_resolution_date_like_any_closed_ticket
   found_on: 2026-11-17
+  fixed_on: 2026-11-18
+  note: "fixed by PR #38 through the CI gate; re-tested in CI run 44295797221"
   rca: RCA.md#rca-1
   steps: |
     1. Set HD Settings auto_close_after_days = 7, auto_close_status = Replied.
@@ -36,6 +39,7 @@
 
 - id: DEF-02
   ref: SEC-01 / W-API-05
+  issue: 3
   title: Customer can assign an agent to their own ticket
   category: Access control
   severity: Major
@@ -57,6 +61,7 @@
 
 - id: DEF-03
   ref: W-API-06
+  issue: 4
   title: Ticket can be assigned to a customer account, which then reads it
   category: Access control
   severity: Major
@@ -78,6 +83,7 @@
 
 - id: DEF-04
   ref: W-API-07
+  issue: 5
   title: Rating an open ticket locks the customer out of closing it
   category: Business rule / data integrity
   severity: Minor
@@ -93,6 +99,7 @@
 
 - id: DEF-05
   ref: W-API-08
+  issue: 6
   title: Agent can overwrite the server-computed resolution date
   category: Business rule / data integrity
   severity: Minor
@@ -108,6 +115,7 @@
 
 - id: DEF-06
   ref: W-API-02
+  issue: 7
   title: Missing required argument returns 500 with a traceback
   category: Error handling (5xx)
   severity: Minor
@@ -123,6 +131,7 @@
 
 - id: DEF-07
   ref: W-API-03
+  issue: 8
   title: Numeric feedback_extra returns 500 from the HTML sanitiser
   category: Error handling (5xx)
   severity: Minor
@@ -138,6 +147,7 @@
 
 - id: DEF-08
   ref: W-API-09
+  issue: 9
   title: Routing a ticket to a team with no members returns 500 (IndexError)
   category: Error handling (5xx)
   severity: Minor
@@ -153,6 +163,7 @@
 
 - id: DEF-09
   ref: W-API-01
+  issue: 10
   title: A number is accepted and stored as a ticket subject
   category: Input validation
   severity: Trivial
@@ -168,6 +179,7 @@
 
 - id: DEF-10
   ref: W-API-04
+  issue: 11
   title: Repeating an identical create request makes a second ticket
   category: Input validation
   severity: Trivial
@@ -183,6 +195,7 @@
 
 - id: DEF-11
   ref: W-API-10
+  issue: 12
   title: A waiting ticket with no messages is never auto-closed
   category: Business rule / data integrity
   severity: Trivial
@@ -198,6 +211,7 @@
 
 - id: DEF-12
   ref: OBS (USE_CASES.md)
+  issue: 13
   title: Description is mandatory in the form but optional through the API
   category: Input validation
   severity: Trivial
@@ -213,6 +227,7 @@
 
 - id: DEF-13
   ref: SEC-05 / UX-03
+  issue: 14
   title: Article search returns 500 with a stack trace when RediSearch is absent
   category: Error handling (5xx)
   severity: Minor
@@ -228,6 +243,7 @@
 
 - id: DEF-14
   ref: SEC-02
+  issue: 15
   title: Bundled DOMPurify 3.4.8 has published CVEs
   category: Security configuration / dependencies
   severity: Major
@@ -243,6 +259,7 @@
 
 - id: DEF-15
   ref: SEC-03
+  issue: 16
   title: No Content-Security-Policy header
   category: Security configuration / dependencies
   severity: Minor
@@ -258,6 +275,7 @@
 
 - id: DEF-16
   ref: SEC-04
+  issue: 17
   title: user_id and full_name cookies are readable by scripts
   category: Security configuration / dependencies
   severity: Minor
@@ -273,6 +291,7 @@
 
 - id: DEF-17
   ref: A11Y-01
+  issue: 18
   title: Icon-only buttons have no accessible name
   category: Accessibility
   severity: Major
@@ -288,6 +307,7 @@
 
 - id: DEF-18
   ref: A11Y-02
+  issue: 19
   title: Description editor has no accessible name
   category: Accessibility
   severity: Major
@@ -302,6 +322,7 @@
 
 - id: DEF-19
   ref: A11Y-03
+  issue: 20
   title: Text below 4.5:1 contrast
   category: Accessibility
   severity: Major
@@ -317,6 +338,7 @@
 
 - id: DEF-20
   ref: A11Y-04
+  issue: 21
   title: Message iframes have no title
   category: Accessibility
   severity: Major
@@ -331,6 +353,7 @@
 
 - id: DEF-21
   ref: A11Y-05
+  issue: 22
   title: ARIA state on a div popover trigger instead of a button
   category: Accessibility
   severity: Major
@@ -345,6 +368,7 @@
 
 - id: DEF-22
   ref: A11Y-06
+  issue: 23
   title: Filter button's accessible name does not contain its visible text
   category: Accessibility
   severity: Minor
@@ -359,6 +383,7 @@
 
 - id: DEF-23
   ref: A11Y-07 (+ A11Y-09)
+  issue: 24
   title: No main landmark; content outside landmarks
   category: Accessibility
   severity: Minor
@@ -374,6 +399,7 @@
 
 - id: DEF-24
   ref: A11Y-08
+  issue: 25
   title: Pages have no level-one heading
   category: Accessibility
   severity: Minor
@@ -389,6 +415,7 @@
 
 - id: DEF-25
   ref: A11Y-10
+  issue: 26
   title: Two unnamed nav landmarks
   category: Accessibility
   severity: Minor
@@ -403,6 +430,7 @@
 
 - id: DEF-26
   ref: A11Y-11
+  issue: 27
   title: No meta description
   category: Accessibility
   severity: Trivial
@@ -417,6 +445,7 @@
 
 - id: DEF-27
   ref: A11Y-12
+  issue: 28
   title: No source maps for large scripts
   category: Accessibility
   severity: Trivial
@@ -432,6 +461,7 @@
 
 - id: DEF-28
   ref: UX-01
+  issue: 29
   title: Customer ticket list hides resolved tickets by default
   category: Usability
   severity: Minor
@@ -446,6 +476,7 @@
 
 - id: DEF-29
   ref: UX-02
+  issue: 30
   title: Rating dialog does not explain why Submit is unavailable
   category: Usability
   severity: Minor
@@ -460,6 +491,7 @@
 
 - id: DEF-30
   ref: UX-04
+  issue: 31
   title: Fifteen toolbar tab stops between description and Submit
   category: Usability
   severity: Trivial
@@ -474,6 +506,7 @@
 
 - id: DEF-31
   ref: OBS (USE_CASES.md)
+  issue: 32
   title: Opening a missing ticket shows the not-found message several times
   category: Usability
   severity: Trivial
@@ -488,6 +521,7 @@
 
 - id: DEF-32
   ref: SonarQube python:S8904
+  issue: 33
   title: Notification HTML with an img without src raises KeyError
   category: Code quality (static)
   severity: Minor
@@ -503,6 +537,7 @@
 
 - id: DEF-33
   ref: SonarQube python:S1763
+  issue: 34
   title: Unreachable second return in helpdesk/api/knowledge_base.py
   category: Code quality (static)
   severity: Trivial
@@ -518,6 +553,7 @@
 
 - id: DEF-34
   ref: SonarQube typescript:S8982/S8984
+  issue: 35
   title: v-for lists without a key binding (5 components)
   category: Code quality (static)
   severity: Minor
@@ -528,4 +564,32 @@
   risk: []
   found_by: SonarQube
   found_on: 2026-11-18
+  reopened: 0
+
+- id: DEF-35
+  ref: CI-01
+  issue: 36
+  title: A closed ticket is shown to its customer as open when the status list loads late
+  category: Frontend state (race)
+  severity: Minor
+  priority: P3
+  status: Open
+  triage: Fix
+  layer: frontend
+  file: desk/src/pages/ticket/TicketCustomer.vue
+  risk: [PR-11]
+  found_by: CI run 44288455600 (UC-05 EF2 and AF2 failed on the runner); reproduced by the UC-05 test "EF2 when the status list arrives late"
+  found_on: 2026-11-18
+  steps: |
+    1. A customer's ticket is Closed.
+    2. The customer opens it, and the ticket response (get_one) arrives before the
+       HD Ticket Status list response (a slow network or server; forced in the test
+       by holding the list until the ticket has arrived).
+  expected: Status Closed; no Close button and no message box (UC-05 EF2).
+  actual: |
+    Status shows "—"; the page offers Close and "Type a message". The ticket's
+    onSuccess handler replaces data.status with getStatus(...)?.label_customer
+    once (TicketCustomer.vue:174); with the list not yet loaded this is
+    undefined, so every "status !== 'Closed'" check (lines 17, 395) is true.
+  note: Intermittent in CI (failed in 2 of 3 runs); deterministic with the forced order. What happens when the customer sends a message on the stale page was not tested.
   reopened: 0

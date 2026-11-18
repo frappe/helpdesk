@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="380" font-family="Arial, sans-serif" font-size="11">
 <rect width="760" height="380" fill="white"/>
-<text x="380.0" y="18" text-anchor="middle" font-size="14" font-weight="bold">Defects by category (Pareto), n = 33</text>
+<text x="380.0" y="18" text-anchor="middle" font-size="14" font-weight="bold">Defects by category (Pareto), n = 34</text>
 <line x1="60" y1="30" x2="60" y2="260" stroke="#333"/>
 <line x1="60" y1="260" x2="700" y2="260" stroke="#333"/>
 <line x1="700" y1="30" x2="700" y2="260" stroke="#333"/>
@@ -19,37 +19,41 @@
 <line x1="60" y1="76.0" x2="700" y2="76.0" stroke="#999" stroke-dasharray="4 3"/>
 <text x="20" y="22">defects</text>
 <text x="690" y="22">cumulative</text>
-<rect x="72.0" y="30.0" width="56.0" height="230.0" fill="#4a78b5"/>
-<text x="100.0" y="26.0" text-anchor="middle">10</text>
-<text transform="translate(100.0,270) rotate(35)" text-anchor="start">Accessibility</text>
-<rect x="152.0" y="168.0" width="56.0" height="92.0" fill="#4a78b5"/>
-<text x="180.0" y="164.0" text-anchor="middle">4</text>
-<text transform="translate(180.0,270) rotate(35)" text-anchor="start">Business rule/data integrity</text>
-<rect x="232.0" y="168.0" width="56.0" height="92.0" fill="#4a78b5"/>
-<text x="260.0" y="164.0" text-anchor="middle">4</text>
-<text transform="translate(260.0,270) rotate(35)" text-anchor="start">Error handling</text>
-<rect x="312.0" y="168.0" width="56.0" height="92.0" fill="#4a78b5"/>
-<text x="340.0" y="164.0" text-anchor="middle">4</text>
-<text transform="translate(340.0,270) rotate(35)" text-anchor="start">Usability</text>
-<rect x="392.0" y="191.0" width="56.0" height="69.0" fill="#4a78b5"/>
-<text x="420.0" y="187.0" text-anchor="middle">3</text>
-<text transform="translate(420.0,270) rotate(35)" text-anchor="start">Input validation</text>
-<rect x="472.0" y="191.0" width="56.0" height="69.0" fill="#4a78b5"/>
-<text x="500.0" y="187.0" text-anchor="middle">3</text>
-<text transform="translate(500.0,270) rotate(35)" text-anchor="start">Security configuration/dependencies</text>
-<rect x="552.0" y="191.0" width="56.0" height="69.0" fill="#4a78b5"/>
-<text x="580.0" y="187.0" text-anchor="middle">3</text>
-<text transform="translate(580.0,270) rotate(35)" text-anchor="start">Code quality</text>
-<rect x="632.0" y="214.0" width="56.0" height="46.0" fill="#4a78b5"/>
-<text x="660.0" y="210.0" text-anchor="middle">2</text>
-<text transform="translate(660.0,270) rotate(35)" text-anchor="start">Access control</text>
-<polyline fill="none" stroke="#d0582c" stroke-width="2" points="100.0,190.3 180.0,162.4 260.0,134.5 340.0,106.7 420.0,85.8 500.0,64.8 580.0,43.9 660.0,30.0"/>
-<circle cx="100.0" cy="190.3" r="3" fill="#d0582c"/>
-<circle cx="180.0" cy="162.4" r="3" fill="#d0582c"/>
-<circle cx="260.0" cy="134.5" r="3" fill="#d0582c"/>
-<circle cx="340.0" cy="106.7" r="3" fill="#d0582c"/>
-<circle cx="420.0" cy="85.8" r="3" fill="#d0582c"/>
-<circle cx="500.0" cy="64.8" r="3" fill="#d0582c"/>
-<circle cx="580.0" cy="43.9" r="3" fill="#d0582c"/>
-<circle cx="660.0" cy="30.0" r="3" fill="#d0582c"/>
+<rect x="70.7" y="30.0" width="49.8" height="230.0" fill="#4a78b5"/>
+<text x="95.6" y="26.0" text-anchor="middle">10</text>
+<text transform="translate(95.6,270) rotate(35)" text-anchor="start">Accessibility</text>
+<rect x="141.8" y="168.0" width="49.8" height="92.0" fill="#4a78b5"/>
+<text x="166.7" y="164.0" text-anchor="middle">4</text>
+<text transform="translate(166.7,270) rotate(35)" text-anchor="start">Business rule/data integrity</text>
+<rect x="212.9" y="168.0" width="49.8" height="92.0" fill="#4a78b5"/>
+<text x="237.8" y="164.0" text-anchor="middle">4</text>
+<text transform="translate(237.8,270) rotate(35)" text-anchor="start">Error handling</text>
+<rect x="284.0" y="168.0" width="49.8" height="92.0" fill="#4a78b5"/>
+<text x="308.9" y="164.0" text-anchor="middle">4</text>
+<text transform="translate(308.9,270) rotate(35)" text-anchor="start">Usability</text>
+<rect x="355.1" y="191.0" width="49.8" height="69.0" fill="#4a78b5"/>
+<text x="380.0" y="187.0" text-anchor="middle">3</text>
+<text transform="translate(380.0,270) rotate(35)" text-anchor="start">Input validation</text>
+<rect x="426.2" y="191.0" width="49.8" height="69.0" fill="#4a78b5"/>
+<text x="451.1" y="187.0" text-anchor="middle">3</text>
+<text transform="translate(451.1,270) rotate(35)" text-anchor="start">Security configuration/dependencies</text>
+<rect x="497.3" y="191.0" width="49.8" height="69.0" fill="#4a78b5"/>
+<text x="522.2" y="187.0" text-anchor="middle">3</text>
+<text transform="translate(522.2,270) rotate(35)" text-anchor="start">Code quality</text>
+<rect x="568.4" y="214.0" width="49.8" height="46.0" fill="#4a78b5"/>
+<text x="593.3" y="210.0" text-anchor="middle">2</text>
+<text transform="translate(593.3,270) rotate(35)" text-anchor="start">Access control</text>
+<rect x="639.6" y="237.0" width="49.8" height="23.0" fill="#4a78b5"/>
+<text x="664.4" y="233.0" text-anchor="middle">1</text>
+<text transform="translate(664.4,270) rotate(35)" text-anchor="start">Frontend state</text>
+<polyline fill="none" stroke="#d0582c" stroke-width="2" points="95.6,192.4 166.7,165.3 237.8,138.2 308.9,111.2 380.0,90.9 451.1,70.6 522.2,50.3 593.3,36.8 664.4,30.0"/>
+<circle cx="95.6" cy="192.4" r="3" fill="#d0582c"/>
+<circle cx="166.7" cy="165.3" r="3" fill="#d0582c"/>
+<circle cx="237.8" cy="138.2" r="3" fill="#d0582c"/>
+<circle cx="308.9" cy="111.2" r="3" fill="#d0582c"/>
+<circle cx="380.0" cy="90.9" r="3" fill="#d0582c"/>
+<circle cx="451.1" cy="70.6" r="3" fill="#d0582c"/>
+<circle cx="522.2" cy="50.3" r="3" fill="#d0582c"/>
+<circle cx="593.3" cy="36.8" r="3" fill="#d0582c"/>
+<circle cx="664.4" cy="30.0" r="3" fill="#d0582c"/>
 </svg>
