@@ -137,16 +137,7 @@
                 <div class="w-[840px] pt-[60px]">
                   <div class="mx-auto flex w-[400px] flex-col gap-5 p-6">
                     <div class="flex flex-col items-start gap-4">
-                      <svg viewBox="0 0 50 50" class="size-8">
-                        <path
-                          d="M35.7143 0H14.2857C6.39593 0 0 6.39593 0 14.2857V35.7143C0 43.6041 6.39593 50 14.2857 50H35.7143C43.6041 50 50 43.6041 50 35.7143V14.2857C50 6.39593 43.6041 0 35.7143 0Z"
-                          fill="#7B808A"
-                        />
-                        <path
-                          d="M25 10.7141L12.625 17.8569V19.9284L16.1964 21.9819L23.2143 26.0176V34.1249L16.1964 30.0712V26.6248L12.625 24.5177V32.1249L25 39.2677L37.375 32.1249V17.8391L25 10.6963V10.7141ZM17.9821 18.8927L25 14.8391L32.0178 18.8927L25 22.9463L17.9821 18.8927ZM33.8035 30.0891L26.7857 34.1427V26.0355L33.8035 21.9819V30.0891Z"
-                          fill="white"
-                        />
-                      </svg>
+                      <img :src="FRAPPE_LOGO" alt="" class="size-8" />
                       <div class="flex flex-col gap-1.5">
                         <p class="text-3xl font-bold text-ink-gray-9">
                           {{ __("Sign In") }}
@@ -490,6 +481,8 @@ import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
 import SetupPreviewDesk from "./SetupPreviewDesk.vue";
 import { SAMPLE_TICKET, avatarUrl, nameOf } from "./preview";
 import { brand, invitees, setup } from "./setup";
+
+const FRAPPE_LOGO = "/assets/frappe/images/frappe-framework-logo.svg";
 
 type Page = "login" | "home" | "desk-list" | "desk-ticket" | "portal-ticket";
 type Point = { x: number; y: number };

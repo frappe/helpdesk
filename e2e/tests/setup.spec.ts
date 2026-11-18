@@ -46,7 +46,8 @@ test.describe("first-run setup", () => {
       await expect(page.getByRole("heading", { name: "You're all set" })).toBeVisible();
       await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).setup_complete).toBe(1);
       await page.getByRole("button", { name: /Go to Helpdesk|Not now/ }).click();
-      await expect(page).toHaveURL(/\/helpdesk\/home$/);
+      await expect(page).toHaveURL(/\/helpdesk\/tickets\/\w*$/);
+      await expect(page.getByText("Welcome to Helpdesk").first()).toBeVisible();
     } finally {
       await restore();
     }

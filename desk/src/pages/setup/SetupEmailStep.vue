@@ -27,7 +27,13 @@
           <div
             class="flex size-9 shrink-0 items-center justify-center rounded-4 bg-surface-gray-2 text-ink-gray-7"
           >
-            <LucideMail class="size-4" aria-hidden="true" />
+            <img
+              v-if="mailboxLogo"
+              :src="mailboxLogo"
+              alt=""
+              class="size-5 object-contain"
+            />
+            <LucideMail v-else class="size-4" aria-hidden="true" />
           </div>
           <div class="min-w-0 flex-1">
             <p
@@ -172,11 +178,19 @@ import {
 } from "frappe-ui";
 import { computed, onMounted, ref, watch } from "vue";
 import Banner from "@framework/ui/components/EmailAccounts/Banner.vue";
+import { serviceOf } from "@framework/ui/components/EmailAccounts/services";
 import SetupProviderPicker from "./SetupProviderPicker.vue";
 import { type Mailbox, next, setup } from "./setup";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const controller = useEmailAccounts("HD Ticket");
+const mailboxLogo = computed(() => {
+  const account = controller.accounts.find(
+    (a) =>
+      a.name === setup.mailbox?.name || a.email_id === setup.mailbox?.address
+  );
+  return account && serviceOf(account).logo;
+});
 const oneClick = useOneClick();
 const reveal = {
   enterActiveClass:

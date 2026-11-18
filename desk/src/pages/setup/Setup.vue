@@ -63,12 +63,12 @@
         </div>
       </main>
 
-      <div class="mx-auto w-full max-w-md">
-        <TelemetryConsent app-name="helpdesk" :label="__('Share usage data')" />
-        <p class="mt-1 pl-6 text-p-xs text-ink-gray-5">
-          {{ __("Helps us improve Helpdesk. Saved as soon as you change it.") }}
-        </p>
-      </div>
+      <TelemetryConsent
+        app-name="helpdesk"
+        class="mx-auto w-full max-w-md"
+        :label="__('Share anonymous usage data to help improve Helpdesk')"
+        :error-message="__('Could not save your choice. Please try again.')"
+      />
     </section>
 
     <aside class="sticky top-0 hidden h-screen min-w-0 lg:block">
