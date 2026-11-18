@@ -406,6 +406,8 @@ class HDTicket(Document, CustomerEditController):
         )
 
     def validate_feedback(self):
+        if self.flags.skip_feedback_rule:  # set by close_tickets_after_n_days
+            return
         is_feedback_mandatory = frappe.get_cached_value(
             "HD Settings", "HD Settings", "is_feedback_mandatory"
         )
@@ -1528,7 +1530,10 @@ def close_tickets_after_n_days():
     for ticket in tickets_to_close:
         doc = frappe.get_doc("HD Ticket", ticket)
         doc.status = "Closed"
-        doc.flags.ignore_validate = True
+        # Skip only the feedback rule: the job closes on the customer's behalf.
+        # flags.ignore_validate would also skip before_save, which stamps the
+        # resolution date and applies the SLA (DEF-01).
+        doc.flags.skip_feedback_rule = True
         try:
             doc.save(ignore_permissions=True)
             # the status flip has a Version row; the reason is only recorded here

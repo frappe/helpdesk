@@ -99,6 +99,21 @@ def test_mcdc_each_condition_independently_decides_the_outcome(index):
     run_validate_feedback(*mcdc_pair(index))  # same row, one condition flipped
 
 
+def test_the_auto_close_job_flag_skips_only_this_rule():
+    """DEF-01 fix: the job sets skip_feedback_rule instead of ignore_validate.
+
+    On the one rejecting row of the table the flag alone makes the rule accept,
+    before HD Settings is even read.
+    """
+    fake = make_fake_frappe()
+    fake.get_cached_value.return_value = 1
+    ticket = Ticket(feedback_rating=0, status_category="Resolved", has_agent_replied="COMM-0001")
+    ticket.flags.skip_feedback_rule = True
+    with patch.object(hd_ticket, "frappe", fake), patch.object(hd_ticket, "is_agent", return_value=False):
+        ticket.validate_feedback()  # must not raise
+    fake.get_cached_value.assert_not_called()
+
+
 def test_reads_the_mandatory_flag_from_hd_settings():
     fake = run_validate_feedback(False, False, False, False, True)
     fake.get_cached_value.assert_called_once_with(
