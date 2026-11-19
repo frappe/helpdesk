@@ -203,6 +203,19 @@ function createSetupFlow() {
     finishSetup(true);
   }
 
+  function reportError(action: string, error: unknown) {
+    const e = error as { exc_type?: string; name?: string; status?: number };
+    capture("setup_error", {
+      data: {
+        step: setup.step,
+        action,
+        error_type:
+          typeof error === "string" ? error : e?.exc_type || e?.name || "Error",
+        status: e?.status ?? null,
+      },
+    });
+  }
+
   let completing: Promise<string | null> = Promise.resolve(null);
 
   function finishSetup(skipped: boolean) {
@@ -219,7 +232,12 @@ function createSetupFlow() {
         steps_completed: outcome.value.completed_steps.length,
       },
     });
-    completing = call("helpdesk.api.setup.complete_setup").catch(() => null);
+    completing = call<string | null>("helpdesk.api.setup.complete_setup").catch(
+      (e) => {
+        reportError("complete_setup", e);
+        return null;
+      }
+    );
     movedAt = performance.now();
     setup.showDone = true;
   }
@@ -254,6 +272,8 @@ function createSetupFlow() {
     setStepBack,
     back,
     skipSetup,
+    /** Sends `setup_error` for a failed `action`: the error's type and HTTP status, never its message. */
+    reportError,
     /** How setup ended, sent along with the done dialog's feedback. */
     outcome,
     /** Opens the welcome ticket once the server has ended setup, with a fresh boot. */

@@ -321,7 +321,7 @@ import type {
 import { validateEmailWithZod } from "@/utils";
 import { type Mailbox, normalizeEmail, useSetupFlow } from "./setup";
 
-const { setStepBack } = useSetupFlow();
+const { reportError, setStepBack } = useSetupFlow();
 
 const props = defineProps<{
   controller: EmailAccountsController;
@@ -501,6 +501,7 @@ async function signIn(p: EmailService, email?: string) {
     if (await props.controller.connect(p.service, email || undefined)) return;
     open(p, email);
   } catch (e) {
+    reportError("email_sign_in", e);
     error.value = errorText(e);
   }
   connecting.value = null;
@@ -533,6 +534,7 @@ async function create() {
       await props.controller.load();
       if (connectExisting(address)) return;
     }
+    reportError("email_create", e);
     error.value = /AUTHENTICATIONFAILED|Invalid credentials/i.test(errorText(e))
       ? __(
           "{0} didn't accept this email and password. Check them and try again.",
