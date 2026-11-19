@@ -38,8 +38,6 @@ def complete_setup() -> str | None:
 
 
 def finish_frappe_setup():
-    """Finishes the Framework setup wizard with the values Frappe Cloud stored, as Raven does.
-    Apps with wizard stages of their own, like ERPNext, still need the desk wizard."""
     from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
 
     if (
