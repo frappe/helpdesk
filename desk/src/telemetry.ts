@@ -3,7 +3,7 @@ const APP = "helpdesk";
 
 interface CaptureOptions {
   data: {
-    [key: string]: string | number | boolean | object;
+    [key: string]: string | number | boolean | object | null;
   };
 }
 
