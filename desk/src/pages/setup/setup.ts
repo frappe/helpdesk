@@ -1,6 +1,7 @@
 import { capture } from "@/telemetry";
 import { validateEmailWithZod } from "@/utils";
-import { useIntervalFn } from "@vueuse/core";
+import { useTelemetry } from "@framework/ui";
+import { until, useIntervalFn } from "@vueuse/core";
 import { call } from "frappe-ui";
 import {
   computed,
@@ -22,6 +23,11 @@ export type InviteRow = {
   sent: boolean;
 };
 export type Mailbox = { name: string; address: string };
+type SetupOutcome = {
+  skipped_setup: boolean;
+  completed_steps: StepKey[];
+  skipped_steps: StepKey[];
+};
 
 const ALL_STEPS: Step[] = [
   { key: "password", required: true },
@@ -113,24 +119,20 @@ function createSetupFlow() {
     setup.ticketArrived = true;
   });
 
-  const funnel = {
-    stepStartedAt: Date.now(),
-    completed: [] as StepKey[],
-    skipped: [] as StepKey[],
-  };
+  const startedAt = Date.now();
+  let stepStartedAt = startedAt;
+  const secondsSince = (start: number) =>
+    Math.round((Date.now() - start) / 1000);
+  const stepStatus: Partial<Record<StepKey, "completed" | "skipped">> = {};
+  const stepsWith = (status: "completed" | "skipped") =>
+    (Object.keys(stepStatus) as StepKey[]).filter(
+      (step) => stepStatus[step] === status
+    );
+  const outcome = ref<SetupOutcome | null>(null);
 
-  function track(event: string, data: Record<string, string | number> = {}) {
-    capture(event, {
-      data: {
-        step: setup.step,
-        step_number: stepIndex.value + 1,
-        total_steps: steps.value.length,
-        duration_seconds: Math.round(
-          (Date.now() - funnel.stepStartedAt) / 1000
-        ),
-        ...data,
-      },
-    });
+  function viewed() {
+    stepStartedAt = Date.now();
+    capture("setup_step_viewed", { data: { step: setup.step } });
   }
 
   let movedAt = 0;
@@ -143,26 +145,44 @@ function createSetupFlow() {
     event.stopPropagation();
   }
 
-  function goTo(step: StepKey) {
+  function open(step: StepKey) {
     movedAt = performance.now();
     setup.step = step;
     sessionStorage.setItem(STEP_KEY, step);
-    funnel.stepStartedAt = Date.now();
   }
+
+  function goTo(step: StepKey) {
+    open(step);
+    viewed();
+  }
+
+  const telemetry = useTelemetry();
 
   function startSetup(step?: StepKey) {
     step ??= (sessionStorage.getItem(STEP_KEY) as StepKey | null) ?? undefined;
-    if (step && steps.value.some((s) => s.key === step)) goTo(step);
-    track("started_setup");
+    if (step && steps.value.some((s) => s.key === step)) open(step);
+    const first = setup.step;
+    until(() => telemetry.isEnabled)
+      .toBe(true)
+      .then(() => {
+        capture("setup_started");
+        capture("setup_step_viewed", { data: { step: first } });
+      });
   }
 
   function next({ skipped = false } = {}) {
-    const from = setup.step;
-    track(skipped ? "skipped_setup_step" : "completed_setup_step");
-    (skipped ? funnel.skipped : funnel.completed).push(from);
+    const step = setup.step;
+    if (!skipped || stepStatus[step] !== "completed")
+      stepStatus[step] = skipped ? "skipped" : "completed";
+    capture(skipped ? "setup_step_skipped" : "setup_step_completed", {
+      data: {
+        step,
+        time_on_step_s: secondsSince(stepStartedAt),
+      },
+    });
     const following = steps.value[stepIndex.value + 1];
     if (following) return goTo(following.key);
-    finishSetup();
+    finishSetup(false);
   }
 
   let stepBack: (() => boolean) | null = null;
@@ -174,24 +194,29 @@ function createSetupFlow() {
   function back() {
     if (stepBack?.()) return;
     if (!canGoBack.value) return;
-    const to = steps.value[stepIndex.value - 1].key;
-    track("went_back_in_setup", { from_step: setup.step, to_step: to });
-    goTo(to);
+    capture("setup_back", { data: { from_step: setup.step } });
+    goTo(steps.value[stepIndex.value - 1].key);
   }
 
   function skipSetup() {
-    track("left_setup");
-    finishSetup();
+    capture("setup_skipped", { data: { step: setup.step } });
+    finishSetup(true);
   }
 
   let completing: Promise<string | null> = Promise.resolve(null);
 
-  function finishSetup() {
+  function finishSetup(skipped: boolean) {
     markSetupDoneLocally();
-    capture("setup_completed", {
+    outcome.value = {
+      skipped_setup: skipped,
+      completed_steps: stepsWith("completed"),
+      skipped_steps: stepsWith("skipped"),
+    };
+    capture("setup_finished", {
       data: {
-        completed_steps: funnel.completed,
-        skipped_steps: funnel.skipped,
+        skipped,
+        duration_s: secondsSince(startedAt),
+        steps_completed: outcome.value.completed_steps.length,
       },
     });
     completing = call("helpdesk.api.setup.complete_setup").catch(() => null);
@@ -220,7 +245,8 @@ function createSetupFlow() {
     importPhase,
     /** Drops an Enter that lands while a step or the done dialog is still coming in. */
     holdEnter,
-    /** Opens `step`, else the step this tab was on before it left, e.g. for a sign-in page. */
+    /** Opens `step`, else the step this tab was on before it left, e.g. for a sign-in page.
+     * Its first events wait for telemetry, which loads after the page starts. */
     startSetup,
     /** Moves on from the current step, or opens the done dialog after the last one. */
     next,
@@ -228,6 +254,8 @@ function createSetupFlow() {
     setStepBack,
     back,
     skipSetup,
+    /** How setup ended, sent along with the done dialog's feedback. */
+    outcome,
     /** Opens the welcome ticket once the server has ended setup, with a fresh boot. */
     openDesk,
   };

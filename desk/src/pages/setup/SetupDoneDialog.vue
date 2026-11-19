@@ -201,6 +201,7 @@
 <script setup lang="ts">
 import { capture } from "@/telemetry";
 import { avatarUrl } from "./preview";
+import { useSetupFlow } from "./setup";
 import { __ } from "@/translation";
 import { Avatar, Button, Dialog, FormControl, Rating, toast } from "frappe-ui";
 import { usePreferredReducedMotion } from "@vueuse/core";
@@ -213,6 +214,7 @@ const props = defineProps<{
   askFeedback: boolean;
 }>();
 const emit = defineEmits<{ close: [] }>();
+const { outcome } = useSetupFlow();
 
 const MAX_COMMENT = 500;
 const rating = ref(0);
@@ -293,8 +295,12 @@ const pop = (delay: number) => ({
 
 function close(submit: boolean) {
   if (submit) {
-    capture("setup_feedback", {
-      data: { rating: rating.value, comment: comment.value.trim() },
+    capture("onboarding_feedback", {
+      data: {
+        ...outcome.value,
+        rating: rating.value,
+        comment: comment.value.trim() || null,
+      },
     });
     toast.success(__("Thanks for the feedback"));
   }
