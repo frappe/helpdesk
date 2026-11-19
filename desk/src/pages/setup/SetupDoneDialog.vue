@@ -268,15 +268,22 @@ const summary = computed(() => {
   const n = props.agents.length;
   if (props.connected && n)
     return n === 1
-      ? __("Your mailbox is connected and 1 agent invited.")
-      : __("Your mailbox is connected and {0} agents invited.", [n]);
+      ? __("Your mailbox is connected, and you've invited 1 agent.")
+      : __("Your mailbox is connected, and you've invited {0} agents.", [n]);
   if (props.connected)
-    return __("Your mailbox is connected. New emails will become tickets.");
+    return __("Your mailbox is connected. New emails will arrive as tickets.");
   if (n)
     return n === 1
-      ? __("1 agent invited. You can connect email from Settings.")
-      : __("{0} agents invited. You can connect email from Settings.", [n]);
-  return __("You can connect email and invite agents any time from Settings.");
+      ? __(
+          "You've invited 1 agent. Connect a mailbox from Settings to turn emails into tickets."
+        )
+      : __(
+          "You've invited {0} agents. Connect a mailbox from Settings to turn emails into tickets.",
+          [n]
+        );
+  return __(
+    "You can connect a mailbox and invite agents from Settings at any time."
+  );
 });
 
 const stroke = (delay: number, ms = 1100) => ({
