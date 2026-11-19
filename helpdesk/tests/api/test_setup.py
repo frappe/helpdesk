@@ -6,7 +6,15 @@ from frappe.tests import IntegrationTestCase
 from helpdesk.api.setup import complete_setup, is_setup_pending
 from helpdesk.patches.mark_existing_sites_set_up import execute as mark_existing_sites
 from helpdesk.setup.welcome_ticket import AUTHOR_EMAIl
-from helpdesk.test_utils import as_v2_site, create_agent, make_ticket, unique_email
+from helpdesk.test_utils import (
+    as_non_v2_site,
+    as_v2_site,
+    create_agent,
+    framework_setup_pending,
+    make_ticket,
+    unique_email,
+    with_wizard_stages,
+)
 
 FRAMEWORK_SETUP = "frappe.desk.page.setup_wizard.setup_wizard.setup_complete"
 
@@ -17,30 +25,12 @@ class TestSetup(IntegrationTestCase):
         frappe.db.set_single_value("HD Settings", "setup_complete", 0)
         self.agent = create_agent(unique_email("setup-agent")).name
 
-    def not_v2_site(self):
-        return patch.dict(
-            frappe.local.conf, {"pilot_endpoint": None, "pilot_auth_token": None}
-        )
-
-    def framework_setup_pending(self):
-        return patch("frappe.is_setup_complete", return_value=False)
-
-    def wizard_stages(self, stages: list[str]):
-        """Installed apps, like ERPNext in CI, may add wizard stages; tests pin them."""
-        hooks = frappe.get_hooks
-        return patch(
-            "frappe.get_hooks",
-            side_effect=lambda hook=None, *a, **kw: (
-                stages if hook == "setup_wizard_stages" else hooks(hook, *a, **kw)
-            ),
-        )
-
     def test_pending_for_system_manager_on_v2_site(self) -> None:
         with as_v2_site():
             self.assertTrue(is_setup_pending())
 
     def test_not_pending_off_v2_site(self) -> None:
-        with self.not_v2_site():
+        with as_non_v2_site():
             self.assertFalse(is_setup_pending())
 
     def test_not_pending_once_complete(self) -> None:
@@ -60,8 +50,8 @@ class TestSetup(IntegrationTestCase):
     def test_complete_finishes_framework_setup_on_v2_site(self) -> None:
         with (
             as_v2_site(),
-            self.framework_setup_pending(),
-            self.wizard_stages([]),
+            framework_setup_pending(),
+            with_wizard_stages([]),
             patch(FRAMEWORK_SETUP, return_value={"status": "ok"}) as framework_setup,
         ):
             complete_setup()
@@ -71,7 +61,7 @@ class TestSetup(IntegrationTestCase):
 
     def test_complete_returns_welcome_ticket(self) -> None:
         welcome = make_ticket(raised_by=AUTHOR_EMAIl).name
-        with self.not_v2_site():
+        with as_non_v2_site():
             self.assertEqual(complete_setup(), welcome)
 
     def test_complete_leaves_finished_framework_setup(self) -> None:
@@ -86,8 +76,8 @@ class TestSetup(IntegrationTestCase):
 
     def test_complete_leaves_framework_setup_off_v2_site(self) -> None:
         with (
-            self.not_v2_site(),
-            self.framework_setup_pending(),
+            as_non_v2_site(),
+            framework_setup_pending(),
             patch(FRAMEWORK_SETUP) as framework_setup,
         ):
             complete_setup()
@@ -96,8 +86,8 @@ class TestSetup(IntegrationTestCase):
     def test_complete_leaves_framework_setup_to_wizard_stages(self) -> None:
         with (
             as_v2_site(),
-            self.framework_setup_pending(),
-            self.wizard_stages(["erpnext.stages"]),
+            framework_setup_pending(),
+            with_wizard_stages(["erpnext.stages"]),
             patch(FRAMEWORK_SETUP) as framework_setup,
         ):
             complete_setup()
@@ -106,8 +96,8 @@ class TestSetup(IntegrationTestCase):
     def test_complete_ends_setup_when_framework_setup_fails(self) -> None:
         with (
             as_v2_site(),
-            self.framework_setup_pending(),
-            self.wizard_stages([]),
+            framework_setup_pending(),
+            with_wizard_stages([]),
             patch(
                 FRAMEWORK_SETUP, return_value={"status": "fail", "fail": "No region"}
             ),

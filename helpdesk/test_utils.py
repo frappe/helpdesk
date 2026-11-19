@@ -1246,6 +1246,29 @@ def as_v2_site():
     )
 
 
+def as_non_v2_site():
+    """Site config without pilot credentials, so `is_v2_site()` is false."""
+    return patch.dict(
+        frappe.local.conf, {"pilot_endpoint": None, "pilot_auth_token": None}
+    )
+
+
+def framework_setup_pending():
+    """Makes `frappe.is_setup_complete()` false, as on a site that skipped the desk wizard."""
+    return patch("frappe.is_setup_complete", return_value=False)
+
+
+def with_wizard_stages(stages: list[str]):
+    """Pins the `setup_wizard_stages` hook; installed apps, like ERPNext in CI, may add stages."""
+    hooks = frappe.get_hooks
+    return patch(
+        "frappe.get_hooks",
+        side_effect=lambda hook=None, *a, **kw: (
+            stages if hook == "setup_wizard_stages" else hooks(hook, *a, **kw)
+        ),
+    )
+
+
 def clear_trial_cache(user: str) -> None:
     """Forget the cached trial and `user`'s dismissal; redis is not rolled back between tests."""
     forget_trial()
