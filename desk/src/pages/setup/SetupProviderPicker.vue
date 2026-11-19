@@ -241,14 +241,16 @@
             <p class="text-base-medium text-ink-gray-8">
               {{
                 workspaceGmail
-                  ? __("This is a Google Workspace address")
+                  ? __("Sign in with Google instead")
                   : __("Sign in instead")
               }}
             </p>
             <p class="text-p-sm text-ink-gray-6">
               {{
                 workspaceGmail
-                  ? __("It connects with Google sign-in, not an app password.")
+                  ? __(
+                      "This is a Google Workspace address, so you don't need an app password."
+                    )
                   : __("No password to create.")
               }}
             </p>
