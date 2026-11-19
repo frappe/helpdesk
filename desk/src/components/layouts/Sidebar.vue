@@ -27,12 +27,6 @@
         />
       </div>
       <SidebarItem
-        v-if="authStore.isAdmin"
-        label="Reset setup"
-        :icon="LucideRotateCcw"
-        :on-click="resetSetup"
-      />
-      <SidebarItem
         v-if="isOnboardingStepsCompleted"
         :label="__('Help')"
         :icon="HelpIcon"
@@ -91,7 +85,6 @@ import {
   showCommentBox,
   showEmailBox,
 } from "@/pages/ticket/modalStates";
-import { resetSetup } from "@/pages/setup/gate";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { CUSTOMER_PORTAL_ROOT } from "@/utils";
@@ -119,7 +112,6 @@ import { __ } from "@/translation";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
 import LucideMail from "~icons/lucide/mail";
-import LucideRotateCcw from "~icons/lucide/rotate-ccw";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
 import Ticket from "~icons/lucide/ticket";

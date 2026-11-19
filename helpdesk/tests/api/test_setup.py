@@ -3,7 +3,7 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.api.setup import complete_setup, is_setup_pending, reset_setup
+from helpdesk.api.setup import complete_setup, is_setup_pending
 from helpdesk.patches.mark_existing_sites_set_up import execute as mark_existing_sites
 from helpdesk.setup.welcome_ticket import AUTHOR_EMAIl
 from helpdesk.test_utils import as_v2_site, create_agent, make_ticket, unique_email
@@ -116,38 +116,3 @@ class TestSetup(IntegrationTestCase):
     def test_agent_cannot_complete_setup(self) -> None:
         with self.set_user(self.agent), self.assertRaises(frappe.PermissionError):
             complete_setup()
-
-
-class TestResetSetup(IntegrationTestCase):
-    def setUp(self) -> None:
-        frappe.set_user("Administrator")
-        frappe.db.set_single_value("HD Settings", "setup_complete", 1)
-
-    def developer_mode(self, on: bool):
-        return patch.dict(frappe.local.conf, {"developer_mode": int(on)})
-
-    def test_reset_shows_setup_again(self) -> None:
-        frappe.db.set_single_value("System Settings", "enable_telemetry", 0)
-        with self.developer_mode(True):
-            reset_setup()
-        self.assertFalse(frappe.db.get_single_value("HD Settings", "setup_complete"))
-        self.assertTrue(
-            frappe.db.get_single_value("System Settings", "enable_telemetry")
-        )
-        self.assertFalse(frappe.is_setup_complete())
-        with as_v2_site():
-            self.assertTrue(is_setup_pending())
-
-    def test_reset_refused_outside_developer_mode(self) -> None:
-        with self.developer_mode(False), self.assertRaises(frappe.PermissionError):
-            reset_setup()
-        self.assertTrue(frappe.db.get_single_value("HD Settings", "setup_complete"))
-
-    def test_agent_cannot_reset_setup(self) -> None:
-        agent = create_agent(unique_email("reset-agent")).name
-        with (
-            self.developer_mode(True),
-            self.set_user(agent),
-            self.assertRaises(frappe.PermissionError),
-        ):
-            reset_setup()

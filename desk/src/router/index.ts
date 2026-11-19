@@ -1,5 +1,5 @@
 import { useScreenSize } from "@/composables/screen";
-import { isSetupPending, resetSetup } from "@/pages/setup/gate";
+import { isSetupPending } from "@/pages/setup/gate";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { CUSTOMER_PORTAL_ROOT } from "@/utils";
@@ -167,9 +167,6 @@ router.beforeEach(async (to, _, next) => {
   if (authStore.isLoggedIn) {
     await authStore.init();
   }
-
-  if (authStore.isLoggedIn && "reset_setup" in to.query && (await resetSetup()))
-    return;
 
   if (!authStore.isLoggedIn) {
     const redirectURL = to.fullPath !== "/" ? to.fullPath : "";
