@@ -543,8 +543,8 @@ function submitMail() {
     (quotedContentRef.value
       ? `<p class="reply-to-content"></p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
       : "");
-  const sender = selectedFromEmail.value?.email_id ?? authStore.userId;
   const ownEmail = getUser(authStore.userId).email;
+  const sender = selectedFromEmail.value?.email_id ?? ownEmail;
 
   pendingRow?.drop();
   pendingRow = addPendingActivity(props.doctype, props.ticketId, {
