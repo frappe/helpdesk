@@ -33,12 +33,18 @@
         <p class="text-sm text-ink-gray-6">{{ __("Logo") }}</p>
         <div
           ref="dropZone"
-          class="flex items-center gap-4 rounded-5 border border-dashed p-4 transition-colors"
+          class="flex cursor-pointer items-center gap-4 rounded-5 border border-dashed p-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
           :class="
             isOverDropZone
               ? 'border-outline-gray-5 bg-surface-gray-2'
-              : 'border-outline-gray-3'
+              : 'border-outline-gray-3 hover:border-outline-gray-4 hover:bg-surface-gray-1'
           "
+          role="button"
+          tabindex="0"
+          :aria-label="__('Upload logo')"
+          @click="browseLogo"
+          @keydown.enter.self.prevent="browseLogo"
+          @keydown.space.self.prevent="browseLogo"
         >
           <span
             class="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-4"
@@ -66,7 +72,7 @@
             <p class="text-sm text-ink-gray-8">
               {{
                 setup.brandLogo
-                  ? __("Drop or paste a new image to replace it")
+                  ? __("Drop or paste a new logo here")
                   : __("Drop or paste your logo here")
               }}
             </p>
@@ -75,17 +81,16 @@
             </p>
           </div>
           <Button
-            :label="__('Browse')"
-            :disabled="logoUpload.isUploading.value"
-            @click="fileDialog.open()"
-          />
-          <Button
             v-if="setup.brandLogo"
             variant="ghost"
-            icon="lucide-x"
+            :tooltip="__('Remove logo')"
             :aria-label="__('Remove logo')"
-            @click="setup.brandLogo = ''"
-          />
+            @click.stop="setup.brandLogo = ''"
+          >
+            <template #icon>
+              <LucideTrash2 class="size-4 text-ink-red-6" aria-hidden="true" />
+            </template>
+          </Button>
         </div>
       </div>
     </div>
@@ -154,6 +159,10 @@ const fileDialog = useFileDialog({
   reset: true,
 });
 fileDialog.onChange((files) => uploadLogo(files?.[0]));
+
+function browseLogo() {
+  if (!logoUpload.isUploading.value) fileDialog.open();
+}
 
 async function uploadLogo(file?: File) {
   if (!file) return;
