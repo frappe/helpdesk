@@ -137,6 +137,9 @@ jobs:
           # localhost is a secure context, which crypto.randomUUID in frappe/ui needs.
           BASE_URL: http://localhost:8000
           ADMIN_PASSWORD: admin
+          # The Meta sign-in spec points the site at a fake Central with bench set-config.
+          SITE_NAME: ${{ env.SITE }}
+          BENCH_PATH: /home/runner/frappe-bench
 
       - name: Upload Blob Report
         uses: actions/upload-artifact@v4

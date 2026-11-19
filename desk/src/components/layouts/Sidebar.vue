@@ -482,5 +482,10 @@ onMounted(() => {
     setActiveSettingsTab("Email Accounts");
     showSettingsModal.value = true;
   }
+  // back from Meta's sign-in: the WhatsApp panel reads ?whatsapp_connect itself
+  if (router.currentRoute.value.query.whatsapp_connect) {
+    setActiveSettingsTab("WhatsApp");
+    showSettingsModal.value = true;
+  }
 });
 </script>
