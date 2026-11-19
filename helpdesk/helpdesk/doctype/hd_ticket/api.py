@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
 from frappe.rate_limiter import rate_limit
-from frappe.utils import get_user_info_for_avatar, now_datetime
+from frappe.utils import get_user_display_id, get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Order
 
@@ -33,7 +33,7 @@ def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     doc["doctype"] = "HD Ticket"
     doc["source"] = "Portal"
     doc["attachments"] = attachments
-    doc["raised_by"] = frappe.session.user
+    doc["raised_by"] = get_user_display_id()
     d = frappe.get_doc(doc)
     # only the portal sends an origin
     d.flags.ticket_origin = origin
