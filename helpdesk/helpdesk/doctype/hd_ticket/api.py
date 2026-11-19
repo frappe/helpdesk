@@ -331,7 +331,6 @@ def merge_ticket(source: str, target: str):
     # comment in target ticket that
     c = frappe.new_doc("Comment")
     c.comment_type = "Comment"
-    c.comment_email = frappe.session.user
     c.reference_doctype = "HD Ticket"
     c.reference_name = target
     source_link = frappe.utils.get_url("/helpdesk/tickets/" + str(source))

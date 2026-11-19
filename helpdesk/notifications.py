@@ -13,7 +13,7 @@ from frappe.desk.doctype.notification_log.notification_log import (
     make_notification_logs,
     set_notifications_as_unseen,
 )
-from frappe.utils import get_fullname
+from frappe.utils import get_fullname, get_user_by_email
 
 HELPDESK_APP = "helpdesk"
 
@@ -25,7 +25,9 @@ def notify_reaction(comment, reacting_user: str) -> None:
     up rows, which is more than ``dedupe_on`` covers, so the existing-row
     branch is hand-rolled here.
     """
-    author = comment.comment_email or comment.owner
+    author = (
+        comment.comment_email and get_user_by_email(comment.comment_email)
+    ) or comment.owner
     if author == reacting_user:
         return
     reacting_users = {r.user for r in comment.reactions if r.user != author}
