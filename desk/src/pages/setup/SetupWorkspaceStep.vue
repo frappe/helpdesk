@@ -138,7 +138,7 @@ import {
 import { ref, watch } from "vue";
 import { useSetupFlow } from "./setup";
 
-const { brand, next, setup } = useSetupFlow();
+const { brand, next, reportError, setup } = useSetupFlow();
 
 const portal = `${window.location.host}/help`;
 
@@ -165,6 +165,7 @@ async function uploadLogo(file?: File) {
     const uploaded = await logoUpload.upload(file, { private: false });
     setup.brandLogo = uploaded.file_url;
   } catch (e) {
+    reportError("upload_logo", e);
     toast.error(e.message || __("Could not upload the logo"));
   }
 }
@@ -206,6 +207,7 @@ async function save() {
     });
     next();
   } catch (e) {
+    reportError("save_workspace", e);
     saveError.value =
       e.messages?.join(" ") || __("Could not save your company");
   } finally {

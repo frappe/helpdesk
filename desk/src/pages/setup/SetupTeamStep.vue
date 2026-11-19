@@ -157,7 +157,7 @@ import { useTimeoutFn } from "@vueuse/core";
 import { computed, nextTick, ref } from "vue";
 import { normalizeEmail, type InviteRow, useSetupFlow } from "./setup";
 
-const { invited, newRow, next, setup } = useSetupFlow();
+const { invited, newRow, next, reportError, setup } = useSetupFlow();
 
 type InviteResult = Parameters<typeof handleInviteUserSuccess>[0];
 
@@ -273,6 +273,7 @@ async function sendInvites() {
         summary[key].push(...result[key]);
     }
   } catch (e) {
+    reportError("send_invites", e);
     toast.error(e.messages?.join(" ") || __("Could not send invites"));
   }
   handleInviteUserSuccess(summary);

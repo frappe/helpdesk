@@ -128,7 +128,7 @@ import {
 import { computed, ref } from "vue";
 import { useSetupFlow } from "./setup";
 
-const { next, setup } = useSetupFlow();
+const { next, reportError, setup } = useSetupFlow();
 
 const MIN_LENGTH = 8;
 const authStore = useAuthStore();
@@ -201,6 +201,7 @@ async function save() {
     });
     next();
   } catch (e) {
+    reportError("save_password", e);
     saveError.value =
       e.messages?.join(" ") || __("Could not save your password");
   } finally {

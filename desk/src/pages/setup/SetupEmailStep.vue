@@ -157,7 +157,7 @@ const PHASES = [
   __("Starting the SLA clocks…"),
 ];
 
-const { importPhase: phase, next, setup } = useSetupFlow();
+const { importPhase: phase, next, reportError, setup } = useSetupFlow();
 const ready = computed(() => phase.value >= IMPORT_PHASES);
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const controller = useEmailAccounts("HD Ticket");
@@ -187,6 +187,7 @@ onMounted(() => {
   const signIn = controller.signIn;
   if (!signIn || setup.mailbox) return;
   if (!["connected", "connected_receive_only"].includes(signIn.result)) {
+    reportError("email_sign_in", signIn.result);
     picker.value?.showSignInFailure(
       signIn.result,
       signIn.mailbox,
