@@ -21,7 +21,6 @@ from frappe.utils import (
     get_string_between,
     get_url,
     get_user_by_email,
-    get_user_display_id,
     getdate,
     now_datetime,
 )
@@ -300,7 +299,7 @@ class HDTicket(Document, CustomerEditController):
     def set_raised_by(self):
         if self.raised_by:
             return
-        self.raised_by = get_user_display_id()
+        self.raised_by = get_email_address()
 
     def set_ticket_origin(self):
         # after the permlevel reset, which would wipe these for a customer
@@ -728,7 +727,7 @@ class HDTicket(Document, CustomerEditController):
         subject = f"Re: {self.subject}"
         from_email_id = from_email.get("email_id") if from_email else None
         email_account_name = from_email.get("email_account") if from_email else None
-        sender = from_email_id or get_user_display_id()
+        sender = from_email_id or get_email_address()
         # the UI always sends `to`; a caller that names nobody means the customer
         if to is None and not cc and not bcc:
             to = self.raised_by
@@ -883,7 +882,7 @@ class HDTicket(Document, CustomerEditController):
         c.sent_or_received = "Received"
         c.email_status = "Open"
         c.subject = f"Re: {self.subject}"
-        c.sender = get_user_display_id()
+        c.sender = get_email_address()
         c.content = message
         c.status = "Linked"
         c.reference_doctype = "HD Ticket"
