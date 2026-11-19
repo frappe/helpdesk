@@ -42,10 +42,17 @@ class TestSetup(IntegrationTestCase):
         with as_v2_site(), self.set_user(self.agent):
             self.assertFalse(is_setup_pending())
 
-    def test_existing_sites_skip_setup(self) -> None:
+    def test_sites_with_tickets_skip_setup(self) -> None:
+        make_ticket()
         mark_existing_sites()
         with as_v2_site():
             self.assertFalse(is_setup_pending())
+
+    def test_sites_with_only_the_welcome_ticket_keep_setup(self) -> None:
+        with patch("frappe.db.count", return_value=1):
+            mark_existing_sites()
+        with as_v2_site():
+            self.assertTrue(is_setup_pending())
 
     def test_complete_finishes_framework_setup_on_v2_site(self) -> None:
         with (
