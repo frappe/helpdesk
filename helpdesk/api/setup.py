@@ -1,5 +1,4 @@
 import frappe
-from frappe import _
 
 from helpdesk.setup.welcome_ticket import AUTHOR_EMAIl as WELCOME_TICKET_AUTHOR
 
@@ -36,23 +35,6 @@ def complete_setup() -> str | None:
         "name",
         order_by="creation asc",
     )
-
-
-@frappe.whitelist(methods=["POST"])
-def reset_setup():
-    """Developer mode only: undoes the Framework and Helpdesk setup, so the first-run setup shows again.
-    Records made during setup stay."""
-    frappe.only_for(SETUP_ROLE)
-    if not frappe.conf.developer_mode:
-        frappe.throw(
-            _("Setup can only be reset in developer mode."), frappe.PermissionError
-        )
-    frappe.qb.update("Installed Application").set("is_setup_complete", 0).run()
-    frappe.db.set_single_value(
-        "System Settings", {"setup_complete": 0, "enable_telemetry": 1}
-    )
-    frappe.db.set_single_value("HD Settings", "setup_complete", 0)
-    frappe.clear_cache()
 
 
 def finish_frappe_setup():
