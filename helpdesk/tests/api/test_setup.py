@@ -67,6 +67,7 @@ class TestSetup(IntegrationTestCase):
         self.assertTrue(frappe.db.get_single_value("HD Settings", "setup_complete"))
 
     def test_complete_returns_welcome_ticket(self) -> None:
+        frappe.db.delete("HD Ticket", {"raised_by": AUTHOR_EMAIl})
         welcome = make_ticket(raised_by=AUTHOR_EMAIl).name
         with as_non_v2_site():
             self.assertEqual(complete_setup(), welcome)
