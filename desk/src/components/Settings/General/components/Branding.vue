@@ -9,7 +9,7 @@
       v-model="settingsData.brandName"
       :label="__('Brand name')"
       :placeholder="__('Enter brand name')"
-      maxlength="30"
+      :maxlength="BRAND_NAME_MAX_LENGTH"
     />
     <LogoUpload
       :title="__('Logo')"
@@ -52,6 +52,7 @@ import { createResource, toast } from "frappe-ui";
 import { __ } from "@/translation";
 import { useConfigStore } from "@/stores/config";
 import { HDSettingsSymbol } from "@/types";
+import { BRAND_NAME_MAX_LENGTH } from "@/utils";
 
 const configStore = useConfigStore();
 const settingsData = inject(HDSettingsSymbol);

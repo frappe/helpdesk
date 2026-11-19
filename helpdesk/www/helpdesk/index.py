@@ -1,10 +1,11 @@
 import frappe
 from frappe import _
 from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
-from frappe.utils import cint, get_system_timezone
+from frappe.utils import get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
+from helpdesk.api.setup import is_setup_pending
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
 from helpdesk.integrations import frappe_cloud
 from helpdesk.utils import get_agent_name, is_agent
@@ -59,7 +60,8 @@ def get_boot():
             "site_name": frappe.local.site,
             "read_only_mode": frappe.flags.read_only,
             "csrf_token": frappe.sessions.get_csrf_token(),
-            "setup_complete": cint(frappe.get_system_settings("setup_complete")),
+            "setup_complete": frappe.is_setup_complete(),
+            "setup_pending": is_setup_pending(),
             "is_fc_site": is_fc_site(),
             "session_user": frappe.session.user,
             "agent": get_agent_name(),
