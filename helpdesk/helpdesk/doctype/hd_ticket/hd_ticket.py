@@ -17,6 +17,7 @@ from frappe.utils import (
     add_to_date,
     cint,
     get_email_address,
+    get_email_addresses,
     get_string_between,
     get_url,
     get_user_by_email,
@@ -951,7 +952,7 @@ class HDTicket(Document, CustomerEditController):
         if not assigned_agents:
             return
 
-        recipients = [a.get("name") for a in self.get_assigned_agents()]
+        recipients = list(get_email_addresses(a.name for a in assigned_agents))
 
         email_content = frappe.db.get_single_value(
             "HD Settings", "reply_email_to_agent_content"
