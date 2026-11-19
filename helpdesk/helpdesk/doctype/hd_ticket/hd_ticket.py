@@ -16,8 +16,10 @@ from frappe.permissions import add_permission, update_permission_property
 from frappe.utils import (
     add_to_date,
     cint,
+    get_email_address,
     get_string_between,
     get_url,
+    get_user_by_email,
     get_user_display_id,
     getdate,
     now_datetime,
@@ -1452,7 +1454,9 @@ def get_customers_to_notify(ticket) -> set[str]:
 
     The readers `has_permission` lets in; not called per user, it repeats these lookups.
     """
-    candidates = {ticket.raised_by, ticket.owner, ticket.contact}
+    candidates = {ticket.owner, ticket.contact}
+    if ticket.raised_by:
+        candidates.add(get_user_by_email(ticket.raised_by))
     if ticket.customer and (
         managers := frappe.get_all(
             "HD Customer Member",
@@ -1502,7 +1506,9 @@ def has_permission(doc, user=None):
     user = user or frappe.session.user
     if is_admin(user):
         return True
-    if user in (doc.contact, doc.raised_by, doc.owner):
+    if user in (doc.contact, doc.owner):
+        return True
+    if doc.raised_by and doc.raised_by == get_email_address(user):
         return True
     if is_customer_manager(doc.customer, user):
         return True
@@ -1593,8 +1599,8 @@ def _agent_query(user: str) -> str | None:
 def _get_base_visibility(user: str) -> str:
     """WHERE fragment for tickets a user is directly tied to: owner, contact, or raiser."""
 
-    return "(`tabHD Ticket`.owner = {u} OR `tabHD Ticket`.contact = {u} OR `tabHD Ticket`.raised_by = {u})".format(
-        u=frappe.db.escape(user)
+    return "(`tabHD Ticket`.owner = {u} OR `tabHD Ticket`.contact = {u} OR `tabHD Ticket`.raised_by = {email})".format(
+        u=frappe.db.escape(user), email=frappe.db.escape(get_email_address(user))
     )
 
 
