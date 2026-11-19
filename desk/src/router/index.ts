@@ -1,4 +1,5 @@
 import { useScreenSize } from "@/composables/screen";
+import { isSetupPending } from "@/pages/setup/gate";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { CUSTOMER_PORTAL_ROOT } from "@/utils";
@@ -141,6 +142,11 @@ const portalRoutes = [
 
 const routes = [
   {
+    path: "/setup",
+    name: "Setup",
+    component: () => import("@/pages/setup/Setup.vue"),
+  },
+  {
     path: "/",
     component: () => import("@/roots/AgentRoot.vue"),
     children: portalRoutes,
@@ -174,12 +180,15 @@ router.beforeEach(async (to, _, next) => {
     );
   } else if (!authStore.hasDeskAccess) {
     window.location.replace(window.customer_home_page);
+  } else if (isSetupPending() !== (to.name === "Setup")) {
+    next({ name: isSetupPending() ? "Setup" : "Home" });
   } else {
     next();
   }
 });
 
 router.afterEach(async (to) => {
+  if (to.name === "Setup") return;
   const { users } = useUserStore();
   if (!users?.fetched) {
     await users.fetch();

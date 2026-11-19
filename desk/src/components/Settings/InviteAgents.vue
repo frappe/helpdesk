@@ -107,7 +107,12 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { handleInviteUserSuccess } from "@/utils";
+import {
+  AGENT_ROLES,
+  type AgentRole,
+  getInviteByEmailRoles,
+  handleInviteUserSuccess,
+} from "@/utils";
 import {
   Button,
   FormControl,
@@ -128,14 +133,13 @@ const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const emails = ref("");
 
-type Role = "Agent" | "Agent Manager" | "System Manager";
 type RoleOption = {
   label: string;
-  value: Role;
+  value: AgentRole;
   description: string;
 };
 
-const roleToLabel = (role: Role) => {
+const roleToLabel = (role: AgentRole) => {
   switch (role) {
     case "Agent":
       return "Agent";
@@ -233,9 +237,7 @@ const pendingInvitesResource = createResource({
   method: "GET",
   transform: (data) =>
     data.filter((invite) =>
-      invite.roles.some((role) =>
-        ["Agent", "Agent Manager", "System Manager"].includes(role)
-      )
+      invite.roles.some((role) => AGENT_ROLES.includes(role))
     ),
 });
 
@@ -248,7 +250,7 @@ const cancelInviteResource = createResource({
   },
 });
 
-const rolesToLabel = (roles: readonly Role[]) => {
+const rolesToLabel = (roles: readonly AgentRole[]) => {
   const rolesSt = new Set(roles);
   if (rolesSt.has("System Manager")) {
     return roleToLabel("System Manager");
@@ -260,25 +262,6 @@ const rolesToLabel = (roles: readonly Role[]) => {
     return roleToLabel("Agent");
   }
   throw new Error(`Invalid roles: ${roles.join(", ")}`);
-};
-
-const getInviteByEmailRoles = (selectedRole: Role) => {
-  const res: Role[] = [];
-  switch (selectedRole) {
-    case "System Manager":
-      res.push("Agent", "Agent Manager");
-      break;
-    case "Agent Manager":
-      res.push("Agent");
-      break;
-    case "Agent":
-      break;
-    default:
-      const x: never = selectedRole;
-      throw new Error(`Invalid selected role: ${x}`);
-  }
-  res.push(selectedRole);
-  return res;
 };
 </script>
 
