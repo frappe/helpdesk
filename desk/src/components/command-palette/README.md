@@ -4,9 +4,7 @@ Leads with the actions for whatever you're looking at — on a ticket, that
 ticket's actions behind a removable context chip; on the ticket list, that list's
 filters and views — then falls back to search, recents and navigation.
 
-Mounted once, in `layouts/AppSidebar.vue`. Desktop agent portal only: the gate is
-`isPaletteAvailable` in `useCommandPalette.ts`, which lives with the state rather
-than the mount site because AppSidebar is shared with the customer portal.
+Mounted once, in `layouts/AppSidebar.vue`, on desktop only.
 
 ## The `Command` shape
 

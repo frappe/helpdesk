@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import ShortcutKey from "@/components/ShortcutKey.vue";
+import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { useDevice } from "@/composables";
 import { Avatar } from "frappe-ui";
 import { computed } from "vue";

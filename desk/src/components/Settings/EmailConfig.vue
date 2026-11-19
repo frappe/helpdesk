@@ -1,26 +1,23 @@
 <template>
-  <div v-if="step === 'email-add'" class="h-full">
-    <EmailAdd @update:step="updateStep" />
-  </div>
-  <div v-else-if="step === 'email-list'" class="h-full">
-    <EmailAccountList @update:step="updateStep" />
-  </div>
-  <div v-else-if="step === 'email-edit'" class="h-full">
-    <EmailEdit :account-data="accountData" @update:step="updateStep" />
+  <div class="px-10 py-8">
+    <EmailAccounts
+      doctype="HD Ticket"
+      v-model:dirty="disableSettingModalOutsideClick"
+      @created="onCreated"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from "vue";
-import EmailAdd from "./EmailAdd.vue";
-import EmailAccountList from "./EmailAccountList.vue";
-import EmailEdit from "./EmailEdit.vue";
-import { EmailAccount, EmailStep } from "@/types";
+import { useOnboarding } from "@framework/ui";
+import { EmailAccounts } from "@framework/ui/EmailAccounts";
+import { capture } from "@/telemetry";
+import { disableSettingModalOutsideClick } from "./settingsModal";
 
-const step: Ref<EmailStep> = ref("email-list");
-const accountData: Ref<EmailAccount> = ref(null);
-function updateStep(newStep: EmailStep, data?: EmailAccount) {
-  step.value = newStep;
-  accountData.value = data;
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
+
+function onCreated(service: string) {
+  updateOnboardingStep?.("setup_email_account");
+  capture("email_account_created", { data: { service: service || "Custom" } });
 }
 </script>

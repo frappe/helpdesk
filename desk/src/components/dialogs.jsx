@@ -1,5 +1,6 @@
 import { Dialog, ErrorMessage } from "frappe-ui";
 import { reactive, ref } from "vue";
+import { withLegacyCloseContext } from "@helpdesk/shared/formScripts";
 
 let dialogs = ref([]);
 
@@ -31,23 +32,6 @@ export let Dialogs = {
     ));
   },
 };
-
-// Callable context so form scripts written for `onClick(close)` keep working
-// alongside frappe-ui v1's `onClick({ close })`.
-function withLegacyCloseContext(actions) {
-  return actions?.map((action) =>
-    action.onClick
-      ? {
-          ...action,
-          onClick: ({ close }) => {
-            const context = () => close();
-            context.close = close;
-            return action.onClick(context);
-          },
-        }
-      : action
-  );
-}
 
 export function createDialog(dialogOptions) {
   let dialog = reactive(dialogOptions);

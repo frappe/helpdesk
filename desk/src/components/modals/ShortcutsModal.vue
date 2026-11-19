@@ -42,9 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { useDevice } from "@/composables/device";
-import { useShortcut } from "@/composables/shortcuts";
-import { isCustomerPortal } from "@/utils";
+import { useDevice } from "@helpdesk/shared/device";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { Dialog } from "frappe-ui";
 import { computed, onMounted } from "vue";
 import { __ } from "@/translation";
@@ -113,7 +112,6 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
 ]);
 
 onMounted(() => {
-  if (isCustomerPortal.value) return;
   useShortcut({ key: "/", meta: true }, () => {
     open.value = !open.value;
   });

@@ -3,8 +3,12 @@ import type { Api } from "./api";
 import { uid } from "./factories";
 import { siteHeader } from "./site";
 
-export async function createCategory(api: Api, name = `E2E Category ${uid()}`) {
-  return api.insert("HD Article Category", { category_name: name });
+export async function createCategory(
+  api: Api,
+  name = `E2E Category ${uid()}`,
+  fields: Record<string, any> = {}
+) {
+  return api.insert("HD Article Category", { category_name: name, ...fields });
 }
 
 export async function createArticle(
@@ -18,18 +22,14 @@ export async function createArticle(
     category,
     content: `<p>${title} body</p>`,
     status: "Published",
+    // New articles default to Customers.
+    visibility: "Public",
     ...fields,
   });
 }
 
-/** Pick an option in a frappe-ui Combobox-backed Link field. */
-export async function pickOption(
-  page: Page,
-  trigger: string,
-  option: string,
-  { opensItself = false } = {}
-) {
-  if (!opensItself) await page.getByRole("button", { name: trigger }).click();
+/** Pick an option in the open dialog's frappe-ui Combobox. */
+export async function chooseOption(page: Page, option: string) {
   await page.getByRole("combobox").last().fill(option);
   await page.getByRole("option", { name: option }).first().click();
 }

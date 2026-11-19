@@ -8,7 +8,7 @@
         @click="toggleDialog()"
       >
         <template #prefix>
-          <component :is="icon" class="h-4 w-4" />
+          <LucidePaperclip class="h-4 w-4" />
         </template>
         <template #suffix>
           <slot name="suffix" />
@@ -42,13 +42,8 @@
 <script setup lang="ts">
 import { Button, Dialog } from "frappe-ui";
 import { getType as getMime } from "mime";
-import { markRaw, ref, type Component } from "vue";
-import LucideFile from "~icons/lucide/file";
-import LucideFileImage from "~icons/lucide/file-image";
-import LucideFileSpreadsheet from "~icons/lucide/file-spreadsheet";
-import LucideFileText from "~icons/lucide/file-text";
-import LucideFileType from "~icons/lucide/file-type";
-import LucideFileVideo from "~icons/lucide/file-video";
+import { ref } from "vue";
+import LucidePaperclip from "~icons/lucide/paperclip";
 
 interface P {
   label: string;
@@ -58,23 +53,6 @@ interface P {
 const props = withDefaults(defineProps<P>(), {
   url: null,
 });
-
-type AttachmentKind =
-  | "image"
-  | "video"
-  | "pdf"
-  | "spreadsheet"
-  | "text"
-  | "file";
-
-const ICONS: Record<AttachmentKind, Component> = {
-  image: markRaw(LucideFileImage),
-  video: markRaw(LucideFileVideo),
-  pdf: markRaw(LucideFileText),
-  spreadsheet: markRaw(LucideFileSpreadsheet),
-  text: markRaw(LucideFileType),
-  file: markRaw(LucideFile),
-};
 
 // browsers render only some image/video mimes (.dwg is image/vnd.dwg, .avi is
 // video/x-msvideo) — anything absent here becomes a download link like pdf
@@ -97,18 +75,8 @@ const PREVIEWS: Record<string, Preview> = {
   "text/plain": "text",
 };
 
-function getKind(mime: string): AttachmentKind {
-  if (mime.startsWith("image/")) return "image";
-  if (mime.startsWith("video/")) return "video";
-  if (mime === "application/pdf") return "pdf";
-  if (mime.includes("spreadsheet")) return "spreadsheet";
-  if (mime === "text/plain") return "text";
-  return "file";
-}
-
 const showDialog = ref(false);
 const mimeType = getMime(props.label) || "";
-const icon = ICONS[getKind(mimeType)];
 const preview = props.url ? PREVIEWS[mimeType] : undefined;
 const content = ref("");
 

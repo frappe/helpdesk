@@ -118,4 +118,5 @@ class HDTeam(Document):
 @frappe.whitelist()
 @agent_only
 def get_team_members(team: str):
+    """User IDs of a team's members. Agents only."""
     return frappe.get_all("HD Team Member", filters={"parent": team}, pluck="user")

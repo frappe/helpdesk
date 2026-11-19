@@ -7,7 +7,7 @@ export async function openSettings(page: Page, tab: string | RegExp) {
   await page.getByRole("menuitem", { name: "Settings" }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("button", { name: tab, exact: true }).click();
-  await expect(dialog.getByRole("heading", { level: 1 }).nth(1)).toBeVisible();
+  await expect(dialog.getByRole("heading").nth(1)).toBeVisible();
   return dialog;
 }
 

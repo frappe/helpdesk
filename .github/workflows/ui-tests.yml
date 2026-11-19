@@ -8,6 +8,8 @@ on:
       - version-16-hotfix
     paths:
       - "desk/**"
+      - "shared/**"
+      - "studio/**"
       - "e2e/**"
       - "playwright.config.ts"
       - "package.json"
@@ -25,7 +27,7 @@ env:
 jobs:
   ui-tests:
     name: Playwright E2E Tests (${{ matrix.shard }}/2)
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -67,6 +69,9 @@ jobs:
           node-version: 24
           check-latest: true
 
+      - name: Install Yarn
+        run: corepack enable && corepack prepare yarn@1.22.22 --activate
+
       - name: Cache pip
         uses: actions/cache@v4
         with:
@@ -87,10 +92,13 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('yarn.lock') }}
 
-      - name: Install MariaDB Client
+      # frappe-arc runners start bare: the same build packages as frappe/suite's runner image.
+      - name: Install System Packages
         run: |
-          sudo apt update
-          sudo apt install -y mariadb-client
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libmariadb-dev mariadb-client libffi-dev libssl-dev libjpeg-dev libcairo2-dev libpango1.0-dev cron
+          # Ubuntu 26.04's mariadb-client (11.8) requires SSL; the mariadb:10.6 service has none.
+          printf '[client]\nskip-ssl\n' > ~/.my.cnf
 
       - name: Setup Bench
         run: |
@@ -103,6 +111,9 @@ jobs:
         working-directory: /home/runner/frappe-bench
         run: |
           bench get-app telephony
+          # get-app builds helpdesk's Studio portal with frappe's Studio toolchain,
+          # which --skip-assets left without its node_modules
+          (cd apps/frappe/studio/frontend && yarn install --frozen-lockfile)
           bench get-app helpdesk $GITHUB_WORKSPACE
           bench setup requirements --dev
           bench new-site --db-root-password root --admin-password admin --install-app helpdesk $SITE
@@ -110,6 +121,8 @@ jobs:
           bench --site $SITE set-config host_name "http://localhost:8000"
           # invites send mail at once; the seed's SMTP is fake, so keep mail queued
           bench --site $SITE set-config -p mute_emails 1
+          # The suite creates more users in an hour than the default limit (60) allows.
+          bench --site $SITE set-config -p throttle_user_limit 10000
           bench build --apps frappe,helpdesk
         env:
           CI: "Yes"
@@ -161,7 +174,7 @@ jobs:
     name: Merge Playwright Reports
     needs: ui-tests
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
 
     steps:
       - name: Clone
@@ -171,6 +184,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+
+      - name: Install Yarn
+        run: corepack enable && corepack prepare yarn@1.22.22 --activate
 
       - name: Install Playwright
         run: yarn install --frozen-lockfile --ignore-scripts

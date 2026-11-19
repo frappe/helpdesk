@@ -9,7 +9,7 @@
       >
         <TrialCard :is-sidebar-collapsed="isCollapsed" />
         <TrialBanner
-          v-if="isFCSite && !isCustomerPortal && !isCloudSettingsAvailable()"
+          v-if="isFCSite && !isCloudSettingsAvailable()"
           :isSidebarCollapsed="isCollapsed"
         />
         <GettingStartedBanner
@@ -17,19 +17,17 @@
           :isSidebarCollapsed="isCollapsed"
           appName="helpdesk"
         />
-        <template v-if="!isCustomerPortal">
-          <CustomerPortalPermissionBanner
-            v-if="isBannerVisible('customer_portal_permission')"
-            :isSidebarCollapsed="isCollapsed"
-          />
-          <TicketFieldPermissionBanner
-            v-if="isBannerVisible('ticket_field_permission')"
-            :isSidebarCollapsed="isCollapsed"
-          />
-        </template>
+        <CustomerPortalPermissionBanner
+          v-if="isBannerVisible('customer_portal_permission')"
+          :isSidebarCollapsed="isCollapsed"
+        />
+        <TicketFieldPermissionBanner
+          v-if="isBannerVisible('ticket_field_permission')"
+          :isSidebarCollapsed="isCollapsed"
+        />
       </div>
       <SidebarItem
-        v-if="isOnboardingStepsCompleted && !isCustomerPortal"
+        v-if="isOnboardingStepsCompleted"
         :label="__('Help')"
         :icon="HelpIcon"
         :on-click="
@@ -65,7 +63,11 @@
 
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import {
+  ArticleIcon,
+  FrappeCloudIcon,
+  InviteCustomer,
+} from "@/components/icons";
 import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalPermissionBanner.vue";
 import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
@@ -85,8 +87,8 @@ import {
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
-import { isCustomerPortal } from "@/utils";
-import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
+import { call, SidebarItem, toast } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -99,14 +101,14 @@ import {
 
 import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
+import { useThemeMenuItem } from "@helpdesk/shared/themeMenu";
 import { useRouter } from "vue-router";
 import AppSidebar from "./AppSidebar.vue";
 import TrialCard from "./TrialCard.vue";
 import { showShortcutsModal } from "./layoutSettings";
 
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { __ } from "@/translation";
-import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
 import LucideMail from "~icons/lucide/mail";
@@ -130,39 +132,16 @@ const authStore = useAuthStore();
 const { isVisible: isBannerVisible } = useBanners();
 
 const { appsMenuOption } = useApps();
-const { colorScheme, toggleColorScheme } = useColorScheme();
-
-const themeMenuItem = computed(() => ({
-  label: __("Toggle theme"),
-  icon: colorScheme.value === "dark" ? LucideSun : LucideMoon,
-  onClick: () => toggleColorScheme(),
-}));
+const themeMenuItem = useThemeMenuItem();
 
 const isFCSite = ref(window.is_fc_site);
 
-const customerPortalDropdown = computed(() => [
-  {
-    group: __("Danger"),
-    hideLabel: true,
-    options: [
-      {
-        label: __("Log out"),
-        icon: "lucide-log-out",
-        onClick: () => authStore.logout(),
-      },
-    ],
-  },
-]);
-
-const agentPortalDropdown = computed(() => [
+const profileSettings = computed(() => [
   appsMenuOption.value,
   {
     label: __("Customer portal"),
     icon: "lucide-users",
-    onClick: () => {
-      const path = router.resolve({ name: "TicketsCustomer" });
-      window.open(path.href);
-    },
+    onClick: () => window.open(CUSTOMER_PORTAL_ROOT),
   },
   {
     icon: "lucide-life-buoy",
@@ -196,6 +175,7 @@ const agentPortalDropdown = computed(() => [
     icon: "lucide-settings",
     onClick: () => (showSettingsModal.value = true),
   },
+  themeMenuItem.value,
   {
     group: __("Danger"),
     hideLabel: true,
@@ -209,12 +189,6 @@ const agentPortalDropdown = computed(() => [
   },
 ]);
 
-const profileSettings = computed(() => {
-  return isCustomerPortal.value
-    ? customerPortalDropdown.value
-    : agentPortalDropdown.value;
-});
-
 const logo = h(
   HDLogo,
   {
@@ -224,11 +198,7 @@ const logo = h(
 );
 
 const showOnboardingBanner = computed(() => {
-  return (
-    !isCustomerPortal.value &&
-    !isOnboardingStepsCompleted?.value &&
-    authStore.isManager
-  );
+  return !isOnboardingStepsCompleted?.value && authStore.isManager;
 });
 
 const steps = [
@@ -317,7 +287,7 @@ const steps = [
     name: "first_article",
     title: __("Create an article"),
     completed: false,
-    icon: markRaw(FileText),
+    icon: markRaw(ArticleIcon),
     onClick: async () => {
       const generalCategory = await getGeneralCategory();
       router.push({
@@ -356,7 +326,7 @@ const steps = [
     completed: false,
     icon: markRaw(Globe),
     onClick: () => {
-      window.open("/helpdesk/my-tickets", "_blank");
+      window.open(CUSTOMER_PORTAL_ROOT, "_blank");
       updateOnboardingStep?.("explore_customer_portal");
       minimize.value = true;
     },
@@ -499,9 +469,13 @@ function setUpOnboarding() {
 
 onMounted(() => {
   setUpOnboarding();
-  if (isCustomerPortal.value) return;
   useShortcut({ key: ",", meta: true }, () => {
     showSettingsModal.value = !showSettingsModal.value;
   });
+  // back from provider sign-in: the Email Accounts panel reads ?email_oauth itself
+  if (router.currentRoute.value.query.email_oauth) {
+    setActiveSettingsTab("Email Accounts");
+    showSettingsModal.value = true;
+  }
 });
 </script>

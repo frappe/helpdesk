@@ -8,15 +8,20 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
+  "category",
   "status",
+  "visibility",
   "published_on",
   "views",
   "column_break_7",
-  "category",
+  "weight",
+  "pinned",
+  "pinned_order",
   "author",
   "title_slug",
   "content_section",
-  "content"
+  "content",
+  "excerpt"
  ],
  "fields": [
   {
@@ -32,6 +37,7 @@
    "fieldname": "category",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Category",
    "options": "HD Article Category"
   },
@@ -46,6 +52,13 @@
    "fieldname": "content",
    "fieldtype": "Text Editor",
    "label": "Content"
+  },
+  {
+   "fieldname": "excerpt",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Excerpt",
+   "read_only": 1
   },
   {
    "depends_on": "author",
@@ -75,6 +88,13 @@
    "options": "Published\nDraft\nArchived"
   },
   {
+   "default": "Customers",
+   "fieldname": "visibility",
+   "fieldtype": "Select",
+   "label": "Visibility",
+   "options": "Public\nCustomers\nPrivate"
+  },
+  {
    "fieldname": "title_slug",
    "fieldtype": "Data",
    "is_virtual": 1,
@@ -86,11 +106,38 @@
    "fieldtype": "Int",
    "label": "Views",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "description": "Articles with a higher weight are listed first in their category.",
+   "fieldname": "weight",
+   "fieldtype": "Int",
+   "label": "Weight",
+   "no_copy": 1,
+   "non_negative": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.status === \"Published\"",
+   "description": "If enabled, this article will appear on the knowledge base home page.",
+   "fieldname": "pinned",
+   "fieldtype": "Check",
+   "label": "Pinned",
+   "no_copy": 1,
+   "search_index": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "pinned_order",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Pinned Order",
+   "no_copy": 1
   }
  ],
  "links": [],
  "make_attachments_public": 1,
- "modified": "2026-06-28 13:55:21.075010",
+ "modified": "2026-10-30 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",

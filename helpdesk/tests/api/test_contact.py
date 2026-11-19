@@ -2,10 +2,17 @@
 # See license.txt
 
 import frappe
+from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import FrappeTestCase
 
+from helpdesk.api.contact import create_contact as create_contact_api
 from helpdesk.api.contact import delete_contact
-from helpdesk.test_utils import create_contact, create_customer, make_ticket
+from helpdesk.test_utils import (
+    create_contact,
+    create_customer,
+    make_invitation,
+    make_ticket,
+)
 
 
 class TestDeleteContact(FrappeTestCase):
@@ -70,15 +77,22 @@ class TestDeleteContact(FrappeTestCase):
             customer_name, [{"contact_name": contact["contact"]}]
         )
         ticket = make_ticket(customer=customer.name, contact=contact["contact"])
-        invitation = frappe.get_doc(
-            {
-                "doctype": "User Invitation",
-                "email": email,
-                "app_name": "helpdesk",
-                "redirect_to_path": "/helpdesk",
-                "roles": [{"role": "HD Customer"}],
-                "customer": customer.name,
-                "contact": contact["contact"],
-            }
-        ).insert(ignore_permissions=True)
+        invitation = make_invitation(email, customer.name, contact["contact"])
         return contact, customer, ticket, invitation
+
+
+class TestCreateContact(IntegrationTestCase):
+    def setUp(self) -> None:
+        frappe.set_user("Administrator")
+
+    def test_customer_gets_the_new_contact_without_an_invite(self) -> None:
+        customer = create_customer("Test Create Contact Customer", [])
+        email = "create-contact-customer@example.com"
+
+        name = create_contact_api(
+            {"first_name": "Sam", "email": email, "customer": customer.name}
+        )
+
+        customer.reload()
+        self.assertIn(name, [row.contact_name for row in customer.contacts])
+        self.assertFalse(frappe.db.exists("User Invitation", {"email": email}))

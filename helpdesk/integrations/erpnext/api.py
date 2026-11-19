@@ -40,6 +40,10 @@ def in_sync() -> bool:
 
 @frappe.whitelist()
 def sync_hd_erpnext_customers() -> None:
+    """Queue a job that links HD Customers and ERPNext Customers by name.
+    Creates whichever side is missing, then syncs user permissions and shares.
+    Needs write on both; throws if the integration is off. Ends with a
+    `helpdesk:erpnext-sync-end` realtime event."""
     frappe.has_permission("Customer", "write", throw=True)
     frappe.has_permission("HD Customer", "write", throw=True)
     if not should_sync():
