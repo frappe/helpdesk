@@ -510,10 +510,12 @@ async function signIn(p: EmailService, email?: string) {
 }
 
 function continueGmail() {
-  checked.value = normalizeEmail(gmail.value);
+  const address = normalizeEmail(gmail.value);
+  const stepsShown = checked.value === address && gmailKind.value === "company";
+  checked.value = address;
   if (!gmailKind.value) return;
-  if (gmailKind.value === "personal") return manual(checked.value);
-  signIn(GMAIL, checked.value);
+  if (gmailKind.value === "personal") return manual(address);
+  if (stepsShown) signIn(GMAIL, address);
 }
 
 async function create() {
