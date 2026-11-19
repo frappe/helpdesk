@@ -22,9 +22,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Setup dependencies
-        run: |
-          npm install @semantic-release/git @semantic-release/exec --no-save
       - name: Get Frappe Release Bot token
         id: app-token
         uses: actions/create-github-app-token@v3
@@ -42,4 +39,5 @@ jobs:
           GIT_AUTHOR_EMAIL: "346168705+frappe-release-bot[bot]@users.noreply.github.com"
           GIT_COMMITTER_NAME: "frappe-release-bot[bot]"
           GIT_COMMITTER_EMAIL: "346168705+frappe-release-bot[bot]@users.noreply.github.com"
-        run: npx semantic-release
+        # npx -p, not npm install: npm rejects the root package.json's yarn `link:` dependency.
+        run: npx -p semantic-release -p @semantic-release/git -p @semantic-release/exec semantic-release
