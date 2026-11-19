@@ -1,4 +1,5 @@
 import frappe
+from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 from frappe.tests.utils import FrappeTestCase, change_settings
 
 from helpdesk.api.doc import get_filterable_fields, get_quick_filters, sort_options
@@ -48,6 +49,25 @@ class TestFilterableFields(FieldPersonas):
 
         self.assertNotIn("agent_group", restricted)
         self.assertIn("agent_group", unrestricted)
+
+    def test_options_from_a_property_setter_are_offered(self) -> None:
+        # source is develop-only; agreement_status is the Select field here
+        options = frappe.get_meta("HD Ticket").get_field("agreement_status").options
+        setter = make_property_setter(
+            "HD Ticket",
+            "agreement_status",
+            "options",
+            f"{options}\nCarrier pigeon",
+            "Text",
+        )
+        self.addCleanup(frappe.clear_cache, doctype="HD Ticket")
+        self.addCleanup(frappe.delete_doc, "Property Setter", setter.name)
+
+        with self.set_user(self.agent):
+            fields = get_filterable_fields("HD Ticket")
+
+        field = next(f for f in fields if f["fieldname"] == "agreement_status")
+        self.assertIn("Carrier pigeon", field["options"].split("\n"))
 
     def test_user_without_read_access_is_refused_even_when_cached(self) -> None:
         get_filterable_fields("HD Agent")

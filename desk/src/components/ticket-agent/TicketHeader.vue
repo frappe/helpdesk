@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import LucideChevronUp from "~icons/lucide/chevron-up";
 import LucideChevronDown from "~icons/lucide/chevron-down";
-import Icon from "@/components/Icon.vue";
+import Icon from "@helpdesk/shared/Icon.vue";
 import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
@@ -92,7 +92,7 @@ import {
   setupCustomizations,
 } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { useView } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";

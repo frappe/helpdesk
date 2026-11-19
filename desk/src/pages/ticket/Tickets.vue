@@ -79,7 +79,7 @@ import BulkEditModal from "@/components/ticket-agent/BulkEditModal.vue";
 import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
-import { normalizeFilters } from "@/components/view-controls/filter";
+import { normalizeFilters } from "@helpdesk/shared/filter";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";

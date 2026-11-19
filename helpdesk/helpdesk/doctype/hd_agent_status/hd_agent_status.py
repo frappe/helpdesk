@@ -55,14 +55,9 @@ class HDAgentStatus(Document):
         if not agents:
             return
 
-        default_status = get_default_agent_status()
-        # save via the controller so validation, timestamp and realtime
-        # updates all happen. save() also catches an agent changing their
-        # status at the same time
+        # save() catches an agent changing their status at the same time
         for name in agents:
-            agent = frappe.get_doc("HD Agent", name)
-            agent.availability = default_status
-            agent.save(ignore_permissions=True)
+            frappe.get_doc("HD Agent", name).reset_availability()
 
 
 def get_default_agent_status() -> str:

@@ -8,6 +8,7 @@ on:
       - version-16-hotfix
     paths:
       - "desk/**"
+      - "shared/**"
       - "e2e/**"
       - "playwright.config.ts"
       - "package.json"
@@ -91,6 +92,8 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y mariadb-client
+          # Ubuntu 26.04's mariadb-client (11.8) requires SSL; the mariadb:10.6 service has none.
+          printf '[client]\nskip-ssl\n' > ~/.my.cnf
 
       - name: Setup Bench
         run: |

@@ -231,6 +231,7 @@ function getOptions(agent) {
     {
       label: "Disable Agent",
       icon: "lucide-x-circle",
+      theme: "red",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
         agents.reload({ ...filters, search: search.value });
