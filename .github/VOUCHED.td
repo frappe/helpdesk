@@ -14,4 +14,5 @@ frappe-pr-bot
 HarishChandran3304
 mergify[bot]
 niraj2477
+sagarvora
 samarth93
