@@ -377,7 +377,8 @@ test("saved replies insert WhatsApp text and templates send from the picker", as
 
   await composer(page).getByRole("button", { name: "Templates" }).click();
   const modal = page.getByRole("dialog", { name: "WhatsApp Templates" });
-  await modal.getByRole("textbox", { name: "Search templates" }).fill(label);
+  await expect(modal.getByRole("textbox", { name: "Search templates" })).toBeFocused();
+  await page.keyboard.type(label);
   const card = modal.getByRole("button", { name: new RegExp(label) });
   await expect(card).toHaveCount(1);
   await expect(card).toContainText("following up on your ticket");
