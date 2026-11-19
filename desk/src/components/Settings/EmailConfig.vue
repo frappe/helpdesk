@@ -1,5 +1,5 @@
 <template>
-  <div class="px-10 py-8">
+  <div class="px-[4.4rem] pt-10 pb-16">
     <EmailAccounts
       doctype="HD Ticket"
       v-model:dirty="disableSettingModalOutsideClick"
