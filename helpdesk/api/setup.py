@@ -58,15 +58,19 @@ def finish_frappe_setup():
 
 def frappe_setup_args() -> dict:
     """What the wizard's first slide would send, from System Settings."""
-    settings = frappe.get_single("System Settings")
+
+    def setting(fieldname: str):
+        return frappe.db.get_single_value("System Settings", fieldname)
+
     language = (
-        frappe.db.get_value("Language", settings.language, "language_name") or "English"
+        frappe.db.get_value("Language", setting("language"), "language_name")
+        or "English"
     )
     return {
         "language": language,
         "lang": language,
-        "country": settings.country,
-        "timezone": settings.time_zone,
-        "currency": settings.currency,
-        "enable_telemetry": settings.enable_telemetry,
+        "country": setting("country"),
+        "timezone": setting("time_zone"),
+        "currency": setting("currency"),
+        "enable_telemetry": setting("enable_telemetry"),
     }
