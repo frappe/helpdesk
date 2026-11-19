@@ -25,6 +25,16 @@ class TestSetup(IntegrationTestCase):
     def framework_setup_pending(self):
         return patch("frappe.is_setup_complete", return_value=False)
 
+    def wizard_stages(self, stages: list[str]):
+        """Installed apps, like ERPNext in CI, may add wizard stages; tests pin them."""
+        hooks = frappe.get_hooks
+        return patch(
+            "frappe.get_hooks",
+            side_effect=lambda hook=None, *a, **kw: (
+                stages if hook == "setup_wizard_stages" else hooks(hook, *a, **kw)
+            ),
+        )
+
     def test_pending_for_system_manager_on_v2_site(self) -> None:
         with as_v2_site():
             self.assertTrue(is_setup_pending())
@@ -51,6 +61,7 @@ class TestSetup(IntegrationTestCase):
         with (
             as_v2_site(),
             self.framework_setup_pending(),
+            self.wizard_stages([]),
             patch(FRAMEWORK_SETUP, return_value={"status": "ok"}) as framework_setup,
         ):
             complete_setup()
@@ -83,18 +94,10 @@ class TestSetup(IntegrationTestCase):
         framework_setup.assert_not_called()
 
     def test_complete_leaves_framework_setup_to_wizard_stages(self) -> None:
-        hooks = frappe.get_hooks
         with (
             as_v2_site(),
             self.framework_setup_pending(),
-            patch(
-                "frappe.get_hooks",
-                side_effect=lambda hook=None, *a, **kw: (
-                    ["erpnext.stages"]
-                    if hook == "setup_wizard_stages"
-                    else hooks(hook, *a, **kw)
-                ),
-            ),
+            self.wizard_stages(["erpnext.stages"]),
             patch(FRAMEWORK_SETUP) as framework_setup,
         ):
             complete_setup()
@@ -104,6 +107,7 @@ class TestSetup(IntegrationTestCase):
         with (
             as_v2_site(),
             self.framework_setup_pending(),
+            self.wizard_stages([]),
             patch(
                 FRAMEWORK_SETUP, return_value={"status": "fail", "fail": "No region"}
             ),
