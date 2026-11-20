@@ -20,13 +20,11 @@
           }}
         </div>
         <div class="flex flex-col gap-2 mt-6">
-          <FormControl
+          <PhoneControl
             v-model="contactDetails.phone"
             :label="__('Phone')"
-            type="text"
             size="sm"
             variant="subtle"
-            placeholder="+918956895623"
             :disabled="false"
           />
           <ErrorMessage :message="error" />
@@ -41,6 +39,7 @@ import { createResource, Dialog, ErrorMessage, toast } from "frappe-ui";
 import { ref, watch } from "vue";
 import { z } from "zod";
 import { __ } from "@/translation";
+import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
 
 const emit = defineEmits(["onUpdate"]);
 const show = defineModel<boolean>();
@@ -58,11 +57,12 @@ const contactDetails = ref({
 });
 
 const onSubmit = () => {
+  const cleanPhone = (contactDetails.value.phone || "").replace(/[\s\-]/g, "");
   if (
     !z
       .string()
       .regex(/^\+(?:[0-9]){6,14}[0-9]$/)
-      .safeParse(contactDetails.value.phone).success
+      .safeParse(cleanPhone).success
   ) {
     error.value = __("Invalid phone number");
     return;
