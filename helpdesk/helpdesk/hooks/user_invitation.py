@@ -32,14 +32,14 @@ def get_or_create_contact(invitation: Document, user: Document) -> str | None:
     create_contact(user)
     return frappe.db.get_value(
         "Contact", {"user": user.name}, "name"
-    ) or frappe.db.get_value("Contact", {"email_id": user.name}, "name")
+    ) or frappe.db.get_value("Contact", {"email_id": user.email}, "name")
 
 
 def create_agent(user: Document) -> None:
-    if not frappe.db.exists("HD Agent", {"user": user.email}):
+    if not frappe.db.exists("HD Agent", {"user": user.name}):
         frappe.get_doc(
             doctype="HD Agent",
-            user=user.email,
+            user=user.name,
             agent_name=user.first_name,
             is_active=True,
         ).insert(True)
