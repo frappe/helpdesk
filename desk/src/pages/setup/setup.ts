@@ -1,8 +1,9 @@
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { validateEmailWithZod } from "@/utils";
 import { useTelemetry } from "@framework/ui";
 import { until, useIntervalFn } from "@vueuse/core";
-import { call } from "frappe-ui";
+import { call, toast } from "frappe-ui";
 import {
   computed,
   inject,
@@ -12,7 +13,6 @@ import {
   ref,
   watch,
 } from "vue";
-import { markSetupDoneLocally } from "./gate";
 
 export type StepKey = "password" | "workspace" | "email" | "team";
 type Step = { key: StepKey; required?: boolean };
@@ -218,8 +218,11 @@ function createSetupFlow() {
 
   let completing: Promise<string | null> = Promise.resolve(null);
 
+  function completeSetup() {
+    return call<string | null>("helpdesk.api.setup.complete_setup");
+  }
+
   function finishSetup(skipped: boolean) {
-    markSetupDoneLocally();
     outcome.value = {
       skipped_setup: skipped,
       completed_steps: stepsWith("completed"),
@@ -232,19 +235,21 @@ function createSetupFlow() {
         steps_completed: outcome.value.completed_steps.length,
       },
     });
-    completing = call<string | null>("helpdesk.api.setup.complete_setup").catch(
-      (e) => {
-        reportError("complete_setup", e);
-        return null;
-      }
-    );
+    completing = completeSetup();
+    completing.catch((e) => reportError("complete_setup", e));
     movedAt = performance.now();
     setup.showDone = true;
   }
 
+  /** Leaves only once HD Settings records the setup, retrying a failed save, so the desk does not send the user back. */
   async function openDesk() {
-    const ticket = await completing;
-    window.location.replace(`/helpdesk/tickets/${ticket ?? ""}`);
+    try {
+      const ticket = await completing.catch(completeSetup);
+      window.location.replace(`/helpdesk/tickets/${ticket ?? ""}`);
+    } catch (e) {
+      reportError("complete_setup", e);
+      toast.error(__("Could not finish setup. Please try again."));
+    }
   }
 
   return {
