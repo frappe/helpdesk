@@ -232,6 +232,23 @@
             </div>
           </div>
         </div>
+        <p v-if="docsPageUrl" class="mt-3 text-p-sm text-ink-gray-6">
+          <a
+            :href="docsPageUrl"
+            target="_blank"
+            rel="noopener"
+            class="underline"
+          >
+            {{
+              __("Copied from docs on {0}", [
+                dateFormat(article.data.docs_copied_on, "MMM D, YYYY"),
+              ])
+            }}
+          </a>
+          <span v-if="article.data.docs_edited">
+            · {{ __("Edited since") }}</span
+          >
+        </p>
       </div>
     </div>
     <!-- First load only: reloads after a save or move keep the page shown. -->
@@ -313,6 +330,7 @@ import { Article, Breadcrumb, Error, Resource } from "@/types";
 import {
   ConfirmDelete,
   CUSTOMER_PORTAL_ROOT,
+  dateFormat,
   getErrorMessage,
   uploadFunction,
 } from "@/utils";
@@ -491,6 +509,12 @@ const articleStats = createResource({
     views.value = data.views;
   },
   auto: true,
+});
+
+// The field is writable through the API, so only an https link is ever rendered.
+const docsPageUrl = computed(() => {
+  const url = article.data?.docs_page_url;
+  return /^https:\/\//i.test(url || "") ? url : "";
 });
 
 const isPublished = computed(() => article.data?.status === "Published");

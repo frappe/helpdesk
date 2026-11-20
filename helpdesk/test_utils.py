@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from functools import partial
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -1242,3 +1243,58 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
     cards = HelpdeskDashboard(filters).get_number_card_data()
     return {card["title"]: card for card in cards}
+
+
+def serve_docs_site(case, host: str, pages: dict[str, str]):
+    """Serve a docs site to the Web Crawler for this test, and run its crawls inline.
+
+    `pages` maps a path (`guide/intro`) to its title; llms.txt lists each page.
+    Returns frappe's FakeSite, so a test can add pages or see what was requested.
+    """
+    from frappe.utils.task_queue import enqueue_task
+    from frappe.web_crawler.tests.fake_site import FakeSite
+
+    site = FakeSite(case)
+    lines = [
+        f"- [{title}](https://{host}/{path}): about" for path, title in pages.items()
+    ]
+    site.add(f"https://{host}/llms.txt", "# Docs\n\n" + "\n".join(lines), "text/plain")
+    for path, title in pages.items():
+        body = f"<main><h1>{title}</h1><p>{title} explains this part of the product.</p></main>"
+        site.page(f"https://{host}/{path}", body, title)
+    # The crawl commits each page; the test's rollback has to undo them.
+    case.enterContext(patch.object(frappe.db, "commit"))
+    case.enterContext(patch("frappe.enqueue"))
+    case.enterContext(
+        patch(
+            "frappe.enqueue_task",
+            side_effect=partial(enqueue_task, enqueue_after_commit=False),
+        )
+    )
+    return site
+
+
+def run_last_docs_import() -> None:
+    """Run the last docs import's crawl as its owner, as its background job would."""
+    name = frappe.db.get_value(
+        "Web Crawl",
+        {"on_page_method": "helpdesk.docs_import.import_page"},
+        order_by="creation desc",
+    )
+    web_crawl = frappe.get_doc("Web Crawl", name)
+    current = frappe.session.user
+    frappe.set_user(web_crawl.owner)
+    try:
+        web_crawl.run()
+    finally:
+        frappe.set_user(current)
+
+
+def get_category_articles(category: str) -> list:
+    """The HD Articles in `category` with the import fields, ordered by title."""
+    return frappe.get_all(
+        "HD Article",
+        filters={"category": category},
+        fields=["name", "title", "status", "docs_page_url", "docs_copied_on"],
+        order_by="title",
+    )
