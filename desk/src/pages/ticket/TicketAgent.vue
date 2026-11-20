@@ -114,7 +114,9 @@ const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
 const customizations: Resource<Customizations> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
-  cache: ["HD Ticket", "customizations"],
+  makeParams: () => ({
+    ticket: props.ticketId,
+  }),
   auto: true,
 });
 
@@ -172,7 +174,10 @@ watch(
 
     // Switching to an already-visited ticket: show its cached conversation and
     // refresh it in the background in case it changed while we were elsewhere.
-    if (oldTicketId) revalidateTicket(newTicketId as string);
+    if (oldTicketId) {
+      revalidateTicket(newTicketId as string);
+      customizations.reload();
+    }
   },
   { immediate: true }
 );
