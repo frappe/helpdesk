@@ -85,7 +85,7 @@
              "componentProps": {
               "fontSize": "text-[34px] sm:text-[40px]",
               "tag": "h1",
-              "text": "{{ t(\"Here's what might help\") }}"
+              "text": "{{ config.brand_name ? t('How can {0} help you?', [config.brand_name]) : t('How can we help you?') }}"
              }
             },
             {
@@ -103,7 +103,7 @@
              "componentProps": {
               "fontSize": "text-p-lg",
               "tag": "p",
-              "text": "{{ config.brand_name ? t('Explore answers to frequently asked questions about {0}.', [config.brand_name]) : t('Explore answers to frequently asked questions.') }}"
+              "text": "{{ t('Search our knowledge base for answers, or raise a ticket with our team.') }}"
              }
             }
            ],
@@ -628,7 +628,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-11-04 12:00:00.000000",
+ "modified": "2026-11-05 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
