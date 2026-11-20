@@ -8,11 +8,16 @@ recursive-include helpdesk *.css
 recursive-include helpdesk *.csv
 recursive-include helpdesk *.html
 recursive-include helpdesk *.ico
+recursive-include helpdesk *.gif
+recursive-include helpdesk *.jpg
 recursive-include helpdesk *.js
 recursive-include helpdesk *.json
+recursive-include helpdesk *.mp4
 recursive-include helpdesk *.md
 recursive-include helpdesk *.png
 recursive-include helpdesk *.py
 recursive-include helpdesk *.svg
+recursive-include helpdesk *.webm
+recursive-include helpdesk *.webp
 recursive-include helpdesk *.txt
 recursive-exclude helpdesk *.pyc
