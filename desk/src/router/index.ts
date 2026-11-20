@@ -1,5 +1,4 @@
 import { useScreenSize } from "@/composables/screen";
-import { isSetupPending } from "@/pages/setup/gate";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { CUSTOMER_PORTAL_ROOT } from "@/utils";
@@ -180,8 +179,8 @@ router.beforeEach(async (to, _, next) => {
     );
   } else if (!authStore.hasDeskAccess) {
     window.location.replace(window.customer_home_page);
-  } else if (isSetupPending() !== (to.name === "Setup")) {
-    next({ name: isSetupPending() ? "Setup" : "Home" });
+  } else if (!!window.setup_pending !== (to.name === "Setup")) {
+    next({ name: window.setup_pending ? "Setup" : "Home" });
   } else {
     next();
   }
