@@ -3,10 +3,12 @@ from frappe.utils import escape_html, get_system_timezone
 from frappe.website.utils import get_home_page
 
 from helpdesk.api.config import get_favicon
+from helpdesk.helpdesk.hooks.portal import grant_customer_role
 
 
 def get_boot() -> dict:
     """In boot so the timezone is there before the first date renders."""
+    grant_customer_role(frappe.session.user)
     return {
         "system_timezone": get_system_timezone(),
         # The zone the customer picked in Settings, else the system's, as on the desk.

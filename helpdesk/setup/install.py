@@ -227,32 +227,12 @@ def setup_customer_role(fresh_install=True):
         else:
             role_doc = frappe.new_doc("Role")
             role_doc.role_name = role_name
-        role_doc.home_page = "/helpdesk"
         role_doc.desk_access = 0
         role_doc.save()
 
     if fresh_install:
-        set_portal_defaults(overwrite=True)
         # Single defaults aren't stored on install; the home pages assume it
         frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 1)
-
-
-def set_portal_defaults(overwrite=False):
-    """Writes the Single directly: a save fails on stale menu rows."""
-    defaults = {
-        "default_role": "HD Customer",
-        # agents fall back to it; customers get theirs from their role
-        "default_portal_home": "/helpdesk",
-    }
-    if overwrite:
-        to_set = defaults
-    else:
-        current = frappe.db.get_singles_dict("Portal Settings")
-        to_set = {
-            field: value for field, value in defaults.items() if not current.get(field)
-        }
-    if to_set:
-        frappe.db.set_single_value("Portal Settings", to_set)
 
 
 def add_website_settings_permission():
