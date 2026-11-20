@@ -32,8 +32,6 @@ CODE_DOCTYPES = {
 # field naming the doctype a script runs on, which may have its own via_customer_portal
 SCRIPT_TARGETS = {"Client Script": "dt", "Server Script": "reference_doctype"}
 OLD_FIELD = "via_customer_portal"
-# escaped, as `_` is a LIKE wildcard
-OLD_FIELD_LIKE = r"%via\_customer\_portal%"
 
 
 @frappe.whitelist()
@@ -73,15 +71,21 @@ def find_old_field_uses(doctype: str, fields: list[str], filters: dict) -> list[
     """Names of `doctype` rows whose `fields` mention the old field, skipping
     scripts on doctypes like ERPNext's Issue where that field still exists."""
     target = SCRIPT_TARGETS.get(doctype)
+    # `_` is a LIKE wildcard and SQLite has no default LIKE escape, so the exact match is in Python
     rows = frappe.get_all(
         doctype,
         filters=filters,
-        or_filters={field: ["like", OLD_FIELD_LIKE] for field in fields},
-        fields=["name", target] if target else ["name"],
+        or_filters={field: ["like", f"%{OLD_FIELD}%"] for field in fields},
+        fields=["name", *fields, target] if target else ["name", *fields],
         order_by="name",
     )
     skip = doctypes_with_old_field() if target else set()
-    return [row.name for row in rows if not target or row[target] not in skip]
+    return [
+        row.name
+        for row in rows
+        if any(OLD_FIELD in (row[field] or "") for field in fields)
+        and (not target or row[target] not in skip)
+    ]
 
 
 def doctypes_with_old_field() -> set[str]:

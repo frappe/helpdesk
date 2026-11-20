@@ -3,7 +3,7 @@ from datetime import date, timedelta
 import frappe
 from frappe import _
 from frappe.query_builder import DocType
-from frappe.query_builder.functions import Count, Function
+from frappe.query_builder.functions import Count, DateFormat, Function
 from frappe.utils import add_days, nowdate
 
 from helpdesk.api.agent_home.utils import calculate_percentage_change
@@ -140,20 +140,18 @@ def _get_sla_violations(
 
     def _query(from_date, to_date, grouped=False):
         Ticket = DocType("HD Ticket")
-        to_date_plus_one = Function(
-            "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
-        )
+        to_date_plus_one = add_days(to_date, 1)
         if grouped:
             if bucket == "daily":
                 key = Function("DATE", Ticket.creation)
                 sort = key
             elif bucket == "weekly":
                 # ISO year-week e.g. "2026-12"
-                key = Function("DATE_FORMAT", Ticket.creation, "%x-%v")
+                key = DateFormat(Ticket.creation, "%x-%v")
                 sort = key
             else:  # monthly
-                key = Function("DATE_FORMAT", Ticket.creation, "%b %Y")
-                sort = Function("DATE_FORMAT", Ticket.creation, "%Y%m")
+                key = DateFormat(Ticket.creation, "%b %Y")
+                sort = DateFormat(Ticket.creation, "%Y%m")
             q = (
                 frappe.qb.from_(Ticket)
                 .select(key.as_("date"), Count(Ticket.name).as_("count"))

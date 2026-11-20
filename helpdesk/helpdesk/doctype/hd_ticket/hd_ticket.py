@@ -1580,8 +1580,8 @@ def _agent_query(user: str) -> str | None:
             query += " OR (`tabHD Ticket`.agent_group is null)"
         return query
 
-    query += " OR (JSON_SEARCH(`tabHD Ticket`._assign, 'all', {u}) IS NOT NULL)".format(
-        u=frappe.db.escape(user)
+    query += " OR (`tabHD Ticket`._assign like {pattern})".format(
+        pattern=frappe.db.escape(f'%"{user}"%')
     )
     team_names = [t.get("team_name") for t in teams]
     if team_names:
