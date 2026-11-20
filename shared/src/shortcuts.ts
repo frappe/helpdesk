@@ -29,7 +29,11 @@ export const useShortcut = (
 
     // Flow renders its composer inside Shadow DOM, so document.activeElement
     // may be the launcher instead of the focused editable element.
-    if (e.composedPath().some((target) => target instanceof Element && target.matches("flow-launcher"))) {
+    if (
+      e.composedPath().some(
+        (target) => target instanceof Element && target.matches("flow-launcher")
+      )
+    ) {
       return;
     }
 
