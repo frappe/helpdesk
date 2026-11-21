@@ -755,6 +755,14 @@ def create_user(email: str):
     ).insert(ignore_permissions=True)
 
 
+def make_user(prefix: str, *roles: str) -> str:
+    """A new User with a unique email and the given roles; no roles makes a Website User."""
+    user = create_user(unique_email(prefix))
+    if roles:
+        user.add_roles(*roles)
+    return user.name
+
+
 def make_organization(label: str) -> tuple:
     """Returns `(customer, owner, manager, member)`."""
     prefix = label.lower().replace(" ", "-")
