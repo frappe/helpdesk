@@ -3,7 +3,7 @@ import { useColorScheme } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { bindRouter, navigateTo } from '@app/stores/router'
-import { askConfirm } from '@helpdesk/shared/utils'
+import { AGENT_PORTAL_ROOT, askConfirm } from '@helpdesk/shared/utils'
 import { useThemeMenuItem } from '@helpdesk/shared/themeMenu'
 import { useSession } from '@app/stores/session'
 import { knowledgeBaseDraft } from '@helpdesk/shared/settings/knowledgeBaseDraft.ts'
@@ -12,7 +12,6 @@ import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
 import { conversationLayout } from '@app/stores/conversationLayout'
 
-const AGENT_PORTAL_ROOT = '/helpdesk'
 
 fetchTranslations()
 

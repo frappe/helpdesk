@@ -17,6 +17,7 @@ from phonenumbers import PhoneNumberFormat as PNF
 from pypika.functions import Replace
 
 CUSTOMER_PORTAL_ROOT = "/help"
+AGENT_PORTAL_ROOT = "/helpdesk"
 
 
 def check_permissions(doctype, parent, doc=None):
@@ -57,6 +58,12 @@ def is_agent(user: str | None = None) -> bool:
         return bool(active)
     roles = frappe.get_roles(user)
     return "Agent Manager" in roles or "Agent" in roles
+
+
+def has_desk_access(user: str | None = None) -> bool:
+    """Agents and System Managers work on the agent desk, not the portal."""
+    user = user or frappe.session.user
+    return is_agent(user) or "System Manager" in frappe.get_roles(user)
 
 
 def get_agent_name(user: str = None) -> str | None:

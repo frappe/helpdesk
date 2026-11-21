@@ -4,6 +4,7 @@ import { call, setConfig } from 'frappe-ui'
 import { spritePlugin } from 'frappe-ui/experimental'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { __ } from '@helpdesk/shared/translation'
+import { AGENT_PORTAL_ROOT } from '@helpdesk/shared/utils'
 import { setLocalTimezone } from '@helpdesk/shared/timezone'
 
 // From boot: must be set before the first date renders.
@@ -114,9 +115,8 @@ function createSessionStore() {
   }
 }
 
-// Frappe's login sends website users to `last_visited`; its signup turns `redirect-to` into the customer role.
+// Frappe's login sends website users to `last_visited` and desk users to `redirect-to`; its signup turns `redirect-to` into the customer role.
 function loginUrl() {
-  const path = location.pathname + location.search
-  localStorage.setItem('last_visited', path)
-  return `/login?redirect-to=${encodeURIComponent(path)}`
+  localStorage.setItem('last_visited', location.pathname + location.search)
+  return `/login?redirect-to=${AGENT_PORTAL_ROOT}`
 }

@@ -14,6 +14,7 @@ const YEAR = 365 * DAY;
 
 // Studio portal, outside the desk SPA.
 export const CUSTOMER_PORTAL_ROOT = "/help";
+export const AGENT_PORTAL_ROOT = "/helpdesk";
 
 /**
  * Delete in its own red group, so the menu draws a divider above it, as

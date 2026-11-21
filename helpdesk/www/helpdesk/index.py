@@ -7,7 +7,7 @@ from frappe.utils.telemetry import capture
 
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
 from helpdesk.integrations import frappe_cloud
-from helpdesk.utils import get_agent_name, is_agent
+from helpdesk.utils import get_agent_name, has_desk_access
 
 no_cache = 1
 
@@ -25,12 +25,7 @@ def get_context(context):
 
 def redirect_customer_home():
     """Agents stay on the desk; everyone else who opens `/helpdesk` goes on to the portal."""
-    # as `has_desk_access` in api/auth.py
-    if (
-        frappe.session.user == "Guest"
-        or is_agent()
-        or "System Manager" in frappe.get_roles()
-    ):
+    if frappe.session.user == "Guest" or has_desk_access():
         return
     # Deep links stay with the desk router, which sends customers to the same page on the portal
     if frappe.request.path.rstrip("/") not in ("", "/helpdesk"):
