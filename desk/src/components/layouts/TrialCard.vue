@@ -6,7 +6,7 @@
     icon="lucide-circle-alert"
     :label="content.title"
     :tooltip="content.title"
-    @click="openBillingSettings"
+    @click="choosePlan"
   />
   <SidebarCard
     v-else-if="content"
@@ -16,7 +16,7 @@
     :dismissible="content.dismissible"
     :action="{
       label: content.actionLabel,
-      onClick: openBillingSettings,
+      onClick: choosePlan,
     }"
     @dismiss="dismiss('trial')"
   />
@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { openBillingSettings } from "@/components/Settings/settingsModal";
 import { useBanners } from "@/composables/useBanners";
+import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import type { BillingTrial } from "@frappe/cloud-sdk";
 import {
@@ -44,6 +45,12 @@ defineProps<{ isSidebarCollapsed?: boolean }>();
 const URGENT_DAYS = 3;
 
 const { banner, dismiss } = useBanners();
+
+// same event as CRM, so upgrade clicks read the same across apps
+function choosePlan() {
+  capture("upgrade_plan_from_trial_banner");
+  openBillingSettings();
+}
 
 const content = computed(() => {
   const trial = banner("trial")?.trial;
