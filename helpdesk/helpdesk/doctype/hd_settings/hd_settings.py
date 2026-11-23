@@ -4,13 +4,12 @@
 
 from __future__ import unicode_literals
 
-import re
-
 import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
+from frappe.utils import validate_url
 from frappe.utils.jinja import validate_template
 
 from helpdesk.api.auth import validate_uploaded_image
@@ -23,10 +22,8 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     set_guest_ticket_creation_permission,
 )
 
-# The footer grid fits this many; keep in sync with MAX_FOOTER_COLUMNS in knowledgeBaseFooter.ts
 MAX_FOOTER_COLUMNS = 4
-# Same rule as isSafeLink in shared/src/utils.ts
-SAFE_LINK = re.compile(r"^(/|https?:|mailto:)", re.IGNORECASE)
+SAFE_URL_SCHEMES = ("http", "https", "mailto", "")
 
 
 class HDSettings(Document):
@@ -39,43 +36,26 @@ class HDSettings(Document):
         self.validate_guest_only_settings()
         # every visitor loads it, so a linked image could track them
         validate_uploaded_image(self.banner_image)
-        self.validate_kb_footer()
+        self.validate_footer()
 
-    def validate_kb_footer(self):
-        """Every visitor sees the footer, so each link must be complete and safe to open."""
-        if not self.kb_footer or not self.has_value_changed("kb_footer"):
-            return
-        footer = frappe.parse_json(self.kb_footer)
-        if not isinstance(footer, dict):
-            frappe.throw(_("The knowledge base footer is not valid"))
-        columns = footer.get("columns") or []
-        socials = footer.get("socials") or {}
-        if not (
-            isinstance(columns, list)
-            and isinstance(socials, dict)
-            and all(isinstance(column, dict) for column in columns)
-            and all(isinstance(column.get("links") or [], list) for column in columns)
-        ):
-            frappe.throw(_("The knowledge base footer is not valid"))
+    def validate_footer(self):
+        """Footer items mirror Website Settings: column rows without a parent, link rows under one."""
+        columns = [d.label for d in self.footer_items if not d.parent_label]
         if len(columns) > MAX_FOOTER_COLUMNS:
             frappe.throw(
                 _("The footer can have at most {0} link columns").format(
                     MAX_FOOTER_COLUMNS
                 )
             )
-
-        links = [link for column in columns for link in column.get("links") or []]
-        if any(
-            not isinstance(link, dict) or not link.get("label") or not link.get("url")
-            for link in links
-        ):
-            frappe.throw(_("Each footer link needs a label and a URL"))
-        for url in [link["url"] for link in links] + [u for u in socials.values() if u]:
-            if not isinstance(url, str) or not SAFE_LINK.match(url):
+        if len(set(columns)) < len(columns):
+            frappe.throw(_("Each footer column needs a different title"))
+        links = [d for d in self.footer_items if d.parent_label] + self.social_links
+        for d in links:
+            if not validate_url(d.url or "", valid_schemes=SAFE_URL_SCHEMES):
                 frappe.throw(
-                    _(
-                        "{0}: use a web address, an email link or a path starting with /"
-                    ).format(frappe.bold(url))
+                    _("{0}: Start with https://, mailto: or /").format(
+                        frappe.bold(d.label)
+                    )
                 )
 
     def turn_off_guest_home_when_private(self):

@@ -40,7 +40,7 @@
     />
   </svg>
   <svg
-    v-else
+    v-else-if="STROKE_ICONS.includes(name)"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -82,9 +82,12 @@
       <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
     </template>
   </svg>
+  <span v-else class="lucide-globe" aria-hidden="true" />
 </template>
 
 <script setup lang="ts">
 // From Frappe Wiki (MIT), X from Simple Icons (CC0); lucide dropped brand icons.
 defineProps<{ name: string }>();
+
+const STROKE_ICONS = ["youtube", "linkedin", "slack", "facebook", "instagram"];
 </script>

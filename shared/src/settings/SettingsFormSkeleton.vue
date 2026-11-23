@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-11" aria-busy="true">
     <!-- Real headings: only the rows wait for data. -->
-    <section v-for="(section, i) in sections" :key="i">
+    <section v-for="(section, index) in sections" :key="index">
       <h2 v-if="section.title" class="text-md-semibold text-ink-gray-8">
         {{ section.title }}
       </h2>

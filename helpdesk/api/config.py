@@ -11,7 +11,11 @@ GUEST_FIELDS = [
     "allow_anonymous_article_voting",
     "banner_image",
     "banner_preset",
-    "kb_footer",
+    "banner_title",
+    "banner_subtitle",
+    "show_footer",
+    "footer_tagline",
+    "footer_copyright",
 ]
 # The portal's ticket and organization pages
 USER_FIELDS = [
@@ -28,6 +32,8 @@ AGENT_FIELDS = [
     "disable_saved_replies_global_scope",
     "enable_comment_reactions",
 ]
+
+FOOTER_ROW_FIELDS = ["label", "url", "parent_label", "open_in_new_tab"]
 
 
 @frappe.whitelist(allow_guest=True)  # nosemgrep
@@ -62,8 +68,17 @@ def get_config():
             pluck="script",
         )
 
+    res.footer_items = get_footer_rows("footer_items") if res.show_footer else []
+    res.social_links = get_footer_rows("social_links") if res.show_footer else []
     res.favicon = get_favicon()
     return res
+
+
+def get_footer_rows(parentfield: str) -> list[dict]:
+    return [
+        {field: d.get(field) for field in FOOTER_ROW_FIELDS}
+        for d in frappe.get_cached_doc("HD Settings").get(parentfield)
+    ]
 
 
 def get_favicon() -> str:

@@ -1,5 +1,5 @@
 <template>
-  <Tabs v-model="tab" :tabs="tabs">
+  <Tabs v-model="selectedTab" :tabs="tabs">
     <template #tab-panel="{ tab: { value } }">
       <Transition
         enter-from-class="opacity-0"
@@ -10,6 +10,29 @@
           class="divide-y divide-outline-gray-1 pt-2 [&>*]:py-3.5"
         >
           <template v-if="value === 'home'">
+            <SettingsRow
+              :title="__('Title')"
+              :description="__('Heading shown in the banner.')"
+            >
+              <TextInput
+                v-model="draft.banner_title"
+                class="w-72"
+                :placeholder="defaultBannerTitle()"
+              />
+            </SettingsRow>
+            <SettingsRow
+              :title="__('Subtitle')"
+              :description="__('Text under the heading.')"
+            >
+              <div class="w-72">
+                <Textarea
+                  v-model="draft.banner_subtitle"
+                  class="max-h-40"
+                  :rows="2"
+                  :placeholder="defaultBannerSubtitle(settings.doc?.brand_name)"
+                />
+              </div>
+            </SettingsRow>
             <BannerPicker
               :image="draft.banner_image"
               :preset="draft.banner_preset"
@@ -92,8 +115,12 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { SettingsRow, Switch, Tabs } from "frappe-ui";
-import { computed, ref } from "vue";
+import { SettingsRow, Switch, Tabs, Textarea, TextInput } from "frappe-ui";
+import { computed } from "vue";
+import {
+  defaultBannerSubtitle,
+  defaultBannerTitle,
+} from "../knowledgeBaseBanner";
 import BannerPicker from "./BannerPicker.vue";
 import FooterSettings from "./FooterSettings.vue";
 import LinkTable from "./LinkTable.vue";
@@ -120,9 +147,8 @@ async function savePinsAndNotify(kind: PinKind, pinned: string[]) {
   return saved;
 }
 
-const tab = ref("home");
+const tab = defineModel<string>("tab", { default: "home" });
 
-// computed, so labels follow a translation load
 const tabs = computed(() => [
   { value: "home", label: __("Home page") },
   { value: "header", label: __("Header") },
@@ -130,9 +156,14 @@ const tabs = computed(() => [
   { value: "access", label: __("Access") },
 ]);
 
-// Each tab's loading shape: switch rows, then panel heights in px.
+const selectedTab = computed({
+  get: () =>
+    tabs.value.some(({ value }) => value === tab.value) ? tab.value : "home",
+  set: (value) => (tab.value = value),
+});
+
 const skeletons = {
-  home: { panels: [180, 50, 50] },
+  home: { rows: 2, panels: [180, 50, 50] },
   header: { rows: 1, panels: [96] },
   footer: { rows: 1 },
   access: { rows: 2 },

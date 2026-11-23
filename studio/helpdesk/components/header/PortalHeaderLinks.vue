@@ -24,7 +24,7 @@
       v-bind="linkTarget(link.open_in_new_tab)"
     >
       <template #icon>
-        <ServiceIcon :name="link.icon" class="size-4" />
+        <PortalServiceIcon :name="link.icon" class="size-4" />
       </template>
     </Button>
   </nav>
@@ -35,7 +35,7 @@ import { computed } from "vue";
 import { Button } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import { linkTarget } from "@helpdesk/shared/utils";
-import ServiceIcon from "@helpdesk/shared/ServiceIcon.vue";
+import PortalServiceIcon from "@app/components/header/PortalServiceIcon.vue";
 
 type HeaderLink = {
   label: string;

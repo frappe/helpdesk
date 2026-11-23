@@ -16,7 +16,8 @@ Agents write articles in the desk at `/helpdesk/kb`. Customers and guests read t
 - `prefer_knowledge_base`: the customer home is the KB (`/help`), not the ticket list (`/help/my-tickets`).
 - `allow_anonymous_article_voting`: guests can vote.
 - `banner_image`, `banner_preset`: the banner on the KB home.
-- `kb_footer`: the KB footer as JSON (`enabled`, `tagline`, `copyright`, `columns`, `socials`). `validate_kb_footer` refuses unsafe URLs, incomplete links and more than four columns.
+- `banner_title`, `banner_subtitle`: the KB home heading and the text under it. Empty uses the default text.
+- `show_footer`, `footer_tagline`, `footer_copyright`, `footer_items`, `social_links`: the KB footer. `footer_items` is a `Top Bar Item` table, as in Website Settings: a row without `parent_label` is a column; link rows name their column in `parent_label`. `social_links` is a `Top Bar Item` table too. `validate_footer` allows at most four columns with different titles and only web, email and `/` links in both tables.
 
 Within a category, every article list (`get_articles` with a `category`, `get_subcategory_articles`, `get_kb_sidebar`) sorts by `weight` first, heaviest on top. Pins never touch the weight; Featured reads them by `pinned_order`.
 

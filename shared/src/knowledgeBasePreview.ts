@@ -3,7 +3,6 @@ import type { KnowledgeBaseFooter } from "./knowledgeBaseFooter";
 // Settings Preview stores the unsaved look here; `?preview=1` enables it per tab.
 export const KNOWLEDGE_BASE_PREVIEW_KEY = "kb:preview";
 
-// A header quick link or a footer link.
 export type KnowledgeBaseLink = {
   label: string;
   url: string;
@@ -13,11 +12,12 @@ export type KnowledgeBaseLink = {
 export type KnowledgeBasePreview = {
   banner_image: string;
   banner_preset: string;
+  banner_title?: string;
+  banner_subtitle?: string;
   pinned: string[];
   // Missing in a preview saved before article pins.
   pinned_articles?: string[];
   links: KnowledgeBaseLink[];
-  // Missing in a preview saved before the footer.
   footer?: KnowledgeBaseFooter;
 };
 

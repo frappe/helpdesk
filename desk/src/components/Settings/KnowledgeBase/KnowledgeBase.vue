@@ -14,7 +14,6 @@
     </template>
     <template #header-actions>
       <div class="flex items-center gap-2">
-        <!-- Always: without edits it previews the saved look. -->
         <Button
           icon-left="lucide-external-link"
           :label="__('Preview')"

@@ -2,8 +2,8 @@ import { computed, effectScope, ref, watch } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
-import { footerNetworks, parseFooter } from '@helpdesk/shared/knowledgeBaseFooter'
-import { isSafeLink, runFormScripts } from '@helpdesk/shared/utils'
+import { footerFromSettings } from '@helpdesk/shared/knowledgeBaseFooter'
+import { isValidLink, runFormScripts } from '@helpdesk/shared/utils'
 import { navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
 import { accountMenuOptions, themeIcon, toggleTheme, useSettingsModal } from '@app/stores/settings'
@@ -32,22 +32,27 @@ const pageActionLabel = computed(() =>
   session.canCreateTicket.value && !session.config.value?.hide_raise_ticket_button ? session.raiseTicketLabel.value : '',
 )
 
-const isShownLink = (link) => link?.label && isSafeLink(link.url)
+const withIcons = (links) => links.filter(isValidLink).map((link) => ({ ...link, icon: serviceIcon(link.url) }))
 
-// Settings Preview shows the unsaved footer until saved; null hides it.
 const footer = computed(() => {
   if (!session.config.value) return null
-  const saved = readKnowledgeBasePreview()?.footer || parseFooter(session.config.value.kb_footer)
-  if (!saved.enabled) return null
+  const settings = readKnowledgeBasePreview()?.footer || footerFromSettings(session.config.value)
+  if (!settings.enabled) return null
+  const columns = settings.columns
+    .map((column) => ({ ...column, links: column.links.filter(isValidLink) }))
+    .filter((column) => column.links.length)
+  const socials = withIcons(settings.socials).map((link) => ({ ...link, icon: link.icon || 'globe' }))
+  const isBlank = !settings.tagline && !settings.copyright && !columns.length && !socials.length
+  const isCompact = !columns.length
+  const isTaglineAside = isCompact && !settings.copyright
+  const aside = isBlank ? __('Powered by Helpdesk') : isCompact ? settings.copyright || settings.tagline : ''
   return {
-    ...saved,
-    columns: saved.columns
-      .map((column) => ({ ...column, links: column.links.filter(isShownLink) }))
-      .filter((column) => column.links.length),
-    // The header's link shape, so PortalHeaderLinks draws them as icons.
-    socials: footerNetworks()
-      .filter(({ value }) => isSafeLink(saved.socials[value]))
-      .map(({ value, label }) => ({ label, url: saved.socials[value], icon: value, open_in_new_tab: true })),
+    columns,
+    socials: isCompact ? [] : socials,
+    asideSocials: isCompact ? socials : [],
+    aside,
+    tagline: isTaglineAside ? '' : settings.tagline,
+    copyright: isCompact ? '' : settings.copyright,
   }
 })
 
@@ -75,9 +80,7 @@ async function runScripts(scripts: string[]) {
   const data = { _form_script: scripts }
   customActions.value = await runFormScripts(data, scriptContext)
   // Settings Preview shows unsaved links until saved.
-  headerLinks.value = (readKnowledgeBasePreview()?.links || data._customLinks || [])
-    .filter(isShownLink)
-    .map((link) => ({ ...link, icon: serviceIcon(link.url) }))
+  headerLinks.value = withIcons(readKnowledgeBasePreview()?.links || data._customLinks || [])
 }
 
 export function useKnowledgeBaseHeader(context) {

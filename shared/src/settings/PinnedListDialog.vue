@@ -68,15 +68,6 @@
                     class="lucide-grip-vertical size-4 shrink-0 text-ink-gray-4"
                     aria-hidden="true"
                   />
-                  <ArticleIcon
-                    v-if="kind === 'articles'"
-                    class="size-4 shrink-0 text-ink-gray-6"
-                  />
-                  <span
-                    v-else
-                    :class="item.icon"
-                    class="size-4 shrink-0 text-ink-gray-6"
-                  />
                   <span class="min-w-0 flex-1 truncate text-base">
                     {{ item.label }}
                   </span>
@@ -124,15 +115,6 @@
                     v-if="!search"
                     class="lucide-grip-vertical size-4 shrink-0 text-ink-gray-4"
                     aria-hidden="true"
-                  />
-                  <ArticleIcon
-                    v-if="kind === 'articles'"
-                    class="size-4 shrink-0 text-ink-gray-6"
-                  />
-                  <span
-                    v-else
-                    :class="item.icon"
-                    class="size-4 shrink-0 text-ink-gray-6"
                   />
                   <span class="min-w-0 flex-1 truncate text-base">
                     {{ item.label }}
@@ -194,9 +176,8 @@
 </template>
 
 <script setup lang="ts">
-import ArticleIcon from "../ArticleIcon.vue";
 import { __ } from "../translation";
-import { askConfirm } from "../utils";
+import { askConfirm, DRAG_OPTIONS } from "../utils";
 import { Badge, Button, Dialog, ScrollArea, TextInput, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import Draggable from "vuedraggable";
@@ -208,7 +189,6 @@ type Section = "pinned" | "unpinned";
 type Item = {
   label: string;
   value: string;
-  icon?: string;
   // Of its articles; "Mixed" when they differ.
   access?: string;
 };
@@ -226,12 +206,6 @@ const LIST = "rounded-6 border border-outline-gray-2 px-1.5 py-2";
 const GROUP = "pinned-items";
 // A big knowledge base lists past this only through search.
 const SHOWN_LIMIT = 100;
-const DRAG_OPTIONS = {
-  animation: 150,
-  delay: 200,
-  delayOnTouchOnly: true,
-  ghostClass: "opacity-40",
-};
 
 const props = defineProps<{
   kind: PinKind;

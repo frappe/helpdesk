@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
-import { findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
+import { defaultBannerSubtitle, defaultBannerTitle, findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useRememberedCount } from '@app/composables/useRememberedCount'
@@ -23,6 +23,15 @@ export default function setup(context) {
   )
   const bannerBackground = computed(() => bannerPreset.value?.background || '')
   const bannerTextColor = computed(() => (bannerImage.value ? '#fff' : 'var(--ink-gray-8)'))
+
+  const bannerTitle = computed(
+    () => (preview.value?.banner_title ?? config.value?.banner_title) || defaultBannerTitle(),
+  )
+  const bannerSubtitle = computed(
+    () =>
+      (preview.value?.banner_subtitle ?? config.value?.banner_subtitle) ||
+      defaultBannerSubtitle(config.value?.brand_name),
+  )
 
   // Saving KB settings reloads the session; pins come with categories.
   watch(config, (_, previous) => previous && categories.reload())
@@ -126,6 +135,8 @@ export default function setup(context) {
     bannerImage,
     bannerBackground,
     bannerTextColor,
+    bannerTitle,
+    bannerSubtitle,
     homeCategories,
     homeCategoryColumns,
     skeletonCount,

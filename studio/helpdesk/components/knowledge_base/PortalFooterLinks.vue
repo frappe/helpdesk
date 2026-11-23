@@ -16,6 +16,5 @@
 import type { KnowledgeBaseLink } from "@helpdesk/shared/knowledgeBasePreview";
 import { linkTarget } from "@helpdesk/shared/utils";
 
-// URLs already vetted by useKnowledgeBaseHeader.
 defineProps<{ links: KnowledgeBaseLink[] }>();
 </script>

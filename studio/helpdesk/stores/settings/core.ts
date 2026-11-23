@@ -14,6 +14,7 @@ import { settingsPath } from '@app/router'
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
   const settingsTab = ref<'profile' | 'members' | 'knowledge-base' | 'portal-settings'>('profile')
+  const knowledgeBaseTab = ref('home')
   const account = ref(null)
   const isSettingsBusy = ref(false)
 
@@ -67,6 +68,7 @@ export function createSettingsCore() {
   return {
     isSettingsOpen,
     settingsTab,
+    knowledgeBaseTab,
     isSettingsBusy,
     settingsUser,
     organizations,
@@ -96,7 +98,7 @@ export function createSettingsDialog(core, organization, session) {
 
   // Not in watchRoute: Studio stops the page's effect scope on navigation.
   watch(
-    [core.isSettingsOpen, core.settingsTab, organization.selectedOrganization, organization.inviteOpen],
+    [core.isSettingsOpen, core.settingsTab, core.knowledgeBaseTab, organization.selectedOrganization, organization.inviteOpen],
     () => pushPath(),
   )
 
@@ -124,6 +126,10 @@ export function createSettingsDialog(core, organization, session) {
     const tab = allowed ? routeTab : 'profile'
     if (core.isSettingsOpen.value) core.settingsTab.value = tab
     else openSettings(tab)
+    if (tab === 'knowledge-base') {
+      core.knowledgeBaseTab.value = rest[0] || 'home'
+      return organization.closeOrganization()
+    }
     const invite = rest[rest.length - 1] === 'invite'
     if (invite) rest.pop()
     applyOrganization(rest.join('/'), invite)
@@ -140,6 +146,8 @@ export function createSettingsDialog(core, organization, session) {
     const page = pagePath(route)
     if (!core.isSettingsOpen.value) return page
     const screens = [core.settingsTab.value]
+    if (core.settingsTab.value === 'knowledge-base' && core.knowledgeBaseTab.value !== 'home')
+      screens.push(core.knowledgeBaseTab.value)
     if (organization.selectedOrganization.value) screens.push(organization.selectedOrganization.value)
     if (organization.selectedOrganization.value && organization.inviteOpen.value) screens.push('invite')
     return settingsPath(page, screens)

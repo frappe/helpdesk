@@ -30,7 +30,7 @@ Studio documents its own rules. Read them before you change a page:
 ```
 studio/helpdesk/
   helpdesk.json          Studio App record: route "help", app_home = public_kb
-  router.ts              opens the Settings dialog at <page>/settings/<screen>
+  router.ts              opens the Settings dialog at <page>/settings/<screen>[/<tab>]
   studio_page/<page>/    <page>.json (block tree) + <page>.ts (setup script)
   studio_components/     Studio Components: reusable block trees with inputs
   components/            custom Vue components, by area
@@ -86,7 +86,7 @@ The stores are module-level singletons, not Pinia.
 
 ### Composables
 
-- `useKnowledgeBaseHeader`: the header for the four KB pages. It runs KB form scripts into header links and custom actions.
+- `useKnowledgeBaseHeader`: the header for the four KB pages. It runs KB form scripts into header links and custom actions, and returns `footer`: the saved footer, or the Settings Preview one, null when off.
 - `useArticleSearch`: debounced article search, used by the search box and the new ticket form.
 - `useDrawer`: the ticket page's mobile side drawer. `useBottomSheet`: open state for the knowledge base sidebar, a frappe-ui `BottomSheet` on phones.
 - `useTicketThread`, `useReplyComposer`, `useTicketDetails`, `useTicketFeedback`, `useOutsideHoursBanner`, `useChatRows`: the parts of the `ticket` page.
@@ -146,7 +146,7 @@ Do not run `bench migrate` or `build-studio-app` in the edit loop. Build only to
 
 1. Make the page in the Studio editor, inside the Helpdesk app. In developer mode the save writes `studio_page/<page>/<page>.json`.
 2. Add `<page>.ts` next to it with `export default function setup(context)`. Spread `useSettingsModal(context)` (or `useKnowledgeBaseHeader(context)` on a KB page) into the return value.
-3. Add `header` and `kb_settings` blocks, like the other pages.
+3. Add `header` and `kb_settings` blocks, like the other pages, and `footer` on a KB page.
 4. Add the path to `ROUTES` in `shared/src/portalRoutes.ts`.
 5. Set `allow_guest` only if guests must see the page.
 

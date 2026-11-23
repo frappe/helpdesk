@@ -32,7 +32,6 @@
 		"./ListViewSkeleton.vue": "./src/ListViewSkeleton.vue",
 		"./ArticleIcon.vue": "./src/ArticleIcon.vue",
 		"./OrganizationsIcon.vue": "./src/OrganizationsIcon.vue",
-		"./ServiceIcon.vue": "./src/ServiceIcon.vue",
 		"./settings/*": "./src/settings/*"
 	},
 	"peerDependencies": {

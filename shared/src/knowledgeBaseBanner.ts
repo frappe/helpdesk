@@ -1,3 +1,5 @@
+import { __ } from "./translation";
+
 // Mixed with the page background: raw dark-mode tints look saturated.
 const tint = (color: string) =>
   `color-mix(in oklab, var(--surface-${color}-3) 40%, var(--surface-base))`;
@@ -22,3 +24,9 @@ export const BANNER_PRESETS = [
 export function findBannerPreset(name?: string | null) {
   return BANNER_PRESETS.find((preset) => preset.name === name);
 }
+
+export const defaultBannerTitle = () => __("Here's what might help");
+export const defaultBannerSubtitle = (brandName?: string) =>
+  brandName
+    ? __("Explore answers to frequently asked questions about {0}.", [brandName])
+    : __("Explore answers to frequently asked questions.");

@@ -7,6 +7,7 @@ from frappe.utils import set_request
 from frappe.website.serve import get_response
 from frappe.website.utils import get_home_page
 
+from helpdesk.api.config import get_config
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     KNOWLEDGE_BASE_HOME,
     TICKETS_HOME,
@@ -211,49 +212,65 @@ def make_customer(email: str) -> None:
 
 
 class TestKnowledgeBaseFooter(IntegrationTestCase):
-    """Every visitor sees the footer, so a save checks its links."""
-
-    def save_footer(self, **footer) -> None:
+    def save_footer(self, items: list[dict], **fields) -> None:
         settings = frappe.get_single("HD Settings")
-        settings.kb_footer = frappe.as_json({"enabled": True, **footer})
+        settings.update({"show_footer": 1, "footer_items": items, **fields})
         settings.save()
 
-    def link(self, url: str = "https://example.com/pricing", label: str = "Pricing"):
-        return {"label": label, "url": url, "open_in_new_tab": False}
+    def column(self, title: str = "Product", *urls: str) -> list[dict]:
+        links = [
+            {"label": f"Link {url}", "url": url, "parent_label": title} for url in urls
+        ]
+        return [{"label": title}, *links]
 
     def test_a_complete_footer_saves(self) -> None:
         self.save_footer(
-            tagline="Help for everyone",
-            columns=[{"title": "Product", "links": [self.link(), self.link("/help")]}],
-            socials={"github": "https://github.com/example", "x": ""},
+            self.column(
+                "Product",
+                "https://example.com/pricing",
+                "/help",
+                "mailto:hi@example.com",
+            ),
+            social_links=[{"label": "GitHub", "url": "https://github.com/example"}],
         )
-        saved = frappe.parse_json(
-            frappe.db.get_single_value("HD Settings", "kb_footer")
+        settings = frappe.get_single("HD Settings")
+        self.assertEqual(
+            [d.url for d in settings.footer_items if d.parent_label][1], "/help"
         )
-        self.assertEqual(saved["columns"][0]["links"][1]["url"], "/help")
 
     def test_unsafe_urls_are_refused(self) -> None:
-        for footer in (
-            {"columns": [{"title": "A", "links": [self.link("javascript:alert(1)")]}]},
-            {"socials": {"github": "data:text/html,hi"}},
-        ):
-            with self.subTest(footer=footer), self.assertRaises(frappe.ValidationError):
-                self.save_footer(**footer)
-
-    def test_a_link_needs_a_label_and_a_url(self) -> None:
-        for link in (self.link(label=""), self.link(url="")):
-            with self.subTest(link=link), self.assertRaises(frappe.ValidationError):
-                self.save_footer(columns=[{"title": "A", "links": [link]}])
+        cases = (
+            {"items": self.column("Product", "javascript:alert(1)")},
+            {"items": self.column("Product", "example.com")},
+            {"items": self.column("Product", "")},
+            {
+                "items": [],
+                "social_links": [{"label": "GitHub", "url": "data:text/html,hi"}],
+            },
+        )
+        for case in cases:
+            with self.subTest(case=case), self.assertRaises(frappe.ValidationError):
+                self.save_footer(**case)
 
     def test_at_most_four_columns(self) -> None:
-        column = {"title": "A", "links": [self.link()]}
-        self.save_footer(columns=[column] * 4)
+        columns = [self.column(f"Column {index}", "/help") for index in range(5)]
+        self.save_footer([row for column in columns[:4] for row in column])
         with self.assertRaises(frappe.ValidationError):
-            self.save_footer(columns=[column] * 5)
+            self.save_footer([row for column in columns for row in column])
 
-    def test_a_malformed_footer_is_refused(self) -> None:
-        settings = frappe.get_single("HD Settings")
-        for value in ("[]", '{"columns": {}}', '{"columns": ["Product"]}'):
-            settings.kb_footer = value
-            with self.subTest(value=value), self.assertRaises(frappe.ValidationError):
-                settings.save()
+    def test_column_titles_differ(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            self.save_footer(
+                self.column("Product", "/a") + self.column("Product", "/b")
+            )
+
+    def test_guests_get_the_footer_only_while_it_is_shown(self) -> None:
+        self.save_footer(self.column("Product", "/help"))
+        frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
+        for show_footer, rows in ((1, 2), (0, 0)):
+            frappe.db.set_single_value("HD Settings", "show_footer", show_footer)
+            frappe.set_user("Guest")
+            try:
+                self.assertEqual(len(get_config().footer_items), rows)
+            finally:
+                frappe.set_user("Administrator")

@@ -15,6 +15,17 @@ const YEAR = 365 * DAY;
 // Studio portal, outside the desk SPA.
 export const CUSTOMER_PORTAL_ROOT = "/help";
 
+export const DRAG_OPTIONS = {
+  animation: 150,
+  delay: 200,
+  delayOnTouchOnly: true,
+  ghostClass: "opacity-40",
+};
+
+export function moveItem(list: unknown[], from: number, to: number) {
+  list.splice(to, 0, ...list.splice(from, 1));
+}
+
 export function MoveOptions(
   index: number,
   count: number,
@@ -44,6 +55,20 @@ export function MoveOptions(
  * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
  * @returns {Array} A menu group for use in dropdowns
  */
+export function ListItemOptions(
+  list: unknown[],
+  index: number,
+  isConfirmingDelete: Ref<boolean>
+) {
+  return [
+    ...MoveOptions(index, list.length, (to) => moveItem(list, index, to)),
+    ...ConfirmDelete({
+      isConfirmingDelete,
+      onConfirmDelete: () => list.splice(index, 1),
+    }),
+  ];
+}
+
 export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   return [
     {
@@ -81,7 +106,17 @@ export function isSafeLink(url: unknown) {
   return typeof url === "string" && /^(\/|https?:|mailto:)/i.test(url);
 }
 
-// rel=noopener: the opened page must not get a handle on this one.
+export function isValidLink(link?: { label?: string; url?: string }) {
+  return Boolean(link?.label?.trim()) && isSafeLink(link?.url?.trim());
+}
+
+export function linkError(url?: string) {
+  const value = url?.trim();
+  return value && !isSafeLink(value)
+    ? __("Start with https://, mailto: or /")
+    : "";
+}
+
 export function linkTarget(openInNewTab?: boolean | number) {
   return openInNewTab
     ? { target: "_blank", rel: "noopener" }
@@ -119,8 +154,7 @@ export function prettyDate(date) {
       return __("{0} hours ago", [Math.floor(absDiff / 3600)]);
     }
     if (absDiff < 120) return __("In 1 minute");
-    if (absDiff < 3600)
-      return __("In {0} minutes", [Math.floor(absDiff / 60)]);
+    if (absDiff < 3600) return __("In {0} minutes", [Math.floor(absDiff / 60)]);
     if (absDiff < 7200) return __("In 1 hour");
     return __("In {0} hours", [Math.floor(absDiff / 3600)]);
   } else if (diff < 0) {

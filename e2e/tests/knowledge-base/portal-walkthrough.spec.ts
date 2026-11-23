@@ -8,7 +8,7 @@ import { siteHeader } from "../../helpers/site";
 
 // Title ids (R1, H9, K2, ...) follow the portal walkthrough checklist.
 
-const KB_SETTINGS = ["public_knowledge_base", "allow_anonymous_article_voting", "banner_preset", "kb_footer"];
+const KB_SETTINGS = ["public_knowledge_base", "allow_anonymous_article_voting", "banner_preset", "show_footer", "footer_tagline", "footer_items", "social_links"];
 const QUICK_LINKS = "Knowledge Base Quick Links";
 const GUEST = { storageState: { cookies: [], origins: [] } };
 const PHONE = { width: 390, height: 844 };
@@ -764,7 +764,7 @@ test.describe("article page", () => {
     for (let i = 0; i < 8; i++) created.push(await createArticle(api, category.name, { title: `Related ${i} ${uid()}`, content: filler }));
     await page.goto(`/help/articles/${created[0].name}`);
     await expect(page.getByText("Related articles")).toBeVisible();
-    const rows = page.locator('[data-component-id="container-article-scroll"]').getByRole("link", { name: /^Related \d/ });
+    const rows = page.getByRole("navigation", { name: "Related articles" }).getByRole("link", { name: /^Related \d/ });
     await expect(rows).toHaveCount(5);
     const panel = page.locator('[data-component-id="container-article-scroll"]');
     await panel.evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
@@ -838,7 +838,7 @@ test.describe("knowledge base settings", () => {
       await dialog.getByRole("radio", { name: "Blue" }).click();
       await expect(dialog.getByText("Unsaved")).toBeVisible();
       // Pins save from their own dialog, apart from the draft.
-      await dialog.getByRole("button", { name: "Customize pinned categories" }).click();
+      await dialog.getByRole("button", { name: "Add category" }).click();
       const pins = page.getByRole("dialog", { name: "Pinned categories" });
       // the dialog lists 100 at most; a busy test site has more
       await pins.getByRole("textbox", { name: "Search categories to pin" }).fill(category.category_name);
@@ -852,7 +852,7 @@ test.describe("knowledge base settings", () => {
       // S33: an unsafe address is refused on Save.
       await dialog.getByPlaceholder("https://example.com/contact").fill("javascript:alert(1)");
       await dialog.getByRole("button", { name: "Save" }).click();
-      await expect(page.getByText(`${label}: use a web address`)).toBeVisible();
+      await expect(page.getByText(`${label}: Start with https://, mailto: or /`)).toBeVisible();
       await dialog.getByPlaceholder("https://example.com/contact").fill("https://example.com/e2e");
 
       // S34: Preview opens the portal with the draft.
@@ -876,25 +876,31 @@ test.describe("knowledge base settings", () => {
   });
 
   test("the footer previews, saves and shows to guests", async ({ page, kb, context, browser, baseURL }) => {
-    await kb({ public_knowledge_base: 1, kb_footer: null });
+    await kb({ public_knowledge_base: 1, show_footer: 0, footer_items: [], social_links: [] });
     const tagline = `E2E tagline ${uid()}`;
     await page.goto("/help/settings/knowledge-base");
     const dialog = page.getByRole("dialog");
-    // Preview shows even without edits.
     await expect(dialog.getByRole("button", { name: "Preview" })).toBeVisible();
     await dialog.getByRole("tab", { name: "Footer" }).click();
     await dialog.getByRole("switch", { name: "Show footer" }).click();
     await dialog.locator("textarea").fill(tagline);
     await dialog.getByRole("button", { name: "Add column" }).click();
-    await dialog.getByText("Untitled").click();
-    await dialog.getByLabel("Column title").fill("Company");
-    await dialog.getByRole("button", { name: "Add link" }).click();
-    await dialog.getByPlaceholder("Contact sales").fill("E2E About");
-    await dialog.getByPlaceholder("https://example.com/contact").fill("https://example.com/about");
-    await dialog.getByLabel("GitHub URL").fill("javascript:alert(1)");
+    const linkDialog = page.getByRole("dialog", { name: "Add column" });
+    await linkDialog.getByLabel("Column title").fill("Company");
+    await linkDialog.getByLabel("Label").fill("E2E About");
+    await linkDialog.getByLabel("URL").fill("javascript:alert(1)");
+    await expect(linkDialog.getByRole("button", { name: "Add column" })).toBeDisabled();
+    await linkDialog.getByLabel("URL").fill("https://example.com/about");
+    await linkDialog.getByRole("button", { name: "Add column" }).click();
+    await expect(linkDialog).toBeHidden();
+    await expect(dialog.getByRole("button", { name: "E2E About", exact: true })).toBeVisible();
+    const socials = dialog.getByRole("group", { name: "Social links" });
+    await socials.getByRole("button", { name: "Add link" }).click();
+    await socials.getByPlaceholder("Contact sales").fill("GitHub");
+    await socials.getByPlaceholder("https://example.com/contact").fill("javascript:alert(1)");
     await dialog.getByRole("button", { name: "Save" }).click();
-    await expect(page.getByText("GitHub: use a web address")).toBeVisible();
-    await dialog.getByLabel("GitHub URL").fill("https://github.com/example");
+    await expect(page.getByText("GitHub: Start with https://, mailto: or /")).toBeVisible();
+    await socials.getByPlaceholder("https://example.com/contact").fill("https://github.com/example");
 
     const popup = context.waitForEvent("page");
     await dialog.getByRole("button", { name: "Preview" }).click();
@@ -926,7 +932,7 @@ test.describe("knowledge base settings: pins on the home page", () => {
       // The settings dialog hides the page from the accessibility tree, so match by CSS.
       const cards = grid.locator("a");
       await expect.poll(() => cards.count()).toBeGreaterThan(2);
-      await page.getByRole("dialog").getByRole("button", { name: "Customize pinned categories" }).click();
+      await page.getByRole("dialog").getByRole("button", { name: "Add category" }).click();
       const pins = page.getByRole("dialog", { name: "Pinned categories" });
       for (const category of pinned) {
         // the dialog lists 100 at most; a busy test site has more
@@ -1030,4 +1036,3 @@ async function saveQuickLinks(api, links: Record<string, any>[]) {
     script: `function setupForm() {\n  return { links: ${json} };\n}`,
   });
 }
-

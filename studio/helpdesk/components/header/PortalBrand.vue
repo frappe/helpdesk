@@ -7,7 +7,7 @@
       aria-hidden="true"
       class="size-6 shrink-0 rounded-2 object-contain"
     />
-    <span v-else class="size-6 shrink-0" />
+    <span v-else-if="compact" class="size-6 shrink-0" />
     <span
       v-if="name"
       class="truncate text-base-medium text-ink-gray-9"
@@ -19,6 +19,5 @@
 </template>
 
 <script setup lang="ts">
-// compact: logo only on phones
 defineProps<{ logo?: string; name?: string; compact?: boolean }>();
 </script>

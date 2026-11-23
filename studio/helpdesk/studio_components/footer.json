@@ -42,8 +42,9 @@
           },
           "isCustomVueComponent": true,
           "classes": [
-           "-ms-2"
-          ]
+           "-ms-1.5"
+          ],
+          "visibilityCondition": "{{ footer.socials.length }}"
          }
         ],
         "classes": [
@@ -110,12 +111,58 @@
          "data": "{{ footer.columns }}"
         },
         "visibilityCondition": "{{ footer.columns.length }}"
+       },
+       {
+        "blockName": "footer-aside",
+        "children": [
+         {
+          "classes": [
+           "text-ink-gray-5",
+           "whitespace-pre-line",
+           "sm:max-w-[360px]",
+           "sm:text-end"
+          ],
+          "componentId": "footer-aside-text",
+          "componentName": "TextBlock",
+          "componentProps": {
+           "fontSize": "text-p-sm",
+           "tag": "p",
+           "text": "{{ footer.aside }}"
+          },
+          "visibilityCondition": "{{ footer.aside }}"
+         },
+         {
+          "classes": [
+           "first:-ms-1.5",
+           "sm:first:ms-0",
+           "sm:-me-1.5"
+          ],
+          "componentId": "footer-aside-socials",
+          "componentName": "PortalHeaderLinks",
+          "componentProps": {
+           "links": "{{ footer.asideSocials }}"
+          },
+          "isCustomVueComponent": true,
+          "visibilityCondition": "{{ footer.asideSocials.length }}"
+         }
+        ],
+        "classes": [
+         "flex",
+         "items-center",
+         "gap-4",
+         "sm:self-center"
+        ],
+        "componentId": "footer-aside",
+        "componentName": "container",
+        "originalElement": "div",
+        "visibilityCondition": "{{ footer.aside || footer.asideSocials.length }}"
        }
       ],
       "classes": [
        "flex",
        "flex-col",
-       "gap-10",
+       "gap-6",
+       "sm:gap-10",
        "sm:flex-row",
        "sm:justify-between"
       ],
@@ -158,8 +205,7 @@
      "flex-col",
      "gap-10",
      "px-4",
-     "pt-12",
-     "pb-8"
+     "py-10"
     ],
     "componentId": "footer-content",
     "componentName": "container",
@@ -186,7 +232,7 @@
  "idx": 0,
  "inputs": [],
  "is_disabled": 0,
- "modified": "2026-11-13 12:00:00.000000",
+ "modified": "2026-11-22 13:30:00.000000",
  "modified_by": "Administrator",
  "name": "footer",
  "owner": "Administrator"

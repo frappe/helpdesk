@@ -1,36 +1,22 @@
 <template>
   <div class="flex flex-col gap-3">
-    <SettingsHeading :title="text.title" :description="text.description">
-      <!-- Named apart: the form has a Customize per list. -->
-      <Button class="shrink-0" :label="text.customize" @click="open = true">
-        {{ __("Customize") }}
-      </Button>
-    </SettingsHeading>
-    <div
-      v-if="pinned.length"
-      class="rounded-5 border border-outline-gray-2 px-1"
-    >
-      <div
-        v-for="(name, index) in pinned"
-        :key="name"
-        class="border-b border-outline-gray-1 py-1 last:border-b-0"
-      >
-        <div
-          class="group flex h-11 items-center gap-2.5 rounded-4 pl-2 pr-1.5 hover:bg-surface-gray-1 sm:h-10"
-        >
-          <ArticleIcon
-            v-if="kind === 'articles'"
-            class="size-4 shrink-0 text-ink-gray-6"
-          />
-          <span
-            v-else
-            :class="categoryIcon(byName[name]?.icon)"
-            class="size-4 shrink-0 text-ink-gray-6"
-          />
-          <span class="min-w-0 flex-1 truncate text-base text-ink-gray-8">
+    <SettingsHeading :title="text.title" :description="text.description" />
+    <SettingsTable v-model="pinned" :columns="columns" :empty-text="text.empty">
+      <template #header>
+        <ListHeaderCell>{{ text.column }}</ListHeaderCell>
+        <ListHeaderCell>{{ __("Visibility") }}</ListHeaderCell>
+        <ListHeaderCell />
+      </template>
+      <template #default="{ item: name, index }">
+        <ListCell class="h-7">
+          <span class="truncate text-base text-ink-gray-8">
             {{ labelOf(name) }}
           </span>
+        </ListCell>
+        <ListCell class="h-7">
           <CategoryAccessBadge :access="byName[name]?.access" />
+        </ListCell>
+        <ListCell class="h-7">
           <Dropdown align="end" :options="rowOptions(index)">
             <Button
               variant="ghost"
@@ -38,17 +24,17 @@
               :label="__('Options for {0}', [labelOf(name)])"
             />
           </Dropdown>
-        </div>
-      </div>
-    </div>
-    <!-- A row's height, so the first pin shifts nothing below. -->
-    <div v-else class="rounded-5 border border-outline-gray-2 px-1 py-1">
-      <div
-        class="flex min-h-11 items-center justify-center px-3 text-center text-p-base text-ink-gray-6 sm:min-h-10"
-      >
-        {{ text.empty }}
-      </div>
-    </div>
+        </ListCell>
+      </template>
+    </SettingsTable>
+    <Button
+      class="self-start"
+      variant="subtle"
+      icon-left="lucide-plus"
+      :label="text.add"
+      :disabled="kind === 'articles' && pinned.length >= MAX_PINNED_ARTICLES"
+      @click="open = true"
+    />
     <PinnedListDialog
       v-model:open="open"
       :kind="kind"
@@ -61,36 +47,34 @@
 </template>
 
 <script setup lang="ts">
-import ArticleIcon from "../ArticleIcon.vue";
-import { categoryIcon } from "../categoryIcons";
 import { __ } from "../translation";
-import { MoveOptions } from "../utils";
+import { MoveOptions, moveItem } from "../utils";
 import { Button, Dropdown } from "frappe-ui";
+import { ListCell, ListHeaderCell } from "frappe-ui/list";
 import { computed, ref } from "vue";
 import CategoryAccessBadge from "./CategoryAccessBadge.vue";
-import type { PinKind } from "./knowledgeBaseDraft";
+import { MAX_PINNED_ARTICLES, type PinKind } from "./knowledgeBaseDraft";
 import PinnedListDialog from "./PinnedListDialog.vue";
 import SettingsHeading from "./SettingsHeading.vue";
+import SettingsTable from "./SettingsTable.vue";
 import { pinnedListText } from "./pinnedListText";
 
 type Item = {
   label: string;
   value: string;
-  icon?: string;
   access?: string;
 };
 
 const props = defineProps<{
   kind: PinKind;
   items: Item[];
-  pinned: string[];
-  // The Customize dialog saves at once; resolves true on success.
   save: (pinned: string[]) => Promise<boolean>;
   search?: (query: string) => void;
 }>();
 
-// Row menu edits wait for the form's Save.
-const emit = defineEmits<{ "update:pinned": [pinned: string[]] }>();
+const pinned = defineModel<string[]>("pinned", { required: true });
+
+const columns = ["minmax(0,1fr)", "112px", "32px"];
 
 const open = ref(false);
 const text = computed(() => pinnedListText(props.kind));
@@ -103,24 +87,15 @@ function labelOf(name: string) {
   return byName.value[name]?.label || name;
 }
 
-function moveTo(name: string, index: number) {
-  const next = props.pinned.filter((row) => row !== name);
-  next.splice(index, 0, name);
-  emit("update:pinned", next);
-}
-
 function rowOptions(index: number) {
-  const name = props.pinned[index];
   return [
-    ...MoveOptions(index, props.pinned.length, (to) => moveTo(name, to)),
+    ...MoveOptions(index, pinned.value.length, (to) =>
+      moveItem(pinned.value, index, to)
+    ),
     {
       label: __("Unpin"),
       icon: "lucide-pin-off",
-      onClick: () =>
-        emit(
-          "update:pinned",
-          props.pinned.filter((row) => row !== name)
-        ),
+      onClick: () => pinned.value.splice(index, 1),
     },
   ];
 }

@@ -15,7 +15,12 @@ export async function openSettings(page: Page, tab: string | RegExp) {
 export async function snapshotSettings(api: Api, fields: string[]) {
   const settings = await api.get("HD Settings", "HD Settings");
   // REST updates skip nulls, so an empty field is restored as "".
-  const saved = Object.fromEntries(fields.map((field) => [field, settings[field] ?? ""]));
+  const saved = Object.fromEntries(
+    fields.map((field) => {
+      const value = settings[field] ?? "";
+      return [field, Array.isArray(value) ? value.map(({ name, ...row }) => row) : value];
+    }),
+  );
   return () => api.update("HD Settings", "HD Settings", saved);
 }
 

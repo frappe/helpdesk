@@ -25,7 +25,14 @@
   "hide_raise_ticket_button",
   "banner_image",
   "banner_preset",
-  "kb_footer",
+  "banner_title",
+  "banner_subtitle",
+  "footer_section",
+  "show_footer",
+  "footer_tagline",
+  "footer_copyright",
+  "footer_items",
+  "social_links",
   "portal_tab",
   "access_section",
   "prefer_knowledge_base",
@@ -302,10 +309,51 @@
    "options": "\nLines\nGray\nBlue\nViolet"
   },
   {
-   "description": "Shown at the bottom of every knowledge base page. Edit it from Knowledge Base settings.",
-   "fieldname": "kb_footer",
-   "fieldtype": "JSON",
-   "label": "Knowledge base footer"
+   "fieldname": "banner_title",
+   "fieldtype": "Data",
+   "label": "Banner title"
+  },
+  {
+   "fieldname": "banner_subtitle",
+   "fieldtype": "Small Text",
+   "label": "Banner subtitle"
+  },
+  {
+   "fieldname": "footer_section",
+   "fieldtype": "Section Break",
+   "label": "Footer"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_footer",
+   "fieldtype": "Check",
+   "label": "Show footer"
+  },
+  {
+   "depends_on": "show_footer",
+   "fieldname": "footer_tagline",
+   "fieldtype": "Small Text",
+   "label": "Footer tagline"
+  },
+  {
+   "depends_on": "show_footer",
+   "fieldname": "footer_copyright",
+   "fieldtype": "Data",
+   "label": "Footer copyright"
+  },
+  {
+   "depends_on": "show_footer",
+   "fieldname": "footer_items",
+   "fieldtype": "Table",
+   "label": "Footer items",
+   "options": "Top Bar Item"
+  },
+  {
+   "depends_on": "show_footer",
+   "fieldname": "social_links",
+   "fieldtype": "Table",
+   "label": "Social links",
+   "options": "Top Bar Item"
   },
   {
    "fieldname": "agent_status_section",
@@ -656,7 +704,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-13 12:00:00.000000",
+ "modified": "2026-11-23 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
