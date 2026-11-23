@@ -47,125 +47,65 @@
           '[mask-image:linear-gradient(to_bottom,transparent,black_1.5rem)]'
         "
       >
-        <!-- Rows already in hand beat the skeleton; enough rows to fill, clipped. -->
+        <!-- Rows already in hand beat the skeleton; enough rows to fill, clipped.
+             Tree: a row click toggles a category and opens its page. -->
         <PortalSkeleton
           v-if="loading && !categories.length"
           variant="nav"
           :count="40"
           class="min-h-0 flex-1 overflow-hidden"
         />
-        <!-- A group: its own articles, then its Subcategories' groups. -->
-        <DefineGroup v-slot="{ category, nested }">
-          <div :class="!nested && revealed && 'portal-reveal'">
-            <!-- The row opens the category's page and keeps it open; the chevron folds. -->
-            <SidebarItem
-              class="max-md:h-11"
-              :active="false"
-              :route="ROUTES.category(category.name)"
-              :data-current="category.name === currentCategory || undefined"
-              @click="expand(category.name, nested)"
+        <Tree
+          v-else
+          :nodes="treeNodes"
+          node-key="key"
+          guides="lines"
+          :expanded="expandedKeys"
+          class="[--tree-indent:32px] motion-safe:[&_[role=group]]:animate-[portal-fade-in_150ms_ease-out] [--tree-row-height:28px] [&_[data-slot=row]:has(>[data-article])>span[aria-hidden]]:hidden [&_[data-slot=row]:has(>[data-more])>span[aria-hidden]]:hidden max-md:[--tree-row-height:44px] [&_[data-slot=row]:has([data-active])]:bg-surface-gray-2 [&>li]:[contain-intrinsic-size:auto_var(--tree-row-height)] [&>li]:[content-visibility:auto]"
+          :class="revealed && 'portal-reveal'"
+          @update:expanded="onExpanded"
+        >
+          <template #item-label="{ node }">
+            <Button
+              v-if="node.kind === 'more'"
+              variant="ghost"
+              data-more
+              class="!h-auto !bg-transparent !px-0 !text-ink-gray-5 underline-offset-2 hover:!text-ink-gray-8 hover:underline"
+              :label="__('Show {0} more', [Math.min(node.hidden, SHOW_STEP)])"
+              @click="showMore(node.name)"
+            />
+            <RouterLink
+              v-else-if="node.kind === 'category'"
+              :to="ROUTES.category(node.name)"
+              :data-current="marked[node.key] === 'current' || undefined"
+              @click.stop="onCategoryClick(node.name, node.nested)"
+              class="flex h-full min-w-0 flex-1 items-center text-sm max-md:text-base"
+              :class="marked[node.key] ? 'text-ink-gray-8' : 'text-ink-gray-6'"
             >
-              <template #prefix>
-                <Icon
-                  :icon="categoryIcon(category.icon)"
-                  class="size-4 max-md:size-[18px]"
-                  :class="
-                    category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'
-                  "
-                />
-              </template>
-              <span
-                class="min-w-0 flex-1 truncate text-sm max-md:text-base"
-                :class="
-                  category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'
-                "
-              >
-                {{ category.label }}
+              <span class="truncate">{{ node.label }}</span>
+            </RouterLink>
+            <RouterLink
+              v-else
+              :to="node.route"
+              :title="node.label"
+              :data-article="node.name"
+              :data-active="marked[node.key] || undefined"
+              :aria-current="marked[node.key] ? 'page' : undefined"
+              class="flex h-full min-w-0 flex-1 items-center text-sm max-md:text-base"
+              :class="marked[node.key] ? 'text-ink-gray-8' : 'text-ink-gray-6'"
+            >
+              <span class="truncate">
+                <template v-for="(part, i) in splitMatch(node.label)" :key="i">
+                  <mark
+                    v-if="i % 2"
+                    class="rounded-sm bg-surface-amber-2 px-0.5 text-ink-gray-9"
+                    >{{ part }}</mark
+                  ><template v-else>{{ part }}</template>
+                </template>
               </span>
-              <template #suffix>
-                <button
-                  type="button"
-                  class="mr-0.5 grid size-6 place-items-center rounded-4 text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-7 focus-visible:focus-ring max-md:size-10"
-                  :aria-expanded="category.isOpen"
-                  :aria-controls="`kb-sidebar-${category.name}`"
-                  :aria-label="
-                    category.isOpen
-                      ? __('Collapse {0}', [category.label])
-                      : __('Expand {0}', [category.label])
-                  "
-                  @click="toggle(category.name, nested)"
-                >
-                  <span
-                    class="lucide-chevron-right size-4 transition-transform duration-150"
-                    :class="category.isOpen && 'rotate-90'"
-                  />
-                </button>
-              </template>
-            </SidebarItem>
-
-            <!-- -mr-1 cancels the pr-1 below so chevrons line up at every depth. -->
-            <PortalCollapse
-              :id="`kb-sidebar-${category.name}`"
-              class="-mr-1"
-              :open="category.isOpen"
-              lazy
-            >
-              <div
-                class="mb-1.5 ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-outline-gray-2 pl-2 pr-1"
-              >
-                <SidebarItem
-                  v-for="article in category.rows"
-                  :key="article.name"
-                  :data-article="article.name"
-                  :route="ROUTES.article(article)"
-                  :active="article.name === activeName"
-                  :title="article.title"
-                  class="!h-auto min-h-7 max-md:min-h-11 data-[state=active]:bg-surface-gray-2 data-[state=active]:shadow-none"
-                >
-                  <template #prefix />
-                  <!-- -ml-2 undoes SidebarItem's icon gap; pr-2 mirrors its pl-2.
-                       Long titles wrap to two lines, then clamp; :title has the rest. -->
-                  <span
-                    class="-ml-2 line-clamp-2 min-w-0 py-1 pr-2 text-p-sm max-md:text-p-base"
-                  >
-                    <template
-                      v-for="(part, i) in splitMatch(article.title)"
-                      :key="i"
-                    >
-                      <mark
-                        v-if="i % 2"
-                        class="rounded-sm bg-surface-amber-2 px-0.5 text-ink-gray-9"
-                        >{{ part }}</mark
-                      ><template v-else>{{ part }}</template>
-                    </template>
-                  </span>
-                </SidebarItem>
-                <button
-                  v-if="category.hidden"
-                  type="button"
-                  class="flex h-7 items-center rounded-4 px-2 text-left text-sm text-ink-gray-5 hover:bg-surface-gray-2 max-md:h-11"
-                  @click="showMore(category.name)"
-                >
-                  {{
-                    __("Show {0} more", [Math.min(category.hidden, SHOW_STEP)])
-                  }}
-                </button>
-                <ReuseGroup
-                  v-for="subcategory in category.subcategories"
-                  :key="subcategory.name"
-                  :category="subcategory"
-                  :nested="true"
-                />
-              </div>
-            </PortalCollapse>
-          </div>
-        </DefineGroup>
-        <ReuseGroup
-          v-for="category in visibleCategories"
-          :key="category.name"
-          :category="category"
-          :nested="false"
-        />
+            </RouterLink>
+          </template>
+        </Tree>
 
         <p
           v-if="query.trim() && !visibleCategories.length"
@@ -179,22 +119,23 @@
 </template>
 
 <script setup lang="ts">
-import { createReusableTemplate, useMediaQuery, useScroll } from "@vueuse/core";
+import { useMediaQuery, useScroll } from "@vueuse/core";
 import { computed, nextTick, reactive, ref, useAttrs, watch } from "vue";
+import { RouterLink } from "vue-router";
 import {
   BottomSheet,
-  Icon,
+  Button,
   Sidebar,
-  SidebarItem,
   TextInput,
+  Tree,
   useKeyboardShortcut,
+  type TreeKey,
+  type TreeNode,
 } from "frappe-ui";
 import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { __ } from "@helpdesk/shared/translation";
-import PortalCollapse from "@app/components/ui/PortalCollapse.vue";
 import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
-import { categoryIcon } from "@helpdesk/shared/categoryIcons";
 import { matchesQuery } from "@helpdesk/shared/utils";
 import { prefetchOnHover, sidebarState } from "@app/stores/knowledgeBase";
 
@@ -209,19 +150,11 @@ type Category = {
 type Group = {
   name: string;
   label: string;
-  icon?: string | null;
   rows: ArticleTitle[];
   hidden: number;
   matches: ArticleTitle[];
   subcategories: Group[];
-  isCurrent: boolean;
-  isOpen: boolean;
 };
-
-const [DefineGroup, ReuseGroup] = createReusableTemplate<{
-  category: Group;
-  nested: boolean;
-}>();
 
 // Studio's attrs go on the column, not the sheet, which renders in a portal.
 defineOptions({ inheritAttrs: false });
@@ -258,7 +191,7 @@ const wrapperProps = computed(() =>
       }
     : {
         ...attrs,
-        class: [attrs.class, "sticky top-0 flex h-[100cqh] w-[239px] shrink-0 flex-col self-start"],
+        class: [attrs.class, "flex h-full w-[239px] shrink-0 flex-col"],
       }
 );
 
@@ -295,6 +228,38 @@ watch(
   { immediate: true }
 );
 
+// Rows read their mark by key, so a page change redraws only the rows it marks.
+const marked = reactive<Record<string, "current" | "parent" | "active">>({});
+watch(
+  () =>
+    [
+      currentCategory.value && categoryKey(currentCategory.value),
+      currentParent.value && categoryKey(currentParent.value),
+      props.activeName && `article:${props.activeName}`,
+    ] as const,
+  ([current, parent, active], previous) => {
+    previous?.forEach((key) => key && delete marked[key]);
+    if (current) marked[current] = "current";
+    if (parent) marked[parent] = "parent";
+    if (active) marked[active] = "active";
+  },
+  { immediate: true }
+);
+
+// Pages past the current article, so its row shows.
+watch(
+  () => props.activeName,
+  (name) => {
+    const articles = props.categories.find(
+      (category) => category.name === currentCategory.value
+    )?.articles;
+    const at = articles?.findIndex((article) => article.name === name) ?? -1;
+    const shown = sidebarState.shown[currentCategory.value!] || SHOW_STEP;
+    if (at >= shown) sidebarState.shown[currentCategory.value!] = at + 1;
+  },
+  { immediate: true }
+);
+
 // Search opens all matches; folds hold until the query changes.
 const foldedInSearch = reactive(new Set<string>());
 watch(query, () => foldedInSearch.clear());
@@ -308,13 +273,11 @@ function toggle(name: string, nested: boolean) {
   if (!foldedInSearch.delete(name)) foldedInSearch.add(name);
 }
 
-// A second click on the row leaves it open; only the chevron folds.
-function expand(name: string, nested: boolean) {
-  if (!query.value.trim()) {
-    (nested ? openSubName : openName).value = name;
-    return;
-  }
-  foldedInSearch.delete(name);
+// Its own page's row folds and opens; another category's row opens it.
+function onCategoryClick(name: string, nested: boolean) {
+  if (name === currentCategory.value) return toggle(name, nested);
+  if (query.value.trim()) return foldedInSearch.delete(name);
+  (nested ? openSubName : openName).value = name;
 }
 
 // First match only, as `matchesQuery` checks.
@@ -337,42 +300,41 @@ function showMore(name: string) {
     (sidebarState.shown[name] || SHOW_STEP) + SHOW_STEP;
 }
 
-function toGroup(
-  category: Category,
-  searching: boolean,
-  openRef: typeof openName
-): Group {
+// Built once per load: a scan per category is O(n²) through reactive proxies.
+const subcategoriesOf = computed(() => {
+  const byParent = new Map<string, Category[]>();
+  for (const category of props.categories) {
+    const parent = category.parent_article_category;
+    if (!parent) continue;
+    if (!byParent.has(parent)) byParent.set(parent, []);
+    byParent.get(parent)!.push(category);
+  }
+  return byParent;
+});
+
+// Kept out of the groups, so a fold does not rebuild the tree.
+function isOpen(name: string, nested: boolean) {
+  if (query.value.trim()) return !foldedInSearch.has(name);
+  return (nested ? openSubName : openName).value === name;
+}
+
+function toGroup(category: Category, searching: boolean): Group {
   const articles = category.articles || [];
   const matches = searching
     ? articles.filter((article) => matchesQuery(query.value, article.title))
     : articles;
-  // Always include the current article.
-  const current = matches.findIndex(
-    (article) => article.name === props.activeName
-  );
-  const limit = Math.max(
-    sidebarState.shown[category.name] || SHOW_STEP,
-    current + 1
-  );
+  const limit = sidebarState.shown[category.name] || SHOW_STEP;
   // Sidebar rows come sorted by `category_name`.
-  const subcategories = props.categories
-    .filter((sub) => sub.parent_article_category === category.name)
-    .map((sub) => toGroup(sub, searching, openSubName))
+  const subcategories = (subcategoriesOf.value.get(category.name) || [])
+    .map((sub) => toGroup(sub, searching))
     .filter((sub) => !searching || sub.matches.length);
   return {
     rows: matches.slice(0, limit),
     hidden: Math.max(matches.length - limit, 0),
     name: category.name,
     label: category.category_name || category.name,
-    icon: category.icon,
     matches,
     subcategories,
-    isCurrent:
-      category.name === currentCategory.value ||
-      category.name === currentParent.value,
-    isOpen: searching
-      ? !foldedInSearch.has(category.name)
-      : openRef.value === category.name,
   };
 }
 
@@ -380,12 +342,87 @@ const visibleCategories = computed(() => {
   const searching = Boolean(query.value.trim());
   return props.categories
     .filter((category) => !category.parent_article_category)
-    .map((category) => toGroup(category, searching, openName))
+    .map((category) => toGroup(category, searching))
     .filter(
       (category) =>
         !searching || category.matches.length || category.subcategories.length
     );
 });
+
+type SidebarNode = TreeNode & {
+  key: string;
+  kind: "category" | "article" | "more";
+  name: string;
+};
+
+function categoryKey(name: string) {
+  return `category:${name}`;
+}
+
+// Keys are prefixed: an article and a category may share a name.
+function toNode(group: Group, nested = false): SidebarNode {
+  const articles = group.rows.map((article) => ({
+    key: `article:${article.name}`,
+    kind: "article" as const,
+    name: article.name,
+    label: article.title,
+    route: ROUTES.article(article),
+  }));
+  const more = group.hidden
+    ? [
+        {
+          key: `more:${group.name}`,
+          kind: "more" as const,
+          name: group.name,
+          label: __("Show more"),
+          hidden: group.hidden,
+        },
+      ]
+    : [];
+  return {
+    key: categoryKey(group.name),
+    kind: "category",
+    name: group.name,
+    label: group.label,
+    nested,
+    children: [
+      ...articles,
+      ...more,
+      ...group.subcategories.map((sub) => toNode(sub, true)),
+    ],
+  };
+}
+
+const treeNodes = computed(() =>
+  visibleCategories.value.map((group) => toNode(group))
+);
+
+function eachGroup(fn: (group: Group, nested: boolean) => void) {
+  const walk = (groups: Group[], nested: boolean) =>
+    groups.forEach((group) => {
+      fn(group, nested);
+      walk(group.subcategories, true);
+    });
+  walk(visibleCategories.value, false);
+}
+
+const expandedKeys = computed(() => {
+  const keys: string[] = [];
+  eachGroup(
+    (group, nested) =>
+      isOpen(group.name, nested) && keys.push(categoryKey(group.name))
+  );
+  return keys;
+});
+
+function onExpanded(keys: TreeKey[]) {
+  const next = new Set(keys);
+  const current = new Set(expandedKeys.value);
+  eachGroup((group, nested) => {
+    const key = categoryKey(group.name);
+    if (next.has(key) !== current.has(key)) toggle(group.name, nested);
+  });
+}
 
 // The list mounts with the page, and again with each sheet open: each mount
 // gets the last scroll back. The current item scrolls into view once per page.
