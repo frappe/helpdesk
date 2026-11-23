@@ -27,6 +27,16 @@ export const useShortcut = (
       return;
     }
 
+    // Flow renders its composer inside Shadow DOM, so document.activeElement
+    // may be the launcher instead of the focused editable element.
+    if (
+      e.composedPath().some(
+        (target) => target instanceof Element && target.matches("flow-launcher")
+      )
+    ) {
+      return;
+    }
+
     if (disableShortcuts()) {
       return; // Don't trigger shortcuts when typing, or in modals/menus
     }
