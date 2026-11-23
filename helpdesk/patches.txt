@@ -30,7 +30,6 @@ helpdesk.patches.add_fields_in_assignment_rule
 helpdesk.patches.update_ticket_statuses
 helpdesk.patches.add_status_category_to_tickets
 helpdesk.patches.enable_new_email_notifications
-helpdesk.patches.add_fulltext_index #v2
 helpdesk.patches.add_telephony_app
 helpdesk.patches.add_website_settings_permission
 helpdesk.patches.add_agent_manager_perms_in_assignment_rule
@@ -69,3 +68,4 @@ helpdesk.patches.hd_article_category_tree
 helpdesk.patches.set_ticket_source
 helpdesk.patches.show_ticket_source_notice
 helpdesk.patches.mark_existing_sites_set_up
+helpdesk.patches.drop_hd_ticket_fulltext_indexes
