@@ -10,7 +10,7 @@
     </p>
     <List
       v-else
-      :columns="['16px', ...columns]"
+      :columns="['16px', ...columns, '32px']"
       divider="none"
       class="[--list-gap:1rem] [--list-row-padding-x:1rem]"
     >
@@ -19,6 +19,7 @@
       >
         <ListHeaderCell />
         <slot name="header" />
+        <ListHeaderCell />
       </ListHeader>
       <Draggable
         v-model="items"
@@ -36,6 +37,21 @@
               />
             </ListCell>
             <slot :item="element" :index="index" />
+            <ListCell class="h-7">
+              <Dropdown
+                align="end"
+                :options="rowOptions(index)"
+                @update:open="(open) => open && (isConfirmingDelete = false)"
+              >
+                <Button
+                  variant="ghost"
+                  icon="lucide-more-horizontal"
+                  :label="
+                    __('Options for {0}', [rowLabel(element) || __('Untitled')])
+                  "
+                />
+              </Dropdown>
+            </ListCell>
           </ListRow>
         </template>
       </Draggable>
@@ -44,6 +60,7 @@
 </template>
 
 <script setup lang="ts" generic="T">
+import { Button, Dropdown } from "frappe-ui";
 import {
   List,
   ListCell,
@@ -51,9 +68,21 @@ import {
   ListHeaderCell,
   ListRow,
 } from "frappe-ui/list";
+import { ref } from "vue";
 import Draggable from "vuedraggable";
-import { DRAG_OPTIONS } from "../utils";
+import { __ } from "../translation";
+import { DRAG_OPTIONS, listItemOptions } from "../utils";
 
-defineProps<{ columns: string[]; emptyText: string }>();
+const props = defineProps<{
+  columns: string[];
+  emptyText: string;
+  rowLabel: (item: T) => string;
+  options?: (index: number) => unknown[];
+}>();
 const items = defineModel<T[]>({ required: true });
+
+const isConfirmingDelete = ref(false);
+const rowOptions = (index: number) =>
+  props.options?.(index) ??
+  listItemOptions(items.value, index, isConfirmingDelete);
 </script>

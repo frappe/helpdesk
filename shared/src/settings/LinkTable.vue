@@ -5,6 +5,7 @@
       v-model="rows"
       :columns="columns"
       :empty-text="__('No links added yet.')"
+      :row-label="(row) => row.label"
     >
       <template #header>
         <ListHeaderCell class="ms-2">{{ __("Label") }}</ListHeaderCell>
@@ -12,9 +13,8 @@
         <ListHeaderCell class="justify-center">
           {{ __("Open in new tab") }}
         </ListHeaderCell>
-        <ListHeaderCell />
       </template>
-      <template #default="{ item: row, index }">
+      <template #default="{ item: row }">
         <ListCell>
           <TextInput
             v-model="row.label"
@@ -35,19 +35,6 @@
         <ListCell class="h-7 justify-center">
           <Checkbox v-model="row.open_in_new_tab" />
         </ListCell>
-        <ListCell class="h-7">
-          <Dropdown
-            align="end"
-            :options="rowOptions(index)"
-            @update:open="(open) => open && (isConfirmingDelete = false)"
-          >
-            <Button
-              variant="ghost"
-              icon="lucide-more-horizontal"
-              :label="__('Row actions')"
-            />
-          </Dropdown>
-        </ListCell>
       </template>
     </SettingsTable>
     <Button
@@ -63,10 +50,9 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { linkError, listItemOptions } from "../utils";
-import { Button, Checkbox, Dropdown, TextInput, SettingsRow } from "frappe-ui";
+import { linkError } from "../utils";
+import { Button, Checkbox, TextInput, SettingsRow } from "frappe-ui";
 import { ListCell, ListHeaderCell } from "frappe-ui/list";
-import { ref } from "vue";
 import type { KnowledgeBaseLink } from "../knowledgeBasePreview";
 import SettingsTable from "./SettingsTable.vue";
 
@@ -74,10 +60,5 @@ defineProps<{ title: string; description?: string }>();
 
 const rows = defineModel<KnowledgeBaseLink[]>({ required: true });
 
-const columns = ["minmax(0,1fr)", "minmax(0,2fr)", "112px", "32px"];
-
-const isConfirmingDelete = ref(false);
-
-const rowOptions = (index: number) =>
-  listItemOptions(rows.value, index, isConfirmingDelete);
+const columns = ["minmax(0,1fr)", "minmax(0,2fr)", "112px"];
 </script>
