@@ -31,6 +31,7 @@
 		"./ExportModal.vue": "./src/ExportModal.vue",
 		"./ListViewSkeleton.vue": "./src/ListViewSkeleton.vue",
 		"./ArticleIcon.vue": "./src/ArticleIcon.vue",
+		"./Brand.vue": "./src/Brand.vue",
 		"./OrganizationsIcon.vue": "./src/OrganizationsIcon.vue",
 		"./settings/*": "./src/settings/*"
 	},

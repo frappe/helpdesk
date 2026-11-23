@@ -7,7 +7,7 @@
         class="-ms-2 flex h-8 min-w-0 max-w-[15rem] shrink-0 cursor-pointer items-center gap-2 rounded-5 px-2 transition-colors duration-300 ease-in-out"
         :class="open ? 'bg-surface-gray-3' : 'hover:bg-surface-gray-3'"
       >
-        <PortalBrand :logo="logo" :name="brandName" compact />
+        <Brand :logo="logo" :name="brandName" compact />
         <Icon
           icon="lucide-chevron-down"
           class="size-4 shrink-0 text-ink-gray-5 transition-transform duration-200"
@@ -22,7 +22,7 @@
     :aria-label="name"
     class="flex h-8 min-w-0 max-w-[15rem] shrink-0 items-center gap-2"
   >
-    <PortalBrand :logo="logo" :name="brandName" compact />
+    <Brand :logo="logo" :name="brandName" compact />
   </RouterLink>
 </template>
 
@@ -31,7 +31,7 @@ import { computed } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import { Dropdown, Icon } from "frappe-ui";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
-import PortalBrand from "@app/components/header/PortalBrand.vue";
+import Brand from "@helpdesk/shared/Brand.vue";
 
 const props = defineProps<{
   options?: unknown[];

@@ -11,7 +11,11 @@
             : 'w-full px-2 hover:bg-surface-gray-3'
         "
       >
-        <BrandLogo />
+        <Brand :logo="config.brandLogo" size="lg">
+          <template #fallback>
+            <HDLogo class="size-8 shrink-0 rounded-4" />
+          </template>
+        </Brand>
         <div
           class="flex flex-1 flex-col text-start duration-300 ease-in-out overflow-hidden rtl:items-start pe-2"
           :class="
@@ -47,7 +51,8 @@
 
 <script setup lang="ts">
 import LucideChevronDown from "~icons/lucide/chevron-down";
-import BrandLogo from "@/components/BrandLogo.vue";
+import HDLogo from "@/assets/logos/HDLogo.vue";
+import Brand from "@helpdesk/shared/Brand.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { useSidebarStore } from "@/stores/sidebar";
