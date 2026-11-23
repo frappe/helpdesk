@@ -197,6 +197,13 @@ def agent_only(fn):
     return wrapper
 
 
+def can_read_knowledge_base() -> bool:
+    """Signed-in users always can; guests only while the knowledge base is public."""
+    return frappe.session.user != "Guest" or bool(
+        frappe.db.get_single_value("HD Settings", "public_knowledge_base")
+    )
+
+
 def is_agent_manager(user: str | None = None) -> bool:
     """
     Check whether `user` may manage other agents

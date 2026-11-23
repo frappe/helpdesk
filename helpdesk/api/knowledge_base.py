@@ -38,7 +38,7 @@ from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     validate_keeps_content,
 )
 from helpdesk.search import NUM_RESULTS
-from helpdesk.utils import is_agent
+from helpdesk.utils import can_read_knowledge_base, is_agent
 
 ARTICLE_MARKDOWN_ENDPOINT = "help-article-markdown"
 
@@ -74,9 +74,7 @@ VIEW_WINDOW = 60 * 60
 
 
 def validate_public_access():
-    if frappe.session.user != "Guest":
-        return
-    if not frappe.db.get_single_value("HD Settings", "public_knowledge_base"):
+    if not can_read_knowledge_base():
         frappe.throw(
             _("Please sign in to read the knowledge base"), frappe.PermissionError
         )

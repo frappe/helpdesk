@@ -1,7 +1,7 @@
 import frappe
 from frappe.utils import get_user_date_format, get_user_time_format
 
-from helpdesk.utils import is_agent
+from helpdesk.utils import can_read_knowledge_base, is_agent
 
 # What the knowledge base needs to render for a guest
 GUEST_FIELDS = [
@@ -57,15 +57,15 @@ def get_config():
     res.date_format = get_user_date_format()
     res.time_format = get_user_time_format()
 
-    can_read_knowledge_base = res.public_knowledge_base or res.session_user != "Guest"
-    if can_read_knowledge_base:
+    is_readable = can_read_knowledge_base()
+    if is_readable:
         res.knowledge_base_form_scripts = frappe.get_all(
             "HD Form Script",
             filters={"enabled": 1, "apply_to_knowledge_base": 1},
             pluck="script",
         )
 
-    show_footer = res.show_footer and can_read_knowledge_base
+    show_footer = res.show_footer and is_readable
     res.footer_items = get_footer_rows(settings.footer_items) if show_footer else []
     res.social_links = get_footer_rows(settings.social_links) if show_footer else []
     res.favicon = get_favicon()
