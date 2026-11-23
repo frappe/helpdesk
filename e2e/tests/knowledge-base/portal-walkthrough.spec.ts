@@ -887,8 +887,8 @@ test.describe("knowledge base settings", () => {
     const tagline = `E2E tagline ${uid()}`;
     await page.goto("/help/settings/knowledge-base");
     const dialog = page.getByRole("dialog");
-    await expect(dialog.getByRole("button", { name: "Preview" })).toBeVisible();
     await dialog.getByRole("tab", { name: "Footer" }).click();
+    await expect(dialog.getByRole("button", { name: "Preview" })).toBeHidden();
     await dialog.getByRole("switch", { name: "Show footer" }).click();
     await dialog.locator("textarea").fill(tagline);
     await dialog.getByRole("button", { name: "Add column" }).click();
