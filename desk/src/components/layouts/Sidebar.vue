@@ -11,6 +11,7 @@
         <TrialBanner
           v-if="isFCSite && !isCloudSettingsAvailable()"
           :isSidebarCollapsed="isCollapsed"
+          :afterUpgrade="() => capture('upgrade_plan_from_trial_banner')"
         />
         <GettingStartedBanner
           v-if="showOnboardingBanner"
