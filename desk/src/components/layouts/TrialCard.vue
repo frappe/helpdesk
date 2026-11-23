@@ -46,7 +46,6 @@ const URGENT_DAYS = 3;
 
 const { banner, dismiss } = useBanners();
 
-// same event as CRM, so upgrade clicks read the same across apps
 function choosePlan() {
   capture("upgrade_plan_from_trial_banner");
   openBillingSettings();
