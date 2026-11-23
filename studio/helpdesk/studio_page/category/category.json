@@ -96,7 +96,8 @@
             "px-4",
             "sm:px-6",
             "xl:px-0",
-            "xl:col-start-2"
+            "xl:col-start-2",
+            "xl:col-span-3"
            ]
           },
           {
@@ -340,6 +341,7 @@
             "sm:px-6",
             "xl:px-0",
             "xl:col-start-2",
+            "xl:col-span-3",
             "portal-reveal"
            ],
            "componentId": "container-pdx9evglv",
@@ -386,7 +388,7 @@
           "grid",
           "grid-cols-1",
           "xl:grid-cols-[48px_minmax(0,1fr)_48px_240px]",
-          "xl:pe-4",
+          "xl:pe-12",
           "min-w-0",
           "shrink-0",
           "min-h-[100cqh]",
@@ -454,7 +456,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-11-24 13:00:00.000000",
+ "modified": "2026-11-24 02:36:28.345383",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

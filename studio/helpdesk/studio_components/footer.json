@@ -42,7 +42,9 @@
           },
           "isCustomVueComponent": true,
           "classes": [
-           "-ms-1.5"
+           "-ms-1.5",
+           "[&_a]:text-ink-gray-6",
+           "[&_a:hover]:text-ink-gray-9"
           ],
           "visibilityCondition": "{{ footer.socials.length }}"
          }
@@ -232,7 +234,7 @@
  "idx": 0,
  "inputs": [],
  "is_disabled": 0,
- "modified": "2026-11-22 13:30:00.000000",
+ "modified": "2026-11-24 02:40:58.852272",
  "modified_by": "Administrator",
  "name": "footer",
  "owner": "Administrator"
