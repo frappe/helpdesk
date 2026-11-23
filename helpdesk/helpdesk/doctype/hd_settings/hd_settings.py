@@ -41,6 +41,7 @@ class HDSettings(Document):
     def validate_footer(self):
         """Footer items mirror Website Settings: column rows without a parent, link rows under one."""
         columns = [d.label for d in self.footer_items if not d.parent_label]
+        links = [d for d in self.footer_items if d.parent_label]
         if len(columns) > MAX_FOOTER_COLUMNS:
             frappe.throw(
                 _("The footer can have at most {0} link columns").format(
@@ -49,11 +50,25 @@ class HDSettings(Document):
             )
         if len(set(columns)) < len(columns):
             frappe.throw(_("Each footer column needs a different title"))
-        links = [d for d in self.footer_items if d.parent_label] + self.social_links
         for d in links:
+            if d.parent_label not in columns:
+                frappe.throw(
+                    _("{0}: No footer column is titled {1}").format(
+                        frappe.bold(d.label), frappe.bold(d.parent_label)
+                    )
+                )
+        parents = {d.parent_label for d in links}
+        for column in columns:
+            if column not in parents:
+                frappe.throw(
+                    _("Footer column {0} needs at least one link").format(
+                        frappe.bold(column)
+                    )
+                )
+        for d in links + self.social_links:
             if not validate_url(d.url or "", valid_schemes=SAFE_URL_SCHEMES):
                 frappe.throw(
-                    _("{0}: Start with https://, mailto: or /").format(
+                    _("{0}: Start with http://, https://, mailto: or /").format(
                         frappe.bold(d.label)
                     )
                 )

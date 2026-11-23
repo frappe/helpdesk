@@ -228,6 +228,7 @@ class TestKnowledgeBaseFooter(IntegrationTestCase):
             self.column(
                 "Product",
                 "https://example.com/pricing",
+                "http://example.com/docs",
                 "/help",
                 "mailto:hi@example.com",
             ),
@@ -235,14 +236,27 @@ class TestKnowledgeBaseFooter(IntegrationTestCase):
         )
         settings = frappe.get_single("HD Settings")
         self.assertEqual(
-            [d.url for d in settings.footer_items if d.parent_label][1], "/help"
+            [d.url for d in settings.footer_items if d.parent_label],
+            [
+                "https://example.com/pricing",
+                "http://example.com/docs",
+                "/help",
+                "mailto:hi@example.com",
+            ],
         )
 
-    def test_unsafe_urls_are_refused(self) -> None:
+    def test_unsafe_footers_are_refused(self) -> None:
         cases = (
             {"items": self.column("Product", "javascript:alert(1)")},
             {"items": self.column("Product", "example.com")},
             {"items": self.column("Product", "")},
+            {"items": self.column("Product")},
+            {
+                "items": [
+                    *self.column("Product", "/help"),
+                    {"label": "Orphan", "url": "/help", "parent_label": "Company"},
+                ]
+            },
             {
                 "items": [],
                 "social_links": [{"label": "GitHub", "url": "data:text/html,hi"}],
@@ -264,10 +278,12 @@ class TestKnowledgeBaseFooter(IntegrationTestCase):
                 self.column("Product", "/a") + self.column("Product", "/b")
             )
 
-    def test_guests_get_the_footer_only_while_it_is_shown(self) -> None:
+    def test_guests_get_the_footer_only_while_it_is_shown_and_public(self) -> None:
         self.save_footer(self.column("Product", "/help"))
-        frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
-        for show_footer, rows in ((1, 2), (0, 0)):
+        for is_public, show_footer, rows in ((1, 1, 2), (1, 0, 0), (0, 1, 0)):
+            frappe.db.set_single_value(
+                "HD Settings", "public_knowledge_base", is_public
+            )
             frappe.db.set_single_value("HD Settings", "show_footer", show_footer)
             frappe.set_user("Guest")
             try:

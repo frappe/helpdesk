@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-3">
-    <SettingsHeading
+    <SettingsRow
       :title="__('Link columns')"
       :description="
         __(
@@ -113,16 +113,15 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Dropdown, TextInput } from "frappe-ui";
+import { Button, Dropdown, TextInput, SettingsRow } from "frappe-ui";
 import { ListCell, ListHeaderCell } from "frappe-ui/list";
 import { computed, nextTick, ref } from "vue";
 import Draggable from "vuedraggable";
 import { type FooterColumn, MAX_FOOTER_COLUMNS } from "../knowledgeBaseFooter";
 import type { KnowledgeBaseLink } from "../knowledgeBasePreview";
 import { __ } from "../translation";
-import { DRAG_OPTIONS, ListItemOptions, moveItem } from "../utils";
+import { DRAG_OPTIONS, listItemOptions, moveItem } from "../utils";
 import FooterLinkDialog from "./FooterLinkDialog.vue";
-import SettingsHeading from "./SettingsHeading.vue";
 import SettingsTable from "./SettingsTable.vue";
 
 const columns = defineModel<FooterColumn[]>({ required: true });
@@ -130,7 +129,7 @@ const columns = defineModel<FooterColumn[]>({ required: true });
 const isConfirmingDelete = ref(false);
 
 const columnOptions = (index: number) =>
-  ListItemOptions(columns.value, index, isConfirmingDelete);
+  listItemOptions(columns.value, index, isConfirmingDelete);
 const editing = ref<{ column: FooterColumn; linkIndex?: number } | null>(null);
 
 const isEditing = computed({

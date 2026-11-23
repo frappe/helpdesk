@@ -213,12 +213,16 @@ function createDraft() {
     if (links.some((link) => !link.label || !link.url)) {
       return toast.error(__("Each link needs a label and a URL"));
     }
-    if (value.footer.columns.some((column) => !column.title)) {
+    const titles = value.footer.columns.map((column) => column.title);
+    if (titles.some((title) => !title)) {
       return toast.error(__("Each column needs a title"));
+    }
+    if (new Set(titles).size < titles.length) {
+      return toast.error(__("Each column needs a different title"));
     }
     const unsafe = links.find((link) => linkError(link.url));
     if (unsafe) {
-      return toast.error(__("{0}: {1}", [unsafe.label, linkError(unsafe.url)]));
+      return toast.error(`${unsafe.label}: ${linkError(unsafe.url)}`);
     }
     saving.value = true;
     try {

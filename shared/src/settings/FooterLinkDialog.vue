@@ -12,8 +12,9 @@
         :label="__('Label')"
         :placeholder="__('Contact sales')"
       />
-      <UrlInput
+      <TextInput
         v-model="form.url"
+        :error="linkError(form.url)"
         :label="__('URL')"
         :placeholder="__('https://example.com/contact')"
       />
@@ -34,8 +35,7 @@ import { Button, Dialog, Switch, TextInput } from "frappe-ui";
 import { computed, reactive, ref, watch } from "vue";
 import type { KnowledgeBaseLink } from "../knowledgeBasePreview";
 import { __ } from "../translation";
-import { isValidLink } from "../utils";
-import UrlInput from "./UrlInput.vue";
+import { isValidLink, linkError } from "../utils";
 
 const props = defineProps<{
   link?: KnowledgeBaseLink;

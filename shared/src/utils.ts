@@ -26,7 +26,7 @@ export function moveItem(list: unknown[], from: number, to: number) {
   list.splice(to, 0, ...list.splice(from, 1));
 }
 
-export function MoveOptions(
+export function moveOptions(
   index: number,
   count: number,
   moveTo: (index: number) => void
@@ -47,6 +47,20 @@ export function MoveOptions(
   ];
 }
 
+export function listItemOptions(
+  list: unknown[],
+  index: number,
+  isConfirmingDelete: Ref<boolean>
+) {
+  return [
+    ...moveOptions(index, list.length, (to) => moveItem(list, index, to)),
+    ...ConfirmDelete({
+      isConfirmingDelete,
+      onConfirmDelete: () => list.splice(index, 1),
+    }),
+  ];
+}
+
 /**
  * Delete in its own red group, so the menu draws a divider above it, as
  * frappe-ui marks a danger action.
@@ -55,20 +69,6 @@ export function MoveOptions(
  * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
  * @returns {Array} A menu group for use in dropdowns
  */
-export function ListItemOptions(
-  list: unknown[],
-  index: number,
-  isConfirmingDelete: Ref<boolean>
-) {
-  return [
-    ...MoveOptions(index, list.length, (to) => moveItem(list, index, to)),
-    ...ConfirmDelete({
-      isConfirmingDelete,
-      onConfirmDelete: () => list.splice(index, 1),
-    }),
-  ];
-}
-
 export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   return [
     {
@@ -113,7 +113,7 @@ export function isValidLink(link?: { label?: string; url?: string }) {
 export function linkError(url?: string) {
   const value = url?.trim();
   return value && !isSafeLink(value)
-    ? __("Start with https://, mailto: or /")
+    ? __("Start with http://, https://, mailto: or /")
     : "";
 }
 

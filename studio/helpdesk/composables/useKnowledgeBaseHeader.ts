@@ -1,5 +1,4 @@
 import { computed, effectScope, ref, watch } from 'vue'
-import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { footerFromSettings } from '@helpdesk/shared/knowledgeBaseFooter'
@@ -41,11 +40,11 @@ const footer = computed(() => {
   const columns = settings.columns
     .map((column) => ({ ...column, links: column.links.filter(isValidLink) }))
     .filter((column) => column.links.length)
-  const socials = withIcons(settings.socials).map((link) => ({ ...link, icon: link.icon || 'globe' }))
-  const isBlank = !settings.tagline && !settings.copyright && !columns.length && !socials.length
+  const socials = withIcons(settings.socials)
+  if (!settings.tagline && !settings.copyright && !columns.length && !socials.length) return null
   const isCompact = !columns.length
   const isTaglineAside = isCompact && !settings.copyright
-  const aside = isBlank ? __('Powered by Helpdesk') : isCompact ? settings.copyright || settings.tagline : ''
+  const aside = isCompact ? settings.copyright || settings.tagline : ''
   return {
     columns,
     socials: isCompact ? [] : socials,

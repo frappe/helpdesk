@@ -1,5 +1,5 @@
 <template>
-  <Tabs v-model="selectedTab" :tabs="tabs">
+  <Tabs v-model="tab" :tabs="tabs">
     <template #tab-panel="{ tab: { value } }">
       <Transition
         enter-from-class="opacity-0"
@@ -116,7 +116,7 @@
 <script setup lang="ts">
 import { __ } from "../translation";
 import { SettingsRow, Switch, Tabs, Textarea, TextInput } from "frappe-ui";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import {
   defaultBannerSubtitle,
   defaultBannerTitle,
@@ -156,11 +156,14 @@ const tabs = computed(() => [
   { value: "access", label: __("Access") },
 ]);
 
-const selectedTab = computed({
-  get: () =>
-    tabs.value.some(({ value }) => value === tab.value) ? tab.value : "home",
-  set: (value) => (tab.value = value),
-});
+watch(
+  tab,
+  (value) => {
+    if (!tabs.value.some((option) => option.value === value))
+      tab.value = "home";
+  },
+  { immediate: true }
+);
 
 const skeletons = {
   home: { rows: 2, panels: [180, 50, 50] },

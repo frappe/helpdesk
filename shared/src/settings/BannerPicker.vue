@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-4">
-    <SettingsHeading
+    <SettingsRow
       :title="__('Banner')"
       :description="
         __(
@@ -96,12 +96,11 @@
 <script setup lang="ts">
 import { __ } from "../translation";
 import { BANNER_PRESETS, findBannerPreset } from "../knowledgeBaseBanner";
-import { Button, FileUploader, Tooltip } from "frappe-ui";
+import { Button, FileUploader, Tooltip, SettingsRow } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import LucideBan from "~icons/lucide/ban";
 import LucideSearch from "~icons/lucide/search";
 import LucideX from "~icons/lucide/x";
-import SettingsHeading from "./SettingsHeading.vue";
 
 const props = defineProps<{ image: string; preset: string }>();
 const emit = defineEmits<{

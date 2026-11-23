@@ -52,33 +52,28 @@ def get_config():
     if res.is_agent:
         fields = fields + AGENT_FIELDS
 
-    # A Single omits fields never set; every requested key is answered so the portal reads null.
-    values = (
-        frappe.get_value(doctype="HD Settings", fieldname=fields, as_dict=True) or {}
-    )
-    res.update({field: values.get(field) for field in fields})
+    settings = frappe.get_cached_doc("HD Settings")
+    res.update({field: settings.get(field) for field in fields})
     res.date_format = get_user_date_format()
     res.time_format = get_user_time_format()
 
-    # A private knowledge base hides its form scripts from guests.
-    if res.public_knowledge_base or res.session_user != "Guest":
+    can_read_knowledge_base = res.public_knowledge_base or res.session_user != "Guest"
+    if can_read_knowledge_base:
         res.knowledge_base_form_scripts = frappe.get_all(
             "HD Form Script",
             filters={"enabled": 1, "apply_to_knowledge_base": 1},
             pluck="script",
         )
 
-    res.footer_items = get_footer_rows("footer_items") if res.show_footer else []
-    res.social_links = get_footer_rows("social_links") if res.show_footer else []
+    show_footer = res.show_footer and can_read_knowledge_base
+    res.footer_items = get_footer_rows(settings.footer_items) if show_footer else []
+    res.social_links = get_footer_rows(settings.social_links) if show_footer else []
     res.favicon = get_favicon()
     return res
 
 
-def get_footer_rows(parentfield: str) -> list[dict]:
-    return [
-        {field: d.get(field) for field in FOOTER_ROW_FIELDS}
-        for d in frappe.get_cached_doc("HD Settings").get(parentfield)
-    ]
+def get_footer_rows(rows: list) -> list[dict]:
+    return [{field: d.get(field) for field in FOOTER_ROW_FIELDS} for d in rows]
 
 
 def get_favicon() -> str:

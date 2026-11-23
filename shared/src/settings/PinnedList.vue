@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-3">
-    <SettingsHeading :title="text.title" :description="text.description" />
+    <SettingsRow :title="text.title" :description="text.description" />
     <SettingsTable v-model="pinned" :columns="columns" :empty-text="text.empty">
       <template #header>
         <ListHeaderCell>{{ text.column }}</ListHeaderCell>
@@ -48,14 +48,13 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { MoveOptions, moveItem } from "../utils";
-import { Button, Dropdown } from "frappe-ui";
+import { moveOptions, moveItem } from "../utils";
+import { Button, Dropdown, SettingsRow } from "frappe-ui";
 import { ListCell, ListHeaderCell } from "frappe-ui/list";
 import { computed, ref } from "vue";
 import CategoryAccessBadge from "./CategoryAccessBadge.vue";
 import { MAX_PINNED_ARTICLES, type PinKind } from "./knowledgeBaseDraft";
 import PinnedListDialog from "./PinnedListDialog.vue";
-import SettingsHeading from "./SettingsHeading.vue";
 import SettingsTable from "./SettingsTable.vue";
 import { pinnedListText } from "./pinnedListText";
 
@@ -89,13 +88,16 @@ function labelOf(name: string) {
 
 function rowOptions(index: number) {
   return [
-    ...MoveOptions(index, pinned.value.length, (to) =>
-      moveItem(pinned.value, index, to)
-    ),
+    ...moveOptions(index, pinned.value.length, (to) => {
+      const next = [...pinned.value];
+      moveItem(next, index, to);
+      pinned.value = next;
+    }),
     {
       label: __("Unpin"),
       icon: "lucide-pin-off",
-      onClick: () => pinned.value.splice(index, 1),
+      onClick: () =>
+        (pinned.value = pinned.value.filter((_, i) => i !== index)),
     },
   ];
 }

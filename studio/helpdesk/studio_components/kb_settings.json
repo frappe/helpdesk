@@ -1547,7 +1547,8 @@
                "iconLeft": "lucide-external-link",
                "label": "{{ t('Preview') }}"
               },
-              "componentSlots": {}
+              "componentSlots": {},
+              "visibilityCondition": "{{ knowledgeBaseIsDirty }}"
              },
              {
               "componentEvents": {
@@ -1564,8 +1565,7 @@
                "loading": "{{ knowledgeBaseSaving }}",
                "variant": "solid"
               },
-              "componentSlots": {},
-              "visibilityCondition": "{{ knowledgeBaseIsDirty }}"
+              "componentSlots": {}
              }
             ],
             "classes": [
@@ -1578,7 +1578,8 @@
             "componentName": "container",
             "componentProps": {},
             "componentSlots": {},
-            "originalElement": "div"
+            "originalElement": "div",
+            "visibilityCondition": "{{ knowledgeBaseIsDirty }}"
            }
           ],
           "classes": [
@@ -1795,7 +1796,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-11-13 12:00:00.000000",
+ "modified": "2026-11-06 18:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

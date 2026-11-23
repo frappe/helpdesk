@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex w-full items-center justify-between gap-4 border-t border-outline-gray-1 pt-6"
+    class="flex w-full items-center justify-between gap-4 border-y border-outline-gray-1 py-6"
   >
     <div class="flex min-w-0 flex-col gap-1.5">
       <span class="text-base text-ink-gray-8">

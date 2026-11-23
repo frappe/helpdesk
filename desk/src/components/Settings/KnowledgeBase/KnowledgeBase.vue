@@ -13,22 +13,21 @@
       </div>
     </template>
     <template #header-actions>
-      <div class="flex items-center gap-2">
-        <Button
-          icon-left="lucide-external-link"
-          :label="__('Preview')"
-          @click="preview"
-        />
-        <Transition name="fade">
+      <Transition name="fade">
+        <div v-if="isDirty" class="flex items-center gap-2">
           <Button
-            v-if="isDirty"
+            icon-left="lucide-external-link"
+            :label="__('Preview')"
+            @click="preview"
+          />
+          <Button
             variant="solid"
             :label="__('Save')"
             :loading="saving"
             @click="save"
           />
-        </Transition>
-      </div>
+        </div>
+      </Transition>
     </template>
     <template #content>
       <KnowledgeBaseForm />

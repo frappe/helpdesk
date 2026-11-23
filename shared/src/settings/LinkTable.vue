@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-3" role="group" :aria-label="title">
-    <SettingsHeading :title="title" :description="description" />
+    <SettingsRow :title="title" :description="description" />
     <SettingsTable
       v-model="rows"
       :columns="columns"
@@ -24,8 +24,9 @@
           />
         </ListCell>
         <ListCell>
-          <UrlInput
+          <TextInput
             v-model="row.url"
+            :error="linkError(row.url)"
             class="w-full [&_input]:text-ellipsis"
             variant="ghost"
             :placeholder="__('https://example.com/contact')"
@@ -62,14 +63,12 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { ListItemOptions } from "../utils";
-import { Button, Checkbox, Dropdown, TextInput } from "frappe-ui";
+import { linkError, listItemOptions } from "../utils";
+import { Button, Checkbox, Dropdown, TextInput, SettingsRow } from "frappe-ui";
 import { ListCell, ListHeaderCell } from "frappe-ui/list";
 import { ref } from "vue";
 import type { KnowledgeBaseLink } from "../knowledgeBasePreview";
-import SettingsHeading from "./SettingsHeading.vue";
 import SettingsTable from "./SettingsTable.vue";
-import UrlInput from "./UrlInput.vue";
 
 defineProps<{ title: string; description?: string }>();
 
@@ -80,5 +79,5 @@ const columns = ["minmax(0,1fr)", "minmax(0,2fr)", "112px", "32px"];
 const isConfirmingDelete = ref(false);
 
 const rowOptions = (index: number) =>
-  ListItemOptions(rows.value, index, isConfirmingDelete);
+  listItemOptions(rows.value, index, isConfirmingDelete);
 </script>

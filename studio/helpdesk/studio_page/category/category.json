@@ -36,291 +36,171 @@
      "isCustomVueComponent": true
     },
     {
+     "blockName": "page-wrapper",
      "children": [
       {
+       "blockName": "sidebar",
+       "componentEvents": {
+        "close": {
+         "action": "Run Script",
+         "event": "close",
+         "script": "drawer.close()"
+        }
+       },
+       "componentId": "PortalArticleSidebar-category",
+       "componentName": "PortalArticleSidebar",
+       "componentProps": {
+        "activeCategory": "{{ route.params.category }}",
+        "categories": "{{ sidebar.data || [] }}",
+        "open": "{{ drawer.open }}",
+        "loading": "{{ !sidebar.data }}"
+       },
+       "isCustomVueComponent": true
+      },
+      {
+       "classes": [
+        "flex",
+        "flex-1",
+        "flex-col",
+        "h-full",
+        "min-w-0",
+        "overflow-y-auto",
+        "[container-type:size]"
+       ],
+       "componentId": "container-category-scroll",
+       "componentName": "container",
+       "originalElement": "div",
        "children": [
         {
-         "blockName": "sidebar",
-         "componentEvents": {
-          "close": {
-           "action": "Run Script",
-           "event": "close",
-           "script": "drawer.close()"
-          }
-         },
-         "componentId": "PortalArticleSidebar-category",
-         "componentName": "PortalArticleSidebar",
-         "componentProps": {
-          "activeCategory": "{{ route.params.category }}",
-          "categories": "{{ sidebar.data || [] }}",
-          "open": "{{ drawer.open }}",
-          "loading": "{{ !sidebar.data }}"
-         },
-         "isCustomVueComponent": true
-        },
-        {
-         "classes": [
-          "flex",
-          "flex-1",
-          "flex-col",
-          "min-w-0"
-         ],
-         "componentId": "container-category-content",
-         "componentName": "container",
-         "originalElement": "div",
+         "blockName": "main-layout",
          "children": [
           {
-           "blockName": "main-layout",
+           "componentId": "PortalSkeleton-category",
+           "componentName": "PortalSkeleton",
+           "isCustomVueComponent": true,
+           "componentProps": {
+            "variant": "category",
+            "count": "{{ skeletonRows }}"
+           },
+           "visibilityCondition": "{{ !category && !notFound && !loadFailed }}",
+           "classes": [
+            "flex",
+            "flex-col",
+            "mt-0",
+            "max-w-[700px]",
+            "xl:max-w-none",
+            "min-w-0",
+            "w-full",
+            "mx-auto",
+            "xl:mx-0",
+            "px-4",
+            "sm:px-6",
+            "xl:px-0",
+            "xl:col-start-2"
+           ]
+          },
+          {
+           "blockName": "category-column",
            "children": [
             {
-             "componentId": "PortalSkeleton-category",
-             "componentName": "PortalSkeleton",
-             "isCustomVueComponent": true,
-             "componentProps": {
-              "variant": "category",
-              "count": "{{ skeletonRows }}"
-             },
-             "visibilityCondition": "{{ !category && !notFound && !loadFailed }}",
-             "classes": [
-              "flex",
-              "flex-col",
-              "mt-0",
-              "max-w-[700px]",
-              "xl:max-w-[830px]",
-              "min-w-0",
-              "w-full",
-              "mx-auto",
-              "xl:mx-0",
-              "px-4",
-              "sm:px-6",
-              "xl:px-0",
-              "xl:col-start-2",
-              "xl:col-span-3"
-             ]
-            },
-            {
-             "blockName": "category-column",
+             "blockName": "category-header",
              "children": [
               {
-               "blockName": "category-header",
                "children": [
                 {
-                 "children": [
-                  {
-                   "classes": [
-                    "text-ink-gray-8"
-                   ],
-                   "componentId": "TextBlock-h8bm1mp3i",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-3xl-bold",
-                    "tag": "h1",
-                    "text": "{{ categoryName }}"
-                   }
-                  },
-                  {
-                   "classes": [
-                    "text-ink-gray-6"
-                   ],
-                   "componentId": "TextBlock-m2czs0278",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-p-base",
-                    "tag": "p",
-                    "text": "{{ categoryDescription }}"
-                   }
-                  }
-                 ],
                  "classes": [
-                  "flex",
-                  "flex-col",
-                  "gap-2"
+                  "text-ink-gray-8"
                  ],
-                 "componentId": "category-title-group",
-                 "componentName": "container",
-                 "originalElement": "div"
+                 "componentId": "TextBlock-h8bm1mp3i",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-3xl-bold",
+                  "tag": "h1",
+                  "text": "{{ categoryName }}"
+                 }
                 },
                 {
-                 "blockName": "meta-row",
-                 "children": [
-                  {
-                   "componentId": "category-byline",
-                   "componentName": "PortalCategoryByline",
-                   "componentProps": {
-                    "creators": "{{ category?.creators }}"
-                   },
-                   "isCustomVueComponent": true
-                  },
-                  {
-                   "classes": [
-                    "text-ink-gray-5"
-                   ],
-                   "componentId": "category-article-count",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-sm",
-                    "tag": "span",
-                    "text": "{{ articleCount }}"
-                   }
-                  },
-                  {
-                   "classes": [
-                    "text-ink-gray-3"
-                   ],
-                   "componentId": "category-last-updated-dot",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-sm",
-                    "tag": "span",
-                    "text": "·"
-                   },
-                   "visibilityCondition": "{{ lastUpdated }}"
-                  },
-                  {
-                   "classes": [
-                    "text-ink-gray-5"
-                   ],
-                   "componentId": "category-last-updated",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-sm",
-                    "tag": "span",
-                    "text": "{{ lastUpdated }}"
-                   },
-                   "visibilityCondition": "{{ lastUpdated }}"
-                  }
-                 ],
                  "classes": [
-                  "items-center",
-                  "flex",
-                  "flex-row",
-                  "gap-2",
-                  "justify-start",
-                  "flex-wrap",
-                  "gap-y-1"
+                  "text-ink-gray-6"
                  ],
-                 "componentId": "category-meta-row",
-                 "componentName": "container",
-                 "originalElement": "div"
+                 "componentId": "TextBlock-m2czs0278",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-p-base",
+                  "tag": "p",
+                  "text": "{{ categoryDescription }}"
+                 }
                 }
                ],
                "classes": [
                 "flex",
                 "flex-col",
-                "gap-3",
-                "w-full"
+                "gap-2"
                ],
-               "componentId": "container-cttvx11fi",
+               "componentId": "category-title-group",
                "componentName": "container",
                "originalElement": "div"
               },
               {
-               "blockName": "articles-section",
+               "blockName": "meta-row",
                "children": [
                 {
-                 "componentId": "PortalSkeleton-category-articles",
-                 "componentName": "PortalSkeleton",
-                 "isCustomVueComponent": true,
+                 "componentId": "category-byline",
+                 "componentName": "PortalCategoryByline",
                  "componentProps": {
-                  "variant": "category-rows",
-                  "count": "{{ skeletonRows }}",
-                  "instant": true
+                  "creators": "{{ category?.creators }}"
                  },
-                 "visibilityCondition": "{{ !loaded }}"
+                 "isCustomVueComponent": true
                 },
                 {
                  "classes": [
-                  "w-full",
-                  "portal-reveal"
+                  "text-ink-gray-5"
                  ],
-                 "componentId": "PortalArticleList-category",
-                 "componentName": "PortalArticleList",
+                 "componentId": "category-article-count",
+                 "componentName": "TextBlock",
                  "componentProps": {
-                  "articles": "{{ moreArticles.rows }}"
-                 },
-                 "isCustomVueComponent": true,
-                 "visibilityCondition": "{{ loaded && articles.data.length }}"
+                  "fontSize": "text-sm",
+                  "tag": "span",
+                  "text": "{{ articleCount }}"
+                 }
                 },
                 {
                  "classes": [
-                  "w-full"
+                  "text-ink-gray-3"
                  ],
-                 "componentId": "PortalInfiniteScroll-category",
-                 "componentName": "PortalInfiniteScroll",
+                 "componentId": "category-last-updated-dot",
+                 "componentName": "TextBlock",
                  "componentProps": {
-                  "failed": "{{ moreArticles.failed }}",
-                  "loading": "{{ moreArticles.loading }}",
-                  "onLoadMore": "() => moreArticles.loadMore()"
+                  "fontSize": "text-sm",
+                  "tag": "span",
+                  "text": "·"
                  },
-                 "isCustomVueComponent": true,
-                 "visibilityCondition": "{{ loaded && moreArticles.hasMore }}"
+                 "visibilityCondition": "{{ lastUpdated }}"
                 },
                 {
                  "classes": [
-                  "w-full",
-                  "!grid",
-                  "items-start",
-                  "sm:grid-cols-2",
-                  "!gap-4"
+                  "text-ink-gray-5"
                  ],
-                 "componentId": "Repeater-category-sections",
-                 "componentName": "Repeater",
+                 "componentId": "category-last-updated",
+                 "componentName": "TextBlock",
                  "componentProps": {
-                  "data": "{{ sections }}",
-                  "dataKey": "name"
+                  "fontSize": "text-sm",
+                  "tag": "span",
+                  "text": "{{ lastUpdated }}"
                  },
-                 "children": [
-                  {
-                   "componentId": "PortalSubcategorySection-category",
-                   "componentName": "PortalSubcategorySection",
-                   "isCustomVueComponent": true,
-                   "componentProps": {
-                    "category": "{{ dataItem.category }}",
-                    "articles": "{{ dataItem.articles }}"
-                   }
-                  }
-                 ],
-                 "visibilityCondition": "{{ loaded && sections.length }}"
-                },
-                {
-                 "blockName": "empty-state",
-                 "children": [
-                  {
-                   "baseStyles": {
-                    "color": "var(--ink-gray-6)",
-                    "fontWeight": "600"
-                   },
-                   "componentId": "TextBlock-7wj9iidyv",
-                   "componentName": "PortalEmptyState",
-                   "componentProps": {
-                    "description": "{{ t('Articles show up here as they are published.') }}",
-                    "icon": "article",
-                    "title": "{{ t('No articles in this category') }}"
-                   },
-                   "isCustomVueComponent": true
-                  }
-                 ],
-                 "classes": [
-                  "flex",
-                  "items-center",
-                  "justify-center",
-                  "py-16",
-                  "w-full"
-                 ],
-                 "componentId": "container-7hq5bv7hx",
-                 "componentName": "container",
-                 "originalElement": "div",
-                 "visibilityCondition": "{{ loaded && !articles.data.length && !sections.length }}"
+                 "visibilityCondition": "{{ lastUpdated }}"
                 }
                ],
                "classes": [
+                "items-center",
                 "flex",
-                "flex-col",
-                "gap-6",
-                "mt-6",
-                "w-full"
+                "flex-row",
+                "gap-2",
+                "justify-start",
+                "flex-wrap",
+                "gap-y-1"
                ],
-               "componentId": "category-articles",
+               "componentId": "category-meta-row",
                "componentName": "container",
                "originalElement": "div"
               }
@@ -328,117 +208,228 @@
              "classes": [
               "flex",
               "flex-col",
-              "mt-0",
-              "max-w-[700px]",
-              "xl:max-w-[830px]",
-              "min-w-0",
-              "w-full",
-              "mx-auto",
-              "xl:mx-0",
-              "px-4",
-              "sm:px-6",
-              "xl:px-0",
-              "xl:col-start-2",
-              "xl:col-span-3",
-              "portal-reveal"
+              "gap-3",
+              "w-full"
              ],
-             "componentId": "container-pdx9evglv",
+             "componentId": "container-cttvx11fi",
              "componentName": "container",
-             "originalElement": "div",
-             "visibilityCondition": "{{ category && !loadFailed }}"
+             "originalElement": "div"
             },
             {
-             "blockName": "load-failed",
-             "classes": [
-              "self-stretch",
-              "xl:col-span-4"
+             "blockName": "articles-section",
+             "children": [
+              {
+               "componentId": "PortalSkeleton-category-articles",
+               "componentName": "PortalSkeleton",
+               "isCustomVueComponent": true,
+               "componentProps": {
+                "variant": "category-rows",
+                "count": "{{ skeletonRows }}",
+                "instant": true
+               },
+               "visibilityCondition": "{{ !loaded }}"
+              },
+              {
+               "classes": [
+                "w-full",
+                "portal-reveal"
+               ],
+               "componentId": "PortalArticleList-category",
+               "componentName": "PortalArticleList",
+               "componentProps": {
+                "articles": "{{ moreArticles.rows }}"
+               },
+               "isCustomVueComponent": true,
+               "visibilityCondition": "{{ loaded && articles.data.length }}"
+              },
+              {
+               "classes": [
+                "w-full"
+               ],
+               "componentId": "PortalInfiniteScroll-category",
+               "componentName": "PortalInfiniteScroll",
+               "componentProps": {
+                "failed": "{{ moreArticles.failed }}",
+                "loading": "{{ moreArticles.loading }}",
+                "onLoadMore": "() => moreArticles.loadMore()"
+               },
+               "isCustomVueComponent": true,
+               "visibilityCondition": "{{ loaded && moreArticles.hasMore }}"
+              },
+              {
+               "classes": [
+                "w-full",
+                "!grid",
+                "items-start",
+                "sm:grid-cols-2",
+                "!gap-4"
+               ],
+               "componentId": "Repeater-category-sections",
+               "componentName": "Repeater",
+               "componentProps": {
+                "data": "{{ sections }}",
+                "dataKey": "name"
+               },
+               "children": [
+                {
+                 "componentId": "PortalSubcategorySection-category",
+                 "componentName": "PortalSubcategorySection",
+                 "isCustomVueComponent": true,
+                 "componentProps": {
+                  "category": "{{ dataItem.category }}",
+                  "articles": "{{ dataItem.articles }}"
+                 }
+                }
+               ],
+               "visibilityCondition": "{{ loaded && sections.length }}"
+              },
+              {
+               "blockName": "empty-state",
+               "children": [
+                {
+                 "baseStyles": {
+                  "color": "var(--ink-gray-6)",
+                  "fontWeight": "600"
+                 },
+                 "componentId": "TextBlock-7wj9iidyv",
+                 "componentName": "PortalEmptyState",
+                 "componentProps": {
+                  "description": "{{ t('Articles show up here as they are published.') }}",
+                  "icon": "article",
+                  "title": "{{ t('No articles in this category') }}"
+                 },
+                 "isCustomVueComponent": true
+                }
+               ],
+               "classes": [
+                "flex",
+                "items-center",
+                "justify-center",
+                "py-16",
+                "w-full"
+               ],
+               "componentId": "container-7hq5bv7hx",
+               "componentName": "container",
+               "originalElement": "div",
+               "visibilityCondition": "{{ loaded && !articles.data.length && !sections.length }}"
+              }
              ],
-             "componentId": "PortalEmptyState-category-load-failed",
-             "componentName": "PortalEmptyState",
-             "componentProps": {
-              "description": "{{ t('Check your connection and reload the page.') }}",
-              "icon": "article",
-              "title": "{{ t('Could not load this category') }}"
-             },
-             "isCustomVueComponent": true,
-             "visibilityCondition": "{{ loadFailed }}"
-            },
-            {
-             "blockName": "not-found",
              "classes": [
-              "self-stretch",
-              "xl:col-span-4"
+              "flex",
+              "flex-col",
+              "gap-6",
+              "mt-6",
+              "w-full"
              ],
-             "componentId": "PortalEmptyState-category-not-found",
-             "componentName": "PortalEmptyState",
-             "componentProps": {
-              "description": "{{ t('It may have moved, or you may need to sign in to see it.') }}",
-              "icon": "article",
-              "title": "{{ t('Category not found') }}"
-             },
-             "isCustomVueComponent": true,
-             "visibilityCondition": "{{ notFound }}"
+             "componentId": "category-articles",
+             "componentName": "container",
+             "originalElement": "div"
             }
            ],
            "classes": [
-            "items-start",
-            "border-outline-gray-1",
-            "grid",
-            "grid-cols-1",
-            "xl:grid-cols-[minmax(24px,1fr)_minmax(0,700px)_minmax(24px,1fr)_300px]",
-            "xl:pe-4",
-            "flex-1",
+            "flex",
+            "flex-col",
+            "mt-0",
+            "max-w-[700px]",
+            "xl:max-w-none",
             "min-w-0",
-            "pb-10",
-            "relative",
             "w-full",
-            "pt-6",
-            "sm:pt-10"
+            "mx-auto",
+            "xl:mx-0",
+            "px-4",
+            "sm:px-6",
+            "xl:px-0",
+            "xl:col-start-2",
+            "portal-reveal"
            ],
-           "componentId": "container-category-main",
+           "componentId": "container-pdx9evglv",
            "componentName": "container",
-           "originalElement": "div"
+           "originalElement": "div",
+           "visibilityCondition": "{{ category && !loadFailed }}"
           },
           {
-           "blockName": "Footer",
-           "componentId": "footer-category",
-           "componentName": "footer",
-           "isStudioComponent": true,
+           "blockName": "load-failed",
            "classes": [
-            "xl:grid",
-            "xl:grid-cols-[minmax(24px,1fr)_minmax(0,700px)_minmax(24px,1fr)_300px]",
-            "xl:pe-4",
-            "xl:[&>*]:col-span-3",
-            "xl:[&>*]:col-start-2",
-            "xl:[&>*]:mx-0",
-            "xl:[&>*]:px-0"
-           ]
+            "self-stretch",
+            "xl:col-span-4"
+           ],
+           "componentId": "PortalEmptyState-category-load-failed",
+           "componentName": "PortalEmptyState",
+           "componentProps": {
+            "description": "{{ t('Check your connection and reload the page.') }}",
+            "icon": "article",
+            "title": "{{ t('Could not load this category') }}"
+           },
+           "isCustomVueComponent": true,
+           "visibilityCondition": "{{ loadFailed }}"
+          },
+          {
+           "blockName": "not-found",
+           "classes": [
+            "self-stretch",
+            "xl:col-span-4"
+           ],
+           "componentId": "PortalEmptyState-category-not-found",
+           "componentName": "PortalEmptyState",
+           "componentProps": {
+            "description": "{{ t('It may have moved, or you may need to sign in to see it.') }}",
+            "icon": "article",
+            "title": "{{ t('Category not found') }}"
+           },
+           "isCustomVueComponent": true,
+           "visibilityCondition": "{{ notFound }}"
           }
+         ],
+         "classes": [
+          "items-start",
+          "border-outline-gray-1",
+          "grid",
+          "grid-cols-1",
+          "xl:grid-cols-[48px_minmax(0,1fr)_48px_240px]",
+          "xl:pe-4",
+          "min-w-0",
+          "shrink-0",
+          "min-h-[100cqh]",
+          "pb-16",
+          "relative",
+          "w-full",
+          "pt-6",
+          "sm:pt-8"
+         ],
+         "componentId": "container-category-main",
+         "componentName": "container",
+         "originalElement": "div"
+        },
+        {
+         "blockName": "Footer",
+         "componentId": "footer-category",
+         "componentName": "footer",
+         "isStudioComponent": true,
+         "classes": [
+          "xl:grid",
+          "xl:grid-cols-[48px_minmax(0,1fr)_48px_240px]",
+          "xl:pe-4",
+          "[&>*]:max-w-[700px]",
+          "sm:[&>*]:px-6",
+          "xl:[&>*]:col-start-2",
+          "xl:[&>*]:mx-0",
+          "xl:[&>*]:px-0",
+          "xl:[&>*]:max-w-none"
          ]
         }
-       ],
-       "classes": [
-        "flex",
-        "flex-1",
-        "shrink-0",
-        "flex-row",
-        "w-full"
-       ],
-       "componentId": "container-category-scroll-row",
-       "componentName": "container",
-       "originalElement": "div"
+       ]
       }
      ],
      "classes": [
       "flex",
       "flex-1",
-      "flex-col",
+      "flex-row",
       "min-h-0",
-      "overflow-y-auto",
-      "w-full",
-      "[container-type:size]"
+      "overflow-y-hidden",
+      "static",
+      "w-full"
      ],
-     "componentId": "container-category-scroll",
+     "componentId": "container-ym3ue277e",
      "componentName": "container",
      "originalElement": "div"
     },
@@ -463,7 +454,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-11-23 13:30:00.000000",
+ "modified": "2026-11-24 13:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

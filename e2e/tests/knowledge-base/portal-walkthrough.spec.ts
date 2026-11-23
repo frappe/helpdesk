@@ -594,25 +594,32 @@ test.describe("categories and category pages", () => {
 
     await page.goto(`/help/category/${category.name}`);
     const sidebar = page.getByRole("navigation", { name: "Knowledge base" });
-    const chevron = (row: { name: string }) => sidebar.locator(`[aria-controls="kb-sidebar-${row.name}"]`);
-    await expect(chevron(category)).toHaveAttribute("aria-expanded", "true");
-    // The chevron folds without leaving the page.
+    const row = (category: { category_name: string }) =>
+      sidebar.getByRole("link", { name: category.category_name, exact: true });
+    const item = (category: { category_name: string }) =>
+      row(category).locator('xpath=ancestor::li[@role="treeitem"][1]');
+    const chevron = (category: { category_name: string }) =>
+      item(category).locator(':scope > [data-slot="row"] [data-slot="toggle"]');
+    await expect(item(category)).toHaveAttribute("aria-expanded", "true");
+    // The tree's chevron folds without leaving the page.
     await chevron(category).click();
-    await expect(chevron(category)).toHaveAttribute("aria-expanded", "false");
+    await expect(item(category)).toHaveAttribute("aria-expanded", "false");
     await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
     await chevron(other).click();
-    await expect(chevron(other)).toHaveAttribute("aria-expanded", "true");
+    await expect(item(other)).toHaveAttribute("aria-expanded", "true");
     await expect(sidebar.getByRole("link", { name: otherArticle.title })).toBeVisible();
-    // The row opens the category's page, and a second click keeps it open.
-    const otherRow = sidebar.getByRole("link", { name: other.category_name, exact: true });
-    await otherRow.click();
+    // The row opens the category's page; there, each click folds or opens it.
+    await row(other).click();
     await expect(page).toHaveURL(new RegExp(`/help/category/${other.name}$`));
-    await otherRow.click();
-    await expect(chevron(other)).toHaveAttribute("aria-expanded", "true");
-    await expect(chevron(category)).toHaveAttribute("aria-expanded", "false");
-    await sidebar.getByRole("link", { name: category.category_name, exact: true }).click();
+    await expect(item(other)).toHaveAttribute("aria-expanded", "true");
+    await expect(item(category)).toHaveAttribute("aria-expanded", "false");
+    await row(other).click();
+    await expect(item(other)).toHaveAttribute("aria-expanded", "false");
+    await row(other).click();
+    await expect(item(other)).toHaveAttribute("aria-expanded", "true");
+    await row(category).click();
     await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
-    await expect(chevron(category)).toHaveAttribute("aria-expanded", "true");
+    await expect(item(category)).toHaveAttribute("aria-expanded", "true");
 
     await page.locator("body").press("/");
     const search = sidebar.getByRole("textbox", { name: "Search articles" });
@@ -852,7 +859,7 @@ test.describe("knowledge base settings", () => {
       // S33: an unsafe address is refused on Save.
       await dialog.getByPlaceholder("https://example.com/contact").fill("javascript:alert(1)");
       await dialog.getByRole("button", { name: "Save" }).click();
-      await expect(page.getByText(`${label}: Start with https://, mailto: or /`)).toBeVisible();
+      await expect(page.getByText(`${label}: Start with http://, https://, mailto: or /`)).toBeVisible();
       await dialog.getByPlaceholder("https://example.com/contact").fill("https://example.com/e2e");
 
       // S34: Preview opens the portal with the draft.
@@ -899,7 +906,7 @@ test.describe("knowledge base settings", () => {
     await socials.getByPlaceholder("Contact sales").fill("GitHub");
     await socials.getByPlaceholder("https://example.com/contact").fill("javascript:alert(1)");
     await dialog.getByRole("button", { name: "Save" }).click();
-    await expect(page.getByText("GitHub: Start with https://, mailto: or /")).toBeVisible();
+    await expect(page.getByText("GitHub: Start with http://, https://, mailto: or /")).toBeVisible();
     await socials.getByPlaceholder("https://example.com/contact").fill("https://github.com/example");
 
     const popup = context.waitForEvent("page");
