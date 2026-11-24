@@ -16,6 +16,8 @@
       :tabs="tabs"
       :user="{ name: authStore.userName, image: authStore.userImage }"
       :cursor="cursor"
+      :expanded="expanded"
+      @expanded="openDesk()"
     >
       <template #tab-icon>
         <img
@@ -270,13 +272,13 @@ import { __ } from "@/translation";
 import { SetupPreviewFrame, SetupPreviewLogin } from "@framework/ui";
 import { usePreferredReducedMotion } from "@vueuse/core";
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { Button } from "frappe-ui";
+import { Button, call, dayjsLocal } from "frappe-ui";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import SetupPreviewDesk from "./SetupPreviewDesk.vue";
 import { SAMPLE_TICKET, nameOf } from "./preview";
-import { useSetupFlow } from "./setup";
+import { type TicketRow, useSetupFlow } from "./setup";
 
-const { brand, invitees, setup } = useSetupFlow();
+const { brand, invitees, openDesk, setup } = useSetupFlow();
 
 type Page = "login" | "home" | "desk-list" | "desk-ticket" | "portal-ticket";
 type Point = { x: number; y: number };
@@ -289,7 +291,7 @@ const replied = computed(() => !!agent.value?.sent);
 const arrived = computed(() => setup.ticketArrived);
 
 const target = computed<Page>(() => {
-  if (setup.showDone) return arrived.value ? "portal-ticket" : "home";
+  if (setup.handingOver) return "desk-list";
   if (setup.step === "password") return "login";
   if (setup.step === "workspace") return "home";
   if (setup.step === "email") return "desk-list";
@@ -358,6 +360,79 @@ watch(agent, () => {
   if (page.value === "desk-ticket") cursor.value = rest("desk-ticket");
 });
 onBeforeUnmount(() => timers.forEach(clearTimeout));
+
+// When setup ends the desk opens the welcome ticket: the preview moves to the ticket list,
+// shows the site's own tickets in place of the samples, clicks the welcome ticket, then grows.
+const expanded = ref(false);
+let growLater: number | undefined;
+watch(
+  () => setup.handingOver,
+  async (handingOver) => {
+    if (!handingOver) return;
+    const started = performance.now();
+    setup.landing = await siteTickets().catch(() => null);
+    const welcome = setup.welcomeTicket ?? setup.landing?.at(-1)?.id;
+    setup.landingTicket = welcome ?? null;
+    const grow = () => {
+      cursor.value = null;
+      expanded.value = true;
+    };
+    setup.landingOpen ||= reducedMotion.value;
+    if (reducedMotion.value) return grow();
+    if (!welcome) return grow();
+    // Long enough for a page move and the rows to settle before the cursor goes to the ticket.
+    const settle = Math.max(0, 1600 - (performance.now() - started));
+    growLater = window.setTimeout(() => {
+      cursor.value = `[data-preview-row="${welcome}"]`;
+      // The frame places the cursor on a selector after it settles, so the click waits for it.
+      growLater = window.setTimeout(() => {
+        frame.value?.click();
+        setup.landingOpen = true;
+        growLater = window.setTimeout(grow, 900);
+      }, 1500);
+    }, settle);
+  }
+);
+onBeforeUnmount(() => clearTimeout(growLater));
+
+async function siteTickets(): Promise<TicketRow[]> {
+  const tickets = await call<
+    {
+      name: string;
+      subject: string;
+      status: string;
+      priority: string;
+      agreement_status: string | null;
+      _assign: string | null;
+      creation: string;
+    }[]
+  >("frappe.client.get_list", {
+    doctype: "HD Ticket",
+    fields: [
+      "name",
+      "subject",
+      "status",
+      "priority",
+      "agreement_status",
+      "_assign",
+      "creation",
+    ],
+    order_by: "creation desc",
+    limit_page_length: 20,
+  });
+  return tickets.map((t) => ({
+    id: t.name,
+    subject: t.subject,
+    status: t.status,
+    response:
+      t.agreement_status === "Fulfilled" || t.agreement_status === "Failed"
+        ? t.agreement_status
+        : "",
+    assigned: JSON.parse(t._assign || "[]")[0] ?? "",
+    priority: t.priority,
+    created: dayjsLocal(t.creation).fromNow(),
+  }));
+}
 
 const isPortal = computed(() => isPortalPage(page.value));
 const isDesk = computed(

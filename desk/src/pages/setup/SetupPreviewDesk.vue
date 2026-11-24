@@ -199,7 +199,7 @@
                 <ListHeaderCell>{{ __("Created") }}</ListHeaderCell>
               </ListHeader>
               <TransitionGroup v-bind="fade">
-                <div v-for="r in rows" :key="r.id">
+                <div v-for="r in rows" :key="r.id" :data-preview-row="r.id">
                   <ListRows :items="[r]" v-slot="{ item, value }">
                     <ListRow
                       :value="value"
@@ -590,6 +590,20 @@
           </div>
         </div>
       </Transition>
+      <!-- The real ticket page, loaded behind the list at the hand-over so the click opens it at once. -->
+      <div
+        v-if="setup.landingTicket"
+        class="absolute inset-0 flex flex-col bg-surface-base transition duration-500 ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none"
+        :class="
+          setup.landingOpen ? '' : 'pointer-events-none translate-x-6 opacity-0'
+        "
+      >
+        <!-- The ticket page puts its header here, as it does in the desk's own header bar. -->
+        <div class="flex border-b pe-5 rtl:pe-6">
+          <div id="app-header" class="w-full flex-1" />
+        </div>
+        <TicketAgent :ticket-id="setup.landingTicket" />
+      </div>
     </div>
   </div>
 </template>
@@ -607,11 +621,14 @@ import {
   ListRow,
   ListRows,
 } from "frappe-ui/list";
-import { computed, defineComponent, h } from "vue";
+import { computed, defineAsyncComponent, defineComponent, h } from "vue";
 import { SAMPLE_TICKET, avatarUrl, nameOf } from "./preview";
 import { useSetupFlow } from "./setup";
 
 const { brand, invitees, setup } = useSetupFlow();
+const TicketAgent = defineAsyncComponent(
+  () => import("@/pages/ticket/TicketAgent.vue")
+);
 
 const props = defineProps<{ page: "desk-list" | "desk-ticket" }>();
 const rail = computed(() => props.page === "desk-ticket");
@@ -751,6 +768,9 @@ const SAMPLE_ROWS = [
   ),
 ];
 const rows = computed(() => {
+  // At the hand-over the samples give way to the site's own tickets, the rows the desk opens with.
+  if (setup.landing)
+    return setup.landing.map((t) => ({ ...t, unseen: false, fresh: false }));
   if (!setup.ticketArrived) return SAMPLE_ROWS;
   const fresh = {
     ...row(

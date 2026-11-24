@@ -43,10 +43,8 @@ test.describe("first-run setup", () => {
       await page.getByRole("button", { name: "Set up later" }).click();
       await page.getByRole("button", { name: "Skip anyway" }).click();
 
-      await expect(page.getByRole("heading", { name: "You're all set" })).toBeVisible();
       await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).setup_complete).toBe(1);
-      await page.getByRole("button", { name: /Go to Helpdesk|Not now/ }).click();
-      await expect(page).toHaveURL(/\/helpdesk\/tickets\/\w*$/);
+      await expect(page).toHaveURL(/\/helpdesk\/tickets\/\w+$/);
       await expect(page.getByText("Welcome to Helpdesk").first()).toBeVisible();
     } finally {
       await restore();

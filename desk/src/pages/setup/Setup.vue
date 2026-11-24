@@ -43,22 +43,13 @@
       <SetupPreview />
     </template>
   </SetupFlow>
-
-  <SetupDoneDialog
-    :open="setup.showDone"
-    :connected="!!setup.mailbox"
-    :agents="invited"
-    :ask-feedback="telemetry.isEnabled"
-    @close="openDesk"
-  />
 </template>
 
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { __ } from "@/translation";
-import { SetupFlow, TelemetryConsent, useTelemetry } from "@framework/ui";
+import { SetupFlow, TelemetryConsent } from "@framework/ui";
 import { useEventListener } from "@vueuse/core";
-import SetupDoneDialog from "./SetupDoneDialog.vue";
 import SetupEmailStep from "./SetupEmailStep.vue";
 import SetupPasswordStep from "./SetupPasswordStep.vue";
 import SetupPreview from "./SetupPreview.vue";
@@ -73,12 +64,9 @@ const STEP_VIEWS = {
   team: SetupTeamStep,
 };
 
-const { bindStep, finishSetup, holdEnter, invited, openDesk, setup, steps } =
-  provideSetupFlow();
+const { bindStep, finishSetup, holdEnter, setup, steps } = provideSetupFlow();
 
 useEventListener(window, "keydown", holdEnter, { capture: true });
-
-const telemetry = useTelemetry();
 
 const labels = {
   back: __("Back"),

@@ -6,7 +6,8 @@
 
 <script setup lang="ts">
 import { useAgentStatusStore } from "@/stores/agentStatus";
-import { computed, defineAsyncComponent } from "vue";
+import { layoutFor } from "@/components/layouts/layouts";
+import { computed } from "vue";
 
 import { useScreenSize } from "@/composables/screen";
 // eager: subscribes the availability socket handler and runs the login
@@ -15,18 +16,5 @@ useAgentStatusStore();
 
 const { isMobileView } = useScreenSize();
 
-const MobileLayout = defineAsyncComponent(
-  () => import("@/components/layouts/MobileLayout.vue")
-);
-const DesktopLayout = defineAsyncComponent(
-  () => import("@/components/layouts/DesktopLayout.vue")
-);
-
-const Layout = computed(() => {
-  if (isMobileView.value) {
-    return MobileLayout;
-  } else {
-    return DesktopLayout;
-  }
-});
+const Layout = computed(() => layoutFor(isMobileView.value));
 </script>

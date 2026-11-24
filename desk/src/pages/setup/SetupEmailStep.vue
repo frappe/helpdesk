@@ -143,7 +143,6 @@
         class="flex items-center justify-end gap-2"
       >
         <Button
-          variant="outline"
           size="md"
           :label="__('Set up later')"
           @click="confirmSkip = true"

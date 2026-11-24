@@ -1,8 +1,10 @@
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import type { SetupFlowResult, StepBack } from "@framework/ui";
+import type { StepBack } from "@framework/ui";
 import { useIntervalFn } from "@vueuse/core";
 import { call, toast } from "frappe-ui";
+import { useRouter } from "vue-router";
+import { preloadLayout } from "@/components/layouts/layouts";
 import {
   computed,
   inject,
@@ -16,10 +18,15 @@ import {
 export type StepKey = "password" | "workspace" | "email" | "team";
 type Step = { name: StepKey; required?: boolean };
 export type Mailbox = { name: string; address: string };
-type SetupOutcome = {
-  skipped_setup: boolean;
-  completed_steps: StepKey[];
-  skipped_steps: StepKey[];
+/** A row of the preview's ticket list. */
+export type TicketRow = {
+  id: string;
+  subject: string;
+  status: string;
+  response: string;
+  assigned: string;
+  priority: string;
+  created: string;
 };
 
 const ALL_STEPS: Step[] = [
@@ -36,6 +43,7 @@ export const IMPORT_PHASES = 3;
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 function createSetupFlow() {
+  const router = useRouter();
   const setup = reactive({
     step: undefined as StepKey | undefined,
     askPassword: window.needs_password_setup,
@@ -49,7 +57,15 @@ function createSetupFlow() {
     typed: [] as { email: string; role: string }[],
     /** Emails the Team step has invited. */
     sentTo: [] as string[],
-    showDone: false,
+    /** True once setup ends: the preview grows into the ticket list the desk opens. */
+    handingOver: false,
+    /** The site's own tickets, swapped into the preview just before it grows. */
+    landing: null as TicketRow[] | null,
+    /** The welcome ticket the server returns when setup ends, which the desk opens first. */
+    welcomeTicket: null as string | null,
+    /** The real ticket page the preview opens at the hand-over, loaded behind the list. */
+    landingTicket: null as string | null,
+    landingOpen: false,
   });
 
   const steps = computed(() =>
@@ -97,9 +113,8 @@ function createSetupFlow() {
     setup.ticketArrived = true;
   });
 
-  const outcome = ref<SetupOutcome | null>(null);
-
   let movedAt = 0;
+  let shellReady: Promise<unknown> = Promise.resolve();
 
   function holdEnter(event: KeyboardEvent) {
     if (event.key !== "Enter" || event.target instanceof HTMLTextAreaElement)
@@ -163,23 +178,35 @@ function createSetupFlow() {
     return call<string | null>("helpdesk.api.setup.complete_setup");
   }
 
-  function finishSetup({ skipped, completed, skippedSteps }: SetupFlowResult) {
-    outcome.value = {
-      skipped_setup: skipped,
-      completed_steps: completed as StepKey[],
-      skipped_steps: skippedSteps as StepKey[],
-    };
+  function finishSetup() {
     completing = completeSetup();
-    completing.catch((e) => reportError("complete_setup", e));
+    completing
+      .then((ticket) => (setup.welcomeTicket = ticket))
+      .catch((e) => reportError("complete_setup", e));
     movedAt = performance.now();
-    setup.showDone = true;
+    // Below lg the preview is hidden, so there is nothing to grow into the desk.
+    if (!window.matchMedia?.("(min-width: 1024px)").matches) return openDesk();
+    // The desk shell and its pages load while the preview grows, so the switch shows no blank frame.
+    shellReady = Promise.all([
+      preloadLayout(false),
+      import("@/roots/AgentRoot.vue"),
+      import("@/pages/ticket/TicketAgent.vue"),
+    ]).catch(() => {});
+    setup.handingOver = true;
   }
 
   /** Leaves only once HD Settings records the setup, retrying a failed save, so the desk does not send the user back. */
   async function openDesk() {
     try {
       const ticket = await completing.catch(completeSetup);
-      window.location.replace(`/helpdesk/tickets/${ticket ?? ""}`);
+      await shellReady;
+      // The router sends a pending setup back here, so it reads the boot flag first.
+      window.setup_pending = false;
+      await router.replace(
+        ticket
+          ? { name: "TicketAgent", params: { ticketId: ticket } }
+          : { name: "TicketsAgent" }
+      );
     } catch (e) {
       reportError("complete_setup", e);
       toast.error(__("Could not finish setup. Please try again."));
@@ -196,7 +223,7 @@ function createSetupFlow() {
     brand,
     /** Seconds-based phase of the mailbox's first import, for the Email step's progress. */
     importPhase,
-    /** Drops an Enter that lands while a step or the done dialog is still coming in. */
+    /** Drops an Enter that lands while a step is still coming in. */
     holdEnter,
     /** Takes SetupFlow's actions for the step on screen; binds no props. */
     bindStep,
@@ -204,13 +231,11 @@ function createSetupFlow() {
     next,
     /** Lets the current step handle Back itself first, e.g. a provider form returning to the list. */
     setStepBack,
-    /** Ends setup, from SetupFlow's finish: saves it and opens the done dialog. */
+    /** Ends setup, from SetupFlow's finish: saves it and hands over to the desk. */
     finishSetup,
     /** Sends `setup_error` for a failed `action`: the error's type and HTTP status, never its message. */
     reportError,
-    /** How setup ended, sent along with the done dialog's feedback. */
-    outcome,
-    /** Opens the welcome ticket once the server has ended setup, with a fresh boot. */
+    /** Opens the welcome ticket once the server has ended setup. */
     openDesk,
   };
 }
