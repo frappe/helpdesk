@@ -102,8 +102,13 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
 }
 
 // Guests see quick links, so allow only paths, web and mail URLs.
+export const SAFE_LINK_PATTERN = "(/|https?:|mailto:).*";
+
 export function isSafeLink(url: unknown) {
-  return typeof url === "string" && /^(\/|https?:|mailto:)/i.test(url);
+  return (
+    typeof url === "string" &&
+    new RegExp(`^${SAFE_LINK_PATTERN}`, "i").test(url)
+  );
 }
 
 export function isValidLink(link?: { label?: string; url?: string }) {

@@ -1,6 +1,9 @@
 <template>
   <Dialog v-model:open="open" size="sm" :title="title">
-    <form class="flex flex-col gap-4" @submit.prevent="save">
+    <form
+      class="flex flex-col gap-4 [&:not(:has(:user-invalid))_[data-slot=error]]:hidden"
+      @submit.prevent="save"
+    >
       <TextInput
         v-if="isNewColumn"
         v-model="newColumnTitle"
@@ -15,6 +18,7 @@
       <TextInput
         v-model="form.url"
         :error="linkError(form.url)"
+        :pattern="SAFE_LINK_PATTERN"
         :label="__('URL')"
         :placeholder="__('https://example.com/contact')"
       />
@@ -35,7 +39,7 @@ import { Button, Dialog, Switch, TextInput } from "frappe-ui";
 import { computed, reactive, ref, watch } from "vue";
 import type { KnowledgeBaseLink } from "../knowledgeBasePreview";
 import { __ } from "../translation";
-import { isValidLink, linkError } from "../utils";
+import { isValidLink, linkError, SAFE_LINK_PATTERN } from "../utils";
 
 const props = defineProps<{
   link?: KnowledgeBaseLink;
