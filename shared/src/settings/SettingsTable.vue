@@ -10,7 +10,7 @@
     </p>
     <List
       v-else
-      :columns="['16px', ...columns, '32px']"
+      :columns="['16px', ...columns.map((column) => column.width), '32px']"
       divider="none"
       class="[--list-gap:1rem] [--list-row-padding-x:1rem]"
     >
@@ -18,7 +18,13 @@
         class="h-9 border-b border-outline-gray-2 bg-surface-gray-2 text-ink-gray-6 [&_[data-slot=list-header-border]]:hidden"
       >
         <ListHeaderCell />
-        <slot name="header" />
+        <ListHeaderCell
+          v-for="column in columns"
+          :key="column.label"
+          :class="column.class"
+        >
+          {{ column.label }}
+        </ListHeaderCell>
         <ListHeaderCell />
       </ListHeader>
       <Draggable
@@ -74,7 +80,7 @@ import { __ } from "../translation";
 import { DRAG_OPTIONS, listItemOptions } from "../utils";
 
 const props = defineProps<{
-  columns: string[];
+  columns: { label: string; width: string; class?: string }[];
   emptyText: string;
   rowLabel: (item: T) => string;
   options?: (index: number) => unknown[];

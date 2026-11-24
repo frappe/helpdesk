@@ -7,31 +7,17 @@
       :empty-text="__('No links added yet.')"
       :row-label="(row) => row.label"
     >
-      <template #header>
-        <ListHeaderCell class="ms-2">{{ __("Label") }}</ListHeaderCell>
-        <ListHeaderCell class="ms-2">{{ __("URL") }}</ListHeaderCell>
-        <ListHeaderCell class="justify-center">
-          {{ __("Open in new tab") }}
-        </ListHeaderCell>
-      </template>
       <template #default="{ item: row }">
-        <ListCell>
-          <TextInput
-            v-model="row.label"
-            class="w-full [&_input]:text-ellipsis"
-            variant="ghost"
-            :placeholder="__('Contact sales')"
-          />
-        </ListCell>
-        <ListCell>
-          <TextInput
-            v-model="row.url"
-            :error="linkError(row.url)"
-            class="w-full [&_input]:text-ellipsis"
-            variant="ghost"
-            :placeholder="__('https://example.com/contact')"
-          />
-        </ListCell>
+        <SettingsTableInput
+          v-model="row.label"
+          :placeholder="__('Contact sales')"
+        />
+        <SettingsTableInput
+          v-model="row.url"
+          :error="linkError(row.url)"
+          :pattern="SAFE_LINK_PATTERN"
+          :placeholder="__('https://example.com/contact')"
+        />
         <ListCell class="h-7 justify-center">
           <Checkbox v-model="row.open_in_new_tab" />
         </ListCell>
@@ -50,15 +36,20 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { linkError } from "../utils";
-import { Button, Checkbox, TextInput, SettingsRow } from "frappe-ui";
-import { ListCell, ListHeaderCell } from "frappe-ui/list";
+import { linkError, SAFE_LINK_PATTERN } from "../utils";
+import { Button, Checkbox, SettingsRow } from "frappe-ui";
+import { ListCell } from "frappe-ui/list";
 import type { KnowledgeBaseLink } from "../knowledgeBasePreview";
 import SettingsTable from "./SettingsTable.vue";
+import SettingsTableInput from "./SettingsTableInput.vue";
 
 defineProps<{ title: string; description?: string }>();
 
 const rows = defineModel<KnowledgeBaseLink[]>({ required: true });
 
-const columns = ["minmax(0,1fr)", "minmax(0,2fr)", "112px"];
+const columns = [
+  { label: __("Label"), width: "minmax(0,1fr)", class: "ms-2" },
+  { label: __("URL"), width: "minmax(0,2fr)", class: "ms-2" },
+  { label: __("Open in new tab"), width: "112px", class: "justify-center" },
+];
 </script>

@@ -8,10 +8,6 @@
       :row-label="labelOf"
       :options="rowOptions"
     >
-      <template #header>
-        <ListHeaderCell>{{ text.column }}</ListHeaderCell>
-        <ListHeaderCell>{{ __("Visibility") }}</ListHeaderCell>
-      </template>
       <template #default="{ item: name }">
         <ListCell class="h-7">
           <span class="truncate text-base text-ink-gray-8">
@@ -46,7 +42,7 @@
 import { __ } from "../translation";
 import { moveOptions, moveItem } from "../utils";
 import { Button, SettingsRow } from "frappe-ui";
-import { ListCell, ListHeaderCell } from "frappe-ui/list";
+import { ListCell } from "frappe-ui/list";
 import { computed, ref } from "vue";
 import CategoryAccessBadge from "./CategoryAccessBadge.vue";
 import { MAX_PINNED_ARTICLES, type PinKind } from "./knowledgeBaseDraft";
@@ -69,10 +65,13 @@ const props = defineProps<{
 
 const pinned = defineModel<string[]>("pinned", { required: true });
 
-const columns = ["minmax(0,1fr)", "112px"];
-
 const open = ref(false);
 const text = computed(() => pinnedListText(props.kind));
+
+const columns = computed(() => [
+  { label: text.value.column, width: "minmax(0,1fr)" },
+  { label: __("Visibility"), width: "112px" },
+]);
 
 const byName = computed(() =>
   Object.fromEntries(props.items.map((row) => [row.value, row]))

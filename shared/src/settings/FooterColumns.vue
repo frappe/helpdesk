@@ -10,24 +10,20 @@
     />
     <SettingsTable
       v-model="columns"
-      :columns="['144px', 'minmax(0,1fr)']"
+      :columns="[
+        { label: __('Title'), width: '144px', class: 'ms-2' },
+        { label: __('Links'), width: 'minmax(0,1fr)' },
+      ]"
       :row-label="(column) => column.title"
       :empty-text="__('No columns added yet.')"
     >
-      <template #header>
-        <ListHeaderCell class="ms-2">{{ __("Title") }}</ListHeaderCell>
-        <ListHeaderCell>{{ __("Links") }}</ListHeaderCell>
-      </template>
       <template #default="{ item: column }">
-        <ListCell>
-          <TextInput
-            v-model="column.title"
-            class="w-full [&_input]:text-ellipsis [&_input]:font-medium"
-            variant="ghost"
-            :placeholder="__('Company')"
-            :aria-label="__('Column title')"
-          />
-        </ListCell>
+        <SettingsTableInput
+          v-model="column.title"
+          class="[&_input]:font-medium"
+          :placeholder="__('Company')"
+          :aria-label="__('Column title')"
+        />
         <ListCell>
           <Draggable
             :list="column.links"
@@ -94,8 +90,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button, TextInput, SettingsRow } from "frappe-ui";
-import { ListCell, ListHeaderCell } from "frappe-ui/list";
+import { Button, SettingsRow } from "frappe-ui";
+import { ListCell } from "frappe-ui/list";
 import { computed, nextTick, ref } from "vue";
 import Draggable from "vuedraggable";
 import { type FooterColumn, MAX_FOOTER_COLUMNS } from "../knowledgeBaseFooter";
@@ -104,6 +100,7 @@ import { __ } from "../translation";
 import { DRAG_OPTIONS, moveItem } from "../utils";
 import FooterLinkDialog from "./FooterLinkDialog.vue";
 import SettingsTable from "./SettingsTable.vue";
+import SettingsTableInput from "./SettingsTableInput.vue";
 
 const columns = defineModel<FooterColumn[]>({ required: true });
 
