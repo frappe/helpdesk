@@ -6,11 +6,12 @@ from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
 from frappe.rate_limiter import rate_limit
-from frappe.utils import get_user_info_for_avatar, now_datetime
+from frappe.utils import get_email_address, get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
+from helpdesk.api.ticket_analytics import user_ids
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket.ticket_origin import TICKET_ORIGIN_FIELDS
@@ -33,7 +34,7 @@ def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     doc["doctype"] = "HD Ticket"
     doc["source"] = "Portal"
     doc["attachments"] = attachments
-    doc["raised_by"] = frappe.session.user
+    doc["raised_by"] = get_email_address()
     d = frappe.get_doc(doc)
     # only the portal sends an origin
     d.flags.ticket_origin = origin
@@ -184,8 +185,12 @@ def get_communications(ticket: str):
         .orderby(QBCommunication.creation, order=Order.asc)
         .run(as_dict=True)
     )
+    sender_ids = user_ids([c.sender for c in communications if c.sender])
     for c in communications:
-        c.author_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
+        if c.sent_or_received == "Sent" and c.user:
+            c.author_id = c.user
+        else:
+            c.author_id = sender_ids.get(c.sender, c.sender)
     authors = {c.author_id for c in communications if c.author_id}
     agents = {author for author in authors if is_agent(author)}
     viewer_is_agent = is_agent()
@@ -331,7 +336,6 @@ def merge_ticket(source: str, target: str):
     # comment in target ticket that
     c = frappe.new_doc("Comment")
     c.comment_type = "Comment"
-    c.comment_email = frappe.session.user
     c.reference_doctype = "HD Ticket"
     c.reference_name = target
     source_link = frappe.utils.get_url("/helpdesk/tickets/" + str(source))

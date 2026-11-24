@@ -5,7 +5,7 @@ import frappe
 from frappe import _
 from frappe.core.api.user_invitation import invite_by_email
 from frappe.model.document import Document
-from frappe.utils import validate_email_address
+from frappe.utils import get_user_by_email, validate_email_address
 
 from helpdesk.integrations.erpnext.utils import (
     cascade_rename,
@@ -176,7 +176,7 @@ class HDCustomer(Document):
         # fallback to email if user is not set for the contact
         email = frappe.get_value("Contact", contact_name, "email_id")
         if email:
-            if user := frappe.db.exists("User", email):
+            if user := get_user_by_email(email):
                 frappe.db.set_value("Contact", contact_name, "user", user)
             return user
         elif throw_error:

@@ -329,7 +329,7 @@ export function handleInviteUserSuccess(
     | "pending_invite_emails"
     | "invited_emails",
     string[]
-  >
+  > & { standard_user_emails?: string[] }
 ) {
   const list = (emails: string[]) => emails.join(", ");
   if (data.invited_emails.length)
@@ -342,6 +342,8 @@ export function handleInviteUserSuccess(
     toast.info(__("{0} already invited", list(data.pending_invite_emails)));
   if (data.accepted_invite_emails.length)
     toast.info(__("{0} already present", list(data.accepted_invite_emails)));
+  if (data.standard_user_emails?.length)
+    toast.info(__("{0} can't be invited", list(data.standard_user_emails)));
 }
 
 export const SEARCH_DEBOUNCE_MS = 300;

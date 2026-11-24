@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 from frappe.model import no_value_fields
+from frappe.utils import get_email_address
 
 from helpdesk.consts import (
     CUSTOMER_ALWAYS_WRITABLE_FIELDS,
@@ -25,7 +26,7 @@ class CustomerEditController:
         self.check_no_feedback_on_insert()
         self.reset_read_only_fields()
         if frappe.session.user != "Guest":
-            self.raised_by = frappe.session.user
+            self.raised_by = get_email_address()
         self.source = "Portal"
         self.flags.ignore_permlevel_for_fields = [
             *PORTAL_INSERT_EXEMPT_FIELDS,

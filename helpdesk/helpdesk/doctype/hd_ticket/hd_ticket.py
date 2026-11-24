@@ -16,8 +16,11 @@ from frappe.permissions import add_permission, update_permission_property
 from frappe.utils import (
     add_to_date,
     cint,
+    get_email_address,
+    get_email_addresses,
     get_string_between,
     get_url,
+    get_user_by_email,
     getdate,
     now_datetime,
 )
@@ -296,7 +299,7 @@ class HDTicket(Document, CustomerEditController):
     def set_raised_by(self):
         if self.raised_by:
             return
-        self.raised_by = frappe.session.user
+        self.raised_by = get_email_address()
 
     def set_ticket_origin(self):
         # after the permlevel reset, which would wipe these for a customer
@@ -724,7 +727,7 @@ class HDTicket(Document, CustomerEditController):
         subject = f"Re: {self.subject}"
         from_email_id = from_email.get("email_id") if from_email else None
         email_account_name = from_email.get("email_account") if from_email else None
-        sender = from_email_id or frappe.session.user
+        sender = from_email_id or get_email_address()
         # the UI always sends `to`; a caller that names nobody means the customer
         if to is None and not cc and not bcc:
             to = self.raised_by
@@ -879,7 +882,7 @@ class HDTicket(Document, CustomerEditController):
         c.sent_or_received = "Received"
         c.email_status = "Open"
         c.subject = f"Re: {self.subject}"
-        c.sender = frappe.session.user
+        c.sender = get_email_address()
         c.content = message
         c.status = "Linked"
         c.reference_doctype = "HD Ticket"
@@ -948,7 +951,7 @@ class HDTicket(Document, CustomerEditController):
         if not assigned_agents:
             return
 
-        recipients = [a.get("name") for a in self.get_assigned_agents()]
+        recipients = list(get_email_addresses(a.name for a in assigned_agents))
 
         email_content = frappe.db.get_single_value(
             "HD Settings", "reply_email_to_agent_content"
@@ -1451,7 +1454,9 @@ def get_customers_to_notify(ticket) -> set[str]:
 
     The readers `has_permission` lets in; not called per user, it repeats these lookups.
     """
-    candidates = {ticket.raised_by, ticket.owner, ticket.contact}
+    candidates = {ticket.owner, ticket.contact}
+    if ticket.raised_by:
+        candidates.add(get_user_by_email(ticket.raised_by))
     if ticket.customer and (
         managers := frappe.get_all(
             "HD Customer Member",
@@ -1501,7 +1506,9 @@ def has_permission(doc, user=None):
     user = user or frappe.session.user
     if is_admin(user):
         return True
-    if user in (doc.contact, doc.raised_by, doc.owner):
+    if user in (doc.contact, doc.owner):
+        return True
+    if doc.raised_by and doc.raised_by == get_email_address(user):
         return True
     if is_customer_manager(doc.customer, user):
         return True
@@ -1592,8 +1599,8 @@ def _agent_query(user: str) -> str | None:
 def _get_base_visibility(user: str) -> str:
     """WHERE fragment for tickets a user is directly tied to: owner, contact, or raiser."""
 
-    return "(`tabHD Ticket`.owner = {u} OR `tabHD Ticket`.contact = {u} OR `tabHD Ticket`.raised_by = {u})".format(
-        u=frappe.db.escape(user)
+    return "(`tabHD Ticket`.owner = {u} OR `tabHD Ticket`.contact = {u} OR `tabHD Ticket`.raised_by = {email})".format(
+        u=frappe.db.escape(user), email=frappe.db.escape(get_email_address(user))
     )
 
 

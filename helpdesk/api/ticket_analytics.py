@@ -112,6 +112,7 @@ def event_series(
     events = []
     gaps: dict[str, list[int]] = {"agent": [], "customer": []}
     names: dict[str, str] = {}
+    by_email = user_ids([m.sender for m in messages if m.sender])
     previous = None
     first_sent_seen = False
     for index, message in enumerate(messages):
@@ -149,7 +150,9 @@ def event_series(
             first_sent_seen = True
         if not is_description(index, message, details) and not is_first_response:
             if message.sender not in names:
-                names[message.sender] = frappe.utils.get_fullname(message.sender)
+                names[message.sender] = frappe.utils.get_fullname(
+                    by_email.get(message.sender, message.sender)
+                )
             events.append(
                 {
                     "side": (
