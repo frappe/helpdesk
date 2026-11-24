@@ -5,7 +5,7 @@ import frappe
 from dateutil.relativedelta import relativedelta
 from frappe.query_builder import DocType
 from frappe.query_builder.functions import Avg, Count, Function
-from frappe.utils import add_months, get_email_address, today
+from frappe.utils import add_months, today
 from pypika import Case
 
 from helpdesk.api.agent_home.utils import (
@@ -627,7 +627,7 @@ ACTIVITY_SOURCES = [
     ),
     (
         "Comment",
-        "comment_email",
+        "owner",
         "reference_name",
         "commented",
         {"reference_doctype": "HD Ticket", "comment_type": "Comment"},
@@ -657,7 +657,6 @@ def get_recent_activity() -> list[dict]:
     One row per ticket over the last few days: replied, commented, updated, viewed
     or assigned."""
     user = frappe.session.user
-    email = get_email_address(user)
     cutoff = frappe.utils.add_days(frappe.utils.nowdate(), -RECENT_ACTIVITY_DAYS)
 
     events = []
@@ -668,8 +667,7 @@ def get_recent_activity() -> list[dict]:
         activity_type,
         extra_filters,
     ) in ACTIVITY_SOURCES:
-        identity = email if user_field == "comment_email" else user
-        filters = {**extra_filters, user_field: identity, "creation": [">=", cutoff]}
+        filters = {**extra_filters, user_field: user, "creation": [">=", cutoff]}
         events += _activity_events(doctype, filters, ticket_field, activity_type)
 
     # One row per ticket: keep only its most recent event across all sources.

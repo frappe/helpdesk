@@ -9,7 +9,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder import Order
 from frappe.realtime import get_site_room
-from frappe.utils import floor
+from frappe.utils import floor, get_email_address
 from frappe.utils.safe_exec import get_safe_globals
 from frappe.utils.telemetry import capture as _capture
 from phonenumbers import NumberParseException
@@ -100,6 +100,13 @@ def get_doc_room(doctype: str, name: str) -> str:
 
 def capture_event(event: str):
     return _capture(event, "helpdesk")
+
+
+def get_session_user_address() -> str:
+    """The session user's email; Administrator and Guest have none of their own and
+    are stored as themselves."""
+    user = frappe.session.user
+    return user if user in frappe.STANDARD_USERS else get_email_address(user)
 
 
 def get_user_contact(user: str | None = None) -> str | None:

@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
 from frappe.rate_limiter import rate_limit
-from frappe.utils import get_email_address, get_user_info_for_avatar, now_datetime
+from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Order
 
@@ -16,7 +16,12 @@ from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_scr
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket.ticket_origin import TICKET_ORIGIN_FIELDS
 from helpdesk.ticket_fields import TicketFields
-from helpdesk.utils import agent_only, is_agent, parse_call_logs
+from helpdesk.utils import (
+    agent_only,
+    get_session_user_address,
+    is_agent,
+    parse_call_logs,
+)
 
 TIMELINE_FIELDS = ("status",)
 
@@ -34,7 +39,7 @@ def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     doc["doctype"] = "HD Ticket"
     doc["source"] = "Portal"
     doc["attachments"] = attachments
-    doc["raised_by"] = get_email_address()
+    doc["raised_by"] = get_session_user_address()
     d = frappe.get_doc(doc)
     # only the portal sends an origin
     d.flags.ticket_origin = origin
