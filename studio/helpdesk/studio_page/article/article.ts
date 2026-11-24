@@ -16,8 +16,6 @@ import { saveArticleFeedback } from '@app/components/knowledge_base/articleFeedb
 import { useBottomSheet } from '@app/composables/useDrawer'
 import { articleName, prefetchOnHover, useArticle, useKnowledgeBase } from '@app/stores/knowledgeBase'
 
-const RELATED_LIMIT = 5
-
 export default function setup(context) {
   const { route, router } = context
   const article = useArticle(() => articleName(route?.params?.name))
@@ -41,15 +39,6 @@ export default function setup(context) {
   const isPublicArticle = computed(
     () => article.data?.visibility === 'Public' && settings.isPublicKnowledgeBase.value,
   )
-
-  // Same Subcategory first, then its parent's own Articles.
-  const relatedArticles = computed(() => {
-    const { category, parent_article_category, name } = article.data || {}
-    const articlesOf = (categoryName) => sidebar.data?.find((row) => row.name === categoryName)?.articles || []
-    return [...articlesOf(category), ...articlesOf(parent_article_category)]
-      .filter((row) => row.name !== name)
-      .slice(0, RELATED_LIMIT)
-  })
 
   // Pre-slug links carry the bare name.
   function isCurrentArticle(routeName) {
@@ -133,7 +122,6 @@ export default function setup(context) {
     parsed,
     readingTime,
     publishedOn,
-    relatedArticles,
     submitFeedback,
     copyPageLink,
     isPublicArticle,

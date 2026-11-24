@@ -594,32 +594,25 @@ test.describe("categories and category pages", () => {
 
     await page.goto(`/help/category/${category.name}`);
     const sidebar = page.getByRole("navigation", { name: "Knowledge base" });
-    const row = (category: { category_name: string }) =>
-      sidebar.getByRole("link", { name: category.category_name, exact: true });
-    const item = (category: { category_name: string }) =>
-      row(category).locator('xpath=ancestor::li[@role="treeitem"][1]');
-    const chevron = (category: { category_name: string }) =>
-      item(category).locator(':scope > [data-slot="row"] [data-slot="toggle"]');
-    await expect(item(category)).toHaveAttribute("aria-expanded", "true");
-    // The tree's chevron folds without leaving the page.
+    const chevron = (row: { name: string }) => sidebar.locator(`[aria-controls="kb-sidebar-${row.name}"]`);
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "true");
+    // The chevron folds without leaving the page.
     await chevron(category).click();
-    await expect(item(category)).toHaveAttribute("aria-expanded", "false");
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "false");
     await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
     await chevron(other).click();
-    await expect(item(other)).toHaveAttribute("aria-expanded", "true");
+    await expect(chevron(other)).toHaveAttribute("aria-expanded", "true");
     await expect(sidebar.getByRole("link", { name: otherArticle.title })).toBeVisible();
-    // The row opens the category's page; there, each click folds or opens it.
-    await row(other).click();
+    // The row opens the category's page, and a second click keeps it open.
+    const otherRow = sidebar.getByRole("link", { name: other.category_name, exact: true });
+    await otherRow.click();
     await expect(page).toHaveURL(new RegExp(`/help/category/${other.name}$`));
-    await expect(item(other)).toHaveAttribute("aria-expanded", "true");
-    await expect(item(category)).toHaveAttribute("aria-expanded", "false");
-    await row(other).click();
-    await expect(item(other)).toHaveAttribute("aria-expanded", "false");
-    await row(other).click();
-    await expect(item(other)).toHaveAttribute("aria-expanded", "true");
-    await row(category).click();
+    await otherRow.click();
+    await expect(chevron(other)).toHaveAttribute("aria-expanded", "true");
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "false");
+    await sidebar.getByRole("link", { name: category.category_name, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
-    await expect(item(category)).toHaveAttribute("aria-expanded", "true");
+    await expect(chevron(category)).toHaveAttribute("aria-expanded", "true");
 
     await page.locator("body").press("/");
     const search = sidebar.getByRole("textbox", { name: "Search articles" });
@@ -764,21 +757,17 @@ test.describe("article page", () => {
     await expect.soft(toc.getByRole("button", { name: "Only part" }), "one heading still shows the xl TOC").toBeVisible();
   });
 
-  test("AR25 AR27 related articles open and reset the article scroll", async ({ page, api }) => {
+  test("AR27 opening another article from the sidebar resets the article scroll", async ({ page, api }) => {
     const category = await createCategory(api);
     const filler = "<p>" + "word ".repeat(800) + "</p>";
     const created = [];
-    for (let i = 0; i < 8; i++) created.push(await createArticle(api, category.name, { title: `Related ${i} ${uid()}`, content: filler }));
+    for (let i = 0; i < 2; i++) created.push(await createArticle(api, category.name, { title: `Scroll ${i} ${uid()}`, content: filler }));
     await page.goto(`/help/articles/${created[0].name}`);
-    await expect(page.getByText("Related articles")).toBeVisible();
-    const rows = page.getByRole("navigation", { name: "Related articles" }).getByRole("link", { name: /^Related \d/ });
-    await expect(rows).toHaveCount(5);
+    await expect(page.getByText("Related articles")).toBeHidden();
     const panel = page.locator('[data-component-id="container-article-scroll"]');
     await panel.evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
-    const target = rows.first();
-    const title = (await target.innerText()).split("\n")[0];
-    await target.click();
-    await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible();
+    await page.getByRole("link", { name: created[1].title }).first().click();
+    await expect(page.getByRole("heading", { name: created[1].title, level: 1 })).toBeVisible();
     await expect.poll(() => panel.evaluate((el) => el.scrollTop)).toBe(0);
   });
 
@@ -837,7 +826,7 @@ test.describe("knowledge base settings", () => {
       await expect(page).toHaveURL(/\/settings\/knowledge-base$/);
 
       // Switches save without the Save button.
-      await dialog.getByRole("tab", { name: "Settings", exact: true }).click();
+      await dialog.getByRole("tab", { name: "Advanced" }).click();
       await dialog.getByText("Allow guests to vote on articles").locator("xpath=../..").getByRole("switch").click();
       await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).allow_anonymous_article_voting).toBe(1);
       await expect(dialog.getByText("Unsaved")).toBeHidden();

@@ -170,7 +170,7 @@ const tabs = computed(() => [
   { value: "home", label: __("Home page") },
   { value: "header", label: __("Header") },
   { value: "footer", label: __("Footer") },
-  { value: "settings", label: __("Settings") },
+  { value: "advanced", label: __("Advanced") },
 ]);
 
 watch(
@@ -186,7 +186,7 @@ const skeletons = {
   home: { rows: 2, panels: [180, 50, 50] },
   header: { rows: 1, panels: [96] },
   footer: { rows: 1 },
-  settings: { rows: 2 },
+  advanced: { rows: 2 },
 };
 
 // computed, so labels follow a translation load
