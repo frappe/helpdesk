@@ -64,6 +64,7 @@ import PortalCollapse from "@app/components/ui/PortalCollapse.vue";
 const ACTIVE_RATIO = 1 / 3;
 // Within this many px of the top, the first heading is current.
 const TOP_ZONE = 100;
+const RAIL_FADE = 40;
 
 type Item = { id: string; text: string; level: number };
 
@@ -125,9 +126,10 @@ watch(activeId, async (id) => {
   if (link.offsetTop < nav.scrollTop) nav.scrollTop = link.offsetTop;
   else if (
     link.offsetTop + link.offsetHeight >
-    nav.scrollTop + nav.clientHeight
+    nav.scrollTop + nav.clientHeight - RAIL_FADE
   )
-    nav.scrollTop = link.offsetTop + link.offsetHeight - nav.clientHeight;
+    nav.scrollTop =
+      link.offsetTop + link.offsetHeight - nav.clientHeight + RAIL_FADE;
 });
 
 // Capture: scroll doesn't bubble from the nested scroller.
