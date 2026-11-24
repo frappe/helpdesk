@@ -1,5 +1,8 @@
 import json
+import re
+from contextlib import contextmanager
 from datetime import datetime
+from types import SimpleNamespace
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -1257,3 +1260,69 @@ def enable_ai_search(**overrides) -> frappe.Document:
         }
     )
     return settings.save()
+
+
+EMBEDDING_KEYWORDS = ("wifi", "refund", "password", "invoice")
+
+
+def fake_embed_texts(texts: list[str]) -> list[list[float]]:
+    """Keyword-count vectors, so knowledge search runs offline and ranks by shared words."""
+    return [
+        [float(text.lower().count(word)) for word in EMBEDDING_KEYWORDS] + [0.1]
+        for text in texts
+    ]
+
+
+@contextmanager
+def fake_flow_knowledge():
+    """Run Flow's knowledge indexing and search on `fake_embed_texts`, in a throwaway store.
+    Ingestion commits, so commits are muted to keep the test's rollback whole."""
+    from frappe.flow.knowledge import store
+
+    store.drop_table()
+    model = frappe.get_doc(
+        {
+            "doctype": "Flow Model",
+            "title": unique_name("Test Embeddings"),
+            "model_id": "openai/text-embedding-3-small",
+            "embedding": 1,
+        }
+    ).insert(ignore_permissions=True)
+    frappe.db.set_single_value(
+        "Flow Knowledge Settings",
+        {
+            "embedding_model": model.name,
+            "embedding_dimension": len(EMBEDDING_KEYWORDS) + 1,
+        },
+    )
+    frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
+    try:
+        with (
+            patch("frappe.flow.knowledge.embedder.embed_texts", fake_embed_texts),
+            patch.object(frappe.db, "commit"),
+        ):
+            yield
+    finally:
+        store.drop_table()
+        frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
+
+
+def make_llm_reply(text: str) -> SimpleNamespace:
+    """A litellm completion response holding `text`."""
+    return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=text))])
+
+
+def cite_every_source(**kwargs) -> SimpleNamespace:
+    """A `litellm.completion` stand-in answering with a citation for each numbered source it was sent."""
+    prompt = " ".join(message["content"] for message in kwargs["messages"])
+    numbers = sorted(set(re.findall(r"^\[(\d+)\] ", prompt, re.MULTILINE)))
+    return make_llm_reply("Here is the answer. " + "".join(f"[{n}]" for n in numbers))
+
+
+def llm_prompt(completion: MagicMock) -> str:
+    """Everything a patched `litellm.completion` was last sent, as one string; empty if it never was."""
+    if not completion.call_args:
+        return ""
+    return " ".join(
+        message["content"] for message in completion.call_args.kwargs["messages"]
+    )

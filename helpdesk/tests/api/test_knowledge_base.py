@@ -9,7 +9,9 @@ from frappe.website.serve import get_response
 from redis.exceptions import ResponseError
 
 from helpdesk.api.article import get_related
+from helpdesk.ai_search import KNOWLEDGE_BASES, index_all_articles, index_article
 from helpdesk.api.knowledge_base import (
+    ANSWER_QUESTION_LENGTH,
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
     archive_articles,
@@ -37,6 +39,7 @@ from helpdesk.api.knowledge_base import (
     search_articles,
     search_categories,
     set_category_visibility,
+    answer_question,
     set_pinned_articles,
     vote_on_article,
 )
@@ -55,12 +58,17 @@ from helpdesk.test_utils import (
     article_index_jobs,
     category_names,
     category_row,
+    cite_every_source,
     create_user,
+    enable_ai_search,
+    fake_flow_knowledge,
+    llm_prompt,
     make_agent,
     make_article,
     make_article_category,
     make_article_feedback,
     make_contact,
+    make_llm_reply,
     make_search_hit,
     make_search_page,
     make_subcategory,
@@ -1967,3 +1975,277 @@ class TestCategoryMerge(IntegrationTestCase):
             frappe.db.get_value("HD Article", article, ["category", "visibility"]),
             (target, PRIVATE),
         )
+
+
+class TestAnswerQuestion(IntegrationTestCase):
+    """The AI answer reads only what its asker may read, and says which articles it used."""
+
+    def setUp(self) -> None:
+        self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
+        self.enterContext(patch("frappe.enqueue"))
+        enable_ai_search()
+        self.enterContext(fake_flow_knowledge())
+        self.customer = make_contact("kb-ai-customer")["user"]
+        self.agent = make_agent(unique_email("kb-ai-agent"))
+        self.category = make_article_category("Fixture AI")
+        self.public = self.make_article("Public wifi guide", PUBLIC, "PUBLIC-FACT")
+        self.members = self.make_article("Members wifi guide", CUSTOMERS, "MEMBERS-FACT")
+        self.internal = self.make_article("Internal wifi guide", PRIVATE, "INTERNAL-FACT")
+
+    def make_article(self, title, visibility, fact) -> str:
+        name = make_article(
+            title,
+            category=self.category.name,
+            visibility=visibility,
+            content=f"<p>Fix wifi by restarting the router. {fact}</p>",
+        )
+        index_article(name)
+        return name
+
+    def ask(self, user, question="How do I fix my wifi?", reply=cite_every_source):
+        with self.set_user(user), patch("litellm.completion", side_effect=reply) as completion:
+            return answer_question(question), llm_prompt(completion)
+
+    def names(self, rows) -> set[str]:
+        return {row["name"] for row in rows}
+
+    def test_it_is_reachable_without_a_session(self) -> None:
+        self.assertIn(answer_question, frappe.guest_methods)
+
+    def test_it_refuses_while_ai_search_is_off(self) -> None:
+        enable_ai_search(enable_ai_search=0)
+        with patch("litellm.completion") as completion:
+            with self.assertRaises(frappe.PermissionError):
+                answer_question("How do I fix my wifi?")
+        completion.assert_not_called()
+
+    def test_a_guest_is_refused_while_the_knowledge_base_is_private(self) -> None:
+        frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
+        with self.set_user("Guest"), patch("litellm.completion") as completion:
+            with self.assertRaises(frappe.PermissionError):
+                answer_question("How do I fix my wifi?")
+        completion.assert_not_called()
+
+    def test_a_guest_is_answered_from_public_articles_only(self) -> None:
+        result, prompt = self.ask("Guest")
+
+        self.assertIn("PUBLIC-FACT", prompt)
+        self.assertNotIn("MEMBERS-FACT", prompt)
+        self.assertNotIn("INTERNAL-FACT", prompt)
+        self.assertEqual(self.names(result["sources"]), {self.public})
+        self.assertEqual(result["related"], [])
+        self.assertNotIn("MEMBERS-FACT", frappe.as_json(result))
+        self.assertNotIn("INTERNAL-FACT", frappe.as_json(result))
+
+    def test_a_customer_is_answered_from_public_and_customers_articles(self) -> None:
+        result, prompt = self.ask(self.customer)
+
+        self.assertIn("PUBLIC-FACT", prompt)
+        self.assertIn("MEMBERS-FACT", prompt)
+        self.assertNotIn("INTERNAL-FACT", prompt)
+        self.assertEqual(self.names(result["sources"]), {self.public, self.members})
+
+    def test_an_agent_is_answered_from_every_article(self) -> None:
+        result, prompt = self.ask(self.agent)
+
+        for fact in ("PUBLIC-FACT", "MEMBERS-FACT", "INTERNAL-FACT"):
+            self.assertIn(fact, prompt)
+        self.assertEqual(
+            self.names(result["sources"]), {self.public, self.members, self.internal}
+        )
+
+    def test_a_citation_numbers_its_source_in_the_answer(self) -> None:
+        result, _ = self.ask("Guest")
+
+        (source,) = result["sources"]
+        self.assertIn(f"[{source['number']}]", result["answer"])
+        self.assertEqual(source["title"], "Public wifi guide")
+        self.assertTrue(source["title_slug"])
+
+    def test_articles_that_were_not_cited_are_related(self) -> None:
+        result, _ = self.ask(
+            self.agent, reply=lambda **kwargs: make_llm_reply("Restart it. [1]")
+        )
+
+        self.assertEqual(len(result["sources"]), 1)
+        self.assertEqual(
+            self.names(result["related"]) | self.names(result["sources"]),
+            {self.public, self.members, self.internal},
+        )
+        self.assertFalse(self.names(result["related"]) & self.names(result["sources"]))
+        self.assertEqual(
+            set(result["related"][0]), {"name", "title", "title_slug", "excerpt"}
+        )
+
+    def test_a_guest_is_not_shown_related_articles_they_cannot_read(self) -> None:
+        result, _ = self.ask(
+            "Guest", reply=lambda **kwargs: make_llm_reply("Restart it. [1]")
+        )
+
+        self.assertEqual(result["related"], [])
+
+    def test_an_article_narrowed_before_the_index_catches_up_stays_hidden(self) -> None:
+        frappe.db.set_value("HD Article", self.public, "visibility", CUSTOMERS)
+
+        result, prompt = self.ask("Guest")
+
+        self.assertNotIn("PUBLIC-FACT", prompt)
+        self.assertEqual(result["sources"], [])
+
+    def test_an_unpublished_article_leaves_the_answers_once_indexed(self) -> None:
+        frappe.db.set_value("HD Article", self.public, "status", "Draft")
+        index_article(self.public)
+
+        self.assertFalse(
+            frappe.db.exists("Flow Knowledge Source", {"title": self.public})
+        )
+        _, prompt = self.ask(self.agent)
+        self.assertNotIn("PUBLIC-FACT", prompt)
+
+    def test_a_narrowed_article_moves_to_the_knowledge_base_of_its_new_audience(
+        self,
+    ) -> None:
+        frappe.db.set_value("HD Article", self.public, "visibility", PRIVATE)
+        index_article(self.public)
+
+        kbs = frappe.get_all(
+            "Flow Knowledge Source", {"title": self.public}, pluck="knowledge_base"
+        )
+        self.assertEqual(kbs, [KNOWLEDGE_BASES[PRIVATE]])
+
+    def test_a_deleted_article_leaves_the_index(self) -> None:
+        frappe.delete_doc("HD Article", self.members, force=True)
+        index_article(self.members)
+
+        self.assertFalse(
+            frappe.db.exists("Flow Knowledge Source", {"title": self.members})
+        )
+
+    def test_an_edited_article_is_answered_from_its_new_text(self) -> None:
+        frappe.db.set_value(
+            "HD Article", self.public, "content", "<p>Fix wifi with NEW-FACT.</p>"
+        )
+        index_article(self.public)
+
+        _, prompt = self.ask("Guest")
+
+        self.assertIn("NEW-FACT", prompt)
+        self.assertNotIn("PUBLIC-FACT", prompt)
+
+    def test_indexing_everything_covers_published_articles_and_drops_the_rest(
+        self,
+    ) -> None:
+        ours = {self.public, self.members, self.internal}
+
+        def indexed() -> set[str]:
+            return ours & set(
+                frappe.get_all(
+                    "Flow Knowledge Source",
+                    {"knowledge_base": ["in", list(KNOWLEDGE_BASES.values())]},
+                    pluck="title",
+                )
+            )
+
+        for source in frappe.get_all("Flow Knowledge Source", pluck="name"):
+            frappe.delete_doc("Flow Knowledge Source", source, ignore_permissions=True)
+        index_all_articles()
+        self.assertEqual(indexed(), {self.public, self.members, self.internal})
+
+        frappe.db.set_value("HD Article", self.members, "status", "Draft")
+        index_all_articles()
+        self.assertEqual(indexed(), {self.public, self.internal})
+
+    def test_an_off_topic_question_gets_a_one_line_refusal(self) -> None:
+        frappe.db.set_single_value("HD Settings", "brand_name", "Acme Desk")
+
+        result, _ = self.ask(
+            "Guest", reply=lambda **kwargs: make_llm_reply("OFF_TOPIC")
+        )
+
+        self.assertEqual(
+            result,
+            {
+                "answer": "I can only help with Acme Desk.",
+                "refused": True,
+                "sources": [],
+                "related": [],
+            },
+        )
+
+    def test_a_question_nothing_matches_is_refused_without_asking_the_model(
+        self,
+    ) -> None:
+        for article in (self.public, self.members, self.internal):
+            frappe.db.set_value("HD Article", article, "status", "Draft")
+            index_article(article)
+
+        with self.set_user("Guest"), patch("litellm.completion") as completion:
+            result = answer_question("How do I fix my wifi?")
+
+        self.assertTrue(result["refused"])
+        completion.assert_not_called()
+
+    def test_the_question_is_capped(self) -> None:
+        _, prompt = self.ask("Guest", question="wifi " + "x" * 5000)
+
+        self.assertIn("x" * 100, prompt)
+        self.assertNotIn("x" * ANSWER_QUESTION_LENGTH, prompt)
+
+    def test_a_model_failure_does_not_reach_the_asker(self) -> None:
+        def fail(**kwargs):
+            raise RuntimeError("401 key sk-test-key rejected")
+
+        with self.set_user("Guest"), patch("litellm.completion", side_effect=fail):
+            with self.assertRaises(frappe.ValidationError) as caught:
+                answer_question("How do I fix my wifi?")
+
+        self.assertNotIn("sk-test-key", str(caught.exception))
+
+    def test_it_is_rate_limited(self) -> None:
+        frappe.cache.delete_keys("rl:helpdesk.api.knowledge_base.answer_question")
+        set_request(method="POST", path="/api/method/answer_question")
+        self.addCleanup(setattr, frappe.local, "request", None)
+
+        with self.set_user("Guest"), patch(
+            "litellm.completion", side_effect=cite_every_source
+        ):
+            with self.assertRaises(frappe.RateLimitExceededError):
+                for _ in range(50):
+                    answer_question("How do I fix my wifi?")
+
+
+class TestAIIndexUpdates(IntegrationTestCase):
+    """Changing an article queues an index update, while AI search is on."""
+
+    def setUp(self) -> None:
+        self.enqueue = self.enterContext(patch("frappe.enqueue"))
+
+    def jobs(self) -> list[str]:
+        return [
+            call.kwargs["article"]
+            for call in self.enqueue.call_args_list
+            if call.args[0] == "helpdesk.ai_search.index_article"
+        ]
+
+    def test_saving_an_article_queues_an_update(self) -> None:
+        enable_ai_search()
+        name = make_article()
+        self.assertEqual(self.jobs(), [name])
+
+        frappe.db.set_value("HD Article", name, "visibility", PRIVATE)
+        frappe.get_doc("HD Article", name).save()
+        self.assertEqual(self.jobs(), [name, name])
+
+    def test_deleting_an_article_queues_an_update(self) -> None:
+        enable_ai_search()
+        name = make_article()
+        self.enqueue.reset_mock()
+
+        frappe.delete_doc("HD Article", name, force=True)
+
+        self.assertEqual(self.jobs(), [name])
+
+    def test_nothing_is_queued_while_ai_search_is_off(self) -> None:
+        enable_ai_search(enable_ai_search=0)
+        make_article()
+        self.assertEqual(self.jobs(), [])

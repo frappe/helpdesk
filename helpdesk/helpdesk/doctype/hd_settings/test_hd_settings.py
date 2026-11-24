@@ -12,7 +12,9 @@ from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     KNOWLEDGE_BASE_HOME,
     TICKETS_HOME,
 )
-from helpdesk.test_utils import create_agent, enable_ai_search
+from unittest.mock import patch
+
+from helpdesk.test_utils import create_agent, enable_ai_search, fake_flow_knowledge
 
 CUSTOMER = "home-page-customer@example.com"
 AGENT_CUSTOMER = "home-page-agent@example.com"
@@ -255,6 +257,22 @@ class TestAISearchSettings(IntegrationTestCase):
 
         provider = frappe.get_doc("Flow Provider", "mistral")
         self.assertEqual(provider.get_password("api_key"), "site-key")
+
+    def test_turning_it_on_queues_indexing_of_every_article(self) -> None:
+        enable_ai_search(enable_ai_search=0)
+        with fake_flow_knowledge(), patch("frappe.enqueue") as enqueue:
+            enable_ai_search()
+            enable_ai_search(ai_model="gpt-4.1")
+
+        jobs = [call.args[0] for call in enqueue.call_args_list]
+        self.assertEqual(jobs, ["helpdesk.ai_search.index_all_articles"])
+
+    def test_nothing_is_queued_without_an_embedding_model(self) -> None:
+        enable_ai_search(enable_ai_search=0)
+        with patch("frappe.enqueue") as enqueue:
+            enable_ai_search()
+
+        enqueue.assert_not_called()
 
     def test_turning_it_off_leaves_the_flow_records_alone(self) -> None:
         enable_ai_search()

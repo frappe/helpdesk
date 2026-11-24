@@ -109,13 +109,25 @@ class HDArticle(Document):
 
     def on_update(self):
         self.update_search_index()
+        self.update_ai_index()
 
     def on_trash(self):
         validate_keeps_content(self.category, leaving_article=self.name)
         self.update_search_index()
+        self.update_ai_index()
 
     def update_search_index(self):
         index_articles([self.name], queue="short")
+
+    def update_ai_index(self):
+        if not frappe.db.get_single_value("HD Settings", "enable_ai_search"):
+            return
+        frappe.enqueue(
+            "helpdesk.ai_search.index_article",
+            queue="short",
+            enqueue_after_commit=True,
+            article=self.name,
+        )
 
     @staticmethod
     def default_list_data():

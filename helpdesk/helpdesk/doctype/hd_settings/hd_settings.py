@@ -6,6 +6,9 @@ from __future__ import unicode_literals
 
 import frappe
 from frappe import _
+from frappe.flow.doctype.flow_knowledge_settings.flow_knowledge_settings import (
+    embeddings_configured,
+)
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
@@ -195,6 +198,7 @@ class HDSettings(Document):
         self.sync_flow_provider()
         model = self.sync_flow_model()
         self.sync_flow_agent(model)
+        self.index_articles_when_turned_on()
 
     def sync_flow_provider(self):
         """A provider the site already has keeps its own key; the model carries ours."""
@@ -232,6 +236,21 @@ class HDSettings(Document):
         agent.sync()
         # sync() keeps an existing agent's model, which a settings change must move
         frappe.db.set_value("Flow Agent", agent.name, "model", model)
+
+    def index_articles_when_turned_on(self):
+        if not self.has_value_changed("enable_ai_search"):
+            return
+        if not embeddings_configured():
+            frappe.msgprint(
+                _("Set an embedding model in Flow Knowledge Settings to index articles"),
+                indicator="orange",
+            )
+            return
+        frappe.enqueue(
+            "helpdesk.ai_search.index_all_articles",
+            queue="long",
+            enqueue_after_commit=True,
+        )
 
     def update_ticket_permissions(self):
         if self.allow_anyone_to_create_tickets:

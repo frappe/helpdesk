@@ -16,6 +16,7 @@ from frappe.website.page_renderers.base_renderer import BaseRenderer
 from frappe.website.utils import cleanup_page_name, find_first_image
 from werkzeug.wrappers import Response
 
+from helpdesk import ai_search
 from helpdesk.api.article import search_accessible_articles
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
     MAX_PINNED_ARTICLES,
@@ -62,6 +63,7 @@ PUBLIC_CATEGORY_FIELDS = [
 ]
 SEARCH_LIMIT = NUM_RESULTS
 SEARCH_QUERY_LENGTH = 200
+ANSWER_QUESTION_LENGTH = 500
 WORDS_PER_MINUTE = 200
 LIST_LIMIT = 100
 SUBCATEGORY_ARTICLES_LIMIT = 5
@@ -741,6 +743,21 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
         for row in hits
         if row["name"] in articles
     ]
+
+
+@frappe.whitelist(allow_guest=True, methods=["POST"])  # nosemgrep
+@rate_limit(limit=10, seconds=60, user_based=True)
+def answer_question(question: str) -> dict:
+    """An AI answer to `question` from the articles the caller may read. Returns the answer,
+    the sources it cites by number, and related articles; `refused` is set when the question
+    is off topic or no article answers it. Guests only when the knowledge base is public."""
+    validate_public_access()
+    if not ai_search.is_enabled():
+        frappe.throw(_("AI search is turned off"), frappe.PermissionError)
+    question = (question or "").strip()[:ANSWER_QUESTION_LENGTH]
+    if not question:
+        frappe.throw(_("Ask a question"))
+    return ai_search.answer(question, frappe.session.user)
 
 
 def _get_search_hit(row: dict, article: frappe._dict, labels: dict) -> dict:
