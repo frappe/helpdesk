@@ -417,8 +417,7 @@
                    "classes": [
                     "size-4",
                     "shrink-0",
-                    "mt-px",
-                    "text-ink-gray-4",
+                    "text-ink-gray-5",
                     "transition-colors",
                     "group-hover:text-ink-gray-7"
                    ],
@@ -429,7 +428,9 @@
                   {
                    "classes": [
                     "flex-1",
-                    "text-ink-gray-6",
+                    "min-w-0",
+                    "truncate",
+                    "text-ink-gray-8",
                     "transition-colors",
                     "group-hover:text-ink-gray-9",
                     "group-focus-visible:text-ink-gray-9"
@@ -441,16 +442,34 @@
                     "tag": "span",
                     "text": "{{ dataItem.title }}"
                    }
+                  },
+                  {
+                   "classes": [
+                    "size-4",
+                    "shrink-0",
+                    "text-ink-gray-4",
+                    "transition-colors",
+                    "group-hover:text-ink-gray-6"
+                   ],
+                   "componentId": "related-row-chevron",
+                   "componentName": "Icon",
+                   "componentProps": {
+                    "icon": "lucide-chevron-right"
+                   }
                   }
                  ],
                  "classes": [
                   "group",
                   "flex",
                   "gap-3",
-                  "items-start",
-                  "py-2",
-                  "rounded-4",
+                  "items-center",
+                  "px-4",
+                  "py-3",
                   "cursor-pointer",
+                  "transition-colors",
+                  "hover:bg-surface-gray-1",
+                  "first:rounded-t-5",
+                  "last:rounded-b-5",
                   "focus-visible:focus-ring"
                  ],
                  "componentEvents": {
@@ -472,7 +491,12 @@
                 "w-full",
                 "!flex-col",
                 "!flex-nowrap",
-                "!gap-0"
+                "!gap-0",
+                "rounded-5",
+                "border",
+                "border-outline-gray-1",
+                "divide-y",
+                "divide-outline-gray-1"
                ],
                "componentId": "Repeater-qufpavvce",
                "componentName": "Repeater",
@@ -485,7 +509,7 @@
              "classes": [
               "flex",
               "flex-col",
-              "gap-3",
+              "gap-4",
               "mt-6",
               "w-full",
               "portal-reveal"
@@ -497,9 +521,6 @@
              "componentProps": {
               "aria-label": "{{ t('Related articles') }}",
               "role": "navigation"
-             },
-             "baseStyles": {
-              "marginBottom": "-8px"
              }
             }
            ],
@@ -649,7 +670,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-11-24 13:00:00.000000",
+ "modified": "2026-11-24 15:00:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
