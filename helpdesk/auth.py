@@ -72,6 +72,8 @@ ALLOWED_PATHS = [
     "/api/method/frappe.desk.form.activity.get_more_email_activities",
     "/api/method/frappe.desk.form.activity.get_more_milestone_activities",
     "/api/method/frappe.core.doctype.user.user.get_timezones",
+    # Flow server callback; arrives as Guest and checks its own secret
+    "/api/method/frappe.flow.daemon.callback.callback",
 ]
 
 WILDCARD_PATHS = [
