@@ -675,6 +675,7 @@ declare global {
     site_name: string;
     setup_complete: boolean;
     setup_pending: boolean;
+    needs_password_setup: boolean;
   }
 }
 

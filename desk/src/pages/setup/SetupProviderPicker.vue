@@ -479,11 +479,7 @@ useEventListener(window, "pageshow", (event: PageTransitionEvent) => {
   if (event.persisted) connecting.value = null;
 });
 
-setStepBack(() => {
-  if (screen.value === "picker") return false;
-  back();
-  return true;
-});
+setStepBack({ canGoBack: () => screen.value !== "picker", back });
 onUnmounted(() => setStepBack(null));
 
 function back() {

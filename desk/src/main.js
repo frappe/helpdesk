@@ -69,7 +69,6 @@ const app = createApp(App);
 app.use(FrappeUI);
 app.use(spritePlugin);
 app.use(pinia);
-app.use(router);
 app.use(translationPlugin);
 app.use(telemetryPlugin, { app_name: "helpdesk" });
 
@@ -91,9 +90,12 @@ if (import.meta.env.DEV) {
     if (window.lang) document.documentElement.lang = window.lang;
     socket = initSocket();
     app.config.globalProperties.$socket = socket;
+    // The router decides the first page as it is installed, so it waits for the boot values.
+    app.use(router);
     app.mount("#app");
   });
 } else {
+  app.use(router);
   socket = initSocket();
   app.config.globalProperties.$socket = socket;
   app.mount("#app");

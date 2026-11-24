@@ -229,6 +229,7 @@ ignore_links_on_delete = [
 # setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
 # setup_wizard_stages = "helpdesk.setup.setup_wizard.get_setup_stages"
 setup_wizard_success = "helpdesk.setup.setup_wizard.setup_complete"
+setup_wizard_auto_complete = True
 
 
 # Testing

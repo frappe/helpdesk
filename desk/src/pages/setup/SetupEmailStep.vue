@@ -116,15 +116,37 @@
     </Transition>
 
     <Transition v-bind="reveal">
+      <Alert
+        v-if="confirmSkip"
+        ref="skipQuestion"
+        key="confirm-skip"
+        :title="__('Skip email for now?')"
+        :description="
+          __(
+            'Without a connected mailbox, no tickets will be created from email. You can connect one from Settings.'
+          )
+        "
+        :icon="false"
+        :primary-action="{
+          label: __('Connect email'),
+          variant: 'solid',
+          onClick: () => (confirmSkip = false),
+        }"
+        :secondary-action="{
+          label: __('Skip anyway'),
+          onClick: () => next({ skipped: true }),
+        }"
+      />
       <div
-        v-if="setup.mailbox || pickerScreen === 'picker'"
+        v-else-if="setup.mailbox || pickerScreen === 'picker'"
+        key="actions"
         class="flex items-center justify-end gap-2"
       >
         <Button
           variant="outline"
           size="md"
           :label="__('Set up later')"
-          @click="setUpLater"
+          @click="confirmSkip = true"
         />
         <Button
           variant="solid"
@@ -144,8 +166,8 @@ import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { useOnboarding } from "@framework/ui";
 import { useEmailAccounts, useOneClick } from "@framework/ui/EmailAccounts";
-import { Badge, Button, dialog, Spinner, toast } from "frappe-ui";
-import { computed, onMounted, ref, watch } from "vue";
+import { Alert, Badge, Button, Spinner, toast } from "frappe-ui";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import Banner from "@framework/ui/components/EmailAccounts/Banner.vue";
 import { serviceOf } from "@framework/ui/components/EmailAccounts/services";
 import SetupProviderPicker from "./SetupProviderPicker.vue";
@@ -181,6 +203,19 @@ const defaultOutgoing = computed(
   () => controller.accounts.find((a) => a.default_outgoing)?.email_id
 );
 const pickerScreen = ref("picker");
+const confirmSkip = ref(false);
+// Opening a provider leaves the list, so the question under it no longer applies.
+watch(pickerScreen, () => (confirmSkip.value = false));
+// On a short screen the question opens below the fold; the step scrolls to show it.
+const skipQuestion = ref<{ $el: HTMLElement } | null>(null);
+watch(confirmSkip, async (open) => {
+  if (!open) return;
+  await nextTick();
+  skipQuestion.value?.$el?.scrollIntoView({
+    block: "nearest",
+    behavior: "smooth",
+  });
+});
 
 onMounted(() => {
   controller.load();
@@ -214,17 +249,5 @@ function onConnected(mailbox: Mailbox) {
   toast.success(__("{0} connected", [mailbox.address]));
   updateOnboardingStep?.("setup_email_account");
   capture("email_account_created", { data: { source: "setup" } });
-}
-
-function setUpLater() {
-  dialog.confirm({
-    title: __("Set up email later?"),
-    message: __(
-      "Without a connected mailbox, no tickets will be created from email. You can connect one from Settings."
-    ),
-    confirmLabel: __("Set up later"),
-    cancelLabel: __("Stay here"),
-    onConfirm: () => next({ skipped: true }),
-  });
 }
 </script>

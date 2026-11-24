@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.core.doctype.user.user import needs_password_setup
 from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
 from frappe.utils import get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
@@ -62,6 +63,8 @@ def get_boot():
             "csrf_token": frappe.sessions.get_csrf_token(),
             "setup_complete": frappe.is_setup_complete(),
             "setup_pending": is_setup_pending(),
+            "needs_password_setup": frappe.session.user != "Guest"
+            and needs_password_setup(),
             "is_fc_site": is_fc_site(),
             "session_user": frappe.session.user,
             "agent": get_agent_name(),
