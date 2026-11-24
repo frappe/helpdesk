@@ -13,7 +13,7 @@
         'font-medium': strong,
       }"
     >
-      {{ name }}
+      {{ user.full_name }}
     </span>
   </div>
 </template>
