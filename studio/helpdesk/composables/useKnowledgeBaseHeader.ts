@@ -41,7 +41,6 @@ const footer = computed(() => {
     .map((column) => ({ ...column, links: column.links.filter(isValidLink) }))
     .filter((column) => column.links.length)
   const socials = withIcons(saved.socials)
-  if (!tagline && !copyright && !columns.length && !socials.length) return null
   return { tagline, copyright, columns, socials, isCompact: !columns.length }
 })
 
