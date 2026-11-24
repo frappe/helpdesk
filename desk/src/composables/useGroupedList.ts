@@ -8,9 +8,6 @@ import type { GroupBySettings } from "@framework/ui/GroupBy";
 import { createResource } from "frappe-ui";
 import { computed, MaybeRefOrGetter, ref, toValue, watch } from "vue";
 
-// most lists of assignees fetched when grouped by assignee
-const ASSIGNEE_CAP = 1000;
-
 // useGroupByData through get_grouped_list, so @me and assigned-on filters match the list
 export function useGroupedList(
   doctype: MaybeRefOrGetter<string>,
@@ -39,7 +36,8 @@ export function useGroupedList(
       ...base(),
       ...serializeGroupBy(grouping()),
       limit_start: start.value,
-      limit_page_length: splitsLocally() ? ASSIGNEE_CAP : pageLength.value,
+      // grouped by assignee, every group is needed to add up each user's values; 0 is no limit
+      limit_page_length: splitsLocally() ? 0 : pageLength.value,
     }),
     onSuccess(data: Record<string, unknown>[]) {
       loaded.value = start.value ? [...loaded.value, ...data] : data;
