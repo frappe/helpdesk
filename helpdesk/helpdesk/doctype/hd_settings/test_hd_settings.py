@@ -274,6 +274,8 @@ class TestAISearchSettings(IntegrationTestCase):
 
     def test_nothing_is_queued_without_an_embedding_model(self) -> None:
         enable_ai_search(enable_ai_search=0)
+        frappe.db.set_single_value("Flow Knowledge Settings", "embedding_model", None)
+        frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
         with patch("frappe.enqueue") as enqueue:
             enable_ai_search()
 

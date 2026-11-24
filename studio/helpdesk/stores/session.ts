@@ -37,6 +37,7 @@ function createSessionStore() {
   const canCreateTicket = computed(() => !isGuest.value)
   const canGiveFeedback = computed(() => !isGuest.value || Boolean(config.value?.allow_anonymous_article_voting))
   const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
+  const isAiSearchEnabled = computed(() => Boolean(config.value?.ai_search_enabled))
   const isAgent = computed(() => Boolean(config.value?.is_agent))
   const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
@@ -98,6 +99,7 @@ function createSessionStore() {
     reloadOnSettingsUpdate,
     isGuest,
     isPublicKnowledgeBase,
+    isAiSearchEnabled,
     canCreateTicket,
     canGiveFeedback,
     isAgent,

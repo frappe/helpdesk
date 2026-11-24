@@ -33,7 +33,17 @@
     </template>
 
     <template #item="{ item }">
-      <div class="flex min-w-0 flex-1 items-start gap-3">
+      <div
+        v-if="item.askAi"
+        class="flex min-w-0 flex-1 items-center gap-3 self-center"
+      >
+        <LucideSparkles class="size-4 shrink-0 text-ink-gray-6" />
+        <span class="min-w-0 flex-1 truncate text-base text-ink-gray-8">
+          {{ __("Ask AI: {0}", [item.label]) }}
+        </span>
+        <LucideCornerDownLeft class="row-enter size-4 text-ink-gray-5" />
+      </div>
+      <div v-else class="flex min-w-0 flex-1 items-start gap-3">
         <PortalArticleIcon class="mt-0.5 size-4 shrink-0 text-ink-gray-4" />
         <div class="flex min-w-0 flex-1 flex-col gap-1">
           <span
@@ -132,6 +142,7 @@ import {
 import LucideCornerDownLeft from "~icons/lucide/corner-down-left";
 import LucideSearch from "~icons/lucide/search";
 import LucideSearchX from "~icons/lucide/search-x";
+import LucideSparkles from "~icons/lucide/sparkles";
 import LucideX from "~icons/lucide/x";
 import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { __ } from "@helpdesk/shared/translation";
@@ -142,6 +153,7 @@ import {
   useArticleSearch,
 } from "@app/composables/useArticleSearch";
 import { useRecent } from "@app/stores/recent";
+import { useSession } from "@app/stores/session";
 import { articleMeta, countLabel } from "@helpdesk/shared/utils";
 
 const MAX_RESULTS = 6;
@@ -151,13 +163,15 @@ const KEY_HINTS = [
   { keys: "esc", label: __("Close") },
 ];
 
-withDefaults(defineProps<{ placeholder?: string }>(), {
-  placeholder: "",
-});
+const props = withDefaults(
+  defineProps<{ placeholder?: string; initialQuery?: string }>(),
+  { placeholder: "", initialQuery: "" }
+);
 
 const router = useRouter();
+const session = useSession();
 const combobox = ref<InstanceType<typeof Combobox> | null>(null);
-const query = ref("");
+const query = ref(props.initialQuery);
 const isOpen = ref(false);
 const isFocused = ref(false);
 const { recentArticles, forgetArticle } = useRecent();
@@ -176,6 +190,11 @@ const searchText = computed(() => query.value.trim());
 const canSearch = computed(() => searchText.value.length >= MIN_QUERY_LENGTH);
 
 watch(query, () => (isOpen.value = canSearch.value || hasHistory.value));
+// The answer page keeps its box on the question it shows.
+watch(
+  () => props.initialQuery,
+  (value) => (query.value = value)
+);
 
 // Last history row removed: close rather than show nothing.
 watch(hasHistory, (value) => {
@@ -185,6 +204,11 @@ watch(hasHistory, (value) => {
 function onFocus() {
   isFocused.value = true;
   isOpen.value = hasHistory.value;
+}
+
+function askAi() {
+  isOpen.value = false;
+  router.push(ROUTES.search(searchText.value));
 }
 
 function createTicket() {
@@ -244,8 +268,25 @@ const resultOptions = computed(() =>
     : []
 );
 
+// First, so Enter asks the AI; arrow down to open an article instead.
+const askOptions = computed(() =>
+  session.isAiSearchEnabled.value && canSearch.value
+    ? [
+        {
+          type: "custom",
+          key: "ask-ai",
+          label: searchText.value,
+          askAi: true,
+          onClick: askAi,
+        },
+      ]
+    : []
+);
+
 const options = computed(() =>
-  canSearch.value ? resultOptions.value : historyOptions.value
+  canSearch.value
+    ? [...askOptions.value, ...resultOptions.value]
+    : historyOptions.value
 );
 </script>
 

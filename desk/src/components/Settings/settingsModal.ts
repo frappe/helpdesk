@@ -30,9 +30,11 @@ import { Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import General from "./General/General.vue";
 import KnowledgeBase from "./KnowledgeBase/KnowledgeBase.vue";
+import AISearch from "./AISearch/AISearch.vue";
 import PortalPermissions from "./Customers/PortalPermissions.vue";
 import LucideUserCog from "~icons/lucide/user-cog";
 import LucideBookOpen from "~icons/lucide/book-open";
+import LucideSparkles from "~icons/lucide/sparkles";
 import SettingsGear from "~icons/lucide/settings";
 import ZapIcon from "~icons/lucide/zap";
 import ProfilePage from "./Profile/ProfilePage.vue";
@@ -167,6 +169,12 @@ export const tabs = computed(() => {
           icon: markRaw(LucideBookOpen),
           component: markRaw(KnowledgeBase),
         },
+        {
+          label: __("AI Search"),
+          icon: markRaw(LucideSparkles),
+          component: markRaw(AISearch),
+          condition: () => auth.isAdmin,
+        },
       ],
     },
     {
@@ -238,6 +246,7 @@ type TabName =
   | "Email Notifications"
   | "General"
   | "Knowledge Base"
+  | "AI Search"
   | "Portal Settings"
   | "Agents"
   | "Invite Agents"

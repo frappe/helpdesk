@@ -8,6 +8,7 @@ export const ROUTES = {
   article: ({ name, title_slug }: { name: string; title_slug?: string }) =>
     `/articles/${[name, title_slug].filter(Boolean).join('-')}`,
   category: (name: string) => `/category/${name}`,
+  search: (q: string) => ({ path: '/search', query: { q } }),
   ticketList: '/my-tickets',
   newTicket: (origin?: TicketOrigin) => ({ path: '/my-tickets/new', query: originQuery(origin) }),
   ticket: (name: string) => `/my-tickets/${name}`,
