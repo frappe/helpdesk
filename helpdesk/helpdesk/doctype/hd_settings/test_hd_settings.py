@@ -14,7 +14,12 @@ from helpdesk.helpdesk.doctype.hd_settings.helpers import (
 )
 from unittest.mock import patch
 
-from helpdesk.test_utils import create_agent, enable_ai_search, fake_flow_knowledge
+from helpdesk.test_utils import (
+    create_agent,
+    enable_ai_search,
+    fake_flow_knowledge,
+    make_agent_manager,
+)
 
 CUSTOMER = "home-page-customer@example.com"
 AGENT_CUSTOMER = "home-page-agent@example.com"
@@ -273,6 +278,22 @@ class TestAISearchSettings(IntegrationTestCase):
             enable_ai_search()
 
         enqueue.assert_not_called()
+
+    def test_only_a_system_manager_reads_or_changes_the_tab(self) -> None:
+        enable_ai_search()
+        manager = make_agent_manager()
+
+        with self.set_user(manager):
+            read = frappe.client.get("HD Settings")
+            self.assertNotIn("ai_api_key", read)
+            self.assertNotIn("ai_model", read)
+            settings = frappe.get_doc("HD Settings")
+            settings.ai_model = "gpt-4.1"
+            settings.save()
+
+        self.assertEqual(
+            frappe.db.get_single_value("HD Settings", "ai_model"), "gpt-4.1-mini"
+        )
 
     def test_turning_it_off_leaves_the_flow_records_alone(self) -> None:
         enable_ai_search()

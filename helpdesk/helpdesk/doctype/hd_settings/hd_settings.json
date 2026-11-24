@@ -715,24 +715,28 @@
    "description": "Answer questions on the knowledge base with an AI assistant that reads only the articles each visitor may see.",
    "fieldname": "enable_ai_search",
    "fieldtype": "Check",
-   "label": "Enable AI search"
+   "label": "Enable AI search",
+   "permlevel": 1
   },
   {
    "description": "LiteLLM provider name, such as openai or anthropic.",
    "fieldname": "ai_provider",
    "fieldtype": "Data",
-   "label": "Provider"
+   "label": "Provider",
+   "permlevel": 1
   },
   {
    "fieldname": "ai_api_key",
    "fieldtype": "Password",
-   "label": "API key"
+   "label": "API key",
+   "permlevel": 1
   },
   {
    "description": "Model name at the provider, such as gpt-4.1-mini.",
    "fieldname": "ai_model",
    "fieldtype": "Data",
-   "label": "Model"
+   "label": "Model",
+   "permlevel": 1
   }
  ],
  "grid_page_length": 50,
@@ -769,6 +773,12 @@
    "read": 1,
    "role": "Agent Manager",
    "share": 1,
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "System Manager",
    "write": 1
   }
  ],
