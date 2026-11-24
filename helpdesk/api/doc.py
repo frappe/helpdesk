@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 from frappe.desk.form.assign_to import set_status
+from frappe.desk.listview import get_assignee_groups
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
 from frappe.query_builder.functions import Date
@@ -563,6 +564,11 @@ def get_grouped_list(
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
     handle_category_filter(filters, doctype)
+    # a record counts under each of its assignees
+    if "_assign" in [f.strip() for f in (group_by or "").split(",")]:
+        return get_assignee_groups(
+            doctype, fields, group_by, filters, order_by, limit_start, limit_page_length
+        )
     return frappe.get_list(
         doctype,
         fields=frappe.parse_json(fields),
