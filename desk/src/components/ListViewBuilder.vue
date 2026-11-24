@@ -38,7 +38,7 @@
           :exclude="options.groupByExclude"
           @update:modelValue="updateGroupBy"
         />
-        <Dropdown v-if="groupBy" :options="exportGroupOptions">
+        <Dropdown v-if="canExportGroups" :options="exportGroupOptions">
           <Button :label="__('Export')" icon-left="lucide-download" />
         </Dropdown>
         <ColumnSettings
@@ -59,7 +59,7 @@
             hideLabel
             @update:modelValue="updateGroupBy"
           />
-          <Dropdown v-if="groupBy" :options="exportGroupOptions">
+          <Dropdown v-if="canExportGroups" :options="exportGroupOptions">
             <Button :tooltip="__('Export')" icon="lucide-download" />
           </Dropdown>
         </div>
@@ -263,6 +263,7 @@ import {
   formatRating,
   GroupBy,
   GroupByTable,
+  groupsByAssignee,
   parseGroupBy,
   serializeGroupBy,
 } from "@framework/ui/GroupBy";
@@ -835,6 +836,11 @@ function exportGroups(fileFormat: "Excel" | "CSV") {
   });
   window.location.href = `/api/method/helpdesk.api.doc.export_grouped_list?${params}`;
 }
+
+// export_query would group by each whole list of assignees, not one user at a time
+const canExportGroups = computed(
+  () => Boolean(groupBy.value) && !groupsByAssignee(groupBy.value!)
+);
 
 const exportGroupOptions = [
   { label: __("Excel"), onClick: () => exportGroups("Excel") },
