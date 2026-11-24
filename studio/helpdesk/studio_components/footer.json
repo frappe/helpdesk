@@ -13,7 +13,7 @@
         "children": [
          {
           "componentId": "footer-brand-name",
-          "componentName": "PortalBrand",
+          "componentName": "Brand",
           "componentProps": {
            "logo": "{{ brandLogo }}",
            "name": "{{ brandName }}"
@@ -32,7 +32,7 @@
            "tag": "p",
            "text": "{{ footer.tagline }}"
           },
-          "visibilityCondition": "{{ footer.tagline }}"
+          "visibilityCondition": "{{ footer.tagline && (!footer.isCompact || footer.copyright) }}"
          },
          {
           "componentId": "footer-socials",
@@ -46,7 +46,7 @@
            "[&_a]:text-ink-gray-6",
            "[&_a:hover]:text-ink-gray-9"
           ],
-          "visibilityCondition": "{{ footer.socials.length }}"
+          "visibilityCondition": "{{ !footer.isCompact && footer.socials.length }}"
          }
         ],
         "classes": [
@@ -129,9 +129,9 @@
           "componentProps": {
            "fontSize": "text-p-sm",
            "tag": "p",
-           "text": "{{ footer.aside }}"
+           "text": "{{ footer.copyright || footer.tagline }}"
           },
-          "visibilityCondition": "{{ footer.aside }}"
+          "visibilityCondition": "{{ footer.copyright || footer.tagline }}"
          },
          {
           "classes": [
@@ -142,10 +142,10 @@
           "componentId": "footer-aside-socials",
           "componentName": "PortalHeaderLinks",
           "componentProps": {
-           "links": "{{ footer.asideSocials }}"
+           "links": "{{ footer.socials }}"
           },
           "isCustomVueComponent": true,
-          "visibilityCondition": "{{ footer.asideSocials.length }}"
+          "visibilityCondition": "{{ footer.socials.length }}"
          }
         ],
         "classes": [
@@ -157,7 +157,7 @@
         "componentId": "footer-aside",
         "componentName": "container",
         "originalElement": "div",
-        "visibilityCondition": "{{ footer.aside || footer.asideSocials.length }}"
+        "visibilityCondition": "{{ footer.isCompact }}"
        }
       ],
       "classes": [
@@ -196,7 +196,7 @@
       "componentId": "footer-bottom",
       "componentName": "container",
       "originalElement": "div",
-      "visibilityCondition": "{{ footer.copyright }}"
+      "visibilityCondition": "{{ footer.copyright && !footer.isCompact }}"
      }
     ],
     "classes": [
@@ -234,7 +234,7 @@
  "idx": 0,
  "inputs": [],
  "is_disabled": 0,
- "modified": "2026-11-24 02:40:58.852272",
+ "modified": "2026-11-24 19:00:00.000000",
  "modified_by": "Administrator",
  "name": "footer",
  "owner": "Administrator"

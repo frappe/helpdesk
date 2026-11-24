@@ -20,7 +20,7 @@
         <ListHeaderCell />
         <ListHeaderCell
           v-for="column in columns"
-          :key="column.label"
+          :key="column.key"
           :class="column.class"
         >
           {{ column.label }}
@@ -35,18 +35,26 @@
         class="divide-y divide-outline-gray-2"
       >
         <template #item="{ element, index }">
-          <ListRow class="min-h-12 !items-start py-2.5">
-            <ListCell class="h-7 justify-center">
+          <ListRow
+            class="min-h-12 !items-start py-2.5 [&>[data-slot=list-cell]]:min-h-7"
+          >
+            <ListCell class="justify-center">
               <span
                 class="lucide-grip-vertical size-4 cursor-grab text-ink-gray-4"
                 aria-hidden="true"
               />
             </ListCell>
-            <slot :item="element" :index="index" />
-            <ListCell class="h-7">
+            <ListCell
+              v-for="column in columns"
+              :key="column.key"
+              :class="column.class"
+            >
+              <slot :name="column.key" :item="element" :index="index" />
+            </ListCell>
+            <ListCell>
               <Dropdown
                 align="end"
-                :options="rowOptions(index)"
+                :options="optionsFor(index)"
                 @update:open="(open) => open && (isConfirmingDelete = false)"
               >
                 <Button
@@ -77,18 +85,17 @@ import {
 import { ref } from "vue";
 import Draggable from "vuedraggable";
 import { __ } from "../translation";
-import { DRAG_OPTIONS, listItemOptions } from "../utils";
+import { DRAG_OPTIONS, rowOptions } from "./settingsTable";
 
 const props = defineProps<{
-  columns: { label: string; width: string; class?: string }[];
+  columns: { key: string; label: string; width: string; class?: string }[];
   emptyText: string;
   rowLabel: (item: T) => string;
-  options?: (index: number) => unknown[];
+  remove?: { label: string; icon: string };
 }>();
 const items = defineModel<T[]>({ required: true });
 
 const isConfirmingDelete = ref(false);
-const rowOptions = (index: number) =>
-  props.options?.(index) ??
-  listItemOptions(items.value, index, isConfirmingDelete);
+const optionsFor = (index: number) =>
+  rowOptions(items, index, isConfirmingDelete, props.remove);
 </script>

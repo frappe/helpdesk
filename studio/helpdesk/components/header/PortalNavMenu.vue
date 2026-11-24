@@ -31,7 +31,7 @@ import { computed } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import { Dropdown, Icon } from "frappe-ui";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
-import Brand from "@helpdesk/shared/Brand.vue";
+import Brand from "./Brand.vue";
 
 const props = defineProps<{
   options?: unknown[];

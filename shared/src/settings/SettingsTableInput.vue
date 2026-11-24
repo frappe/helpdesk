@@ -1,5 +1,5 @@
 <template>
-  <ListCell class="flex-col !items-stretch gap-1.5">
+  <div class="-ms-2 flex w-[calc(100%+0.5rem)] flex-col gap-1.5">
     <TextInput
       v-model="value"
       v-bind="$attrs"
@@ -14,12 +14,11 @@
     >
       {{ error }}
     </p>
-  </ListCell>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { TextInput } from "frappe-ui";
-import { ListCell } from "frappe-ui/list";
 import { useId } from "vue";
 
 defineOptions({ inheritAttrs: false });

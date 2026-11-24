@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import Brand from "@helpdesk/shared/Brand.vue";
+import Brand from "../../../studio/helpdesk/components/header/Brand.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { useSidebarStore } from "@/stores/sidebar";

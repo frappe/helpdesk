@@ -3,14 +3,13 @@ import type { KnowledgeBaseLink } from "./knowledgeBasePreview";
 export type FooterColumn = { title: string; links: KnowledgeBaseLink[] };
 
 export type KnowledgeBaseFooter = {
-  enabled: boolean;
   tagline: string;
   copyright: string;
   columns: FooterColumn[];
   socials: KnowledgeBaseLink[];
 };
 
-type FooterItem = {
+type FooterRow = {
   label: string;
   url?: string;
   parent_label?: string;
@@ -19,48 +18,47 @@ type FooterItem = {
 
 export const MAX_FOOTER_COLUMNS = 4;
 
-/** Reads the footer from HD Settings fields; footer_items nest like Website Settings' footer. */
-export function footerFromSettings(
+/** HD Settings stores footer_items as flat rows: a row without parent_label is a column,
+ * a link row names its column in parent_label. This groups the links under their column. */
+export function nestFooterRows(
   settings: Record<string, any>
 ): KnowledgeBaseFooter {
-  const items: FooterItem[] = settings.footer_items || [];
+  const rows: FooterRow[] = settings.footer_items || [];
   return {
-    enabled: Boolean(settings.show_footer),
     tagline: settings.footer_tagline || "",
     copyright: settings.footer_copyright || "",
-    columns: items
-      .filter((item) => !item.parent_label)
+    columns: rows
+      .filter((row) => !row.parent_label)
       .map((column) => ({
         title: column.label,
-        links: items
-          .filter((item) => item.parent_label === column.label)
-          .map(toLink),
+        links: rows
+          .filter((row) => row.parent_label === column.label)
+          .map(rowToLink),
       }))
       .filter((column) => column.links.length),
-    socials: (settings.social_links || []).map(toLink),
+    socials: (settings.social_links || []).map(rowToLink),
   };
 }
 
-export function footerToSettings(footer: KnowledgeBaseFooter) {
+export function flattenFooterColumns(footer: KnowledgeBaseFooter) {
   return {
-    show_footer: footer.enabled ? 1 : 0,
     footer_tagline: footer.tagline,
     footer_copyright: footer.copyright,
     footer_items: footer.columns.flatMap((column) => [
       { label: column.title },
       ...column.links.map((link) => ({
-        ...toRow(link),
+        ...linkToRow(link),
         parent_label: column.title,
       })),
     ]),
-    social_links: footer.socials.map(toRow),
+    social_links: footer.socials.map(linkToRow),
   };
 }
 
-function toLink({ label, url, open_in_new_tab }: FooterItem) {
+function rowToLink({ label, url, open_in_new_tab }: FooterRow) {
   return { label, url: url || "", open_in_new_tab: Boolean(open_in_new_tab) };
 }
 
-function toRow(link: KnowledgeBaseLink) {
+function linkToRow(link: KnowledgeBaseLink) {
   return { ...link, open_in_new_tab: link.open_in_new_tab ? 1 : 0 };
 }

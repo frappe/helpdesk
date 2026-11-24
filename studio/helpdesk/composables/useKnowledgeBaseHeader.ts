@@ -1,7 +1,7 @@
 import { computed, effectScope, ref, watch } from 'vue'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
-import { footerFromSettings } from '@helpdesk/shared/knowledgeBaseFooter'
+import { nestFooterRows } from '@helpdesk/shared/knowledgeBaseFooter'
 import { isValidLink, runFormScripts } from '@helpdesk/shared/utils'
 import { navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
@@ -34,25 +34,15 @@ const pageActionLabel = computed(() =>
 const withIcons = (links) => links.filter(isValidLink).map((link) => ({ ...link, icon: serviceIcon(link.url) }))
 
 const footer = computed(() => {
-  if (!session.config.value) return null
-  const settings = readKnowledgeBasePreview()?.footer || footerFromSettings(session.config.value)
-  if (!settings.enabled) return null
-  const columns = settings.columns
+  const config = session.config.value
+  if (!config?.show_footer) return null
+  const { tagline, copyright, ...saved } = readKnowledgeBasePreview()?.footer || nestFooterRows(config)
+  const columns = saved.columns
     .map((column) => ({ ...column, links: column.links.filter(isValidLink) }))
     .filter((column) => column.links.length)
-  const socials = withIcons(settings.socials)
-  if (!settings.tagline && !settings.copyright && !columns.length && !socials.length) return null
-  const isCompact = !columns.length
-  const isTaglineAside = isCompact && !settings.copyright
-  const aside = isCompact ? settings.copyright || settings.tagline : ''
-  return {
-    columns,
-    socials: isCompact ? [] : socials,
-    asideSocials: isCompact ? socials : [],
-    aside,
-    tagline: isTaglineAside ? '' : settings.tagline,
-    copyright: isCompact ? '' : settings.copyright,
-  }
+  const socials = withIcons(saved.socials)
+  if (!tagline && !copyright && !columns.length && !socials.length) return null
+  return { tagline, copyright, columns, socials, isCompact: !columns.length }
 })
 
 // Phone: text links move into the logo menu.

@@ -4,6 +4,8 @@
 
 from __future__ import unicode_literals
 
+from urllib.parse import urlparse
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -23,7 +25,13 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
 )
 
 MAX_FOOTER_COLUMNS = 4
-SAFE_URL_SCHEMES = ("http", "https", "mailto", "")
+
+
+def is_safe_link(url: str) -> bool:
+    """A web link with a host, a mailto: link or a path on this site."""
+    if urlparse(url).scheme in ("http", "https"):
+        return bool(urlparse(url).netloc)
+    return validate_url(url, valid_schemes=("mailto", ""))
 
 
 class HDSettings(Document):
@@ -66,10 +74,10 @@ class HDSettings(Document):
                     )
                 )
         for d in links + self.social_links:
-            if not validate_url(d.url or "", valid_schemes=SAFE_URL_SCHEMES):
+            if not is_safe_link(d.url or ""):
                 frappe.throw(
                     _("{0}: Start with http://, https://, mailto: or /").format(
-                        frappe.bold(d.label)
+                        frappe.bold(d.label or _("Row {0}").format(d.idx))
                     )
                 )
 

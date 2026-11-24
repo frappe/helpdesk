@@ -15,52 +15,6 @@ const YEAR = 365 * DAY;
 // Studio portal, outside the desk SPA.
 export const CUSTOMER_PORTAL_ROOT = "/help";
 
-export const DRAG_OPTIONS = {
-  animation: 150,
-  delay: 200,
-  delayOnTouchOnly: true,
-  ghostClass: "opacity-40",
-};
-
-export function moveItem(list: unknown[], from: number, to: number) {
-  list.splice(to, 0, ...list.splice(from, 1));
-}
-
-export function moveOptions(
-  index: number,
-  count: number,
-  moveTo: (index: number) => void
-) {
-  return [
-    {
-      label: __("Move up"),
-      icon: "lucide-arrow-up",
-      disabled: index === 0,
-      onClick: () => moveTo(index - 1),
-    },
-    {
-      label: __("Move down"),
-      icon: "lucide-arrow-down",
-      disabled: index === count - 1,
-      onClick: () => moveTo(index + 1),
-    },
-  ];
-}
-
-export function listItemOptions(
-  list: unknown[],
-  index: number,
-  isConfirmingDelete: Ref<boolean>
-) {
-  return [
-    ...moveOptions(index, list.length, (to) => moveItem(list, index, to)),
-    ...ConfirmDelete({
-      isConfirmingDelete,
-      onConfirmDelete: () => list.splice(index, 1),
-    }),
-  ];
-}
-
 /**
  * Delete in its own red group, so the menu draws a divider above it, as
  * frappe-ui marks a danger action.
@@ -102,22 +56,18 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
 }
 
 // Guests see quick links, so allow only paths, web and mail URLs.
-export const SAFE_LINK_PATTERN = "(/|https?:|mailto:).*";
-
-export function isSafeLink(url: unknown) {
-  return (
-    typeof url === "string" &&
-    new RegExp(`^${SAFE_LINK_PATTERN}`, "i").test(url)
-  );
-}
+export const SAFE_LINK_PATTERN = "(/|https?://\\w|mailto:\\S).*";
+const SAFE_LINK = new RegExp(`^${SAFE_LINK_PATTERN}`, "i");
 
 export function isValidLink(link?: { label?: string; url?: string }) {
-  return Boolean(link?.label?.trim()) && isSafeLink(link?.url?.trim());
+  return (
+    Boolean(link?.label?.trim()) && SAFE_LINK.test(link?.url?.trim() || "")
+  );
 }
 
 export function linkError(url?: string) {
   const value = url?.trim();
-  return value && !isSafeLink(value)
+  return value && !SAFE_LINK.test(value)
     ? __("Start with http://, https://, mailto: or /")
     : "";
 }

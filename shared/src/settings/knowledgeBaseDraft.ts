@@ -13,9 +13,10 @@ import {
   type KnowledgeBaseLink,
   type KnowledgeBasePreview,
 } from "../knowledgeBasePreview";
-import { footerFromSettings, footerToSettings } from "../knowledgeBaseFooter";
+import { flattenFooterColumns, nestFooterRows } from "../knowledgeBaseFooter";
 import { __ } from "../translation";
 import { CUSTOMER_PORTAL_ROOT, getErrorMessage, linkError } from "../utils";
+import { saveToggle } from "./settingsToggle";
 
 type Draft = Required<KnowledgeBasePreview>;
 
@@ -145,7 +146,7 @@ function createDraft() {
       pinned: getPinned(categories.data),
       pinned_articles: getPinned(articles.data),
       links: parseLinks(script),
-      footer: footerFromSettings(settings.doc),
+      footer: nestFooterRows(settings.doc),
     };
   });
 
@@ -233,7 +234,7 @@ function createDraft() {
           )
         ),
         ...(changed.value.includes("footer")
-          ? footerToSettings(value.footer)
+          ? flattenFooterColumns(value.footer)
           : {}),
       };
       if (Object.keys(values).length) {
@@ -348,10 +349,7 @@ function createDraft() {
 
   // Saves at once, bypassing the draft.
   function setToggle(fieldname: string, value: boolean) {
-    settings.setValue.submit(
-      { [fieldname]: value },
-      { onSuccess: () => toast.success(__("Settings updated")) }
-    );
+    saveToggle(settings, fieldname, value);
   }
 
   function discard() {
@@ -403,7 +401,6 @@ function normalize(draft: Draft): Draft {
     banner_subtitle: draft.banner_subtitle.trim(),
     links: normalizeLinks(draft.links),
     footer: {
-      enabled: footer.enabled,
       tagline: footer.tagline.trim(),
       copyright: footer.copyright.trim(),
       columns: footer.columns

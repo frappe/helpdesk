@@ -13,9 +13,6 @@ GUEST_FIELDS = [
     "banner_preset",
     "banner_title",
     "banner_subtitle",
-    "show_footer",
-    "footer_tagline",
-    "footer_copyright",
 ]
 # The portal's ticket and organization pages
 USER_FIELDS = [
@@ -32,7 +29,6 @@ AGENT_FIELDS = [
     "disable_saved_replies_global_scope",
     "enable_comment_reactions",
 ]
-
 FOOTER_ROW_FIELDS = ["label", "url", "parent_label", "open_in_new_tab"]
 
 
@@ -64,12 +60,23 @@ def get_config():
             filters={"enabled": 1, "apply_to_knowledge_base": 1},
             pluck="script",
         )
+    res.update(get_footer(settings, is_readable and bool(settings.show_footer)))
 
-    show_footer = res.show_footer and is_readable
-    res.footer_items = get_footer_rows(settings.footer_items) if show_footer else []
-    res.social_links = get_footer_rows(settings.social_links) if show_footer else []
     res.favicon = get_favicon()
     return res
+
+
+def get_footer(settings, is_shown: bool) -> dict:
+    """The knowledge base footer; empty while it is off or the reader can't see the knowledge base."""
+    if not is_shown:
+        return {"show_footer": 0, "footer_items": [], "social_links": []}
+    return {
+        "show_footer": 1,
+        "footer_tagline": settings.footer_tagline,
+        "footer_copyright": settings.footer_copyright,
+        "footer_items": get_footer_rows(settings.footer_items),
+        "social_links": get_footer_rows(settings.social_links),
+    }
 
 
 def get_footer_rows(rows: list) -> list[dict]:

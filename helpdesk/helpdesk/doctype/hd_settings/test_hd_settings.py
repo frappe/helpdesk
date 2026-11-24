@@ -249,6 +249,9 @@ class TestKnowledgeBaseFooter(IntegrationTestCase):
         cases = (
             {"items": self.column("Product", "javascript:alert(1)")},
             {"items": self.column("Product", "example.com")},
+            {"items": self.column("Product", "https://")},
+            {"items": self.column("Product", "http:example.com")},
+            {"items": self.column("Product", "mailto:")},
             {"items": self.column("Product", "")},
             {"items": self.column("Product")},
             {
@@ -279,14 +282,20 @@ class TestKnowledgeBaseFooter(IntegrationTestCase):
             )
 
     def test_guests_get_the_footer_only_while_it_is_shown_and_public(self) -> None:
-        self.save_footer(self.column("Product", "/help"))
-        for is_public, show_footer, rows in ((1, 1, 2), (1, 0, 0), (0, 1, 0)):
+        self.save_footer(self.column("Product", "/help"), footer_tagline="Hi")
+        for is_public, show_footer, rows, tagline in (
+            (1, 1, 2, "Hi"),
+            (1, 0, 0, None),
+            (0, 1, 0, None),
+        ):
             frappe.db.set_single_value(
                 "HD Settings", "public_knowledge_base", is_public
             )
             frappe.db.set_single_value("HD Settings", "show_footer", show_footer)
             frappe.set_user("Guest")
             try:
-                self.assertEqual(len(get_config().footer_items), rows)
+                config = get_config()
+                self.assertEqual(len(config.footer_items), rows)
+                self.assertEqual(config.footer_tagline, tagline)
             finally:
                 frappe.set_user("Administrator")

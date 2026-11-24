@@ -11,64 +11,64 @@
     <SettingsTable
       v-model="columns"
       :columns="[
-        { label: __('Title'), width: '144px', class: 'ms-2' },
-        { label: __('Links'), width: 'minmax(0,1fr)' },
+        { key: 'title', label: __('Title'), width: '144px' },
+        { key: 'links', label: __('Links'), width: 'minmax(0,1fr)' },
       ]"
       :row-label="(column) => column.title"
       :empty-text="__('No columns added yet.')"
     >
-      <template #default="{ item: column }">
+      <template #title="{ item: column }">
         <SettingsTableInput
           v-model="column.title"
           class="[&_input]:font-medium"
           :placeholder="__('Company')"
           :aria-label="__('Column title')"
         />
-        <ListCell>
-          <Draggable
-            :list="column.links"
-            @change="(event) => event.removed && removeIfEmpty(column)"
-            :item-key="(link) => link"
-            group="footer-links"
-            v-bind="DRAG_OPTIONS"
-            class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5"
-          >
-            <template #item="{ element: link, index: linkIndex }">
-              <span class="inline-flex">
-                <Button
-                  class="cursor-grab rounded-e-none"
-                  variant="subtle"
-                  :label="link.label"
-                  :title="__('Drag to reorder')"
-                  @click="editing = { column, linkIndex }"
-                  @keydown.alt.left.prevent="
-                    moveLink($event, column, linkIndex, -1)
-                  "
-                  @keydown.alt.right.prevent="
-                    moveLink($event, column, linkIndex, 1)
-                  "
-                  @keydown.delete.prevent="removeLink(column, linkIndex)"
-                />
-                <Button
-                  variant="subtle"
-                  icon="lucide-x"
-                  class="rounded-s-none text-ink-gray-5 hover:text-ink-gray-8"
-                  :label="__('Remove {0}', [link.label])"
-                  @click="removeLink(column, linkIndex)"
-                />
-              </span>
-            </template>
-            <template #footer>
+      </template>
+      <template #links="{ item: column }">
+        <Draggable
+          :list="column.links"
+          @change="(event) => event.removed && removeIfEmpty(column)"
+          :item-key="(link) => link"
+          group="footer-links"
+          v-bind="DRAG_OPTIONS"
+          class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5"
+        >
+          <template #item="{ element: link, index: linkIndex }">
+            <span class="inline-flex">
               <Button
-                variant="outline"
-                icon-left="lucide-plus"
-                class="border-dashed"
-                :label="__('Add link')"
-                @click="editing = { column }"
+                class="cursor-grab rounded-e-none"
+                variant="subtle"
+                :label="link.label"
+                :title="__('Drag to reorder')"
+                @click="editing = { column, linkIndex }"
+                @keydown.alt.left.prevent="
+                  moveLink($event, column, linkIndex, -1)
+                "
+                @keydown.alt.right.prevent="
+                  moveLink($event, column, linkIndex, 1)
+                "
+                @keydown.delete.prevent="removeLink(column, linkIndex)"
               />
-            </template>
-          </Draggable>
-        </ListCell>
+              <Button
+                variant="subtle"
+                icon="lucide-x"
+                class="rounded-s-none text-ink-gray-5 hover:text-ink-gray-8"
+                :label="__('Remove {0}', [link.label])"
+                @click="removeLink(column, linkIndex)"
+              />
+            </span>
+          </template>
+          <template #footer>
+            <Button
+              variant="outline"
+              icon-left="lucide-plus"
+              class="border-dashed"
+              :label="__('Add link')"
+              @click="editing = { column }"
+            />
+          </template>
+        </Draggable>
       </template>
     </SettingsTable>
     <Button
@@ -91,13 +91,12 @@
 
 <script setup lang="ts">
 import { Button, SettingsRow } from "frappe-ui";
-import { ListCell } from "frappe-ui/list";
 import { computed, nextTick, ref } from "vue";
 import Draggable from "vuedraggable";
 import { type FooterColumn, MAX_FOOTER_COLUMNS } from "../knowledgeBaseFooter";
 import type { KnowledgeBaseLink } from "../knowledgeBasePreview";
 import { __ } from "../translation";
-import { DRAG_OPTIONS, moveItem } from "../utils";
+import { DRAG_OPTIONS, moveItem } from "./settingsTable";
 import FooterLinkDialog from "./FooterLinkDialog.vue";
 import SettingsTable from "./SettingsTable.vue";
 import SettingsTableInput from "./SettingsTableInput.vue";
@@ -123,7 +122,8 @@ function saveLink(link: KnowledgeBaseLink, columnTitle: string) {
   const { column, linkIndex } = editing.value;
   if (linkIndex === undefined) column.links.push(link);
   else column.links[linkIndex] = link;
-  if (isNewColumn.value) columns.value.push({ ...column, title: columnTitle });
+  if (isNewColumn.value)
+    columns.value = [...columns.value, { ...column, title: columnTitle }];
 }
 
 async function moveLink(
@@ -147,6 +147,6 @@ function removeLink(column: FooterColumn, index: number) {
 
 function removeIfEmpty(column: FooterColumn) {
   if (!column.links.length)
-    columns.value.splice(columns.value.indexOf(column), 1);
+    columns.value = columns.value.filter((other) => other !== column);
 }
 </script>

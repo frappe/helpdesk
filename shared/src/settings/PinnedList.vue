@@ -6,17 +6,15 @@
       :columns="columns"
       :empty-text="text.empty"
       :row-label="labelOf"
-      :options="rowOptions"
+      :remove="{ label: __('Unpin'), icon: 'lucide-pin-off' }"
     >
-      <template #default="{ item: name }">
-        <ListCell class="h-7">
-          <span class="truncate text-base text-ink-gray-8">
-            {{ labelOf(name) }}
-          </span>
-        </ListCell>
-        <ListCell class="h-7">
-          <CategoryAccessBadge :access="byName[name]?.access" />
-        </ListCell>
+      <template #name="{ item: name }">
+        <span class="truncate text-base text-ink-gray-8">
+          {{ labelOf(name) }}
+        </span>
+      </template>
+      <template #access="{ item: name }">
+        <CategoryAccessBadge :access="byName[name]?.access" />
       </template>
     </SettingsTable>
     <Button
@@ -40,9 +38,7 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { moveOptions, moveItem } from "../utils";
 import { Button, SettingsRow } from "frappe-ui";
-import { ListCell } from "frappe-ui/list";
 import { computed, ref } from "vue";
 import CategoryAccessBadge from "./CategoryAccessBadge.vue";
 import { MAX_PINNED_ARTICLES, type PinKind } from "./knowledgeBaseDraft";
@@ -69,8 +65,8 @@ const open = ref(false);
 const text = computed(() => pinnedListText(props.kind));
 
 const columns = computed(() => [
-  { label: text.value.column, width: "minmax(0,1fr)" },
-  { label: __("Visibility"), width: "112px" },
+  { key: "name", label: text.value.column, width: "minmax(0,1fr)" },
+  { key: "access", label: __("Visibility"), width: "112px" },
 ]);
 
 const byName = computed(() =>
@@ -79,21 +75,5 @@ const byName = computed(() =>
 
 function labelOf(name: string) {
   return byName.value[name]?.label || name;
-}
-
-function rowOptions(index: number) {
-  return [
-    ...moveOptions(index, pinned.value.length, (to) => {
-      const next = [...pinned.value];
-      moveItem(next, index, to);
-      pinned.value = next;
-    }),
-    {
-      label: __("Unpin"),
-      icon: "lucide-pin-off",
-      onClick: () =>
-        (pinned.value = pinned.value.filter((_, i) => i !== index)),
-    },
-  ];
 }
 </script>

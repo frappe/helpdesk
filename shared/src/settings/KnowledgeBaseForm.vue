@@ -81,10 +81,27 @@
               "
             />
           </template>
-          <FooterSettings
-            v-else-if="value === 'footer'"
-            v-model="draft.footer"
-          />
+          <template v-else-if="value === 'footer'">
+            <SettingsRow
+              label-for=""
+              :title="__('Show footer')"
+              :description="
+                __(
+                  'A footer will appear at the bottom of every knowledge base page.'
+                )
+              "
+            >
+              <Switch
+                :aria-label="__('Show footer')"
+                :model-value="Boolean(settings.doc?.show_footer)"
+                @update:model-value="(on) => setToggle('show_footer', on)"
+              />
+            </SettingsRow>
+            <FooterSettings
+              v-if="settings.doc?.show_footer"
+              v-model="draft.footer"
+            />
+          </template>
           <template v-else>
             <!-- label-for="": a title click must not flip the switch, so aria-label names it -->
             <SettingsRow
