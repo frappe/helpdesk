@@ -54,7 +54,7 @@ import {
 } from "frappe-ui";
 import { computed } from "vue";
 import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
-import { saveToggle } from "./settingsToggle";
+import { saveToggle } from "../utils";
 
 // The portal mounts all panels at once; re-creating a cached doc refetches.
 const hdSettings =

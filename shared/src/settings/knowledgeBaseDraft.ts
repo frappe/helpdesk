@@ -15,8 +15,12 @@ import {
 } from "../knowledgeBasePreview";
 import { flattenFooterColumns, nestFooterRows } from "../knowledgeBaseFooter";
 import { __ } from "../translation";
-import { CUSTOMER_PORTAL_ROOT, getErrorMessage, linkError } from "../utils";
-import { saveToggle } from "./settingsToggle";
+import {
+  CUSTOMER_PORTAL_ROOT,
+  getErrorMessage,
+  linkError,
+  saveToggle,
+} from "../utils";
 
 type Draft = Required<KnowledgeBasePreview>;
 

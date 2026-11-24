@@ -232,9 +232,16 @@ class TestKnowledgeBaseFooter(IntegrationTestCase):
                 "/help",
                 "mailto:hi@example.com",
             ),
-            social_links=[{"label": "GitHub", "url": "https://github.com/example"}],
+            social_links=[
+                {
+                    "label": "GitHub",
+                    "url": "https://github.com/example",
+                    "parent_label": "Product",
+                }
+            ],
         )
         settings = frappe.get_single("HD Settings")
+        self.assertIsNone(settings.social_links[0].parent_label)
         self.assertEqual(
             [d.url for d in settings.footer_items if d.parent_label],
             [

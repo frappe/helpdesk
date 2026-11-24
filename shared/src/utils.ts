@@ -72,6 +72,15 @@ export function linkError(url?: string) {
     : "";
 }
 
+/** Saves one switch; a click while a save is running is dropped, as a second save would fail on the stale timestamp. */
+export function saveToggle(settings, fieldname: string, value: boolean) {
+  if (settings.setValue.loading) return;
+  settings.setValue.submit(
+    { [fieldname]: value },
+    { onSuccess: () => toast.success(__("Settings updated")) }
+  );
+}
+
 export function linkTarget(openInNewTab?: boolean | number) {
   return openInNewTab
     ? { target: "_blank", rel: "noopener" }

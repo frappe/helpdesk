@@ -837,7 +837,7 @@ test.describe("knowledge base settings", () => {
       await expect(page).toHaveURL(/\/settings\/knowledge-base$/);
 
       // Switches save without the Save button.
-      await dialog.getByRole("tab", { name: "Access" }).click();
+      await dialog.getByRole("tab", { name: "Settings", exact: true }).click();
       await dialog.getByText("Allow guests to vote on articles").locator("xpath=../..").getByRole("switch").click();
       await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).allow_anonymous_article_voting).toBe(1);
       await expect(dialog.getByText("Unsaved")).toBeHidden();

@@ -48,6 +48,8 @@ class HDSettings(Document):
 
     def validate_footer(self):
         """Footer items mirror Website Settings: column rows without a parent, link rows under one."""
+        for d in self.social_links:
+            d.parent_label = None
         columns = [d.label for d in self.footer_items if not d.parent_label]
         links = [d for d in self.footer_items if d.parent_label]
         if len(columns) > MAX_FOOTER_COLUMNS:

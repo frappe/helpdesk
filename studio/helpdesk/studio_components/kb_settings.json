@@ -1563,7 +1563,8 @@
               "componentProps": {
                "label": "{{ t('Save') }}",
                "loading": "{{ knowledgeBaseSaving }}",
-               "variant": "solid"
+               "variant": "solid",
+               "disabled": "{{ !knowledgeBaseIsDirty }}"
               },
               "componentSlots": {}
              }
@@ -1578,8 +1579,7 @@
             "componentName": "container",
             "componentProps": {},
             "componentSlots": {},
-            "originalElement": "div",
-            "visibilityCondition": "{{ knowledgeBaseIsDirty }}"
+            "originalElement": "div"
            }
           ],
           "classes": [
@@ -1796,7 +1796,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-11-06 18:00:00.000000",
+ "modified": "2026-11-24 20:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
