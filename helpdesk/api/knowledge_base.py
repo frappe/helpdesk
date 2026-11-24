@@ -65,6 +65,8 @@ SEARCH_QUERY_LENGTH = 200
 WORDS_PER_MINUTE = 200
 LIST_LIMIT = 100
 SUBCATEGORY_ARTICLES_LIMIT = 5
+# the sidebar reads its titles in one request; newer ones win past this
+TITLES_LIMIT = 1000
 # within a category, heavier articles list first
 WEIGHT_ORDER = "weight desc"
 
@@ -503,12 +505,14 @@ def get_subcategory_articles(category: str) -> dict[str, list[dict]]:
     subcategories = get_subcategories(category)
     if not subcategories:
         return {}
+    # one query for all; like the sidebar, newer ones win past TITLES_LIMIT
     result = {}
     for row in frappe.get_all(
         "HD Article",
         filters=make_article_filters(category=["in", subcategories]),
         fields=["name", "title", "category"],
         order_by=f"{WEIGHT_ORDER}, published_on desc",
+        limit_page_length=TITLES_LIMIT,
     ):
         rows = result.setdefault(row.pop("category"), [])
         if len(rows) < SUBCATEGORY_ARTICLES_LIMIT:
@@ -540,6 +544,7 @@ def get_kb_sidebar() -> list[dict]:
         filters=make_article_filters(category=["is", "set"]),
         fields=["name", "title", "category"],
         order_by=f"{WEIGHT_ORDER}, published_on desc",
+        limit_page_length=TITLES_LIMIT,
     ):
         articles.setdefault(row.pop("category"), []).append(row)
     categories = _get_categories(with_creators=True)

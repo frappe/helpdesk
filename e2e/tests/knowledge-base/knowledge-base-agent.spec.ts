@@ -58,11 +58,8 @@ test("a searched icon can be picked and shows in the portal", async ({
   await expect(page.getByText("Category updated successfully.")).toBeVisible();
 
   const customer = await pageAs("customer");
-  // The sidebar has no icons; the category's card does.
-  await customer.goto("/help/categories");
-  const icon = customer
-    .getByRole("link", { name: new RegExp(category.category_name) })
-    .locator(".lucide-anchor");
+  await customer.goto(`/help/category/${category.name}`);
+  const icon = customer.locator(".lucide-anchor").first();
   await expect(icon).toBeVisible();
   // No CSS for the name would leave an empty box.
   await expect(icon).toHaveCSS("mask-image", /url/);
