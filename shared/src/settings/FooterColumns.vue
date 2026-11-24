@@ -96,7 +96,7 @@ import Draggable from "vuedraggable";
 import { type FooterColumn, MAX_FOOTER_COLUMNS } from "../knowledgeBaseFooter";
 import type { KnowledgeBaseLink } from "../knowledgeBasePreview";
 import { __ } from "../translation";
-import { DRAG_OPTIONS, moveItem } from "./settingsTable";
+import { DRAG_OPTIONS, moveItem } from "./tableRows";
 import FooterLinkDialog from "./FooterLinkDialog.vue";
 import SettingsTable from "./SettingsTable.vue";
 import SettingsTableInput from "./SettingsTableInput.vue";

@@ -85,7 +85,7 @@ import {
 import { ref } from "vue";
 import Draggable from "vuedraggable";
 import { __ } from "../translation";
-import { DRAG_OPTIONS, rowOptions } from "./settingsTable";
+import { DRAG_OPTIONS, rowOptions } from "./tableRows";
 
 const props = defineProps<{
   columns: { key: string; label: string; width: string; class?: string }[];

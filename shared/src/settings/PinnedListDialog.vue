@@ -178,7 +178,7 @@
 <script setup lang="ts">
 import { __ } from "../translation";
 import { askConfirm } from "../utils";
-import { DRAG_OPTIONS } from "./settingsTable";
+import { DRAG_OPTIONS } from "./tableRows";
 import { Badge, Button, Dialog, ScrollArea, TextInput, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import Draggable from "vuedraggable";

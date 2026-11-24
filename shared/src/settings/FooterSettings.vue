@@ -18,7 +18,7 @@
     />
   </SettingsRow>
   <FooterColumns v-model="footer.columns" />
-  <LinkTable
+  <SettingsLinkTable
     v-model="footer.socials"
     :title="__('Social links')"
     :description="__('Icons appear under your tagline.')"
@@ -30,7 +30,7 @@ import { SettingsRow, Textarea, TextInput } from "frappe-ui";
 import type { KnowledgeBaseFooter } from "../knowledgeBaseFooter";
 import { __ } from "../translation";
 import FooterColumns from "./FooterColumns.vue";
-import LinkTable from "./LinkTable.vue";
+import SettingsLinkTable from "./SettingsLinkTable.vue";
 
 const footer = defineModel<KnowledgeBaseFooter>({ required: true });
 </script>

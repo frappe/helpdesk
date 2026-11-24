@@ -71,7 +71,7 @@
                 "
               />
             </SettingsRow>
-            <LinkTable
+            <SettingsLinkTable
               v-model="draft.links"
               :title="__('Quick links')"
               :description="
@@ -140,7 +140,7 @@ import {
 } from "../knowledgeBaseBanner";
 import BannerPicker from "./BannerPicker.vue";
 import FooterSettings from "./FooterSettings.vue";
-import LinkTable from "./LinkTable.vue";
+import SettingsLinkTable from "./SettingsLinkTable.vue";
 import PinnedList from "./PinnedList.vue";
 import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
 import { type PinKind, useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
