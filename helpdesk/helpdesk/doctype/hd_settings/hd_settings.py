@@ -4,14 +4,11 @@
 
 from __future__ import unicode_literals
 
-from urllib.parse import urlparse
-
 import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
-from frappe.utils import validate_url
 from frappe.utils.jinja import validate_template
 
 from helpdesk.api.auth import validate_uploaded_image
@@ -23,15 +20,9 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     remove_guest_ticket_creation_permission,
     set_guest_ticket_creation_permission,
 )
+from helpdesk.utils import is_safe_link
 
 MAX_FOOTER_COLUMNS = 4
-
-
-def is_safe_link(url: str) -> bool:
-    """A web link with a host, a mailto: link or a path on this site."""
-    if urlparse(url).scheme in ("http", "https"):
-        return bool(urlparse(url).netloc)
-    return validate_url(url, valid_schemes=("mailto", ""))
 
 
 class HDSettings(Document):
