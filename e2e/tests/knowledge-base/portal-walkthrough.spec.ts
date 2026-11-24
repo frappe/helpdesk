@@ -771,6 +771,19 @@ test.describe("article page", () => {
     await expect.poll(() => panel.evaluate((el) => el.scrollTop)).toBe(0);
   });
 
+  test("an empty footer shows the brand below a long article", async ({ page, api, kb }) => {
+    await kb({ show_footer: 1, footer_tagline: "", footer_items: [], social_links: [] });
+    const category = await createCategory(api);
+    const article = await createArticle(api, category.name, { content: "<p>" + "word ".repeat(3000) + "</p>" });
+    await page.goto(`/help/articles/${article.name}`);
+    const feedback = page.getByText("Was this article helpful?");
+    const brand = page.locator('[data-component-id="footer-brand"]');
+    await brand.scrollIntoViewIfNeeded();
+    await expect(brand).toBeVisible();
+    const [feedbackBox, brandBox] = [await feedback.boundingBox(), await brand.boundingBox()];
+    expect(brandBox!.y, "the footer starts below the feedback").toBeGreaterThan(feedbackBox!.y + feedbackBox!.height);
+  });
+
   test.describe("phone", () => {
     test.use({ viewport: PHONE });
 
