@@ -33,6 +33,7 @@ const theme = computed({
 
 export const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
 export const toggleTheme = toggleColorScheme
+export const knowledgeBaseTab = core.knowledgeBaseTab
 const themeMenuItem = useThemeMenuItem()
 
 const themeOptions = computed(() => [

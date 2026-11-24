@@ -16,6 +16,8 @@ Agents write articles in the desk at `/helpdesk/kb`. Customers and guests read t
 - `prefer_knowledge_base`: the customer home is the KB (`/help`), not the ticket list (`/help/my-tickets`).
 - `allow_anonymous_article_voting`: guests can vote.
 - `banner_image`, `banner_preset`: the banner on the KB home.
+- `banner_title`, `banner_subtitle`: the KB home heading and the text under it. Empty uses the default text.
+- `show_footer`, `footer_tagline`, `footer_copyright`, `footer_items`, `social_links`: the KB footer. `footer_items` is a `Top Bar Item` table, as in Website Settings: a row without `parent_label` is a column; link rows name their column in `parent_label`. `social_links` is a `Top Bar Item` table too. `validate_footer` allows at most four columns with different titles and only web, email and `/` links in both tables.
 
 Within a category, every article list (`get_articles` with a `category`, `get_subcategory_articles`, `get_kb_sidebar`) sorts by `weight` first, heaviest on top. Pins never touch the weight; Featured reads them by `pinned_order`.
 
@@ -82,17 +84,17 @@ The desk links to the portal copy of an article with `CUSTOMER_PORTAL_ROOT + ROU
 | `category` | `/help/category/:category` | `get_articles` for one category, 20 at a time as the reader scrolls |
 | `article` | `/help/articles/:name-slug` | `get_article`, `increment_views`, `vote_on_article`, `/help/articles/<name>.md` |
 
-All four pages allow guests and use `useKnowledgeBaseHeader` and the `kb_settings` Studio Component. The sidebar, the article cache and hover prefetch are in `studio/helpdesk/stores/knowledgeBase.ts`. The article parts (body, contents, feedback, sidebar, "copy for LLM") are in `studio/helpdesk/components/knowledge_base/`.
+All four pages allow guests and use `useKnowledgeBaseHeader` and the `kb_settings` and `footer` Studio Components. The sidebar, the article cache and hover prefetch are in `studio/helpdesk/stores/knowledgeBase.ts`. The article parts (body, contents, feedback, sidebar, "copy for LLM") are in `studio/helpdesk/components/knowledge_base/`.
 
 Search (`PortalArticleSearch`) and the article suggestions on the new ticket form both use `useArticleSearch`, which calls `search_articles`.
 
 ## Settings shared by both apps
 
-The KB look and feel (banner, pinned categories and articles, header links) has one form, `shared/src/settings/KnowledgeBaseForm.vue`. The desk Settings tab and the portal Settings dialog both render it.
+The KB look and feel (banner, pinned categories and articles, header links, footer) has one form, `shared/src/settings/KnowledgeBaseForm.vue`, in four tabs: Home page, Header, Footer and Access. The desk Settings tab and the portal Settings dialog both render it.
 
 `shared/src/settings/knowledgeBaseDraft.ts` holds the unsaved draft. It writes `HD Settings`, the category and article pins and the header links. Header links are stored in an `HD Form Script` with `apply_to_knowledge_base` set.
 
-`?preview=1` on the KB home shows the unsaved draft (`shared/src/knowledgeBasePreview.ts`).
+`?preview=1` on the KB home shows the unsaved draft (`shared/src/knowledgeBasePreview.ts`). Preview is always available; without edits it shows the saved look.
 
 ## Old URLs
 

@@ -51,10 +51,10 @@ import {
   getCachedDocumentResource,
   SettingsRow,
   Switch,
-  toast,
 } from "frappe-ui";
 import { computed } from "vue";
 import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
+import { saveToggle } from "../utils";
 
 // The portal mounts all panels at once; re-creating a cached doc refetches.
 const hdSettings =
@@ -150,9 +150,6 @@ const sections = computed(() => [
 ]);
 
 function save(toggle, value: boolean) {
-  toggle.settings.setValue.submit(
-    { [toggle.fieldname]: value },
-    { onSuccess: () => toast.success(__("Settings updated")) }
-  );
+  saveToggle(toggle.settings, toggle.fieldname, value);
 }
 </script>

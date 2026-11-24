@@ -13,21 +13,23 @@
       </div>
     </template>
     <template #header-actions>
-      <Transition name="fade">
-        <div v-if="isDirty" class="flex items-center gap-2">
+      <div class="flex items-center gap-2">
+        <Transition name="fade">
           <Button
+            v-if="isDirty"
             icon-left="lucide-external-link"
             :label="__('Preview')"
             @click="preview"
           />
-          <Button
-            variant="solid"
-            :label="__('Save')"
-            :loading="saving"
-            @click="save"
-          />
-        </div>
-      </Transition>
+        </Transition>
+        <Button
+          variant="solid"
+          :label="__('Save')"
+          :loading="saving"
+          :disabled="!isDirty"
+          @click="save"
+        />
+      </div>
     </template>
     <template #content>
       <KnowledgeBaseForm />

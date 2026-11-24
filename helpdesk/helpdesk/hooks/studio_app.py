@@ -3,6 +3,7 @@ from frappe.utils import escape_html, get_system_timezone
 from frappe.website.utils import get_home_page
 
 from helpdesk.api.config import get_favicon
+from helpdesk.utils import can_read_knowledge_base
 
 
 def get_boot() -> dict:
@@ -17,8 +18,7 @@ def get_boot() -> dict:
         )
         or get_system_timezone(),
         # Read before the first render, so a private knowledge base never flashes for a guest
-        "send_guest_to_login": frappe.session.user == "Guest"
-        and not frappe.db.get_single_value("HD Settings", "public_knowledge_base"),
+        "send_guest_to_login": not can_read_knowledge_base(),
         # Frappe renders the home page at `/` instead of redirecting to it
         "home_page": "/" + get_home_page().lstrip("/"),
         # Pages put it in their tab title before get_config answers

@@ -30,7 +30,7 @@ Studio documents its own rules. Read them before you change a page:
 ```
 studio/helpdesk/
   helpdesk.json          Studio App record: route "help", app_home = public_kb
-  router.ts              opens the Settings dialog at <page>/settings/<screen>
+  router.ts              opens the Settings dialog at <page>/settings/<screen>[/<tab>]
   studio_page/<page>/    <page>.json (block tree) + <page>.ts (setup script)
   studio_components/     Studio Components: reusable block trees with inputs
   components/            custom Vue components, by area
@@ -56,9 +56,10 @@ The `article` URL param is `<name>-<slug>`. `articleName()` in `stores/knowledge
 
 ### Studio Components
 
-Every page embeds `header` and `kb_settings`.
+Every page embeds `header` and `kb_settings`. The four KB pages also embed `footer`.
 
 - `header`: the top bar. It has the brand, breadcrumbs, quick links, the theme toggle and the account menu. Its inputs (`crumb`, `parentRoute`, `drawerToggle` and others) are listed in the JSON.
+- `footer`: the KB footer: brand, tagline, link columns, social icons and copyright. It has no inputs and binds to `footer` from `useKnowledgeBaseHeader`, which is null when the footer is off. Edit its layout in Studio; edit its content in Settings > Knowledge Base > Footer.
 - `kb_settings`: the portal Settings dialog. It has profile, members, knowledge base and portal settings tabs. It has no inputs and binds to `useSettingsModal`.
 - `category_grid`: a Repeater of category cards. `public_kb` and `categories` use it.
 - `home_article_list`: the bordered list of article rows on `public_kb`. Its `articles` input feeds both the tabbed list and the Featured list above a lone category.
@@ -69,7 +70,7 @@ Under `components/`, by area: `ui`, `header`, `list`, `ticket`, `knowledge_base`
 
 - Portal-only components start with `Portal`.
 - The file name must be unique in `studio/helpdesk/` and must not match a Studio built-in component. Studio skips a clash and writes an Error Log.
-- The desk imports `NewTicketForm.vue`, `CustomActions.vue` and `SettingsBackButton.vue` from here by relative path. Test the desk when you change them.
+- The desk imports `NewTicketForm.vue`, `CustomActions.vue`, `SettingsBackButton.vue` and `Brand.vue` from here by relative path. Test the desk when you change them.
 
 ### Stores
 
@@ -85,7 +86,7 @@ The stores are module-level singletons, not Pinia.
 
 ### Composables
 
-- `useKnowledgeBaseHeader`: the header for the four KB pages. It runs KB form scripts into header links and custom actions.
+- `useKnowledgeBaseHeader`: the header for the four KB pages. It runs KB form scripts into header links and custom actions, and returns `footer`: the saved footer, or the Settings Preview one, null when off.
 - `useArticleSearch`: debounced article search, used by the search box and the new ticket form.
 - `useDrawer`: the ticket page's mobile side drawer. `useBottomSheet`: open state for the knowledge base sidebar, a frappe-ui `BottomSheet` on phones.
 - `useTicketThread`, `useReplyComposer`, `useTicketDetails`, `useTicketFeedback`, `useOutsideHoursBanner`, `useChatRows`: the parts of the `ticket` page.
@@ -145,7 +146,7 @@ Do not run `bench migrate` or `build-studio-app` in the edit loop. Build only to
 
 1. Make the page in the Studio editor, inside the Helpdesk app. In developer mode the save writes `studio_page/<page>/<page>.json`.
 2. Add `<page>.ts` next to it with `export default function setup(context)`. Spread `useSettingsModal(context)` (or `useKnowledgeBaseHeader(context)` on a KB page) into the return value.
-3. Add `header` and `kb_settings` blocks, like the other pages.
+3. Add `header` and `kb_settings` blocks, like the other pages, and `footer` on a KB page.
 4. Add the path to `ROUTES` in `shared/src/portalRoutes.ts`.
 5. Set `allow_guest` only if guests must see the page.
 

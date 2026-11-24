@@ -12,8 +12,7 @@
       variant="ghost"
       :label="link.label"
       :href="link.url"
-      :target="target(link)"
-      :rel="rel(link)"
+      v-bind="linkTarget(link.open_in_new_tab)"
     />
     <Button
       v-for="link in iconLinks"
@@ -22,8 +21,7 @@
       :label="link.label"
       :tooltip="link.label"
       :href="link.url"
-      :target="target(link)"
-      :rel="rel(link)"
+      v-bind="linkTarget(link.open_in_new_tab)"
     >
       <template #icon>
         <PortalServiceIcon :name="link.icon" class="size-4" />
@@ -36,6 +34,7 @@
 import { computed } from "vue";
 import { Button } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
+import { linkTarget } from "@helpdesk/shared/utils";
 import PortalServiceIcon from "@app/components/header/PortalServiceIcon.vue";
 
 type HeaderLink = {
@@ -50,9 +49,4 @@ const props = defineProps<{ links?: HeaderLink[] }>();
 
 const textLinks = computed(() => (props.links || []).filter((l) => !l.icon));
 const iconLinks = computed(() => (props.links || []).filter((l) => l.icon));
-
-const target = (link: HeaderLink) =>
-  link.open_in_new_tab ? "_blank" : "_self";
-const rel = (link: HeaderLink) =>
-  link.open_in_new_tab ? "noopener" : undefined;
 </script>

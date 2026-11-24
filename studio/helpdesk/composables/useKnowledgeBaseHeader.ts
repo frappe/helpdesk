@@ -1,8 +1,8 @@
 import { computed, effectScope, ref, watch } from 'vue'
-import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
-import { isSafeLink, runFormScripts } from '@helpdesk/shared/utils'
+import { nestFooterRows } from '@helpdesk/shared/knowledgeBaseFooter'
+import { isValidLink, runFormScripts } from '@helpdesk/shared/utils'
 import { navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
 import { accountMenuOptions, themeIcon, toggleTheme, useSettingsModal } from '@app/stores/settings'
@@ -31,6 +31,20 @@ const pageActionLabel = computed(() =>
   session.canCreateTicket.value && !session.config.value?.hide_raise_ticket_button ? session.raiseTicketLabel.value : '',
 )
 
+const withIcons = (links) => links.filter(isValidLink).map((link) => ({ ...link, icon: serviceIcon(link.url) }))
+
+const footer = computed(() => {
+  const config = session.config.value
+  if (!config?.show_footer) return null
+  const { tagline, copyright, ...saved } = readKnowledgeBasePreview()?.footer || nestFooterRows(config)
+  const columns = saved.columns
+    .map((column) => ({ ...column, links: column.links.filter(isValidLink) }))
+    .filter((column) => column.links.length)
+  const socials = withIcons(saved.socials)
+  if (!tagline && !copyright && !columns.length && !socials.length) return null
+  return { tagline, copyright, columns, socials, isCompact: !columns.length }
+})
+
 // Phone: text links move into the logo menu.
 const menuOptions = computed(() => [
   ...(session.isPhone.value ? headerLinks.value.filter((link) => !link.icon) : []).map((link) => ({
@@ -55,9 +69,7 @@ async function runScripts(scripts: string[]) {
   const data = { _form_script: scripts }
   customActions.value = await runFormScripts(data, scriptContext)
   // Settings Preview shows unsaved links until saved.
-  headerLinks.value = (readKnowledgeBasePreview()?.links || data._customLinks || [])
-    .filter((link) => link?.label && isSafeLink(link.url))
-    .map((link) => ({ ...link, icon: serviceIcon(link.url) }))
+  headerLinks.value = withIcons(readKnowledgeBasePreview()?.links || data._customLinks || [])
 }
 
 export function useKnowledgeBaseHeader(context) {
@@ -77,6 +89,7 @@ export function useKnowledgeBaseHeader(context) {
     ...useSettingsModal(context),
     customActions,
     headerLinks,
+    footer,
     accountMenuOptions: menuOptions,
     themeIcon,
     toggleTheme,

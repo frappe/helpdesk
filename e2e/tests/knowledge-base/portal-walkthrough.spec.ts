@@ -8,7 +8,7 @@ import { siteHeader } from "../../helpers/site";
 
 // Title ids (R1, H9, K2, ...) follow the portal walkthrough checklist.
 
-const KB_SETTINGS = ["public_knowledge_base", "allow_anonymous_article_voting", "banner_preset"];
+const KB_SETTINGS = ["public_knowledge_base", "allow_anonymous_article_voting", "banner_preset", "show_footer", "footer_tagline", "footer_items", "social_links"];
 const QUICK_LINKS = "Knowledge Base Quick Links";
 const GUEST = { storageState: { cookies: [], origins: [] } };
 const PHONE = { width: 390, height: 844 };
@@ -757,21 +757,17 @@ test.describe("article page", () => {
     await expect.soft(toc.getByRole("button", { name: "Only part" }), "one heading still shows the xl TOC").toBeVisible();
   });
 
-  test("AR25 AR27 related articles open and reset the article scroll", async ({ page, api }) => {
+  test("AR27 opening another article from the sidebar resets the article scroll", async ({ page, api }) => {
     const category = await createCategory(api);
     const filler = "<p>" + "word ".repeat(800) + "</p>";
     const created = [];
-    for (let i = 0; i < 8; i++) created.push(await createArticle(api, category.name, { title: `Related ${i} ${uid()}`, content: filler }));
+    for (let i = 0; i < 2; i++) created.push(await createArticle(api, category.name, { title: `Scroll ${i} ${uid()}`, content: filler }));
     await page.goto(`/help/articles/${created[0].name}`);
-    await expect(page.getByText("Related articles")).toBeVisible();
-    const rows = page.locator('[data-component-id="container-article-scroll"]').getByRole("link", { name: /^Related \d/ });
-    await expect(rows).toHaveCount(5);
+    await expect(page.getByText("Related articles")).toBeHidden();
     const panel = page.locator('[data-component-id="container-article-scroll"]');
     await panel.evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
-    const target = rows.first();
-    const title = (await target.innerText()).split("\n")[0];
-    await target.click();
-    await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible();
+    await page.getByRole("link", { name: created[1].title }).first().click();
+    await expect(page.getByRole("heading", { name: created[1].title, level: 1 })).toBeVisible();
     await expect.poll(() => panel.evaluate((el) => el.scrollTop)).toBe(0);
   });
 
@@ -830,13 +826,15 @@ test.describe("knowledge base settings", () => {
       await expect(page).toHaveURL(/\/settings\/knowledge-base$/);
 
       // Switches save without the Save button.
+      await dialog.getByRole("tab", { name: "Advanced" }).click();
       await dialog.getByText("Allow guests to vote on articles").locator("xpath=../..").getByRole("switch").click();
       await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).allow_anonymous_article_voting).toBe(1);
       await expect(dialog.getByText("Unsaved")).toBeHidden();
+      await dialog.getByRole("tab", { name: "Home page" }).click();
       await dialog.getByRole("radio", { name: "Blue" }).click();
       await expect(dialog.getByText("Unsaved")).toBeVisible();
       // Pins save from their own dialog, apart from the draft.
-      await dialog.getByRole("button", { name: "Customize pinned categories" }).click();
+      await dialog.getByRole("button", { name: "Add category" }).click();
       const pins = page.getByRole("dialog", { name: "Pinned categories" });
       // the dialog lists 100 at most; a busy test site has more
       await pins.getByRole("textbox", { name: "Search categories to pin" }).fill(category.category_name);
@@ -844,12 +842,13 @@ test.describe("knowledge base settings", () => {
       await pins.getByRole("button", { name: "Save" }).click();
       await expect(pins).toBeHidden();
       await expect.poll(async () => (await api.get("HD Article Category", category.name)).pinned).toBe(1);
+      await dialog.getByRole("tab", { name: "Header" }).click();
       await dialog.getByRole("button", { name: "Add link" }).click();
       await dialog.getByPlaceholder("Contact sales").fill(label);
       // S33: an unsafe address is refused on Save.
       await dialog.getByPlaceholder("https://example.com/contact").fill("javascript:alert(1)");
       await dialog.getByRole("button", { name: "Save" }).click();
-      await expect(page.getByText(`${label}: use a web address`)).toBeVisible();
+      await expect(page.getByText(`${label}: Start with http://, https://, mailto: or /`)).toBeVisible();
       await dialog.getByPlaceholder("https://example.com/contact").fill("https://example.com/e2e");
 
       // S34: Preview opens the portal with the draft.
@@ -871,6 +870,50 @@ test.describe("knowledge base settings", () => {
       if (await api.exists("HD Form Script", { name: QUICK_LINKS })) await api.delete("HD Form Script", QUICK_LINKS);
     }
   });
+
+  test("the footer previews, saves and shows to guests", async ({ page, kb, context, browser, baseURL }) => {
+    await kb({ public_knowledge_base: 1, show_footer: 0, footer_items: [], social_links: [] });
+    const tagline = `E2E tagline ${uid()}`;
+    await page.goto("/help/settings/knowledge-base");
+    const dialog = page.getByRole("dialog");
+    await dialog.getByRole("tab", { name: "Footer" }).click();
+    await expect(dialog.getByRole("button", { name: "Preview" })).toBeHidden();
+    await dialog.getByRole("switch", { name: "Show footer" }).click();
+    await dialog.locator("textarea").fill(tagline);
+    await dialog.getByRole("button", { name: "Add column" }).click();
+    const linkDialog = page.getByRole("dialog", { name: "Add column" });
+    await linkDialog.getByLabel("Column title").fill("Company");
+    await linkDialog.getByLabel("Label").fill("E2E About");
+    await linkDialog.getByLabel("URL").fill("javascript:alert(1)");
+    await expect(linkDialog.getByRole("button", { name: "Add column" })).toBeDisabled();
+    await linkDialog.getByLabel("URL").fill("https://example.com/about");
+    await linkDialog.getByRole("button", { name: "Add column" }).click();
+    await expect(linkDialog).toBeHidden();
+    await expect(dialog.getByRole("button", { name: "E2E About", exact: true })).toBeVisible();
+    const socials = dialog.getByRole("group", { name: "Social links" });
+    await socials.getByRole("button", { name: "Add link" }).click();
+    await socials.getByPlaceholder("Contact sales").fill("GitHub");
+    await socials.getByPlaceholder("https://example.com/contact").fill("javascript:alert(1)");
+    await dialog.getByRole("button", { name: "Save" }).click();
+    await expect(page.getByText("GitHub: Start with http://, https://, mailto: or /")).toBeVisible();
+    await socials.getByPlaceholder("https://example.com/contact").fill("https://github.com/example");
+
+    const popup = context.waitForEvent("page");
+    await dialog.getByRole("button", { name: "Preview" }).click();
+    const preview = await popup;
+    await expect(preview.getByText(tagline)).toBeVisible();
+    await preview.close();
+
+    await dialog.getByRole("button", { name: "Save" }).click();
+    await expect(dialog.getByText("Unsaved")).toBeHidden();
+
+    const guest = await (await browser.newContext({ baseURL, ...GUEST })).newPage();
+    await guest.goto("/help");
+    await expect(guest.getByText(tagline)).toBeVisible();
+    await expect(guest.getByRole("link", { name: "E2E About" })).toHaveAttribute("href", "https://example.com/about");
+    await expect(guest.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", "https://github.com/example");
+    await guest.close();
+  });
 });
 
 test.describe("knowledge base settings: pins on the home page", () => {
@@ -885,7 +928,7 @@ test.describe("knowledge base settings: pins on the home page", () => {
       // The settings dialog hides the page from the accessibility tree, so match by CSS.
       const cards = grid.locator("a");
       await expect.poll(() => cards.count()).toBeGreaterThan(2);
-      await page.getByRole("dialog").getByRole("button", { name: "Customize pinned categories" }).click();
+      await page.getByRole("dialog").getByRole("button", { name: "Add category" }).click();
       const pins = page.getByRole("dialog", { name: "Pinned categories" });
       for (const category of pinned) {
         // the dialog lists 100 at most; a busy test site has more
@@ -989,4 +1032,3 @@ async function saveQuickLinks(api, links: Record<string, any>[]) {
     script: `function setupForm() {\n  return { links: ${json} };\n}`,
   });
 }
-

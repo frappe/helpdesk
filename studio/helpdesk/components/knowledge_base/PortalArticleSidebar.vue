@@ -258,7 +258,10 @@ const wrapperProps = computed(() =>
       }
     : {
         ...attrs,
-        class: [attrs.class, "flex h-full w-[239px] shrink-0 flex-col"],
+        class: [
+          attrs.class,
+          "sticky top-0 flex h-[100cqh] w-[239px] shrink-0 flex-col self-start",
+        ],
       }
 );
 

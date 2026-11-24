@@ -7,6 +7,7 @@ from frappe.utils import set_request
 from frappe.website.serve import get_response
 from frappe.website.utils import get_home_page
 
+from helpdesk.api.config import get_config
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     KNOWLEDGE_BASE_HOME,
     TICKETS_HOME,
@@ -208,3 +209,100 @@ def make_customer(email: str) -> None:
         }
     ).insert(ignore_permissions=True)
     user.add_roles("HD Customer")
+
+
+class TestKnowledgeBaseFooter(IntegrationTestCase):
+    def save_footer(self, items: list[dict], **fields) -> None:
+        settings = frappe.get_single("HD Settings")
+        settings.update({"show_footer": 1, "footer_items": items, **fields})
+        settings.save()
+
+    def column(self, title: str = "Product", *urls: str) -> list[dict]:
+        links = [
+            {"label": f"Link {url}", "url": url, "parent_label": title} for url in urls
+        ]
+        return [{"label": title}, *links]
+
+    def test_a_complete_footer_saves(self) -> None:
+        self.save_footer(
+            self.column(
+                "Product",
+                "https://example.com/pricing",
+                "http://example.com/docs",
+                "/help",
+                "mailto:hi@example.com",
+            ),
+            social_links=[
+                {
+                    "label": "GitHub",
+                    "url": "https://github.com/example",
+                    "parent_label": "Product",
+                }
+            ],
+        )
+        settings = frappe.get_single("HD Settings")
+        self.assertIsNone(settings.social_links[0].parent_label)
+        self.assertEqual(
+            [d.url for d in settings.footer_items if d.parent_label],
+            [
+                "https://example.com/pricing",
+                "http://example.com/docs",
+                "/help",
+                "mailto:hi@example.com",
+            ],
+        )
+
+    def test_unsafe_footers_are_refused(self) -> None:
+        cases = (
+            {"items": self.column("Product", "javascript:alert(1)")},
+            {"items": self.column("Product", "example.com")},
+            {"items": self.column("Product", "https://")},
+            {"items": self.column("Product", "http:example.com")},
+            {"items": self.column("Product", "mailto:")},
+            {"items": self.column("Product", "")},
+            {"items": self.column("Product")},
+            {
+                "items": [
+                    *self.column("Product", "/help"),
+                    {"label": "Orphan", "url": "/help", "parent_label": "Company"},
+                ]
+            },
+            {
+                "items": [],
+                "social_links": [{"label": "GitHub", "url": "data:text/html,hi"}],
+            },
+        )
+        for case in cases:
+            with self.subTest(case=case), self.assertRaises(frappe.ValidationError):
+                self.save_footer(**case)
+
+    def test_at_most_four_columns(self) -> None:
+        columns = [self.column(f"Column {index}", "/help") for index in range(5)]
+        self.save_footer([row for column in columns[:4] for row in column])
+        with self.assertRaises(frappe.ValidationError):
+            self.save_footer([row for column in columns for row in column])
+
+    def test_column_titles_differ(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            self.save_footer(
+                self.column("Product", "/a") + self.column("Product", "/b")
+            )
+
+    def test_guests_get_the_footer_only_while_it_is_shown_and_public(self) -> None:
+        self.save_footer(self.column("Product", "/help"), footer_tagline="Hi")
+        for is_public, show_footer, rows, tagline in (
+            (1, 1, 2, "Hi"),
+            (1, 0, 0, None),
+            (0, 1, 0, None),
+        ):
+            frappe.db.set_single_value(
+                "HD Settings", "public_knowledge_base", is_public
+            )
+            frappe.db.set_single_value("HD Settings", "show_footer", show_footer)
+            frappe.set_user("Guest")
+            try:
+                config = get_config()
+                self.assertEqual(len(config.footer_items), rows)
+                self.assertEqual(config.footer_tagline, tagline)
+            finally:
+                frappe.set_user("Administrator")

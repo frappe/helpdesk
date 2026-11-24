@@ -193,6 +193,12 @@
        "componentId": "container-categories-section",
        "componentName": "container",
        "originalElement": "div"
+      },
+      {
+       "blockName": "Footer",
+       "componentId": "footer-categories",
+       "componentName": "footer",
+       "isStudioComponent": true
       }
      ],
      "classes": [
@@ -234,7 +240,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-23 19:30:00.000000",
+ "modified": "2026-11-22 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "categories",
  "owner": "Administrator",

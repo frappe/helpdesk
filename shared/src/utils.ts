@@ -56,8 +56,35 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
 }
 
 // Guests see quick links, so allow only paths, web and mail URLs.
-export function isSafeLink(url: unknown) {
-  return typeof url === "string" && /^(\/|https?:|mailto:)/i.test(url);
+export const SAFE_LINK_PATTERN = "(/|https?://\\w|mailto:\\S).*";
+const SAFE_LINK = new RegExp(`^${SAFE_LINK_PATTERN}`, "i");
+
+export function isValidLink(link?: { label?: string; url?: string }) {
+  return (
+    Boolean(link?.label?.trim()) && SAFE_LINK.test(link?.url?.trim() || "")
+  );
+}
+
+export function linkError(url?: string) {
+  const value = url?.trim();
+  return value && !SAFE_LINK.test(value)
+    ? __("Start with http://, https://, mailto: or /")
+    : "";
+}
+
+/** Saves one switch; a click while a save is running is dropped, as a second save would fail on the stale timestamp. */
+export function saveToggle(settings, fieldname: string, value: boolean) {
+  if (settings.setValue.loading) return;
+  settings.setValue.submit(
+    { [fieldname]: value },
+    { onSuccess: () => toast.success(__("Settings updated")) }
+  );
+}
+
+export function linkTarget(openInNewTab?: boolean | number) {
+  return openInNewTab
+    ? { target: "_blank", rel: "noopener" }
+    : { target: "_self" };
 }
 
 export function prettyDate(date) {
@@ -91,8 +118,7 @@ export function prettyDate(date) {
       return __("{0} hours ago", [Math.floor(absDiff / 3600)]);
     }
     if (absDiff < 120) return __("In 1 minute");
-    if (absDiff < 3600)
-      return __("In {0} minutes", [Math.floor(absDiff / 60)]);
+    if (absDiff < 3600) return __("In {0} minutes", [Math.floor(absDiff / 60)]);
     if (absDiff < 7200) return __("In 1 hour");
     return __("In {0} hours", [Math.floor(absDiff / 3600)]);
   } else if (diff < 0) {

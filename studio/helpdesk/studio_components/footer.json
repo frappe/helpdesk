@@ -1,0 +1,241 @@
+{
+ "block": {
+  "blockName": "Footer",
+  "children": [
+   {
+    "blockName": "footer-content",
+    "children": [
+     {
+      "blockName": "footer-top",
+      "children": [
+       {
+        "blockName": "footer-brand",
+        "children": [
+         {
+          "componentId": "footer-brand-name",
+          "componentName": "Brand",
+          "componentProps": {
+           "logo": "{{ brandLogo }}",
+           "name": "{{ brandName }}"
+          },
+          "isCustomVueComponent": true
+         },
+         {
+          "classes": [
+           "text-ink-gray-6",
+           "whitespace-pre-line"
+          ],
+          "componentId": "footer-tagline",
+          "componentName": "TextBlock",
+          "componentProps": {
+           "fontSize": "text-p-sm",
+           "tag": "p",
+           "text": "{{ footer.tagline }}"
+          },
+          "visibilityCondition": "{{ footer.tagline && (!footer.isCompact || footer.copyright) }}"
+         },
+         {
+          "componentId": "footer-socials",
+          "componentName": "PortalHeaderLinks",
+          "componentProps": {
+           "links": "{{ footer.socials }}"
+          },
+          "isCustomVueComponent": true,
+          "classes": [
+           "-ms-1.5",
+           "[&_a]:text-ink-gray-6",
+           "[&_a:hover]:text-ink-gray-9"
+          ],
+          "visibilityCondition": "{{ !footer.isCompact && footer.socials.length }}"
+         }
+        ],
+        "classes": [
+         "flex",
+         "flex-col",
+         "gap-3",
+         "sm:max-w-[220px]"
+        ],
+        "componentId": "footer-brand",
+        "componentName": "container",
+        "originalElement": "div"
+       },
+       {
+        "blockName": "footer-columns",
+        "children": [
+         {
+          "blockName": "footer-column",
+          "children": [
+           {
+            "classes": [
+             "text-ink-gray-9"
+            ],
+            "componentId": "footer-column-title",
+            "componentName": "TextBlock",
+            "componentProps": {
+             "fontSize": "text-sm-medium",
+             "tag": "h2",
+             "text": "{{ dataItem.title }}"
+            },
+            "visibilityCondition": "{{ dataItem.title }}"
+           },
+           {
+            "componentId": "footer-column-links",
+            "componentName": "PortalFooterLinks",
+            "componentProps": {
+             "links": "{{ dataItem.links }}"
+            },
+            "isCustomVueComponent": true
+           }
+          ],
+          "classes": [
+           "flex",
+           "min-w-0",
+           "flex-col",
+           "gap-3"
+          ],
+          "componentId": "footer-column",
+          "componentName": "container",
+          "originalElement": "div"
+         }
+        ],
+        "classes": [
+         "!grid",
+         "grid-cols-2",
+         "sm:grid-flow-col",
+         "sm:grid-cols-none",
+         "sm:auto-cols-max",
+         "!gap-x-12",
+         "!gap-y-8"
+        ],
+        "componentId": "footer-columns",
+        "componentName": "Repeater",
+        "componentProps": {
+         "data": "{{ footer.columns }}"
+        },
+        "visibilityCondition": "{{ footer.columns.length }}"
+       },
+       {
+        "blockName": "footer-aside",
+        "children": [
+         {
+          "classes": [
+           "text-ink-gray-5",
+           "whitespace-pre-line",
+           "sm:max-w-[360px]",
+           "sm:text-end"
+          ],
+          "componentId": "footer-aside-text",
+          "componentName": "TextBlock",
+          "componentProps": {
+           "fontSize": "text-p-sm",
+           "tag": "p",
+           "text": "{{ footer.copyright || footer.tagline }}"
+          },
+          "visibilityCondition": "{{ footer.copyright || footer.tagline }}"
+         },
+         {
+          "classes": [
+           "first:-ms-1.5",
+           "sm:first:ms-0",
+           "sm:-me-1.5"
+          ],
+          "componentId": "footer-aside-socials",
+          "componentName": "PortalHeaderLinks",
+          "componentProps": {
+           "links": "{{ footer.socials }}"
+          },
+          "isCustomVueComponent": true,
+          "visibilityCondition": "{{ footer.socials.length }}"
+         }
+        ],
+        "classes": [
+         "flex",
+         "items-center",
+         "gap-4",
+         "sm:self-center"
+        ],
+        "componentId": "footer-aside",
+        "componentName": "container",
+        "originalElement": "div",
+        "visibilityCondition": "{{ footer.isCompact }}"
+       }
+      ],
+      "classes": [
+       "flex",
+       "flex-col",
+       "gap-6",
+       "sm:gap-10",
+       "sm:flex-row",
+       "sm:justify-between"
+      ],
+      "componentId": "footer-top",
+      "componentName": "container",
+      "originalElement": "div"
+     },
+     {
+      "blockName": "footer-bottom",
+      "children": [
+       {
+        "classes": [
+         "text-ink-gray-5"
+        ],
+        "componentId": "footer-copyright",
+        "componentName": "TextBlock",
+        "componentProps": {
+         "fontSize": "text-p-sm",
+         "tag": "p",
+         "text": "{{ footer.copyright }}"
+        }
+       }
+      ],
+      "classes": [
+       "border-t",
+       "border-outline-gray-1",
+       "pt-6"
+      ],
+      "componentId": "footer-bottom",
+      "componentName": "container",
+      "originalElement": "div",
+      "visibilityCondition": "{{ footer.copyright && !footer.isCompact }}"
+     }
+    ],
+    "classes": [
+     "mx-auto",
+     "flex",
+     "w-full",
+     "max-w-[832px]",
+     "flex-col",
+     "gap-10",
+     "px-4",
+     "py-10"
+    ],
+    "componentId": "footer-content",
+    "componentName": "container",
+    "originalElement": "div"
+   }
+  ],
+  "classes": [
+   "w-full",
+   "shrink-0",
+   "mt-auto",
+   "border-t",
+   "border-outline-gray-1"
+  ],
+  "componentId": "footer-root",
+  "componentName": "container",
+  "originalElement": "div",
+  "visibilityCondition": "{{ footer }}"
+ },
+ "component_id": "footer",
+ "component_name": "Footer",
+ "creation": "2026-11-13 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Studio Component",
+ "idx": 0,
+ "inputs": [],
+ "is_disabled": 0,
+ "modified": "2026-11-24 19:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "footer",
+ "owner": "Administrator"
+}

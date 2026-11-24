@@ -1,8 +1,10 @@
 <template>
   <div class="space-y-11" aria-busy="true">
     <!-- Real headings: only the rows wait for data. -->
-    <section v-for="section in sections" :key="section.title">
-      <h2 class="text-md-semibold text-ink-gray-8">{{ section.title }}</h2>
+    <section v-for="(section, index) in sections" :key="index">
+      <h2 v-if="section.title" class="text-md-semibold text-ink-gray-8">
+        {{ section.title }}
+      </h2>
       <div class="mt-2 divide-y divide-outline-gray-1">
         <div
           v-for="i in section.rows || 0"
@@ -54,7 +56,7 @@ import { __ } from "../translation";
 
 // panels: each panel's box height, in px.
 defineProps<{
-  sections: { title: string; rows?: number; panels?: number[] }[];
+  sections: { title?: string; rows?: number; panels?: number[] }[];
 }>();
 
 const BLOCK = "motion-reduce:animate-none";

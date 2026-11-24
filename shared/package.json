@@ -15,6 +15,7 @@
 		"./tiptap": "./src/tiptap.ts",
 		"./knowledgeBaseBanner": "./src/knowledgeBaseBanner.ts",
 		"./knowledgeBasePreview": "./src/knowledgeBasePreview.ts",
+		"./knowledgeBaseFooter": "./src/knowledgeBaseFooter.ts",
 		"./portalRoutes": "./src/portalRoutes.ts",
 		"./categoryIcons": "./src/categoryIcons.ts",
 		"./Icon.vue": "./src/Icon.vue",

@@ -6,7 +6,8 @@ export function pinnedListText(kind: PinKind) {
   return {
     categories: {
       title: __("Pinned categories"),
-      customize: __("Customize pinned categories"),
+      column: __("Category"),
+      add: __("Add category"),
       description: __(
         "Pinned categories will appear first on your knowledge base home page, in this order."
       ),
@@ -20,12 +21,15 @@ export function pinnedListText(kind: PinKind) {
     },
     articles: {
       title: __("Pinned articles"),
-      customize: __("Customize pinned articles"),
+      column: __("Article"),
+      add: __("Add article"),
       description: __(
         "Up to {0} pinned articles will appear as featured articles on your knowledge base home page, in this order.",
         [MAX_PINNED_ARTICLES]
       ),
-      empty: __("Nothing pinned yet. The home page will show no featured articles."),
+      empty: __(
+        "Nothing pinned yet. The home page will show no featured articles."
+      ),
       search: __("Search articles to pin"),
       others: __("Other articles"),
       allPinned: __("Every article is pinned"),

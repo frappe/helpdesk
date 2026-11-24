@@ -20,6 +20,9 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     remove_guest_ticket_creation_permission,
     set_guest_ticket_creation_permission,
 )
+from helpdesk.utils import is_safe_link
+
+MAX_FOOTER_COLUMNS = 4
 
 
 class HDSettings(Document):
@@ -32,6 +35,44 @@ class HDSettings(Document):
         self.validate_guest_only_settings()
         # every visitor loads it, so a linked image could track them
         validate_uploaded_image(self.banner_image)
+        self.validate_footer()
+
+    def validate_footer(self):
+        """Footer items mirror Website Settings: column rows without a parent, link rows under one."""
+        for d in self.social_links:
+            d.parent_label = None
+        columns = [d.label for d in self.footer_items if not d.parent_label]
+        links = [d for d in self.footer_items if d.parent_label]
+        if len(columns) > MAX_FOOTER_COLUMNS:
+            frappe.throw(
+                _("The footer can have at most {0} link columns").format(
+                    MAX_FOOTER_COLUMNS
+                )
+            )
+        if len(set(columns)) < len(columns):
+            frappe.throw(_("Each footer column needs a different title"))
+        for d in links:
+            if d.parent_label not in columns:
+                frappe.throw(
+                    _("{0}: No footer column is titled {1}").format(
+                        frappe.bold(d.label), frappe.bold(d.parent_label)
+                    )
+                )
+        parents = {d.parent_label for d in links}
+        for column in columns:
+            if column not in parents:
+                frappe.throw(
+                    _("Footer column {0} needs at least one link").format(
+                        frappe.bold(column)
+                    )
+                )
+        for d in links + self.social_links:
+            if not is_safe_link(d.url or ""):
+                frappe.throw(
+                    _("{0}: Start with http://, https://, mailto: or /").format(
+                        frappe.bold(d.label or _("Row {0}").format(d.idx))
+                    )
+                )
 
     def turn_off_guest_home_when_private(self):
         """A private knowledge base turns away guests, so it can't be their home."""

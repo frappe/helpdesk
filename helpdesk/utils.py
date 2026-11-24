@@ -1,6 +1,7 @@
 import functools
 import json
 import re
+from urllib.parse import urlparse
 
 import frappe
 import phonenumbers
@@ -9,7 +10,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder import Order
 from frappe.realtime import get_site_room
-from frappe.utils import floor
+from frappe.utils import floor, validate_url
 from frappe.utils.safe_exec import get_safe_globals
 from frappe.utils.telemetry import capture as _capture
 from phonenumbers import NumberParseException
@@ -195,6 +196,21 @@ def agent_only(fn):
         return fn(*args, **kwargs)
 
     return wrapper
+
+
+def can_read_knowledge_base() -> bool:
+    """Signed-in users always can; guests only while the knowledge base is public."""
+    return frappe.session.user != "Guest" or bool(
+        frappe.db.get_single_value("HD Settings", "public_knowledge_base")
+    )
+
+
+def is_safe_link(url: str) -> bool:
+    """A web link with a host, a mailto: link or a path on this site."""
+    parsed = urlparse(url)
+    if parsed.scheme in ("http", "https"):
+        return bool(parsed.netloc)
+    return validate_url(url, valid_schemes=("mailto", ""))
 
 
 def is_agent_manager(user: str | None = None) -> bool:
