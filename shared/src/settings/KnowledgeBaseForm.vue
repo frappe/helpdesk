@@ -1,5 +1,5 @@
 <template>
-  <Tabs v-model="tab" :tabs="tabs">
+  <Tabs v-model="tab" :tabs="tabs" class="-mt-1.5">
     <template #tab-panel="{ tab: { value } }">
       <Transition
         enter-from-class="opacity-0"
