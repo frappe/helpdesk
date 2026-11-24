@@ -1165,7 +1165,7 @@ class HDTicket(Document, CustomerEditController):
 
             if self.has_agent_replied:
                 self.status = self.ticket_reopen_status
-                self.flags.reopened_by = c.sender
+                self.flags.reopened_by = get_user_by_email(c.sender) or c.sender
             else:
                 self.status = self.default_open_status
             # if received that means customer has replied
