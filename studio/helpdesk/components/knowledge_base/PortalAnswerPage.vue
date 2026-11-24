@@ -81,6 +81,7 @@
             {{ question }}
           </h1>
           <div
+            v-if="answer.data.answer"
             class="flex items-center gap-1.5 text-p-sm font-medium text-ink-gray-6"
           >
             <LucideSparkles class="size-4" />
@@ -89,7 +90,10 @@
           <p v-if="answer.data.refused" class="text-p-base text-ink-gray-7">
             {{ answer.data.answer }}
           </p>
-          <div v-else class="flex flex-col gap-3 text-p-base text-ink-gray-8">
+          <div
+            v-else-if="answer.data.answer"
+            class="flex flex-col gap-3 text-p-base text-ink-gray-8"
+          >
             <p
               v-for="(paragraph, index) in paragraphs"
               :key="index"
@@ -139,7 +143,10 @@
           </div>
         </div>
 
-        <p v-if="!answer.data.refused" class="text-p-sm text-ink-gray-5">
+        <p
+          v-if="answer.data.answer && !answer.data.refused"
+          class="text-p-sm text-ink-gray-5"
+        >
           {{ __("AI can make mistakes. Check the linked articles.") }}
         </p>
       </section>

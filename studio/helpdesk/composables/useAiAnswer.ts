@@ -38,5 +38,5 @@ export function useAiAnswer(question: Ref<string>) {
   )
   watch(isFailed, (failed) => failed && (matchQuery.value = question.value))
 
-  return { answer, matches, isAiOn, isFailed, isLoading, showMatches }
+  return { answer, matches, isFailed, isLoading, showMatches }
 }

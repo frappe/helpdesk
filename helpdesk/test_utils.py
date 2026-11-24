@@ -1,8 +1,6 @@
 import json
-import re
 from contextlib import contextmanager
 from datetime import datetime
-from types import SimpleNamespace
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -1304,25 +1302,6 @@ def fake_flow_knowledge():
             yield
     finally:
         store.drop_table()
-        frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
-
-
-def make_llm_reply(text: str) -> SimpleNamespace:
-    """A litellm completion response holding `text`."""
-    return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=text))])
-
-
-def cite_every_source(**kwargs) -> SimpleNamespace:
-    """A `litellm.completion` stand-in answering with a citation for each numbered source it was sent."""
-    prompt = " ".join(message["content"] for message in kwargs["messages"])
-    numbers = sorted(set(re.findall(r"^\[(\d+)\] ", prompt, re.MULTILINE)))
-    return make_llm_reply("Here is the answer. " + "".join(f"[{n}]" for n in numbers))
-
-
-def llm_prompt(completion: MagicMock) -> str:
-    """Everything a patched `litellm.completion` was last sent, as one string; empty if it never was."""
-    if not completion.call_args:
-        return ""
-    return " ".join(
-        message["content"] for message in completion.call_args.kwargs["messages"]
-    )
+        frappe.clear_document_cache(
+            "Flow Knowledge Settings", "Flow Knowledge Settings"
+        )

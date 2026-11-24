@@ -120,7 +120,9 @@ class HDArticle(Document):
         index_articles([self.name], queue="short")
 
     def update_ai_index(self):
-        if not frappe.db.get_single_value("HD Settings", "enable_ai_search"):
+        from helpdesk import ai_search
+
+        if not ai_search.is_enabled():
             return
         frappe.enqueue(
             "helpdesk.ai_search.index_article",

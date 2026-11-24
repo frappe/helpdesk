@@ -96,7 +96,7 @@ With AI search on, Enter in the home search opens the `search` page (`/help/sear
 
 ## AI search
 
-An AI answer to a reader's question, from the articles that reader may read, built on Frappe Flow (`frappe.flow`, which ships with the framework). It is off by default.
+An AI answer to a reader's question, from the articles that reader may read, built on Frappe Flow (`frappe.flow`, which ships with the framework). It is off by default. Until Flow can run an agent for portal readers, it returns the matching articles only (see [Answering](#answering)).
 
 ### Settings
 
@@ -139,21 +139,20 @@ Saving or deleting an article queues `index_article` (queue `short`) while AI se
 
 - calls `validate_public_access()`, so a guest is refused while `public_knowledge_base` is off, and is refused while AI search is off;
 - is rate limited to 10 requests a minute per user, or per IP for a guest, and cuts the question at `ANSWER_QUESTION_LENGTH` (500) characters;
-- retrieves the best 8 passages (`frappe.flow.knowledge.retriever.retrieve`), keeps the ones the asker may read, sends the best 3 articles to the model with the agent's instructions, and returns:
+- retrieves the best 8 passages (`frappe.flow.knowledge.retriever.retrieve`) from the bases its asker may read, keeps the ones whose article the asker may read now, and returns:
 
 ```
-{ "answer": str, "refused": bool,
-  "sources": [{ "number", "name", "title", "title_slug", "excerpt" }],
+{ "answer": null, "refused": bool, "sources": [],
   "related": [{ "name", "title", "title_slug", "excerpt" }] }
 ```
 
-`sources` are the articles the answer cites as `[n]`. `related` are the other matching articles the asker may read, at most 4. An off-topic question, or one no readable article matches, gets `refused` set, "I can only help with <product>." and no sources or related articles. A model failure is logged and the asker sees only a generic message, never the provider's error.
+`related` are the matching articles the asker may read, at most 4. A question no readable article matches gets `refused` set, "I can only help with <product>." as `answer`, and no related articles. No model is called: `answer` and `sources` stay empty until the blocker below is fixed.
 
-**Flow limit.** Flow runs agents as sessions on its flow server. A session belongs to a signed-in owner and its callbacks act as that user, so a guest cannot have one. The endpoint therefore reads the agent's model and instructions from the synced `Flow Agent` and makes one LiteLLM completion with the model's credentials (`frappe.flow.lib.model.model_config`), instead of starting a session. Move it onto Flow sessions once Flow can run one for a guest.
+**Blocker: Flow cannot run an agent for portal readers.** Flow runs agents only as sessions on its flow server (`frappe.flow.lib.agent.Agent.run`). A session needs read access to the `Flow Agent` and `Flow Model` (roles System Manager and Flow User), belongs to a signed-in owner whose callbacks act as that user, and runs asynchronously. Guests and customers have none of that, and Flow has no synchronous call. Calling the model directly with LiteLLM would bypass Flow's runtime, so Helpdesk does not. Once Flow can run an agent for a guest, send the retrieved articles to `helpdesk/kb-assistant` and fill `answer` (citing `[n]`) and `sources` (`{ "number", "name", "title", "title_slug", "excerpt" }`); the portal page already renders both.
 
 ### Portal page
 
-`PortalAnswerPage` (`/help/search?q=`, the `search` page) shows the question, a loading state, the answer with numbered citations that link to the articles, and the related articles below. If the call fails it says so and lists the plain `search_articles` matches. `get_config` gives the portal `ai_search_enabled`, which is on only when AI search is on and the reader may read the knowledge base. With it off, the home search shows today's dropdown and Enter opens no answer page.
+`PortalAnswerPage` (`/help/search?q=`, the `search` page) shows the question, a loading state, the answer with numbered citations that link to the articles when there is one, and the related articles below. While `answer` is empty (see the Flow blocker), it shows only the related articles. If the call fails it says so and lists the plain `search_articles` matches. `get_config` gives the portal `ai_search_enabled`, which is on only when AI search is on and the reader may read the knowledge base. With it off, the home search shows today's dropdown and Enter opens no answer page.
 
 ## Settings shared by both apps
 
