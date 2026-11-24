@@ -1242,3 +1242,18 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
     cards = HelpdeskDashboard(filters).get_number_card_data()
     return {card["title"]: card for card in cards}
+
+
+def enable_ai_search(**overrides) -> frappe.Document:
+    """Save HD Settings with AI search on and a test provider, key and model; `overrides` win."""
+    settings = frappe.get_single("HD Settings")
+    settings.update(
+        {
+            "enable_ai_search": 1,
+            "ai_provider": "openai",
+            "ai_api_key": "sk-test-key",
+            "ai_model": "gpt-4.1-mini",
+            **overrides,
+        }
+    )
+    return settings.save()

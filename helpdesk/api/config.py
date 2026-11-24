@@ -54,6 +54,7 @@ def get_config():
     res.time_format = get_user_time_format()
 
     is_readable = can_read_knowledge_base()
+    res.ai_search_enabled = bool(is_readable and settings.enable_ai_search)
     if is_readable:
         res.knowledge_base_form_scripts = frappe.get_all(
             "HD Form Script",

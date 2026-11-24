@@ -91,6 +91,11 @@
   "column_break_qoxt",
   "description_weight",
   "headings_weight",
+  "ai_search_tab",
+  "enable_ai_search",
+  "ai_provider",
+  "ai_api_key",
+  "ai_model",
   "email_customisations_tab",
   "share_feedback_section",
   "enable_email_ticket_feedback",
@@ -699,12 +704,41 @@
    "default": "0",
    "label": "Allow customer managers to manage their organization",
    "description": "If enabled, customer managers can promote members of their organization to managers, demote them back, remove them, and change the organization's logo."
+  },
+  {
+   "fieldname": "ai_search_tab",
+   "fieldtype": "Tab Break",
+   "label": "AI Search"
+  },
+  {
+   "default": "0",
+   "description": "Answer questions on the knowledge base with an AI assistant that reads only the articles each visitor may see.",
+   "fieldname": "enable_ai_search",
+   "fieldtype": "Check",
+   "label": "Enable AI search"
+  },
+  {
+   "description": "LiteLLM provider name, such as openai or anthropic.",
+   "fieldname": "ai_provider",
+   "fieldtype": "Data",
+   "label": "Provider"
+  },
+  {
+   "fieldname": "ai_api_key",
+   "fieldtype": "Password",
+   "label": "API key"
+  },
+  {
+   "description": "Model name at the provider, such as gpt-4.1-mini.",
+   "fieldname": "ai_model",
+   "fieldtype": "Data",
+   "label": "Model"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-23 12:00:00.000000",
+ "modified": "2026-11-24 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
