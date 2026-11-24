@@ -96,8 +96,7 @@
             "px-4",
             "sm:px-6",
             "xl:px-0",
-            "xl:col-start-2",
-            "xl:col-span-3"
+            "xl:col-start-2"
            ]
           },
           {
@@ -263,7 +262,9 @@
                 "!grid",
                 "items-start",
                 "sm:grid-cols-2",
-                "!gap-4"
+                "!gap-4",
+                "xl:w-auto",
+                "xl:-me-64"
                ],
                "componentId": "Repeater-category-sections",
                "componentName": "Repeater",
@@ -341,7 +342,6 @@
             "sm:px-6",
             "xl:px-0",
             "xl:col-start-2",
-            "xl:col-span-3",
             "portal-reveal"
            ],
            "componentId": "container-pdx9evglv",
@@ -388,7 +388,7 @@
           "grid",
           "grid-cols-1",
           "xl:grid-cols-[48px_minmax(0,1fr)_48px_240px]",
-          "xl:pe-12",
+          "xl:pe-4",
           "min-w-0",
           "shrink-0",
           "min-h-[100cqh]",
@@ -456,7 +456,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-11-24 02:36:28.345383",
+ "modified": "2026-11-24 14:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
