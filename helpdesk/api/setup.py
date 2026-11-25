@@ -1,16 +1,9 @@
 import frappe
+from frappe.integrations.frappe_providers.cloud_settings import is_v2_site
 
 from helpdesk.setup.welcome_ticket import AUTHOR_EMAIl as WELCOME_TICKET_AUTHOR
 
 SETUP_ROLE = "System Manager"
-
-
-def is_v2_site() -> bool:
-    try:
-        from frappe.integrations.frappe_providers.cloud_settings import is_v2_site
-    except ImportError:
-        return False
-    return is_v2_site()
 
 
 def is_setup_pending() -> bool:
@@ -27,7 +20,6 @@ def complete_setup() -> str | None:
     """Ends the first-run setup, on Finish or Skip. A second call is a no-op.
     Returns the welcome ticket, for the desk to open first."""
     frappe.only_for(SETUP_ROLE)
-    finish_frappe_setup()
     frappe.db.set_single_value("HD Settings", "setup_complete", 1)
     return frappe.db.get_value(
         "HD Ticket",
@@ -35,40 +27,3 @@ def complete_setup() -> str | None:
         "name",
         order_by="creation asc",
     )
-
-
-def finish_frappe_setup():
-    from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
-
-    if (
-        frappe.is_setup_complete()
-        or not is_v2_site()
-        or frappe.get_hooks("setup_wizard_stages")
-    ):
-        return
-    result = setup_complete(frappe_setup_args())
-    if result.get("status") != "ok":
-        frappe.log_error(
-            title="Helpdesk: could not finish the Framework setup wizard",
-            message=result.get("fail"),
-        )
-
-
-def frappe_setup_args() -> dict:
-    """What the wizard's first slide would send, from System Settings."""
-
-    def setting(fieldname: str):
-        return frappe.db.get_single_value("System Settings", fieldname)
-
-    language = (
-        frappe.db.get_value("Language", setting("language"), "language_name")
-        or "English"
-    )
-    return {
-        "language": language,
-        "lang": language,
-        "country": setting("country"),
-        "timezone": setting("time_zone"),
-        "currency": setting("currency"),
-        "enable_telemetry": setting("enable_telemetry"),
-    }

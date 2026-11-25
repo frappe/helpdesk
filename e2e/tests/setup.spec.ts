@@ -41,12 +41,10 @@ test.describe("first-run setup", () => {
       await expect(page.getByRole("heading", { name: "Connect your support email" })).toBeVisible();
       await expect(page.getByRole("button", { name: /Gmail App password/ })).toBeVisible();
       await page.getByRole("button", { name: "Set up later" }).click();
-      await page.getByRole("dialog").getByRole("button", { name: "Set up later" }).click();
+      await page.getByRole("button", { name: "Skip anyway" }).click();
 
-      await expect(page.getByRole("heading", { name: "You're all set" })).toBeVisible();
       await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).setup_complete).toBe(1);
-      await page.getByRole("button", { name: /Go to Helpdesk|Not now/ }).click();
-      await expect(page).toHaveURL(/\/helpdesk\/tickets\/\w*$/);
+      await expect(page).toHaveURL(/\/helpdesk\/tickets\/\w+$/);
       await expect(page.getByText("Welcome to Helpdesk").first()).toBeVisible();
     } finally {
       await restore();
@@ -54,15 +52,15 @@ test.describe("first-run setup", () => {
   });
 });
 
-/** The Password step shows while the Framework setup is not done. */
+/** The Password step shows while the site owner has no password of their own. */
 async function setPasswordIfAsked(page: Page) {
-  const heading = page.getByRole("heading", { name: "Welcome. Set your password" });
+  const heading = page.getByRole("heading", { name: "Set your password" });
   const workspace = page.getByRole("heading", { name: "What's your company called?" });
   await expect(heading.or(workspace)).toBeVisible();
   if (!(await heading.isVisible())) return;
   const password = `Bright-Harbor-${uid()}-Lantern`;
-  await page.getByLabel("New password", { exact: true }).fill(password);
+  await page.getByLabel("Password", { exact: true }).fill(password);
   await expect(page.getByText("Great")).toBeVisible();
-  await page.getByLabel("Confirm new password").fill(password);
-  await page.getByRole("button", { name: "Confirm" }).click();
+  await page.getByLabel("Confirm password").fill(password);
+  await page.getByRole("button", { name: "Save and continue" }).click();
 }
