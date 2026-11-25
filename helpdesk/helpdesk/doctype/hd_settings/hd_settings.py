@@ -11,6 +11,7 @@ from frappe.flow.doctype.flow_knowledge_settings.flow_knowledge_settings import 
 )
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
+from frappe.utils import cint
 from frappe.realtime import get_website_room
 from frappe.utils.jinja import validate_template
 
@@ -47,6 +48,8 @@ class HDSettings(Document):
         self.ai_model = (self.ai_model or "").strip()
         if self.enable_ai_search and not (self.ai_provider and self.ai_model):
             frappe.throw(_("Set a provider and a model to turn on AI search"))
+        if cint(self.ai_daily_question_limit) < 1:
+            frappe.throw(_("Daily questions per visitor must be at least 1"))
 
     def validate_footer(self):
         """Footer items mirror Website Settings: column rows without a parent, link rows under one."""
@@ -228,6 +231,7 @@ class HDSettings(Document):
         agent = Agent(
             name=AI_AGENT,
             model=model,
+            skills=[row.skill for row in self.ai_skills],
             description="Answers knowledge base questions from the articles a reader may see",
             instructions=INSTRUCTIONS.format(
                 product=self.brand_name or "Helpdesk", off_topic=OFF_TOPIC

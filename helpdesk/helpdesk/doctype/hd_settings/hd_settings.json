@@ -96,6 +96,8 @@
   "ai_provider",
   "ai_api_key",
   "ai_model",
+  "ai_daily_question_limit",
+  "ai_skills",
   "email_customisations_tab",
   "share_feedback_section",
   "enable_email_ticket_feedback",
@@ -737,12 +739,28 @@
    "fieldtype": "Data",
    "label": "Model",
    "permlevel": 1
+  },
+  {
+   "default": "20",
+   "description": "Questions each visitor may ask a day. Past it, search shows matching articles without AI.",
+   "fieldname": "ai_daily_question_limit",
+   "fieldtype": "Int",
+   "label": "Daily questions per visitor",
+   "non_negative": 1,
+   "permlevel": 1
+  },
+  {
+   "fieldname": "ai_skills",
+   "fieldtype": "Table",
+   "label": "Skills",
+   "options": "HD AI Skill",
+   "permlevel": 1
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-24 12:00:00.000000",
+ "modified": "2026-11-25 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

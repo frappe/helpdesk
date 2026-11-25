@@ -1,6 +1,7 @@
 import frappe
 from frappe.utils import get_user_date_format, get_user_time_format
 
+from helpdesk import ai_search
 from helpdesk.utils import can_read_knowledge_base, is_agent
 
 # What the knowledge base needs to render for a guest
@@ -54,7 +55,11 @@ def get_config():
     res.time_format = get_user_time_format()
 
     is_readable = can_read_knowledge_base()
-    res.ai_search_enabled = bool(is_readable and settings.enable_ai_search)
+    res.ai_search_enabled = bool(
+        is_readable
+        and settings.enable_ai_search
+        and ai_search.has_questions_left(frappe.session.user)
+    )
     if is_readable:
         res.knowledge_base_form_scripts = frappe.get_all(
             "HD Form Script",

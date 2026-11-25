@@ -71,6 +71,7 @@ from helpdesk.test_utils import (
     make_subcategory,
     make_ticket,
     misplaced_categories,
+    reset_ai_question_counts,
     unique_email,
     unique_name,
 )
@@ -1981,6 +1982,7 @@ class TestAnswerQuestion(IntegrationTestCase):
         self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
         self.enterContext(patch("frappe.enqueue"))
         enable_ai_search()
+        reset_ai_question_counts()
         self.enterContext(fake_flow_knowledge())
         self.customer = make_contact("kb-ai-customer")["user"]
         self.agent = make_agent(unique_email("kb-ai-agent"))
@@ -2028,7 +2030,7 @@ class TestAnswerQuestion(IntegrationTestCase):
             result = self.ask("Guest")
 
         completion.assert_not_called()
-        self.assertEqual(set(result), {"refused", "related"})
+        self.assertEqual(set(result), {"refused", "related", "links"})
 
     def test_a_guest_is_shown_public_articles_only(self) -> None:
         result = self.ask("Guest")
@@ -2139,8 +2141,28 @@ class TestAnswerQuestion(IntegrationTestCase):
                 "refused": True,
                 "message": "I can only help with Acme Desk.",
                 "related": [],
+                "links": [],
             },
         )
+
+    def test_a_visitor_past_the_daily_limit_gets_no_ai_search(self) -> None:
+        frappe.db.set_single_value("HD Settings", "ai_daily_question_limit", 2)
+        self.ask("Guest")
+        self.ask("Guest")
+
+        with patch("frappe.flow.knowledge.retriever.retrieve") as retrieve:
+            result = self.ask("Guest")
+
+        retrieve.assert_not_called()
+        self.assertEqual(result["limited"], True)
+        self.assertEqual(result["related"], [])
+
+    def test_each_visitor_has_a_daily_limit_of_their_own(self) -> None:
+        frappe.db.set_single_value("HD Settings", "ai_daily_question_limit", 1)
+        self.ask("Guest")
+
+        self.assertTrue(self.ask("Guest").get("limited"))
+        self.assertFalse(self.ask(self.customer).get("limited"))
 
     def test_the_question_is_capped(self) -> None:
         with patch(

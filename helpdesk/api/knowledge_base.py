@@ -748,8 +748,8 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
 @frappe.whitelist(allow_guest=True, methods=["POST"])  # nosemgrep
 @rate_limit(limit=10, seconds=60, user_based=True)
 def answer_question(question: str) -> dict:
-    """The articles the caller may read that match `question`. `refused` is set, with a
-    `message`, when no article matches. Guests only when the knowledge base is public."""
+    """The articles and web pages the caller may read that match `question`. `refused` is set
+    when nothing matches, `limited` past the daily limit. Guests only when the KB is public."""
     validate_public_access()
     if not ai_search.is_enabled():
         frappe.throw(_("AI search is turned off"), frappe.PermissionError)
