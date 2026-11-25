@@ -45,6 +45,13 @@
         </div>
       </section>
 
+      <section v-else-if="isEmpty" key="empty">
+        <PortalEmptyState
+          :title="__('What are you looking for?')"
+          :description="__('Type a question in the search box above.')"
+        />
+      </section>
+
       <section
         v-else-if="showMatches"
         key="matches"
@@ -64,6 +71,19 @@
           v-if="matches.data?.length"
           :articles="matches.data"
         />
+        <template v-else-if="isRefused && matchesSettled">
+          <p class="text-p-base text-ink-gray-7">
+            {{ answer.data.message }}
+          </p>
+          <Button
+            v-if="canRaiseTicket"
+            class="w-fit"
+            variant="subtle"
+            icon-left="lucide-plus"
+            :label="__('Raise a ticket')"
+            @click="raiseTicket"
+          />
+        </template>
         <PortalEmptyState
           v-else-if="matches.settledQuery && !isFailed"
           :title="__('No articles found')"
@@ -132,6 +152,7 @@ import PortalArticleSearch from "@app/components/knowledge_base/PortalArticleSea
 import PortalEmptyState from "@app/components/ui/PortalEmptyState.vue";
 import PortalLink from "@app/components/ui/PortalLink.vue";
 import { useAiAnswer } from "@app/composables/useAiAnswer";
+import { MIN_QUERY_LENGTH } from "@app/composables/useArticleSearch";
 import { useSession } from "@app/stores/session";
 
 const SKELETON_WIDTHS = ["100%", "92%", "78%"];
@@ -146,7 +167,7 @@ const props = defineProps<{ question: string }>();
 
 const router = useRouter();
 const session = useSession();
-const { answer, matches, isFailed, isLoading, showMatches } =
+const { answer, matches, isEmpty, isFailed, isRefused, isLoading, showMatches } =
   useAiAnswer(toRef(props, "question"));
 
 // The status line moves on while the search runs, so a slow one still feels alive.
@@ -170,6 +191,13 @@ watch(
   { immediate: true }
 );
 onUnmounted(() => clearInterval(timer));
+
+// Too short a question is never searched, so it settles at once with no matches.
+const matchesSettled = computed(
+  () =>
+    Boolean(matches.settledQuery) ||
+    props.question.trim().length < MIN_QUERY_LENGTH
+);
 
 const canRaiseTicket = computed(
   () => !session.config.value?.hide_raise_ticket_button

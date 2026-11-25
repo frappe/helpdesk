@@ -13,15 +13,21 @@ export function useAiAnswer(question: Ref<string>) {
     makeParams: () => ({ question: question.value }),
   })
 
-  // Plain matches stand in while AI search is off, or when the answer fails.
+  // Plain matches stand in while AI search is off, the answer fails, or it is refused with nothing to show.
   const matchQuery = ref('')
   const matches = useArticleSearch(matchQuery, { limit: MATCH_LIMIT })
 
   const isReady = computed(() => Boolean(session.config.value))
   const isAiOn = computed(() => session.isAiSearchEnabled.value)
+  const isEmpty = computed(() => !(question.value || '').trim())
   const isFailed = computed(() => Boolean(answer.error))
-  const showMatches = computed(() => isReady.value && (!isAiOn.value || isFailed.value))
-  const isLoading = computed(() => !isReady.value || (isAiOn.value && !answer.data && !isFailed.value))
+  const isRefused = computed(() => Boolean(answer.data?.refused && !answer.data.related?.length))
+  const showMatches = computed(
+    () => isReady.value && !isEmpty.value && (!isAiOn.value || isFailed.value || isRefused.value),
+  )
+  const isLoading = computed(
+    () => !isReady.value || (!isEmpty.value && isAiOn.value && !answer.data && !isFailed.value),
+  )
 
   watch(
     [isReady, isAiOn, question],
@@ -31,12 +37,13 @@ export function useAiAnswer(question: Ref<string>) {
       matchQuery.value = ''
       if (!ready) return
       // A failed answer falls back to plain matches, so the rejection is not news.
-      if (on && text) answer.submit().catch(() => {})
+      if (!(text || '').trim()) return
+      if (on) answer.submit().catch(() => {})
       else matchQuery.value = text
     },
     { immediate: true },
   )
-  watch(isFailed, (failed) => failed && (matchQuery.value = question.value))
+  watch([isFailed, isRefused], ([failed, refused]) => (failed || refused) && (matchQuery.value = question.value))
 
-  return { answer, matches, isFailed, isLoading, showMatches }
+  return { answer, matches, isEmpty, isFailed, isRefused, isLoading, showMatches }
 }
