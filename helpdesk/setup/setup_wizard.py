@@ -7,7 +7,7 @@ import frappe
 
 # nosemgrep
 def setup_complete(args=None):
-    email = args.get("email") or frappe.session.user
+    email = args.get("email") or frappe.utils.get_email_address()
     if not email:
         return
     # Create first Agent for the user
