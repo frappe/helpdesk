@@ -4,8 +4,8 @@ import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useBottomSheet } from '@app/composables/useDrawer'
 import { useMoreArticles } from '@app/composables/useMoreArticles'
 import { dayjsLocal } from '@helpdesk/shared/timezone'
-import { countLabel, DATE_FORMATS } from '@helpdesk/shared/utils'
-import { prefetchOnHover, useKnowledgeBase } from '@app/stores/knowledgeBase'
+import { DATE_FORMATS } from '@helpdesk/shared/utils'
+import { articleCountLabel, prefetchOnHover, useKnowledgeBase } from '@app/stores/knowledgeBase'
 
 export default function setup(context) {
   const { route } = context
@@ -19,8 +19,7 @@ export default function setup(context) {
     () => category.value?.description || __('Find answers to common {0} questions.', [categoryName.value]),
   )
   // `articles` is one page; the count includes Subcategories.
-  const countText = (count) => countLabel(count, __('1 article'), __('{0} articles'))
-  const articleCount = computed(() => countText(category.value?.article_count))
+  const articleCount = computed(() => articleCountLabel(category.value?.article_count))
 
   // Sidebar rows come sorted by `category_name`.
   const subcategories = computed(() =>

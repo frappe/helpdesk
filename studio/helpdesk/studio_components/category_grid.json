@@ -6,7 +6,7 @@
     "baseStyles": {
      "--category-columns": "{{ inputs.columns || 3 }}",
      "display": "grid",
-     "gap": "10px",
+     "gap": "16px",
      "gridAutoColumns": "minmax(0, 1fr)",
      "height": "auto",
      "width": "100%"
@@ -17,16 +17,20 @@
       "children": [
        {
         "classes": [
-         "size-5",
-         "text-ink-gray-6",
+         "size-6",
+         "my-1",
+         "[&[src]]:my-0",
+         "[&[src]]:size-8",
+         "text-ink-gray-5",
          "transition-colors",
          "group-hover:text-ink-gray-8"
         ],
         "componentId": "category-grid-icon",
-        "componentName": "Icon",
+        "componentName": "PortalCategoryIcon",
         "componentProps": {
-         "icon": "{{ dataItem.icon || 'lucide-folder' }}"
-        }
+         "icon": "{{ dataItem.icon }}"
+        },
+        "isCustomVueComponent": true
        },
        {
         "blockName": "container",
@@ -34,12 +38,13 @@
          {
           "blockName": "category-title",
           "classes": [
-           "text-ink-gray-9"
+           "font-medium",
+           "text-ink-gray-8"
           ],
           "componentId": "category-grid-title",
           "componentName": "TextBlock",
           "componentProps": {
-           "fontSize": "text-base-semibold",
+           "fontSize": "text-base",
            "tag": "h3",
            "text": "{{ dataItem.category_name }}"
           }
@@ -58,13 +63,28 @@
            "tag": "p",
            "text": "{{ dataItem.description || t('Browse articles in this category') }}"
           }
+         },
+         {
+          "blockName": "category-article-count",
+          "classes": [
+           "mt-1.5",
+           "text-ink-gray-5"
+          ],
+          "componentId": "category-grid-article-count",
+          "componentName": "TextBlock",
+          "componentProps": {
+           "fontSize": "text-sm",
+           "tag": "p",
+           "text": "{{ articleCountLabel(dataItem.article_count) }}"
+          },
+          "visibilityCondition": "{{ dataItem.article_count }}"
          }
         ],
         "classes": [
          "flex",
          "flex-col",
          "shrink",
-         "gap-1",
+         "gap-1.5",
          "h-fit",
          "min-w-0",
          "w-full"
@@ -76,10 +96,10 @@
       ],
       "classes": [
        "transition",
-       "hover:bg-surface-gray-1",
+       "hover:border-outline-gray-3",
        "items-start",
        "border-outline-gray-2",
-       "rounded-5",
+       "rounded-7",
        "border",
        "cursor-pointer",
        "flex",
@@ -93,7 +113,7 @@
        "max-sm:px-4",
        "max-sm:py-3.5",
        "group",
-       "gap-4",
+       "gap-8",
        "p-5",
        "focus-visible:focus-ring"
       ],
@@ -153,7 +173,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-19 02:59:37.432603",
+ "modified": "2026-11-24 14:20:00.000000",
  "modified_by": "Administrator",
  "name": "category_grid",
  "owner": "Administrator"
