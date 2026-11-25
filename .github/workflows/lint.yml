@@ -67,4 +67,4 @@ jobs:
       - name: Install and run pip-audit
         run: |
           pip install pip-audit
-          pip-audit --desc on .
+          pip-audit --cache-dir "$RUNNER_TEMP/pip-audit" --desc on .
