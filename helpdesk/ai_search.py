@@ -44,6 +44,10 @@ RELATED_LIMIT = 4
 MIN_VECTOR_SCORE = 0.3
 
 
+class AISearchNotReadyError(frappe.ValidationError):
+    """Nothing could be searched yet, as opposed to nothing relevant being found."""
+
+
 def is_enabled() -> bool:
     return bool(frappe.db.get_single_value("HD Settings", "enable_ai_search"))
 
@@ -56,10 +60,26 @@ def answer(question: str, user: str) -> dict:
     """The articles `user` may read that match `question`, or a refusal when none do.
     Flow cannot yet run its agent for portal readers (see KNOWLEDGE_BASE.md), so no answer is written.
     """
-    articles = find_articles(question, user)
+    kbs = get_readable_knowledge_bases(user)
+    validate_ready(kbs)
+    articles = find_articles(question, kbs, user)
     if not articles:
         return refusal()
     return {"refused": False, "related": [get_related(row) for row in articles]}
+
+
+def validate_ready(kbs: list[str]) -> None:
+    """Throw unless Flow can embed questions and `kbs` hold indexed articles to search."""
+    from frappe.flow.doctype.flow_knowledge_settings.flow_knowledge_settings import (
+        embeddings_configured,
+    )
+
+    indexed = embeddings_configured() and frappe.db.exists(
+        "Flow Knowledge Source",
+        {"knowledge_base": ["in", kbs], "status": "Completed"},
+    )
+    if not indexed:
+        frappe.throw(_("AI search is not ready yet"), AISearchNotReadyError)
 
 
 def refusal() -> dict:
@@ -74,13 +94,11 @@ def get_readable_knowledge_bases(user: str) -> list[str]:
     return [KNOWLEDGE_BASES[audience] for audience in audiences]
 
 
-def find_articles(question: str, user: str) -> list[frappe._dict]:
-    """The articles `user` may read that match `question`, best first."""
+def find_articles(question: str, kbs: list[str], user: str) -> list[frappe._dict]:
+    """The articles `user` may read in `kbs` that match `question`, best first."""
     from frappe.flow.knowledge.retriever import retrieve
 
-    passages = retrieve(
-        question, kbs=get_readable_knowledge_bases(user), limit=RETRIEVE_LIMIT
-    )
+    passages = retrieve(question, kbs=kbs, limit=RETRIEVE_LIMIT)
     # a passage's source is titled by its article
     names = list(
         dict.fromkeys(p["source"] for p in passages if is_relevant(p["score"]))

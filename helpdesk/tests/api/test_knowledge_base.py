@@ -9,7 +9,12 @@ from frappe.website.serve import get_response
 from redis.exceptions import ResponseError
 
 from helpdesk.api.article import get_related
-from helpdesk.ai_search import KNOWLEDGE_BASES, index_all_articles, index_article
+from helpdesk.ai_search import (
+    KNOWLEDGE_BASES,
+    AISearchNotReadyError,
+    index_all_articles,
+    index_article,
+)
 from helpdesk.api.knowledge_base import (
     ANSWER_QUESTION_LENGTH,
     PUBLIC_ARTICLE_FIELDS,
@@ -2127,21 +2132,6 @@ class TestAnswerQuestion(IntegrationTestCase):
         index_all_articles()
         self.assertEqual(indexed(), {self.public, self.internal})
 
-    def test_a_question_nothing_matches_gets_a_one_line_refusal(self) -> None:
-        frappe.db.set_single_value("HD Settings", "brand_name", "Acme Desk")
-        for article in (self.public, self.members, self.internal):
-            frappe.db.set_value("HD Article", article, "status", "Draft")
-            index_article(article)
-
-        self.assertEqual(
-            self.ask("Guest"),
-            {
-                "refused": True,
-                "message": "I can only help with Acme Desk.",
-                "related": [],
-            },
-        )
-
     def test_an_off_topic_question_is_refused_though_articles_exist(self) -> None:
         frappe.db.set_single_value("Flow Knowledge Settings", "search_type", "Vector")
         frappe.db.set_single_value("HD Settings", "brand_name", "Acme Desk")
@@ -2154,6 +2144,25 @@ class TestAnswerQuestion(IntegrationTestCase):
                 "related": [],
             },
         )
+
+    def test_it_is_not_ready_without_an_embedding_model(self) -> None:
+        frappe.db.set_single_value("Flow Knowledge Settings", "embedding_model", None)
+        frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
+
+        with self.assertRaises(AISearchNotReadyError):
+            self.ask("Guest")
+
+    def test_it_is_not_ready_before_the_readable_articles_are_indexed(self) -> None:
+        for source in frappe.get_all(
+            "Flow Knowledge Source",
+            {"knowledge_base": KNOWLEDGE_BASES[PUBLIC]},
+            pluck="name",
+        ):
+            frappe.delete_doc("Flow Knowledge Source", source, ignore_permissions=True)
+
+        with self.assertRaises(AISearchNotReadyError):
+            self.ask("Guest")
+        self.assertIn(self.members, self.names(self.ask(self.customer)["related"]))
 
     def test_the_question_is_capped(self) -> None:
         with patch(

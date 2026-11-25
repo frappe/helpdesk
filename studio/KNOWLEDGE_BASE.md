@@ -148,6 +148,8 @@ Saving or deleting an article queues `index_article` (queue `short`) while AI se
 
 `related` are the matching articles the asker may read, at most 4. A question nothing readable matches gets `refused` set, "I can only help with <product>." as `message`, and nothing else. No model is called, so there is no answer text or cited sources until the blocker below is fixed.
 
+Until the asker's bases can be searched, `answer_question` throws `AISearchNotReadyError` instead of refusing: while Flow Knowledge Settings has no embedding model, or none of the asker's bases holds a `Completed` source yet. The page then shows its error line and the plain `search_articles` matches, so readers keep search while indexing catches up.
+
 A passage counts as a match only when its cosine similarity is at least `MIN_VECTOR_SCORE` (0.3), so an off-topic question is refused even though articles exist.
 
 **Blocker: off-topic questions are refused only with Flow's Vector search.** Flow's retriever always returns the top passages, and under Hybrid search (Flow's default) their `score` is LanceDB's rank-fused (RRF) score, which says how a passage ranked, not how relevant it is. Helpdesk cannot tell an off-topic question from an on-topic one there, so it applies the threshold only when **Flow Knowledge Settings → Search Type** is Vector. Fix in Flow: return each hit's vector similarity in hybrid mode too, then apply the threshold always.
