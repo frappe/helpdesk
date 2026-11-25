@@ -114,6 +114,30 @@
           </div>
         </div>
 
+        <div v-if="answer.data.links?.length" class="flex flex-col gap-3">
+          <h2 class="text-p-sm font-medium text-ink-gray-6">
+            {{ __("From the docs") }}
+          </h2>
+          <ul
+            class="divide-y divide-outline-gray-1 rounded-6 border border-outline-gray-2"
+          >
+            <li v-for="link in answer.data.links" :key="link.url">
+              <a
+                :href="link.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-3 px-4 py-3 text-base text-ink-gray-8 hover:bg-surface-gray-1 focus-visible:focus-ring"
+              >
+                <LucideGlobe class="size-4 shrink-0 text-ink-gray-5" />
+                <span class="min-w-0 flex-1 truncate">
+                  {{ prettyUrl(link.url) }}
+                </span>
+                <LucideArrowUpRight class="size-4 shrink-0 text-ink-gray-4" />
+              </a>
+            </li>
+          </ul>
+        </div>
+
         <p
           class="flex items-center gap-1.5 text-xs text-ink-gray-5"
           data-testid="powered-by-flow"
@@ -131,6 +155,8 @@ import { computed, onUnmounted, ref, toRef, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Button } from "frappe-ui";
 import LucideArrowLeft from "~icons/lucide/arrow-left";
+import LucideArrowUpRight from "~icons/lucide/arrow-up-right";
+import LucideGlobe from "~icons/lucide/globe";
 import LucideWorkflow from "~icons/lucide/workflow";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { __ } from "@helpdesk/shared/translation";
@@ -182,6 +208,10 @@ onUnmounted(() => clearInterval(timer));
 const canRaiseTicket = computed(
   () => !session.config.value?.hide_raise_ticket_button
 );
+
+function prettyUrl(url: string) {
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
 
 function raiseTicket() {
   if (session.isGuest.value) return session.signIn();

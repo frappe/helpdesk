@@ -2,7 +2,7 @@
   <SettingsLayoutBase
     :description="
       __(
-        'Search the knowledge base by meaning, from the articles each reader may see.'
+        'Search the knowledge base by meaning, from the articles and sources each reader may see.'
       )
     "
   >
@@ -94,11 +94,13 @@
           </div>
         </section>
 
+        <AISearchSources />
+
         <p class="flex items-start gap-1.5 text-p-sm text-ink-gray-6">
           <LucideShieldCheck class="mt-0.5 size-3.5 shrink-0" />
           {{
             __(
-              "Results come only from the articles each reader may see."
+              "Results come only from the articles and sources each reader may see."
             )
           }}
         </p>
@@ -124,6 +126,7 @@ import { computed, onUnmounted, reactive, ref, watch } from "vue";
 import LucideShieldCheck from "~icons/lucide/shield-check";
 import LucideWorkflow from "~icons/lucide/workflow";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import AISearchSources from "./AISearchSources.vue";
 
 const PROVIDERS = [
   { label: "OpenAI", value: "openai" },

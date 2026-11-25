@@ -2033,7 +2033,7 @@ class TestAnswerQuestion(IntegrationTestCase):
             result = self.ask("Guest")
 
         completion.assert_not_called()
-        self.assertEqual(set(result), {"refused", "related"})
+        self.assertEqual(set(result), {"refused", "related", "links"})
 
     def test_a_guest_is_shown_public_articles_only(self) -> None:
         result = self.ask("Guest")
@@ -2142,6 +2142,7 @@ class TestAnswerQuestion(IntegrationTestCase):
                 "refused": True,
                 "message": "I can only help with Acme Desk.",
                 "related": [],
+                "links": [],
             },
         )
 

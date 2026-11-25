@@ -6,7 +6,10 @@ visibility is checked again before anything is returned, so an index that is
 behind never shows more than the reader may read.
 """
 
+import os
+
 import frappe
+import requests
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.website.utils import cleanup_page_name
@@ -29,6 +32,24 @@ KNOWLEDGE_BASES = {
     CUSTOMERS: "Helpdesk Articles - Customers",
     PRIVATE: "Helpdesk Articles - Agents",
 }
+# sources an admin adds, kept apart so article indexing never touches them
+SOURCE_KNOWLEDGE_BASES = {
+    PUBLIC: "Helpdesk Sources - Public",
+    CUSTOMERS: "Helpdesk Sources - Customers",
+    PRIVATE: "Helpdesk Sources - Agents",
+}
+# the settings tab's "Visible to" labels
+SOURCE_VISIBILITY = {"Public": PUBLIC, "Customers": CUSTOMERS, "Agents": PRIVATE}
+SOURCE_FILE_TYPES = ("pdf", "md", "txt")
+SOURCE_STATUS = {
+    "Pending": "Syncing",
+    "Processing": "Syncing",
+    "Completed": "Ready",
+    "Failed": "Failed",
+}
+SOURCE_FIELDS = ["name", "title", "source_type", "url", "file", "knowledge_base"]
+SOURCE_FIELDS += ["status", "error_log"]
+URL_CHECK_TIMEOUT = 10
 INSTRUCTIONS = (
     "You are the knowledge base assistant for {product}.\n"
     "Answer only from the numbered sources in the user's message. Do not use outside knowledge.\n"
@@ -40,6 +61,7 @@ INSTRUCTIONS = (
 )
 RETRIEVE_LIMIT = 8
 RELATED_LIMIT = 4
+LINK_LIMIT = 3
 # cosine similarity below which a passage is unrelated to the question
 MIN_VECTOR_SCORE = 0.3
 
@@ -57,19 +79,25 @@ def get_product_name() -> str:
 
 
 def answer(question: str, user: str) -> dict:
-    """The articles `user` may read that match `question`, or a refusal when none do.
-    Flow cannot yet run its agent for portal readers (see KNOWLEDGE_BASE.md), so no answer is written.
+    """The articles and linked sources `user` may read that match `question`, or a refusal
+    when none do. Flow cannot yet run its agent for portal readers (see KNOWLEDGE_BASE.md),
+    so no answer is written.
     """
-    kbs = get_readable_knowledge_bases(user)
+    audiences = get_readable_audiences(user)
+    kbs = [KNOWLEDGE_BASES[audience] for audience in audiences]
+    kbs += [SOURCE_KNOWLEDGE_BASES[audience] for audience in audiences]
     validate_ready(kbs)
-    articles = find_articles(question, kbs, user)
-    if not articles:
+    passages = find_passages(question, kbs)
+    articles = find_articles(passages, user)
+    links = find_links(passages, audiences)
+    if not articles and not links:
         return refusal()
-    return {"refused": False, "related": [get_related(row) for row in articles]}
+    related = [get_related(row) for row in articles]
+    return {"refused": False, "related": related, "links": links}
 
 
 def validate_ready(kbs: list[str]) -> None:
-    """Throw unless Flow can embed questions and `kbs` hold indexed articles to search."""
+    """Throw unless Flow can embed questions and `kbs` hold indexed sources to search."""
     from frappe.flow.doctype.flow_knowledge_settings.flow_knowledge_settings import (
         embeddings_configured,
     )
@@ -84,25 +112,25 @@ def validate_ready(kbs: list[str]) -> None:
 
 def refusal() -> dict:
     message = _("I can only help with {0}.").format(get_product_name())
-    return {"refused": True, "message": message, "related": []}
+    return {"refused": True, "message": message, "related": [], "links": []}
 
 
-def get_readable_knowledge_bases(user: str) -> list[str]:
-    audiences = (
-        list(KNOWLEDGE_BASES) if is_agent(user) else get_readable_visibilities(user)
-    )
-    return [KNOWLEDGE_BASES[audience] for audience in audiences]
+def get_readable_audiences(user: str) -> list[str]:
+    return list(KNOWLEDGE_BASES) if is_agent(user) else get_readable_visibilities(user)
 
 
-def find_articles(question: str, kbs: list[str], user: str) -> list[frappe._dict]:
-    """The articles `user` may read in `kbs` that match `question`, best first."""
+def find_passages(question: str, kbs: list[str]) -> list[dict]:
+    """The passages of `kbs` that match `question`, best first, without the unrelated ones."""
     from frappe.flow.knowledge.retriever import retrieve
 
     passages = retrieve(question, kbs=kbs, limit=RETRIEVE_LIMIT)
-    # a passage's source is titled by its article
-    names = list(
-        dict.fromkeys(p["source"] for p in passages if is_relevant(p["score"]))
-    )
+    return [passage for passage in passages if is_relevant(passage["score"])]
+
+
+def find_articles(passages: list[dict], user: str) -> list[frappe._dict]:
+    """The articles `user` may read among `passages`, best first."""
+    # an article's passages are titled by the article's name
+    names = list(dict.fromkeys(passage["source"] for passage in passages))
     readable = {
         row.name: row
         for row in frappe.get_all(
@@ -112,6 +140,28 @@ def find_articles(question: str, kbs: list[str], user: str) -> list[frappe._dict
         )
     }
     return [readable[name] for name in names if name in readable][:RELATED_LIMIT]
+
+
+def find_links(passages: list[dict], audiences: list[str]) -> list[dict]:
+    """The web pages among `passages` that `audiences` may see; files are never linked."""
+    titles = list(dict.fromkeys(passage["source"] for passage in passages))
+    urls = dict(
+        frappe.get_all(
+            "Flow Knowledge Source",
+            filters={
+                "title": ["in", titles],
+                "source_type": "URL",
+                "knowledge_base": [
+                    "in",
+                    [SOURCE_KNOWLEDGE_BASES[audience] for audience in audiences],
+                ],
+            },
+            fields=["title", "url"],
+            as_list=True,
+        )
+    )
+    links = [{"url": urls[title]} for title in titles if title in urls]
+    return links[:LINK_LIMIT]
 
 
 def is_relevant(score: float) -> bool:
@@ -194,3 +244,138 @@ def index_all_articles() -> None:
     published = set(frappe.get_all("HD Article", {"status": "Published"}, pluck="name"))
     for article in published | indexed:
         index_article(article)
+
+
+def get_sources() -> list[dict]:
+    """The sources an admin added, newest first, with their audience and sync status."""
+    return [
+        get_source_row(row)
+        for row in frappe.get_all(
+            "Flow Knowledge Source",
+            filters={"knowledge_base": ["in", list(SOURCE_KNOWLEDGE_BASES.values())]},
+            fields=SOURCE_FIELDS,
+            order_by="creation desc",
+        )
+    ]
+
+
+def get_source_row(source) -> dict:
+    audience = next(
+        key for key, kb in SOURCE_KNOWLEDGE_BASES.items() if kb == source.knowledge_base
+    )
+    status = SOURCE_STATUS.get(source.status, "Syncing")
+    return {
+        "name": source.name,
+        "title": source.title,
+        "source_type": source.source_type,
+        "url": source.url,
+        "visibility": next(
+            label for label, value in SOURCE_VISIBILITY.items() if value == audience
+        ),
+        "status": status,
+        "error": get_sync_error(source.error_log) if status == "Failed" else None,
+    }
+
+
+def get_sync_error(error_log: str | None) -> str:
+    """The last line of the sync's traceback, without the exception's class."""
+    lines = [line.strip() for line in (error_log or "").splitlines() if line.strip()]
+    last = lines[-1] if lines else _("Sync failed")
+    return last.split(": ", 1)[-1][:200]
+
+
+def add_source(
+    source_type: str,
+    url: str | None = None,
+    file_url: str | None = None,
+    visibility: str = "Public",
+) -> dict:
+    """Add a web page or a PDF, MD or TXT file for `visibility`'s readers; it syncs in the background."""
+    kb = get_source_knowledge_base(visibility)
+    if source_type == "URL":
+        url = (url or "").strip()
+        check_url_opens(url)
+        fields = {"source_type": "URL", "url": url, "title": url}
+    elif source_type == "File":
+        file = frappe.get_doc("File", {"file_url": file_url})
+        extension = os.path.splitext(file.file_name or "")[1].lower().lstrip(".")
+        if extension not in SOURCE_FILE_TYPES:
+            frappe.throw(_("Only PDF, MD or TXT files can be added"))
+        fields = {"source_type": "File", "file": file.file_url, "title": file.file_name}
+    else:
+        frappe.throw(_("Add a link or a file"))
+    if frappe.db.exists(
+        "Flow Knowledge Source",
+        {
+            "title": fields["title"],
+            "knowledge_base": ["in", list(SOURCE_KNOWLEDGE_BASES.values())],
+        },
+    ):
+        frappe.throw(_("This source is already added"))
+    source = frappe.get_doc(
+        {"doctype": "Flow Knowledge Source", "knowledge_base": kb, **fields}
+    ).insert()
+    return get_source_row(source)
+
+
+def get_source_knowledge_base(visibility: str) -> str:
+    from frappe.flow.knowledge import Knowledge
+
+    if visibility not in SOURCE_VISIBILITY:
+        frappe.throw(_("Visible to must be Public, Customers or Agents"))
+    return Knowledge(SOURCE_KNOWLEDGE_BASES[SOURCE_VISIBILITY[visibility]]).name
+
+
+def check_url_opens(url: str) -> None:
+    # Flow fetches the page the same way when it syncs, refusing internal hosts and redirects
+    from frappe.flow.knowledge.extract import _validate_public_url
+
+    _validate_public_url(url)
+    try:
+        response = requests.get(
+            url, timeout=URL_CHECK_TIMEOUT, stream=True, allow_redirects=False
+        )
+    except requests.RequestException as error:
+        frappe.throw(_("Couldn't open this link: {0}").format(error))
+    response.close()
+    if response.is_redirect:
+        frappe.throw(_("This link redirects. Enter the address it leads to."))
+    if response.status_code >= 400:
+        frappe.throw(
+            _("Couldn't open this link: it returned {0}").format(response.status_code)
+        )
+
+
+def get_source(name: str):
+    """A source an admin added; any other Flow source does not exist here."""
+    knowledge_base = frappe.db.get_value("Flow Knowledge Source", name, "knowledge_base")
+    if knowledge_base not in SOURCE_KNOWLEDGE_BASES.values():
+        raise frappe.DoesNotExistError(_("Source {0} not found").format(name))
+    return frappe.get_doc("Flow Knowledge Source", name)
+
+
+def remove_source(name: str) -> None:
+    get_source(name).delete()
+
+
+def resync_source(name: str) -> dict:
+    source = get_source(name)
+    source.resync()
+    return get_source_row(source)
+
+
+def set_source_visibility(name: str, visibility: str) -> dict:
+    """Move a source to `visibility`'s knowledge base. Flow cannot move one, so it is added anew."""
+    source = get_source(name)
+    kb = get_source_knowledge_base(visibility)
+    if source.knowledge_base == kb:
+        return get_source_row(source)
+    moved = frappe.get_doc(
+        {
+            "doctype": "Flow Knowledge Source",
+            "knowledge_base": kb,
+            **{field: source.get(field) for field in ("source_type", "title", "url", "file")},
+        }
+    ).insert()
+    source.delete()
+    return get_source_row(moved)

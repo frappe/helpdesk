@@ -63,7 +63,8 @@ Other files:
 - `helpdesk/api/article.py`: `get_related` (articles for a ticket), `get_article_stats` and search helpers.
 - `helpdesk/search.py`: the RediSearch index for articles. `after_migrate` and a scheduled job build it.
 - `helpdesk/api/config.py`: `get_config` gives the portal its KB flags, banner, KB form scripts and `ai_search_enabled`.
-- `helpdesk/ai_search.py`: AI search, from article indexing to the answer.
+- `helpdesk/ai_search.py`: AI search, from article and source indexing to the answer.
+- `helpdesk/api/ai_search.py`: the AI search tab's knowledge sources (System Managers only).
 
 ## Desk: authoring
 
@@ -96,7 +97,7 @@ With AI search on, Enter in the home search opens the `search` page (`/help/sear
 
 ## AI search
 
-An AI answer to a reader's question, from the articles that reader may read, built on Frappe Flow (`frappe.flow`, which ships with the framework). It is off by default. Until Flow can run an agent for portal readers, it returns the best matches by meaning only, and the portal labels it as search, not as an answer (see [Answering](#answering)).
+An AI answer to a reader's question, from the articles and sources that reader may read, built on Frappe Flow (`frappe.flow`, which ships with the framework). It is off by default. Until Flow can run an agent for portal readers, it returns the best matches by meaning only, and the portal labels it as search, not as an answer (see [Answering](#answering)).
 
 ### Settings
 
@@ -106,6 +107,8 @@ The AI search tab of `HD Settings` (desk Settings > Customer Portal > AI search,
 - `ai_provider`: a LiteLLM provider name, such as `openai` or `anthropic`.
 - `ai_api_key`: a Password field.
 - `ai_model`: the model at that provider, such as `gpt-4.1-mini`.
+
+Knowledge sources live in Flow, not in `HD Settings`. See [Knowledge sources](#knowledge-sources).
 
 The provider, model and key save together with Save. All of them are System Manager fields (permission level 1). Saving with AI on writes the Flow records the assistant runs on (`HDSettings.sync_ai_search`):
 
@@ -117,6 +120,16 @@ The agent is limited to the product (`brand_name`, else "Helpdesk") and to the s
 
 Articles are embedded with the model in **Flow Knowledge Settings**. Set an embedding model there first; turning AI on without one shows a warning and indexes nothing.
 
+### Knowledge sources
+
+An admin adds documentation pages (URL) and files (PDF, MD or TXT) for the assistant to read, from the tab's Knowledge sources section. `helpdesk/api/ai_search.py` has `get_sources`, `add_source`, `remove_source`, `resync_source` and `set_source_visibility` (all System Managers only); the logic is in `helpdesk/ai_search.py`.
+
+- Each source is a `Flow Knowledge Source` in the base for its "Visible to" setting: `Helpdesk Sources - Public`, `- Customers` or `- Agents` (default Public). These bases are apart from the article bases, so article indexing never removes a source.
+- A link must use http or https, resolve to a public address (Flow's own SSRF check), not redirect, and answer without an error. A file must be PDF, MD or TXT. A source with the same link or file name as one already added is refused.
+- Flow syncs a new source in the background (`after_insert` queues the ingestion). The tab shows Flow's status as Syncing (Pending, Processing), Ready (Completed) or Failed (with the last line of Flow's error as the reason), and checks again every 5 seconds while one syncs.
+- Flow cannot move a source between bases (`knowledge_base` is immutable), so changing "Visible to" adds the source to the new base and deletes the old one.
+- Only sources in the three source bases can be read or changed through these endpoints; any other Flow source is "not found".
+
 ### Who is answered from what
 
 `index_article` (`helpdesk/ai_search.py`) keeps every published article in one `Flow Knowledge Source` (type Text, titled with the article's name) in the Flow knowledge base of its audience:
@@ -127,7 +140,7 @@ Articles are embedded with the model in **Flow Knowledge Settings**. Set an embe
 | `Customers` | `Helpdesk Articles - Customers` |
 | `Private` | `Helpdesk Articles - Agents` |
 
-A question searches only the bases its asker may read, a guest or a user without a customer role gets Public, a customer Public and Customers, an agent all three. Flow itself does not check permissions per chunk: the knowledge base is the boundary, so never search a base that was not chosen by role.
+A question searches only the bases its asker may read, for articles and sources alike: a guest or a user without a customer role gets Public, a customer Public and Customers, an agent all three. Flow itself does not check permissions per chunk: the knowledge base is the boundary, so never search a base that was not chosen by role.
 
 Before any passage reaches the model, its article is read again with `make_article_filters`. An article narrowed, unpublished or deleted after it was indexed is dropped even while the index is behind.
 
@@ -139,14 +152,15 @@ Saving or deleting an article queues `index_article` (queue `short`) while AI se
 
 - calls `validate_public_access()`, so a guest is refused while `public_knowledge_base` is off, and is refused while AI search is off;
 - is rate limited to 10 requests a minute per user, or per IP for a guest, and cuts the question at `ANSWER_QUESTION_LENGTH` (500) characters;
-- retrieves the best 8 passages (`frappe.flow.knowledge.retriever.retrieve`) from the article bases its asker may read, keeps the ones whose article the asker may read now, and returns:
+- retrieves the best 8 passages (`frappe.flow.knowledge.retriever.retrieve`) from the article and source bases its asker may read, keeps the ones whose article the asker may read now, and returns:
 
 ```
 { "refused": bool, "message": "…" (only when refused),
-  "related": [{ "name", "title", "title_slug", "excerpt" }] }
+  "related": [{ "name", "title", "title_slug", "excerpt" }],
+  "links": [{ "url" }] }
 ```
 
-`related` are the matching articles the asker may read, at most 4. A question nothing readable matches gets `refused` set, "I can only help with <product>." as `message`, and nothing else. No model is called, so there is no answer text or cited sources until the blocker below is fixed.
+`related` are the matching articles the asker may read, at most 4. `links` are the matching web page sources, at most 3; a file source is never linked, as its file is private. A question nothing readable matches gets `refused` set, "I can only help with <product>." as `message`, and nothing else. No model is called, so there is no answer text or cited sources until the blocker below is fixed.
 
 Until the asker's bases can be searched, `answer_question` throws `AISearchNotReadyError` instead of refusing: while Flow Knowledge Settings has no embedding model, or none of the asker's bases holds a `Completed` source yet. The page then shows its error line and the plain `search_articles` matches, so readers keep search while indexing catches up.
 
@@ -158,7 +172,7 @@ A passage counts as a match only when its cosine similarity is at least `MIN_VEC
 
 ### Portal page
 
-`PortalAnswerPage` (`/help/search?q=`, the `search` page) shows the question, a thinking state (a pulsing ✦ with rotating status lines), then the related articles below, and "Search powered by Frappe Flow". With no question in the URL it shows "What are you looking for?" and makes no call. A refusal shows its line and a "Raise a ticket" button, which opens the new ticket form with the question (`ROUTES.newTicket({ from: 'search', q })`), or sign-in for a guest, and is hidden when `hide_raise_ticket_button` is on; it never lists plain matches. If the call fails, it says so and lists the plain `search_articles` matches.
+`PortalAnswerPage` (`/help/search?q=`, the `search` page) shows the question, a thinking state (a pulsing ✦ with rotating status lines), then the related articles and "From the docs" links below, and "Search powered by Frappe Flow". With no question in the URL it shows "What are you looking for?" and makes no call. A refusal shows its line and a "Raise a ticket" button, which opens the new ticket form with the question (`ROUTES.newTicket({ from: 'search', q })`), or sign-in for a guest, and is hidden when `hide_raise_ticket_button` is on; it never lists plain matches. If the call fails, it says so and lists the plain `search_articles` matches.
 
 With AI search on, the search box (`PortalArticleSearch`) is the "glow ring" of the sketch: a subtle gray gradient edge, built from the `--outline-gray-*` and `--ink-gray-*` theme tokens so it follows dark mode, that brightens, with a faint glow, on focus, and ✦ in place of the magnifier. "/" still focuses it. With it off, the box is the plain one. `get_config` gives the portal `ai_search_enabled`, which is on only when AI search is on and the reader may read the knowledge base. With it off, the home search shows today's dropdown and Enter opens no answer page.
 
