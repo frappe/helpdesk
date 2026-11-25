@@ -151,8 +151,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref, toRef, watch } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 import { useRouter } from "vue-router";
+import { useIntervalFn } from "@vueuse/core";
 import { Button } from "frappe-ui";
 import LucideArrowLeft from "~icons/lucide/arrow-left";
 import LucideArrowUpRight from "~icons/lucide/arrow-up-right";
@@ -185,25 +186,24 @@ const { answer, matches, isEmpty, isFailed, isLoading, showMatches } = useAiAnsw
 
 // The status line moves on while the search runs, so a slow one still feels alive.
 const thinkingStep = ref(0);
-let timer: ReturnType<typeof setInterval> | undefined;
+const { pause, resume } = useIntervalFn(
+  () =>
+    (thinkingStep.value = Math.min(
+      thinkingStep.value + 1,
+      THINKING_STEPS.length - 1
+    )),
+  THINKING_STEP_MS,
+  { immediate: false }
+);
 watch(
   isLoading,
   (loading) => {
-    clearInterval(timer);
     thinkingStep.value = 0;
-    if (loading)
-      timer = setInterval(
-        () =>
-          (thinkingStep.value = Math.min(
-            thinkingStep.value + 1,
-            THINKING_STEPS.length - 1
-          )),
-        THINKING_STEP_MS
-      );
+    if (loading) resume();
+    else pause();
   },
   { immediate: true }
 );
-onUnmounted(() => clearInterval(timer));
 
 const canRaiseTicket = computed(
   () => !session.config.value?.hide_raise_ticket_button

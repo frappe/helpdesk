@@ -1,10 +1,5 @@
-"""AI search over the knowledge base, built on Frappe Flow.
-
-Published articles are indexed into one Flow knowledge base per audience, and each
-question searches only the bases its reader's role may see. The article's current
-visibility is checked again before anything is returned, so an index that is
-behind never shows more than the reader may read.
-"""
+"""AI search over the knowledge base, built on Frappe Flow: one knowledge base per audience,
+searched only as far as the reader's role allows. See studio/KNOWLEDGE_BASE.md."""
 
 import os
 
@@ -55,12 +50,10 @@ SOURCE_FIELDS = [
     "title",
     "source_type",
     "url",
-    "file",
     "knowledge_base",
     "status",
     "error_log",
 ]
-URL_CHECK_TIMEOUT = 10
 INSTRUCTIONS = (
     "You are the knowledge base assistant for {product}.\n"
     "Answer only from the numbered sources in the user's message. Do not use outside knowledge.\n"
@@ -90,10 +83,8 @@ def get_product_name() -> str:
 
 
 def answer(question: str, user: str) -> dict:
-    """The articles and linked sources `user` may read that match `question`, or a refusal
-    when none do. Flow cannot yet run its agent for portal readers (see KNOWLEDGE_BASE.md),
-    so no answer is written.
-    """
+    """The articles and linked sources `user` may read that match `question`, or a refusal.
+    No answer is written yet: Flow cannot run its agent for portal readers."""
     audiences = get_readable_audiences(user)
     kbs = [KNOWLEDGE_BASES[audience] for audience in audiences]
     kbs += [SOURCE_KNOWLEDGE_BASES[audience] for audience in audiences]
@@ -333,35 +324,30 @@ def get_source_knowledge_base(visibility: str) -> str:
 
 
 def check_url_opens(url: str) -> None:
-    # Flow fetches the page the same way when it syncs, refusing internal hosts and redirects
-    from frappe.flow.knowledge.extract import _validate_public_url
+    from frappe.flow.knowledge.extract import extract
 
-    _validate_public_url(url)
+    # Flow's own fetch: refuses internal hosts, redirects and oversized pages
     try:
-        response = requests.get(
-            url, timeout=URL_CHECK_TIMEOUT, stream=True, allow_redirects=False
-        )
+        extract(frappe._dict(source_type="URL", url=url))
     except requests.RequestException as error:
         frappe.throw(_("Couldn't open this link: {0}").format(error))
-    response.close()
-    if response.is_redirect:
-        frappe.throw(_("This link redirects. Enter the address it leads to."))
-    if response.status_code >= 400:
-        frappe.throw(
-            _("Couldn't open this link: it returned {0}").format(response.status_code)
-        )
 
 
-def get_source(name: str):
-    """A source an admin added; any other Flow source does not exist here."""
+def check_source(name: str) -> None:
+    """Refuse any Flow source an admin did not add here."""
     knowledge_base = frappe.db.get_value("Flow Knowledge Source", name, "knowledge_base")
     if knowledge_base not in SOURCE_KNOWLEDGE_BASES.values():
         raise frappe.DoesNotExistError(_("Source {0} not found").format(name))
+
+
+def get_source(name: str):
+    check_source(name)
     return frappe.get_doc("Flow Knowledge Source", name)
 
 
 def remove_source(name: str) -> None:
-    get_source(name).delete()
+    check_source(name)
+    frappe.delete_doc("Flow Knowledge Source", name)
 
 
 def resync_source(name: str) -> dict:
