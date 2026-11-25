@@ -2,7 +2,7 @@
   <SettingsLayoutBase
     :description="
       __(
-        'Give readers an answer from your knowledge base, not just a list of articles.'
+        'Search the knowledge base by meaning, from the articles and sources each reader may see.'
       )
     "
   >
@@ -32,65 +32,104 @@
       >
         <LoadingIndicator class="w-4" />
       </div>
-      <div v-else class="flex flex-col gap-8">
-        <div class="flex items-center justify-between gap-8">
-          <div class="flex flex-col gap-1">
-            <span class="text-base-medium text-ink-gray-8">
-              {{ __("Enable AI search") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">
-              {{
-                __(
-                  "On the help center, Enter opens an AI answer. When off, search shows matching articles."
-                )
-              }}
-            </span>
+      <div v-else class="flex flex-col gap-10">
+        <section class="flex flex-col gap-2">
+          <div class="flex items-center justify-between gap-8">
+            <div class="flex flex-col gap-1">
+              <span class="text-base-medium text-ink-gray-8">
+                {{ __("Enable AI search") }}
+              </span>
+              <span class="text-p-sm text-ink-gray-6">
+                {{
+                  __(
+                    "On the help center, Enter opens a page of the best matches. When off, search shows a list of matching articles."
+                  )
+                }}
+              </span>
+            </div>
+            <Switch
+              :model-value="enabled"
+              :disabled="toggle.loading"
+              @update:model-value="toggle.submit({ value: $event })"
+            />
           </div>
-          <Switch v-model="draft.enabled" />
-        </div>
+          <span class="flex items-center gap-1.5 text-sm text-ink-gray-5">
+            <LucideWorkflow class="size-3.5" />
+            {{ __("Runs on Frappe Flow") }}
+          </span>
+        </section>
 
-        <div class="flex flex-col gap-4">
+        <section class="flex flex-col gap-4">
           <div class="flex flex-col gap-1">
             <span class="text-base-semibold text-ink-gray-9">
               {{ __("Language model") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
-              {{
-                __(
-                  "Connect your own provider. Answers are written with this model."
-                )
-              }}
+              {{ __("Connect your own provider for the assistant.") }}
             </span>
           </div>
-          <FormControl
-            v-model="draft.provider"
-            type="select"
-            :label="__('Provider')"
-            :options="providerOptions"
-          />
-          <FormControl
-            v-model="draft.model"
-            :label="__('Model')"
-            placeholder="gpt-4.1-mini"
-          />
-          <Password
-            v-model="draft.apiKey"
-            :label="__('API key')"
-            :description="
-              __(
-                'Stored encrypted. Only admins can change it, and it is never shown to readers.'
-              )
-            "
-          />
-        </div>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormControl
+              v-model="draft.provider"
+              type="select"
+              :label="__('Provider')"
+              :options="providerOptions"
+            />
+            <FormControl
+              v-model="draft.model"
+              :label="__('Model')"
+              placeholder="gpt-4.1-mini"
+            />
+            <div class="sm:col-span-2">
+              <Password
+                v-model="draft.apiKey"
+                :label="__('API key')"
+                :description="
+                  __(
+                    'Stored encrypted. Only admins can change it, and it is never shown to readers.'
+                  )
+                "
+              />
+            </div>
+          </div>
+        </section>
 
-        <p class="text-p-sm text-ink-gray-6">
-          {{
-            __(
-              "Answers come only from the articles each reader may see. Set an embedding model in Flow Knowledge Settings so articles can be indexed."
-            )
-          }}
-        </p>
+        <AISearchSources />
+        <AISearchSkills />
+
+        <section class="flex flex-col gap-4">
+          <span class="text-base-semibold text-ink-gray-9">
+            {{ __("Limits and guardrails") }}
+          </span>
+          <div class="flex items-center justify-between gap-8">
+            <div class="flex flex-col gap-1">
+              <span class="text-base-medium text-ink-gray-8">
+                {{ __("Daily questions per visitor") }}
+              </span>
+              <span class="text-p-sm text-ink-gray-6">
+                {{
+                  __(
+                    "Past the limit, search shows matching articles without AI."
+                  )
+                }}
+              </span>
+            </div>
+            <FormControl
+              v-model.number="draft.dailyLimit"
+              type="number"
+              class="w-24 shrink-0"
+              :aria-label="__('Daily questions per visitor')"
+            />
+          </div>
+          <p class="flex items-start gap-1.5 text-p-sm text-ink-gray-6">
+            <LucideShieldCheck class="mt-0.5 size-3.5 shrink-0" />
+            {{
+              __(
+                "Guardrails are always on: the assistant only helps with your product and your sources."
+              )
+            }}
+          </p>
+        </section>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -109,8 +148,12 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
-import { computed, onUnmounted, reactive, watch } from "vue";
+import { computed, onUnmounted, reactive, ref, watch } from "vue";
+import LucideShieldCheck from "~icons/lucide/shield-check";
+import LucideWorkflow from "~icons/lucide/workflow";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import AISearchSkills from "./AISearchSkills.vue";
+import AISearchSources from "./AISearchSources.vue";
 
 const PROVIDERS = [
   { label: "OpenAI", value: "openai" },
@@ -121,11 +164,14 @@ const PROVIDERS = [
   { label: "OpenRouter", value: "openrouter" },
 ];
 
+type SaveError = { messages?: string[] };
+
+const enabled = ref(false);
 const draft = reactive({
-  enabled: false,
   provider: "",
   model: "",
   apiKey: "",
+  dailyLimit: 20,
 });
 // The saved key is masked, so a changed key is a new one.
 const saved = reactive({ ...draft });
@@ -144,14 +190,37 @@ const settings = createResource({
 });
 
 function load(data: Record<string, any>) {
+  enabled.value = Boolean(data.enable_ai_search);
   Object.assign(draft, {
-    enabled: Boolean(data.enable_ai_search),
     provider: data.ai_provider || "",
     model: data.ai_model || "",
     apiKey: data.ai_api_key || "",
+    dailyLimit: data.ai_daily_question_limit,
   });
   Object.assign(saved, draft);
 }
+
+function showError(error: SaveError) {
+  toast.error(error.messages?.[0] || __("Could not save the settings"));
+}
+
+// The switch saves on its own; a refused change leaves it where it was.
+const toggle = createResource({
+  url: "frappe.client.set_value",
+  makeParams: ({ value }: { value: boolean }) => ({
+    doctype: "HD Settings",
+    name: "HD Settings",
+    fieldname: "enable_ai_search",
+    value: value ? 1 : 0,
+  }),
+  onSuccess(data: Record<string, any>) {
+    enabled.value = Boolean(data.enable_ai_search);
+    toast.success(
+      enabled.value ? __("AI search turned on") : __("AI search turned off")
+    );
+  },
+  onError: showError,
+});
 
 const save = createResource({
   url: "frappe.client.set_value",
@@ -159,9 +228,9 @@ const save = createResource({
     doctype: "HD Settings",
     name: "HD Settings",
     fieldname: {
-      enable_ai_search: draft.enabled ? 1 : 0,
       ai_provider: draft.provider,
       ai_model: draft.model,
+      ai_daily_question_limit: draft.dailyLimit,
       ...(draft.apiKey !== saved.apiKey && { ai_api_key: draft.apiKey }),
     },
   }),
@@ -169,12 +238,12 @@ const save = createResource({
     load(data);
     toast.success(__("Settings updated"));
   },
-  onError(error: { messages?: string[] }) {
-    toast.error(error.messages?.[0] || __("Could not save the settings"));
-  },
+  onError: showError,
 });
 
-const isDirty = computed(() => JSON.stringify(draft) !== JSON.stringify(saved));
+const isDirty = computed(
+  () => JSON.stringify(draft) !== JSON.stringify(saved)
+);
 
 // Unsaved edits keep the modal open and guard tab changes.
 watch(isDirty, (dirty) => (disableSettingModalOutsideClick.value = dirty), {

@@ -17,7 +17,7 @@ Agents write articles in the desk at `/helpdesk/kb`. Customers and guests read t
 - `allow_anonymous_article_voting`: guests can vote.
 - `banner_image`, `banner_preset`: the banner on the KB home.
 - `banner_title`, `banner_subtitle`: the KB home heading and the text under it. Empty uses the default text.
-- `enable_ai_search`, `ai_provider`, `ai_api_key`, `ai_model`: the AI search tab (see [AI search](#ai-search)). System Managers only (permission level 1), and the key is a Password field, so no read path returns it.
+- `enable_ai_search`, `ai_provider`, `ai_api_key`, `ai_model`, `ai_daily_question_limit`, `ai_skills`: the AI search tab (see [AI search](#ai-search)). System Managers only (permission level 1), and the key is a Password field, so no read path returns it.
 - `show_footer`, `footer_tagline`, `footer_copyright`, `footer_items`, `social_links`: the KB footer. `footer_items` is a `Top Bar Item` table, as in Website Settings: a row without `parent_label` is a column; link rows name their column in `parent_label`. `social_links` is a `Top Bar Item` table too. `validate_footer` allows at most four columns with different titles and only web, email and `/` links in both tables.
 
 Within a category, every article list (`get_articles` with a `category`, `get_subcategory_articles`, `get_kb_sidebar`) sorts by `weight` first, heaviest on top. Pins never touch the weight; Featured reads them by `pinned_order`.
@@ -49,7 +49,7 @@ The `General` category is reserved. It cannot be renamed or deleted.
 `helpdesk/api/knowledge_base.py` has the KB endpoints.
 
 - **Reads** (guests allowed, `GET`): `get_categories`, `get_articles`, `get_featured_articles`, `get_subcategory_articles`, `get_kb_sidebar`, `get_article`, `search_articles`. `/help/articles/<name>.md` serves an article as plain Markdown (`ArticleMarkdownPage`), the link Copy for LLM and Open in Claude/ChatGPT use.
-- **Guest reads that call a model** (`POST`, rate limited): `answer_question`.
+- **Guest AI search** (`POST`, rate limited, daily limit): `answer_question`.
 - **Guest writes** (`POST`, rate limited): `vote_on_article`, `increment_views`. A guest voter is known by the `hd_visitor` cookie.
 - **Agent only**:
   - Categories: `create_category`, `merge_category`, `delete_category`, `get_category_delete_summary`, `get_category_options`, `get_category_visibility`, `set_category_visibility`, `get_category_access`, `get_general_category`.
@@ -63,7 +63,8 @@ Other files:
 - `helpdesk/api/article.py`: `get_related` (articles for a ticket), `get_article_stats` and search helpers.
 - `helpdesk/search.py`: the RediSearch index for articles. `after_migrate` and a scheduled job build it.
 - `helpdesk/api/config.py`: `get_config` gives the portal its KB flags, banner, KB form scripts and `ai_search_enabled`.
-- `helpdesk/ai_search.py`: AI search, from article indexing to the answer.
+- `helpdesk/ai_search.py`: AI search, from article and source indexing to the answer.
+- `helpdesk/api/ai_search.py`: the AI search tab's knowledge sources and skills (System Managers only).
 
 ## Desk: authoring
 
@@ -96,26 +97,47 @@ With AI search on, Enter in the home search opens the `search` page (`/help/sear
 
 ## AI search
 
-An AI answer to a reader's question, from the articles that reader may read, built on Frappe Flow (`frappe.flow`, which ships with the framework). It is off by default. Until Flow can run an agent for portal readers, it returns the matching articles only (see [Answering](#answering)).
+An AI answer to a reader's question, from the articles and sources that reader may read, built on Frappe Flow (`frappe.flow`, which ships with the framework). It is off by default. Until Flow can run an agent for portal readers, it returns the best matches by meaning only, and the portal labels it as search, not as an answer (see [Answering](#answering)).
 
 ### Settings
 
-The AI search tab of `HD Settings` (desk Settings > Customer Portal > AI search) has:
+The AI search tab of `HD Settings` (desk Settings > Customer Portal > AI search, `desk/src/components/Settings/AISearch/`) has:
 
-- `enable_ai_search`: on or off. Turning it on without a provider and a model is refused.
+- `enable_ai_search`: on or off. The switch saves on its own, as soon as it changes. Turning it on without a saved provider and model is refused, and the switch stays off.
 - `ai_provider`: a LiteLLM provider name, such as `openai` or `anthropic`.
 - `ai_api_key`: a Password field.
 - `ai_model`: the model at that provider, such as `gpt-4.1-mini`.
+- `ai_daily_question_limit`: questions each visitor may ask a day, default 20, at least 1. See [Daily limit](#daily-limit).
+- `ai_skills`: a table of `HD AI Skill` rows, each linking a `Flow Skill`. See [Skills](#skills).
+- Knowledge sources, which live in Flow, not in `HD Settings`. See [Knowledge sources](#knowledge-sources).
 
-All four are System Manager fields (permission level 1). Saving with AI on writes the Flow records the assistant runs on (`HDSettings.sync_ai_search`):
+The provider, model, key and daily limit save together with Save. All of them are System Manager fields (permission level 1). Saving with AI on writes the Flow records the assistant runs on (`HDSettings.sync_ai_search`):
 
 - a `Flow Provider` named after the provider, created only if the site has none; an existing one keeps its own key;
 - a `Flow Model` titled `Helpdesk AI Search`, which carries the key and takes precedence over the provider's;
-- a system-generated `Flow Agent`, `helpdesk/kb-assistant`, holding the guardrail instructions and the model.
+- a system-generated `Flow Agent`, `helpdesk/kb-assistant`, holding the guardrail instructions, the model and the skills in `ai_skills`.
 
 The agent is limited to the product (`brand_name`, else "Helpdesk") and to the sources it is given, and answers `OFF_TOPIC` to anything else. The guardrails are on by default and live in `INSTRUCTIONS` in `helpdesk/ai_search.py`.
 
 Articles are embedded with the model in **Flow Knowledge Settings**. Set an embedding model there first; turning AI on without one shows a warning and indexes nothing.
+
+### Knowledge sources
+
+An admin adds documentation pages (URL) and files (PDF, MD or TXT) for the assistant to read, from the tab's Knowledge sources section. `helpdesk/api/ai_search.py` has `get_sources`, `add_source`, `remove_source`, `resync_source` and `set_source_visibility`; the logic is in `helpdesk/ai_search.py`.
+
+- Each source is a `Flow Knowledge Source` in the base for its "Visible to" setting: `Helpdesk Sources - Public`, `- Customers` or `- Agents` (default Public). These bases are apart from the article bases, so article indexing never removes a source.
+- A link must use http or https, resolve to a public address (Flow's own SSRF check), not redirect, and answer without an error. A file must be PDF, MD or TXT. A source with the same link or file name as one already added is refused.
+- Flow syncs a new source in the background (`after_insert` queues the ingestion). The tab shows Flow's status as Syncing (Pending, Processing), Ready (Completed) or Failed, with the last line of Flow's error as the reason, and checks again every 5 seconds while one syncs.
+- Flow cannot move a source between bases (`knowledge_base` is immutable), so changing "Visible to" adds the source to the new base and deletes the old one.
+- Only sources in the three source bases can be read or changed through these endpoints; any other Flow source is "not found".
+
+### Skills
+
+Skills are instructions the assistant follows on every answer. `add_skill(title, instructions)` creates a `Flow Skill` and adds a row to `ai_skills`, and saving `HD Settings` attaches every skill in `ai_skills` to the agent. `remove_skill(title)` removes the row and deletes the `Flow Skill`. Flow makes a skill's instructions immutable, so a skill is added or removed, never edited. A name another `Flow Skill` already has is refused.
+
+### Daily limit
+
+Each question to `answer_question` counts against the asker's daily limit (`ai_daily_question_limit`). The count is kept in the cache under `helpdesk:ai_questions:<date>:<user>`, or `ip:<address>` for a guest, and expires after two days. Past the limit, `answer_question` returns `limited` with no matches and does not search, and `get_config` turns `ai_search_enabled` off for that visitor, so the home search shows the plain dropdown. The patch `set_ai_daily_question_limit` sets 20 on existing sites.
 
 ### Who is answered from what
 
@@ -127,7 +149,7 @@ Articles are embedded with the model in **Flow Knowledge Settings**. Set an embe
 | `Customers` | `Helpdesk Articles - Customers` |
 | `Private` | `Helpdesk Articles - Agents` |
 
-A question searches only the bases its asker may read: a guest or a user without a customer role gets Public, a customer Public and Customers, an agent all three. Flow itself does not check permissions per chunk: the knowledge base is the boundary, so never search a base that was not chosen by role.
+A question searches only the bases its asker may read, for articles and sources alike: a guest or a user without a customer role gets Public, a customer Public and Customers, an agent all three. Flow itself does not check permissions per chunk: the knowledge base is the boundary, so never search a base that was not chosen by role.
 
 Before any passage reaches the model, its article is read again with `make_article_filters`. An article narrowed, unpublished or deleted after it was indexed is dropped even while the index is behind.
 
@@ -139,20 +161,24 @@ Saving or deleting an article queues `index_article` (queue `short`) while AI se
 
 - calls `validate_public_access()`, so a guest is refused while `public_knowledge_base` is off, and is refused while AI search is off;
 - is rate limited to 10 requests a minute per user, or per IP for a guest, and cuts the question at `ANSWER_QUESTION_LENGTH` (500) characters;
-- retrieves the best 8 passages (`frappe.flow.knowledge.retriever.retrieve`) from the bases its asker may read, keeps the ones whose article the asker may read now, and returns:
+- counts one of the asker's daily questions, and past the limit returns `{ "limited": true, "message", "related": [], "links": [] }`;
+- retrieves the best 8 passages (`frappe.flow.knowledge.retriever.retrieve`) from the article and source bases its asker may read, keeps the ones whose article the asker may read now, and returns:
 
 ```
 { "refused": bool, "message": "…" (only when refused),
-  "related": [{ "name", "title", "title_slug", "excerpt" }] }
+  "related": [{ "name", "title", "title_slug", "excerpt" }],
+  "links": [{ "url" }] }
 ```
 
-`related` are the matching articles the asker may read, at most 4. A question no readable article matches gets `refused` set, "I can only help with <product>." as `message`, and no related articles. No model is called, so there is no answer text or cited sources until the blocker below is fixed.
+`related` are the matching articles the asker may read, at most 4. `links` are the matching web page sources, at most 3; a file source is never linked, as its file is private. A question nothing readable matches gets `refused` set, "I can only help with <product>." as `message`, and nothing else. No model is called, so there is no answer text or cited sources until the blocker below is fixed.
 
-**Blocker: Flow cannot run an agent for portal readers.** Flow runs agents only as sessions on its flow server (`frappe.flow.lib.agent.Agent.run`). A session needs read access to the `Flow Agent` and `Flow Model` (roles System Manager and Flow User), belongs to a signed-in owner whose callbacks act as that user, and runs asynchronously. Guests and customers have none of that, and Flow has no synchronous call. Calling the model directly with LiteLLM would bypass Flow's runtime, so Helpdesk does not. Once Flow can run an agent for a guest, send the retrieved articles to `helpdesk/kb-assistant`, add `answer` (citing `[n]`) and `sources` to the response, and render them on the portal page.
+**Blocker: Flow cannot run an agent for portal readers.** Flow runs agents only as sessions on its flow server (`frappe.flow.lib.agent.Agent.run`). A session needs read access to the `Flow Agent` and `Flow Model` (roles System Manager and Flow User), belongs to a signed-in owner whose callbacks act as that user, and runs asynchronously. Guests and customers have none of that, and Flow has no synchronous call. Calling the model directly with LiteLLM would bypass Flow's runtime, so Helpdesk does not. Once Flow can run an agent for a guest, send the retrieved articles to `helpdesk/kb-assistant`, add `answer` (citing `[n]`) and `sources` to the response, and render them on the portal page with the streamed answer, follow-ups and "Powered by Flow". Until then the portal does not call the page an answer: the search row reads "See the best matches for …", not "Ask AI". Skills reach the agent, but take effect only once it runs.
 
 ### Portal page
 
-`PortalAnswerPage` (`/help/search?q=`, the `search` page) shows the question, a loading state, the refusal line when `refused`, and the related articles below (no answer text until the Flow blocker is fixed). If the call fails it says so and lists the plain `search_articles` matches. `get_config` gives the portal `ai_search_enabled`, which is on only when AI search is on and the reader may read the knowledge base. With it off, the home search shows today's dropdown and Enter opens no answer page.
+`PortalAnswerPage` (`/help/search?q=`, the `search` page) shows the question, a thinking state (a pulsing ✦ with rotating status lines), then the related articles and "From the docs" links below, and "Search powered by Frappe Flow". A refusal shows its line and a "Raise a ticket" button, which opens the new ticket form with the question (`ROUTES.newTicket({ from: 'search', q })`), or sign-in for a guest, and is hidden when `hide_raise_ticket_button` is on. If the call fails, or the daily limit is used up, it says so and lists the plain `search_articles` matches; a used-up limit also reloads the session, so the home search turns plain.
+
+With AI search on, the search box (`PortalArticleSearch`) is the "glow ring" of the sketch: a soft pastel gradient edge that brightens, with a faint glow, on focus, and ✦ in place of the magnifier. "/" still focuses it. With it off, or past the limit, the box is the plain one. `get_config` gives the portal `ai_search_enabled`, which is on only when AI search is on and the reader may read the knowledge base. With it off, the home search shows today's dropdown and Enter opens no answer page.
 
 ## Settings shared by both apps
 

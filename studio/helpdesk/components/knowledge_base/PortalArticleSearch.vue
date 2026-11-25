@@ -1,9 +1,20 @@
 <template>
+  <div
+    class="search-ring relative w-full rounded-6"
+    :class="{ 'is-ai': isAi, 'is-focused': isFocused }"
+  >
+    <div v-if="isAi" class="search-ring-glow" aria-hidden="true" />
+    <div v-if="isAi" class="search-ring-edge" aria-hidden="true" />
   <Combobox
     ref="combobox"
     v-model:open="isOpen"
     v-model:query="query"
-    class="min-h-[42px] w-full !gap-1.5 !rounded-6 !border-outline-gray-2 !px-3.5 shadow-lg hover:!border-outline-gray-3 focus-within:!border-outline-gray-4 focus-within:!outline-0 data-[state=open]:!border-outline-gray-4 data-[state=open]:!outline-0 [&_input]:!text-base"
+    class="relative min-h-[42px] w-full !gap-1.5 !rounded-6 !px-3.5 shadow-lg focus-within:!outline-0 data-[state=open]:!outline-0 [&_input]:!text-base"
+    :class="
+      isAi
+        ? '!border-transparent'
+        : '!border-outline-gray-2 hover:!border-outline-gray-3 focus-within:!border-outline-gray-4 data-[state=open]:!border-outline-gray-4'
+    "
     trigger="input"
     variant="outline"
     size="lg"
@@ -17,7 +28,14 @@
     @blur="isFocused = false"
   >
     <template #prefix>
-      <LucideSearch class="size-4.5 text-ink-gray-5" />
+      <span
+        v-if="isAi"
+        class="w-4.5 text-center text-base leading-none text-ink-gray-6"
+        aria-hidden="true"
+      >
+        ✦
+      </span>
+      <LucideSearch v-else class="size-4.5 text-ink-gray-5" />
     </template>
     <template #suffix>
       <LoadingIndicator
@@ -37,9 +55,14 @@
         v-if="item.askAi"
         class="flex min-w-0 flex-1 items-center gap-3 self-center"
       >
-        <LucideSparkles class="size-4 shrink-0 text-ink-gray-6" />
+        <span
+          class="w-4 shrink-0 text-center text-base leading-none text-ink-gray-6"
+          aria-hidden="true"
+        >
+          ✦
+        </span>
         <span class="min-w-0 flex-1 truncate text-base text-ink-gray-8">
-          {{ __("Ask AI: {0}", [item.label]) }}
+          {{ __("See the best matches for “{0}”", [item.label]) }}
         </span>
         <LucideCornerDownLeft class="row-enter size-4 text-ink-gray-5" />
       </div>
@@ -128,6 +151,7 @@
       </div>
     </template>
   </Combobox>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -142,7 +166,6 @@ import {
 import LucideCornerDownLeft from "~icons/lucide/corner-down-left";
 import LucideSearch from "~icons/lucide/search";
 import LucideSearchX from "~icons/lucide/search-x";
-import LucideSparkles from "~icons/lucide/sparkles";
 import LucideX from "~icons/lucide/x";
 import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { __ } from "@helpdesk/shared/translation";
@@ -177,6 +200,8 @@ const isFocused = ref(false);
 const { recentArticles, forgetArticle } = useRecent();
 
 const hasHistory = computed(() => recentArticles.value.length > 0);
+// The glow ring marks a box whose Enter opens the AI search page.
+const isAi = computed(() => session.isAiSearchEnabled.value);
 
 useKeyboardShortcut({
   combo: "Slash",
@@ -291,6 +316,48 @@ const options = computed(() =>
 </script>
 
 <style>
+/* A soft pastel ring that brightens on focus; it should whisper, not shout. */
+.search-ring {
+  --ring-gradient: linear-gradient(90deg, #a5b4fc, #d8b4fe, #f9a8d4, #fcd34d);
+}
+.search-ring-edge,
+.search-ring-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--ring-gradient);
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.search-ring-edge {
+  /* above the box, masked to its 1px border */
+  z-index: 1;
+  opacity: 0.45;
+  /* only the 1px edge shows, around the box that sits on top */
+  padding: 1px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.search-ring-glow {
+  inset: -4px;
+  opacity: 0;
+  filter: blur(14px);
+}
+.search-ring.is-focused .search-ring-edge {
+  opacity: 0.75;
+}
+.search-ring.is-focused .search-ring-glow {
+  opacity: 0.18;
+}
+@media (prefers-reduced-motion: reduce) {
+  .search-ring-edge,
+  .search-ring-glow {
+    transition: none;
+  }
+}
 /* Portaled to <body>, so unscoped; only this box uses outline lg. */
 [data-slot="content"][data-variant="outline"][data-size="lg"] {
   width: var(--reka-combobox-trigger-width);
