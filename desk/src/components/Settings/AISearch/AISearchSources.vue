@@ -54,7 +54,9 @@
             </span>
           </div>
         </div>
-        <div class="flex shrink-0 items-center justify-between gap-2 pl-7 sm:pl-0">
+        <div
+          class="flex shrink-0 items-center justify-between gap-2 pl-7 sm:pl-0"
+        >
           <Select
             class="w-32"
             :model-value="source.visibility"
@@ -63,18 +65,16 @@
             @update:model-value="setVisibility(source, $event)"
           />
           <div class="flex items-center gap-2">
-            <Badge
-              :label="__(source.status)"
-              theme="gray"
-              variant="subtle"
-            />
-            <Dropdown :options="rowActions(source)" align="end">
-              <Button
-                variant="ghost"
-                icon="lucide-ellipsis"
-                :aria-label="__('More actions')"
-              />
-            </Dropdown>
+            <Badge :label="__(source.status)" theme="gray" variant="subtle" />
+            <Tooltip :text="__('More actions')">
+              <Dropdown :options="rowActions(source)" align="end">
+                <Button
+                  variant="ghost"
+                  icon="lucide-ellipsis"
+                  :aria-label="__('More actions')"
+                />
+              </Dropdown>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -191,6 +191,7 @@ import {
   Select,
   TabButtons,
   toast,
+  Tooltip,
 } from "frappe-ui";
 import { useTimeoutPoll } from "@vueuse/core";
 import { reactive, ref, watch } from "vue";
@@ -221,7 +222,10 @@ const VISIBILITY_OPTIONS = [
 ];
 const VISIBILITY_HINTS = [
   { label: __("Public: everyone, including guests"), value: "Public" },
-  { label: __("Customers: signed-in customers and agents"), value: "Customers" },
+  {
+    label: __("Customers: signed-in customers and agents"),
+    value: "Customers",
+  },
   { label: __("Agents: agents only"), value: "Agents" },
 ];
 const POLL_MS = 5000;
@@ -247,7 +251,12 @@ const form = reactive({
 });
 watch(showAdd, (open) => {
   if (!open) return;
-  Object.assign(form, { type: "URL", url: "", file: null, visibility: "Public" });
+  Object.assign(form, {
+    type: "URL",
+    url: "",
+    file: null,
+    visibility: "Public",
+  });
   add.reset();
 });
 
