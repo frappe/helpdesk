@@ -7,11 +7,7 @@
         :to="ROUTES.category(category.name)"
         class="group flex items-center gap-2.5 border-b border-outline-gray-1 px-4 py-3 focus-visible:focus-ring"
       >
-        <span
-          class="size-4 shrink-0 text-ink-gray-7"
-          :class="categoryIcon(category.icon)"
-          aria-hidden="true"
-        />
+        <CategoryIcon :icon="category.icon" class="size-4 text-ink-gray-7" />
         <span class="min-w-0 flex-1 truncate text-base-medium text-ink-gray-9">
           {{ category.category_name }}
         </span>
@@ -45,7 +41,7 @@
 <script setup lang="ts">
 import ArticleIcon from "@helpdesk/shared/ArticleIcon.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
-import { categoryIcon } from "@helpdesk/shared/categoryIcons";
+import CategoryIcon from "@helpdesk/shared/CategoryIcon.vue";
 import PortalLink from "@app/components/ui/PortalLink.vue";
 import { prefetchOnHover } from "@app/stores/knowledgeBase";
 

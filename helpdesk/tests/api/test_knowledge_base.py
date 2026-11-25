@@ -10,6 +10,7 @@ from redis.exceptions import ResponseError
 
 from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
+    CATEGORY_ICON_FOLDER,
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
     archive_articles,
@@ -24,6 +25,7 @@ from helpdesk.api.knowledge_base import (
     get_category_access,
     get_category_delete_summary,
     get_category_group_options,
+    get_category_icons,
     get_category_options,
     get_category_visibility,
     get_cited_articles,
@@ -38,6 +40,7 @@ from helpdesk.api.knowledge_base import (
     search_categories,
     set_category_visibility,
     set_pinned_articles,
+    upload_category_icon,
     vote_on_article,
 )
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
@@ -66,6 +69,7 @@ from helpdesk.test_utils import (
     make_subcategory,
     make_ticket,
     misplaced_categories,
+    post_file,
     unique_email,
     unique_name,
 )
@@ -1967,3 +1971,63 @@ class TestCategoryMerge(IntegrationTestCase):
             frappe.db.get_value("HD Article", article, ["category", "visibility"]),
             (target, PRIVATE),
         )
+
+
+class TestCategoryIcons(IntegrationTestCase):
+    def upload(self, filename: str, content: bytes | None = None):
+        post_file(self, filename, content or frappe.generate_hash().encode())
+        self.addCleanup(frappe.form_dict.clear)
+        file = upload_category_icon()
+        self.addCleanup(file.delete)
+        return file
+
+    def test_an_upload_is_public_under_a_random_name(self) -> None:
+        frappe.form_dict.is_private = 1
+
+        file = self.upload("Company Logo.SVG")
+
+        self.assertRegex(file.file_name, r"^[0-9a-f]{16}\.svg$")
+        self.assertTrue(file.file_url.endswith(file.file_name))
+        self.assertFalse(file.is_private)
+        self.assertEqual(file.folder, CATEGORY_ICON_FOLDER)
+
+    def test_only_images_are_accepted(self) -> None:
+        with self.assertRaisesRegex(frappe.ValidationError, "PNG, JPG or SVG"):
+            self.upload("page.html", b"<html><script>alert(1)</script></html>")
+
+    def test_scripts_are_stripped_from_an_svg(self) -> None:
+        svg = (
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8" onload="alert(1)">'
+            f'<script>alert(2)</script><path d="M0 0h8v8z" id="{frappe.generate_hash()}"/></svg>'
+        )
+
+        content = frappe.safe_decode(
+            self.upload("logo.svg", svg.encode()).get_content()
+        )
+
+        self.assertNotIn("script", content)
+        self.assertNotIn("onload", content)
+        self.assertIn("<path", content)
+
+    def test_uploads_list_newest_first(self) -> None:
+        older = self.upload("older.png").file_url
+        newer = self.upload("newer.png").file_url
+
+        icons = get_category_icons()
+
+        self.assertLess(icons.index(newer), icons.index(older))
+
+    def test_image_icons_categories_use_are_listed(self) -> None:
+        make_article_category(unique_name("Fixture Logo"), icon="/files/logo.png")
+        make_article_category(unique_name("Fixture Lucide"), icon="lucide-rocket")
+
+        icons = get_category_icons()
+
+        self.assertIn("/files/logo.png", icons)
+        self.assertNotIn("lucide-rocket", icons)
+
+    def test_only_category_editors_upload_or_list(self) -> None:
+        post_file(self, "logo.png", b"png")
+        with self.set_user(create_user(unique_email("kb-reader")).name):
+            self.assertRaises(frappe.PermissionError, upload_category_icon)
+            self.assertRaises(frappe.PermissionError, get_category_icons)

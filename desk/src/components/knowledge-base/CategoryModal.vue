@@ -20,7 +20,7 @@
                 class="grid size-8 shrink-0 place-items-center rounded-4 bg-surface-gray-2 text-ink-gray-7"
                 aria-hidden="true"
               >
-                <span :class="parentIcon" class="size-4" />
+                <CategoryIcon :icon="parentIcon" class="size-4" />
               </span>
               <Combobox
                 v-model="parent"
@@ -95,7 +95,11 @@
             />
           </svg>
         </Transition>
-        <IconPicker v-model="icon" />
+        <IconPicker
+          v-model="icon"
+          :uploads="uploadedIcons"
+          @upload="categoryIcons.reload()"
+        />
         <TextInput
           ref="nameInput"
           v-model="newTitle"
@@ -154,13 +158,15 @@ import {
   Button,
   Checkbox,
   Combobox,
+  createResource,
   Dialog,
   Textarea,
   TextInput,
   Tooltip,
 } from "frappe-ui";
 import { categoryOptions } from "@/stores/knowledgeBase";
-import { categoryIcon } from "@helpdesk/shared/categoryIcons";
+import CategoryIcon from "@helpdesk/shared/CategoryIcon.vue";
+import { isImageIcon } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
 import IconPicker from "@helpdesk/shared/IconPicker.vue";
 
@@ -207,12 +213,16 @@ function onUndrawn() {
 }
 
 const nameInput = ref<InstanceType<typeof TextInput> | null>(null);
+const categoryIcons = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_icons",
+});
 
 watch(showDialog, async (open) => {
   if (!open) return;
   // shared with other dialogs: drop their list before it shows here
   categoryOptions.reset();
   categoryOptions.submit();
+  categoryIcons.submit();
   nesting.value = drawn.value = Boolean(parent.value);
   await nextTick();
   nameInput.value?.focus();
@@ -234,10 +244,15 @@ const hasSubcategories = computed(
       ?.has_subcategories
 );
 
-const parentIcon = computed(() =>
-  categoryIcon(
+const uploadedIcons = computed(() => [
+  ...new Set(
+    [icon.value, ...(categoryIcons.data || [])].filter(isImageIcon)
+  ),
+]);
+
+const parentIcon = computed(
+  () =>
     categoryOptions.data?.find((option) => option.value === parent.value)?.icon
-  )
 );
 
 const dialogTitle = computed(() => {

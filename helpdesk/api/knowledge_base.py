@@ -1,9 +1,14 @@
 from contextlib import suppress
+from io import BytesIO
+from mimetypes import guess_type
+from pathlib import Path
 
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.core.utils import html2text
+from frappe.core.api.file import create_new_folder
+from frappe.handler import upload_file
 from frappe.query_builder.functions import Coalesce
 from frappe.rate_limiter import rate_limit
 from frappe.utils import (
@@ -12,6 +17,7 @@ from frappe.utils import (
     expand_relative_urls,
     get_user_info_for_avatar,
 )
+from frappe.utils.html_utils import sanitize_svg
 from frappe.website.page_renderers.base_renderer import BaseRenderer
 from frappe.website.utils import cleanup_page_name, find_first_image
 from werkzeug.wrappers import Response
@@ -69,6 +75,8 @@ SUBCATEGORY_ARTICLES_LIMIT = 5
 TITLES_LIMIT = 1000
 # within a category, heavier articles list first
 WEIGHT_ORDER = "weight desc"
+
+CATEGORY_ICON_FOLDER = "Home/Category Icons"
 
 VISITOR_COOKIE = "hd_visitor"
 VISITOR_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
@@ -232,6 +240,45 @@ def create_category(
         "HD Article", title="New Article", category=category.name
     ).insert()
     return {"article": article.name, "category": category.name}
+
+
+@frappe.whitelist(methods=["POST"])
+def upload_category_icon():
+    """Save the posted image as a public File in the category icon folder, under a
+    random name that keeps its extension. SVGs lose scripts and event handlers."""
+    frappe.has_permission("HD Article Category", "write", throw=True)
+    file = frappe.request.files.get("file")
+    if not file:
+        frappe.throw(_("Choose an image to upload"))
+    file.filename = frappe.generate_hash(length=16) + Path(file.filename).suffix.lower()
+    content_type = guess_type(file.filename)[0] or ""
+    if not content_type.startswith("image/"):
+        frappe.throw(_("Upload a PNG, JPG or SVG image"))
+    if content_type == "image/svg+xml":
+        svg = file.stream.read().decode("utf-8", "replace")
+        file.stream = BytesIO(sanitize_svg(svg).encode())
+    if not frappe.db.exists("File", CATEGORY_ICON_FOLDER):
+        create_new_folder("Category Icons", "Home")
+    frappe.form_dict.update(is_private=0, folder=CATEGORY_ICON_FOLDER)
+    return upload_file()
+
+
+@frappe.whitelist()
+def get_category_icons() -> list[str]:
+    """URLs of uploaded category icons, newest first, then image icons categories
+    already use. Needs write permission on categories."""
+    frappe.has_permission("HD Article Category", "write", throw=True)
+    uploaded = frappe.get_all(
+        "File",
+        filters={"folder": CATEGORY_ICON_FOLDER, "is_folder": 0},
+        pluck="file_url",
+        order_by="creation desc",
+    )
+    used = frappe.get_all(
+        "HD Article Category", filters={"icon": ["is", "set"]}, pluck="icon"
+    )
+    images = [icon for icon in used if icon.startswith(("/", "http://", "https://"))]
+    return list(dict.fromkeys(uploaded + images))
 
 
 def _validate_category(category: str) -> None:

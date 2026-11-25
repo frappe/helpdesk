@@ -28,10 +28,13 @@
         v-else
         variant="subtle"
         size="md"
-        :icon="categoryIcon(icon)"
         :aria-label="__('Choose an icon')"
         class="shrink-0"
-      />
+      >
+        <template #icon>
+          <CategoryIcon :icon="icon" class="size-4" />
+        </template>
+      </Button>
     </template>
     <template #default>
       <div class="w-[19.5rem] max-w-[calc(100vw-2rem)] p-2">
@@ -44,6 +47,45 @@
           :aria-label="__('Search icons')"
         />
         <ScrollArea viewport-class="max-h-72">
+          <template v-if="uploads">
+            <p class="px-1 pb-1 text-xs text-ink-gray-5">
+              {{ __("Your icons") }}
+            </p>
+            <div class="mb-3 grid grid-cols-8 gap-1">
+              <FileUploader
+                :file-types="['image/*']"
+                :private="false"
+                upload-endpoint="/api/method/helpdesk.api.knowledge_base.upload_category_icon"
+                @success="(file) => uploaded(file.file_url)"
+              >
+                <template #default="{ uploading, openFileSelector }">
+                  <Tooltip :text="__('Upload an icon')">
+                    <Button
+                      variant="ghost"
+                      icon="lucide-plus"
+                      class="border border-dashed border-outline-gray-3"
+                      :loading="uploading"
+                      :aria-label="__('Upload an icon')"
+                      @click="openFileSelector"
+                    />
+                  </Tooltip>
+                </template>
+              </FileUploader>
+              <Button
+                v-for="(url, index) in uploads"
+                :key="url"
+                :variant="url === icon ? 'subtle' : 'ghost'"
+                :aria-label="__('Uploaded icon {0}', [index + 1])"
+                :aria-pressed="url === icon"
+                @click="pick(url)"
+              >
+                <template #icon>
+                  <CategoryIcon :icon="url" class="size-4" />
+                </template>
+              </Button>
+            </div>
+            <p class="px-1 pb-1 text-xs text-ink-gray-5">{{ __("Icons") }}</p>
+          </template>
           <div class="grid grid-cols-8 gap-1">
             <Button
               v-for="value in matches"
@@ -60,6 +102,12 @@
         <p v-if="!matches.length" class="px-1 py-4 text-p-sm text-ink-gray-5">
           {{ __("No icons found") }}
         </p>
+        <p
+          v-if="uploads"
+          class="mt-2 border-t border-outline-gray-1 px-1 pt-2 text-p-xs text-ink-gray-5"
+        >
+          {{ __("Square SVG or PNG, at least 64 px.") }}
+        </p>
       </div>
     </template>
   </Popover>
@@ -67,15 +115,29 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { Button, Popover, ScrollArea, TextInput, vFocus } from "frappe-ui";
-import { CATEGORY_ICONS, categoryIcon } from "./categoryIcons";
+import {
+  Button,
+  FileUploader,
+  Popover,
+  ScrollArea,
+  TextInput,
+  Tooltip,
+  vFocus,
+} from "frappe-ui";
+import { CATEGORY_ICONS } from "./categoryIcons";
+import CategoryIcon from "./CategoryIcon.vue";
 import Icon from "./Icon.vue";
 import { __ } from "./translation";
 
 // `field` shows a full-width input that searches as you type.
-const props = defineProps<{ field?: boolean; placeholder?: string }>();
+const props = defineProps<{
+  field?: boolean;
+  placeholder?: string;
+  uploads?: string[];
+}>();
 
 const icon = defineModel<string>();
+const emit = defineEmits<{ upload: [] }>();
 const open = ref(false);
 const query = ref("");
 
@@ -103,6 +165,11 @@ watch(open, () => (query.value = ""));
 // Deleting past an empty search clears the icon.
 function clearIcon() {
   if (!query.value) icon.value = "";
+}
+
+function uploaded(url: string) {
+  emit("upload");
+  pick(url);
 }
 
 function pick(value: string) {

@@ -345,6 +345,21 @@ def make_article_category(label: str, **values):
     ).insert()
 
 
+def post_file(case, filename: str, content: bytes):
+    """Make the current request a multipart POST carrying `content` as `file`, until
+    `case` cleans up."""
+    from io import BytesIO
+
+    from werkzeug.test import EnvironBuilder
+    from werkzeug.wrappers import Request
+
+    builder = EnvironBuilder(method="POST", data={"file": (BytesIO(content), filename)})
+    case.addCleanup(
+        setattr, frappe.local, "request", getattr(frappe.local, "request", None)
+    )
+    frappe.local.request = Request(builder.get_environ())
+
+
 def make_subcategory(parent: str, label: str = "Sub", **values):
     """A uniquely named Subcategory of `parent`."""
     return make_article_category(

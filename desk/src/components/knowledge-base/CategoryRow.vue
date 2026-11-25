@@ -57,6 +57,11 @@
               class="size-4"
               aria-hidden="true"
             />
+            <CategoryIcon
+              v-else-if="isImageIcon(group.group.icon)"
+              :icon="group.group.icon"
+              class="size-4"
+            />
             <SpriteIcon v-else :name="icon" class="size-4" :class="iconTone" />
           </button>
           <span
@@ -116,6 +121,8 @@
 <script setup lang="ts">
 import { MultipleAvatar } from "@/components";
 import Icon from "@helpdesk/shared/Icon.vue";
+import CategoryIcon from "@helpdesk/shared/CategoryIcon.vue";
+import { isImageIcon } from "@helpdesk/shared/categoryIcons";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import { __ } from "@/translation";
 import { Button, Checkbox, Dropdown, dayjsLocal } from "frappe-ui";

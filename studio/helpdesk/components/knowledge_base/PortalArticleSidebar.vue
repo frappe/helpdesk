@@ -66,8 +66,8 @@
               @click="expand(category.name, nested)"
             >
               <template #prefix>
-                <Icon
-                  :icon="categoryIcon(category.icon)"
+                <CategoryIcon
+                  :icon="category.icon"
                   class="size-4 max-md:size-[18px]"
                   :class="
                     category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'
@@ -183,7 +183,6 @@ import { createReusableTemplate, useMediaQuery, useScroll } from "@vueuse/core";
 import { computed, nextTick, reactive, ref, useAttrs, watch } from "vue";
 import {
   BottomSheet,
-  Icon,
   Sidebar,
   SidebarItem,
   TextInput,
@@ -194,7 +193,7 @@ import { __ } from "@helpdesk/shared/translation";
 import PortalCollapse from "@app/components/ui/PortalCollapse.vue";
 import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
-import { categoryIcon } from "@helpdesk/shared/categoryIcons";
+import CategoryIcon from "@helpdesk/shared/CategoryIcon.vue";
 import { matchesQuery } from "@helpdesk/shared/utils";
 import { prefetchOnHover, sidebarState } from "@app/stores/knowledgeBase";
 
