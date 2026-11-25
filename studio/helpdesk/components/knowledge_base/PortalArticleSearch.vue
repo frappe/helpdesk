@@ -342,8 +342,8 @@ const options = computed(() =>
   /* only the 1px edge shows, around the box that sits on top */
   padding: 1px;
   -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
+    linear-gradient(var(--ink-gray-9) 0 0) content-box,
+    linear-gradient(var(--ink-gray-9) 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
 }
