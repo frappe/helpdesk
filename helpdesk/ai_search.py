@@ -51,24 +51,19 @@ def get_product_name() -> str:
 
 
 def answer(question: str, user: str) -> dict:
-    """The articles `user` may read that match `question`. Flow cannot yet run its agent for
-    portal readers (see KNOWLEDGE_BASE.md), so `answer` and `sources` stay empty until it can.
+    """The articles `user` may read that match `question`, or a refusal when none do.
+    Flow cannot yet run its agent for portal readers (see KNOWLEDGE_BASE.md), so no answer is written.
     """
     articles = find_articles(question, user)
     if not articles:
         return refusal()
     related = [get_related(article) for article in articles.values()]
-    return {
-        "answer": None,
-        "refused": False,
-        "sources": [],
-        "related": related[:RELATED_LIMIT],
-    }
+    return {"refused": False, "related": related[:RELATED_LIMIT]}
 
 
 def refusal() -> dict:
     message = _("I can only help with {0}.").format(get_product_name())
-    return {"answer": message, "refused": True, "sources": [], "related": []}
+    return {"refused": True, "message": message, "related": []}
 
 
 def get_readable_knowledge_bases(user: str) -> list[str]:
