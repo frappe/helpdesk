@@ -24,7 +24,12 @@
 <script setup lang="ts">
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { AGENT_ROLES, type AgentRole, getInviteByEmailRoles } from "@/utils";
+import {
+  AGENT_ROLES,
+  type AgentRole,
+  getInviteByEmailRoles,
+  handleInviteUserSuccess,
+} from "@/utils";
 import { InviteStep, useOnboarding } from "@framework/ui";
 import { call } from "frappe-ui";
 import { normalizeEmail, useSetupFlow } from "./setup";
@@ -81,6 +86,9 @@ async function send(role: string, emails: string[]) {
       ...result.pending_invite_emails
     );
     capture("agents_invited", { data: { role, source: "setup" } });
+    // Names who was invited, who already had an account and who was invited before;
+    // the step itself names the disabled users.
+    handleInviteUserSuccess({ ...result, disabled_user_emails: [] });
     return {
       invited: result.invited_emails.length,
       failed: result.disabled_user_emails,

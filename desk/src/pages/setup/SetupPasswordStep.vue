@@ -36,7 +36,7 @@ const labels = {
   ),
   show: __("Show password"),
   hide: __("Hide password"),
-  save: __("Save and continue"),
+  save: __("Save"),
   failed: __("Could not save your password"),
   confirmLabel: __("Confirm password"),
   confirmPlaceholder: "••••••••",
