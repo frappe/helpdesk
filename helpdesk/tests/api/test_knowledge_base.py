@@ -2147,7 +2147,6 @@ class TestAnswerQuestion(IntegrationTestCase):
 
     def test_it_is_not_ready_without_an_embedding_model(self) -> None:
         frappe.db.set_single_value("Flow Knowledge Settings", "embedding_model", None)
-        frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
 
         with self.assertRaises(AISearchNotReadyError):
             self.ask("Guest")
