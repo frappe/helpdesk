@@ -61,8 +61,6 @@ function createSetupFlow() {
     handingOver: false,
     /** The site's own tickets, swapped into the preview just before it grows. */
     landing: null as TicketRow[] | null,
-    /** The welcome ticket the server returns when setup ends, which the desk opens first. */
-    welcomeTicket: null as string | null,
     /** The real ticket page the preview opens at the hand-over, loaded behind the list. */
     landingTicket: null as string | null,
     landingOpen: false,
@@ -180,9 +178,7 @@ function createSetupFlow() {
 
   function finishSetup() {
     completing = completeSetup();
-    completing
-      .then((ticket) => (setup.welcomeTicket = ticket))
-      .catch((e) => reportError("complete_setup", e));
+    completing.catch((e) => reportError("complete_setup", e));
     movedAt = performance.now();
     // Below lg the preview is hidden, so there is nothing to grow into the desk.
     if (!window.matchMedia?.("(min-width: 1024px)").matches) return openDesk();
@@ -216,6 +212,8 @@ function createSetupFlow() {
   return {
     setup,
     steps,
+    /** Resolves once the server has ended setup, with the welcome ticket it made, if any. */
+    setupEnded: () => completing.catch(() => null),
     /** Valid, unique emails typed on the Team step, in order. */
     invitees,
     invited,

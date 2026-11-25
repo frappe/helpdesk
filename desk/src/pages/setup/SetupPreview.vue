@@ -272,13 +272,13 @@ import { __ } from "@/translation";
 import { SetupPreviewFrame, SetupPreviewLogin } from "@framework/ui";
 import { usePreferredReducedMotion } from "@vueuse/core";
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { Button, call, dayjsLocal } from "frappe-ui";
+import { Button, createListResource, dayjsLocal } from "frappe-ui";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import SetupPreviewDesk from "./SetupPreviewDesk.vue";
 import { SAMPLE_TICKET, nameOf } from "./preview";
 import { type TicketRow, useSetupFlow } from "./setup";
 
-const { brand, invitees, openDesk, setup } = useSetupFlow();
+const { brand, invitees, openDesk, setup, setupEnded } = useSetupFlow();
 
 type Page = "login" | "home" | "desk-list" | "desk-ticket" | "portal-ticket";
 type Point = { x: number; y: number };
@@ -370,9 +370,10 @@ watch(
   async (handingOver) => {
     if (!handingOver) return;
     const started = performance.now();
+    // The server makes the welcome ticket as setup ends, so the list waits for it.
+    const welcome = await setupEnded();
     setup.landing = await siteTickets().catch(() => null);
-    const welcome = setup.welcomeTicket ?? setup.landing?.at(-1)?.id;
-    setup.landingTicket = welcome ?? null;
+    setup.landingTicket = welcome;
     const grow = () => {
       cursor.value = null;
       expanded.value = true;
@@ -395,31 +396,33 @@ watch(
 );
 onBeforeUnmount(() => clearTimeout(growLater));
 
+type SiteTicket = {
+  name: string;
+  subject: string;
+  status: string;
+  priority: string;
+  agreement_status: string | null;
+  _assign: string | null;
+  creation: string;
+};
+const siteTicketList = createListResource({
+  doctype: "HD Ticket",
+  fields: [
+    "name",
+    "subject",
+    "status",
+    "priority",
+    "agreement_status",
+    "_assign",
+    "creation",
+  ],
+  orderBy: "creation desc",
+  pageLength: 20,
+});
+
 async function siteTickets(): Promise<TicketRow[]> {
-  const tickets = await call<
-    {
-      name: string;
-      subject: string;
-      status: string;
-      priority: string;
-      agreement_status: string | null;
-      _assign: string | null;
-      creation: string;
-    }[]
-  >("frappe.client.get_list", {
-    doctype: "HD Ticket",
-    fields: [
-      "name",
-      "subject",
-      "status",
-      "priority",
-      "agreement_status",
-      "_assign",
-      "creation",
-    ],
-    order_by: "creation desc",
-    limit_page_length: 20,
-  });
+  await siteTicketList.reload();
+  const tickets: SiteTicket[] = siteTicketList.data ?? [];
   return tickets.map((t) => ({
     id: t.name,
     subject: t.subject,
