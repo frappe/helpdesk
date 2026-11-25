@@ -181,7 +181,7 @@ class HDTicket(Document, CustomerEditController):
         if not send_feedback_email:
             return
 
-        last_communication = self.get_last_communication()
+        in_reply_to = self._last_threadable_communication()
 
         url = f"{frappe.utils.get_url()}/ticket-feedback/new?key={self.key}"
         feedback_email_content = frappe.db.get_single_value(
@@ -191,7 +191,7 @@ class HDTicket(Document, CustomerEditController):
         try:
             frappe.sendmail(
                 recipients=[self.raised_by],
-                subject=f"Re: {self.subject}",
+                subject=self.get_reply_subject(in_reply_to),
                 message=self._get_rendered_template(
                     feedback_email_content,
                     default_feedback_email_content,
@@ -200,7 +200,7 @@ class HDTicket(Document, CustomerEditController):
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
                 now=self.instantly_send_email(),
-                in_reply_to=last_communication.name if last_communication else None,
+                in_reply_to=in_reply_to,
                 email_headers={"X-Auto-Generated": "hd-email-feedback"},
             )
             frappe.msgprint(_("Feedback email has been sent to the customer"))
@@ -610,6 +610,11 @@ class HDTicket(Document, CustomerEditController):
             order_by="creation desc",
         )
 
+    def get_reply_subject(self, in_reply_to: str | None) -> str:
+        """`Re:` only with a parent to thread on; spam filters flag a `Re:` without
+        In-Reply-To as a fake reply."""
+        return f"Re: {self.subject}" if in_reply_to else self.subject
+
     def last_communication_email(self):
         if not (communication := self.get_last_communication()):
             return
@@ -721,7 +726,8 @@ class HDTicket(Document, CustomerEditController):
             )
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
-        subject = f"Re: {self.subject}"
+        in_reply_to = self._last_threadable_communication()
+        subject = self.get_reply_subject(in_reply_to)
         from_email_id = from_email.get("email_id") if from_email else None
         email_account_name = from_email.get("email_account") if from_email else None
         sender = from_email_id or frappe.session.user
@@ -757,10 +763,9 @@ class HDTicket(Document, CustomerEditController):
                 "sent_or_received": "Sent",
                 "status": "Linked",
                 "subject": subject,
+                "in_reply_to": in_reply_to,
             }
         )
-
-        communication.in_reply_to = self._last_threadable_communication()
 
         # Each reply needs its own id so the next reply can point at it. Saved after
         # the send below, not here.
@@ -957,7 +962,8 @@ class HDTicket(Document, CustomerEditController):
         try:
             frappe.sendmail(
                 recipients=recipients,
-                subject=f"Re: {self.subject} - #{self.name}",
+                # a notice, not a reply to a mail the agents got, so no `Re:`
+                subject=_("New reply on #{0}: {1}").format(self.name, self.subject),
                 message=self._get_rendered_template(
                     email_content,
                     default_email_content,
