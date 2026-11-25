@@ -66,15 +66,14 @@
           />
           <div class="flex items-center gap-2">
             <Badge :label="__(source.status)" theme="gray" variant="subtle" />
-            <Tooltip :text="__('More actions')">
-              <Dropdown :options="rowActions(source)" align="end">
-                <Button
-                  variant="ghost"
-                  icon="lucide-ellipsis"
-                  :aria-label="__('More actions')"
-                />
-              </Dropdown>
-            </Tooltip>
+            <Dropdown :options="rowActions(source)" align="end">
+              <Button
+                variant="ghost"
+                icon="lucide-ellipsis"
+                :tooltip="__('More actions')"
+                :aria-label="__('More actions')"
+              />
+            </Dropdown>
           </div>
         </div>
       </div>
@@ -191,7 +190,6 @@ import {
   Select,
   TabButtons,
   toast,
-  Tooltip,
 } from "frappe-ui";
 import { useTimeoutPoll } from "@vueuse/core";
 import { reactive, ref, watch } from "vue";
