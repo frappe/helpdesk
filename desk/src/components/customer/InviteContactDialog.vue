@@ -124,7 +124,6 @@ interface InviteResult {
   pending_invite_emails: string[];
   accepted_invite_emails: string[];
   disabled_user_emails: string[];
-  standard_user_emails?: string[];
 }
 
 const roleOptions = [
