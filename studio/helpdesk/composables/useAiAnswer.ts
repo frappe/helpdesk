@@ -7,17 +7,10 @@ const MATCH_LIMIT = 6
 
 export function useAiAnswer(question: Ref<string>) {
   const session = useSession()
-  const isLimited = ref(false)
   const answer = createResource({
     url: 'helpdesk.api.knowledge_base.answer_question',
     method: 'POST',
     makeParams: () => ({ question: question.value }),
-    onSuccess(data) {
-      if (!data.limited) return
-      // Past today's limit: the session turns AI search off, and plain matches take over.
-      isLimited.value = true
-      session.reloadSession()
-    },
   })
 
   // Plain matches stand in while AI search is off, or when the answer fails.
@@ -25,7 +18,7 @@ export function useAiAnswer(question: Ref<string>) {
   const matches = useArticleSearch(matchQuery, { limit: MATCH_LIMIT })
 
   const isReady = computed(() => Boolean(session.config.value))
-  const isAiOn = computed(() => session.isAiSearchEnabled.value && !isLimited.value)
+  const isAiOn = computed(() => session.isAiSearchEnabled.value)
   const isFailed = computed(() => Boolean(answer.error))
   const showMatches = computed(() => isReady.value && (!isAiOn.value || isFailed.value))
   const isLoading = computed(() => !isReady.value || (isAiOn.value && !answer.data && !isFailed.value))
@@ -45,5 +38,5 @@ export function useAiAnswer(question: Ref<string>) {
   )
   watch(isFailed, (failed) => failed && (matchQuery.value = question.value))
 
-  return { answer, matches, isFailed, isLimited, isLoading, showMatches }
+  return { answer, matches, isFailed, isLoading, showMatches }
 }

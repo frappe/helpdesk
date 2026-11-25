@@ -19,7 +19,6 @@ from helpdesk.test_utils import (
     enable_ai_search,
     fake_flow_knowledge,
     make_agent_manager,
-    reset_ai_question_counts,
 )
 
 CUSTOMER = "home-page-customer@example.com"
@@ -317,25 +316,6 @@ class TestAISearchSettings(IntegrationTestCase):
 
         enable_ai_search(enable_ai_search=0)
         with self.set_user("Guest"):
-            self.assertFalse(get_config().ai_search_enabled)
-
-    def test_the_daily_limit_starts_at_20_and_must_be_at_least_1(self) -> None:
-        self.assertEqual(frappe.get_meta("HD Settings").get_field("ai_daily_question_limit").default, "20")
-        with self.assertRaises(frappe.ValidationError):
-            enable_ai_search(ai_daily_question_limit=0)
-
-    def test_a_visitor_past_the_daily_limit_is_told_it_is_off(self) -> None:
-        from helpdesk.api.knowledge_base import answer_question
-
-        frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
-        enable_ai_search(ai_daily_question_limit=1)
-        reset_ai_question_counts()
-        with (
-            self.set_user("Guest"),
-            patch("frappe.flow.knowledge.retriever.retrieve", return_value=[]),
-        ):
-            self.assertTrue(get_config().ai_search_enabled)
-            answer_question("How do I fix my wifi?")
             self.assertFalse(get_config().ai_search_enabled)
 
     def test_a_guest_is_told_it_is_off_while_the_knowledge_base_is_private(

@@ -1254,7 +1254,6 @@ def enable_ai_search(**overrides) -> frappe.Document:
             "ai_provider": "openai",
             "ai_api_key": "sk-test-key",
             "ai_model": "gpt-4.1-mini",
-            "ai_daily_question_limit": 20,
             **overrides,
         }
     )
@@ -1306,79 +1305,3 @@ def fake_flow_knowledge():
         frappe.clear_document_cache(
             "Flow Knowledge Settings", "Flow Knowledge Settings"
         )
-
-
-def reset_ai_question_counts() -> None:
-    """Forget every visitor's AI questions today, so each test starts under the daily limit."""
-    from helpdesk.ai_search import QUESTION_COUNT_KEY
-
-    frappe.cache.delete_keys(QUESTION_COUNT_KEY)
-
-
-class FakeWebResponse:
-    """Enough of a `requests` response for Flow to read a web page."""
-
-    def __init__(self, text: str, status_code: int = 200):
-        self.text = text
-        self.status_code = status_code
-        self.is_redirect = False
-        self.headers = {"Content-Type": "text/html"}
-
-    def raise_for_status(self) -> None:
-        if self.status_code >= 400:
-            import requests
-
-            raise requests.HTTPError(f"{self.status_code} Error")
-
-    def iter_content(self, _size: int):
-        yield self.text.encode()
-
-    def close(self) -> None:
-        pass
-
-
-@contextmanager
-def fake_web(pages: dict[str, str | int]):
-    """Serve `pages` (url to HTML, or to an HTTP error code) in place of the internet,
-    with every host public. A url not in `pages` is a 404."""
-
-    def get(url, **_kwargs):
-        page = pages.get(url, 404)
-        if isinstance(page, int):
-            return FakeWebResponse("", status_code=page)
-        return FakeWebResponse(page)
-
-    public = [(2, 1, 6, "", ("93.184.216.34", 0))]
-    with (
-        patch("requests.get", side_effect=get),
-        patch("socket.getaddrinfo", return_value=public),
-    ):
-        yield
-
-
-def make_private_file(file_name: str, content: str = "Some text") -> str:
-    """Upload a private File called `file_name` and return its URL."""
-    return (
-        frappe.get_doc(
-            {
-                "doctype": "File",
-                "file_name": file_name,
-                "content": content,
-                "is_private": 1,
-            }
-        )
-        .insert(ignore_permissions=True)
-        .file_url
-    )
-
-
-def clear_ai_sources() -> None:
-    """Delete every knowledge source added in the AI search tab."""
-    from helpdesk.ai_search import SOURCE_KNOWLEDGE_BASES
-
-    for name in frappe.get_all(
-        "Flow Knowledge Source",
-        {"knowledge_base": ["in", list(SOURCE_KNOWLEDGE_BASES.values())]},
-        pluck="name",
-    ):
-        frappe.delete_doc("Flow Knowledge Source", name, ignore_permissions=True)

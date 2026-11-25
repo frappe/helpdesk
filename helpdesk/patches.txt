@@ -69,4 +69,3 @@ helpdesk.patches.hd_article_category_tree
 helpdesk.patches.set_ticket_source
 helpdesk.patches.show_ticket_source_notice
 helpdesk.patches.mark_existing_sites_set_up
-helpdesk.patches.set_ai_daily_question_limit

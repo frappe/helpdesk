@@ -2,7 +2,7 @@
   <SettingsLayoutBase
     :description="
       __(
-        'Search the knowledge base by meaning, from the articles and sources each reader may see.'
+        'Search the knowledge base by meaning, from the articles each reader may see.'
       )
     "
   >
@@ -65,7 +65,7 @@
               {{ __("Language model") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
-              {{ __("Connect your own provider for the assistant.") }}
+              {{ __("Connect your own provider and model.") }}
             </span>
           </div>
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -94,42 +94,14 @@
           </div>
         </section>
 
-        <AISearchSources />
-        <AISearchSkills />
-
-        <section class="flex flex-col gap-4">
-          <span class="text-base-semibold text-ink-gray-9">
-            {{ __("Limits and guardrails") }}
-          </span>
-          <div class="flex items-center justify-between gap-8">
-            <div class="flex flex-col gap-1">
-              <span class="text-base-medium text-ink-gray-8">
-                {{ __("Daily questions per visitor") }}
-              </span>
-              <span class="text-p-sm text-ink-gray-6">
-                {{
-                  __(
-                    "Past the limit, search shows matching articles without AI."
-                  )
-                }}
-              </span>
-            </div>
-            <FormControl
-              v-model.number="draft.dailyLimit"
-              type="number"
-              class="w-24 shrink-0"
-              :aria-label="__('Daily questions per visitor')"
-            />
-          </div>
-          <p class="flex items-start gap-1.5 text-p-sm text-ink-gray-6">
-            <LucideShieldCheck class="mt-0.5 size-3.5 shrink-0" />
-            {{
-              __(
-                "Guardrails are always on: the assistant only helps with your product and your sources."
-              )
-            }}
-          </p>
-        </section>
+        <p class="flex items-start gap-1.5 text-p-sm text-ink-gray-6">
+          <LucideShieldCheck class="mt-0.5 size-3.5 shrink-0" />
+          {{
+            __(
+              "Results come only from the articles each reader may see, and off-topic questions match nothing."
+            )
+          }}
+        </p>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -152,8 +124,6 @@ import { computed, onUnmounted, reactive, ref, watch } from "vue";
 import LucideShieldCheck from "~icons/lucide/shield-check";
 import LucideWorkflow from "~icons/lucide/workflow";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import AISearchSkills from "./AISearchSkills.vue";
-import AISearchSources from "./AISearchSources.vue";
 
 const PROVIDERS = [
   { label: "OpenAI", value: "openai" },
@@ -171,7 +141,6 @@ const draft = reactive({
   provider: "",
   model: "",
   apiKey: "",
-  dailyLimit: 20,
 });
 // The saved key is masked, so a changed key is a new one.
 const saved = reactive({ ...draft });
@@ -195,7 +164,6 @@ function load(data: Record<string, any>) {
     provider: data.ai_provider || "",
     model: data.ai_model || "",
     apiKey: data.ai_api_key || "",
-    dailyLimit: data.ai_daily_question_limit,
   });
   Object.assign(saved, draft);
 }
@@ -230,7 +198,6 @@ const save = createResource({
     fieldname: {
       ai_provider: draft.provider,
       ai_model: draft.model,
-      ai_daily_question_limit: draft.dailyLimit,
       ...(draft.apiKey !== saved.apiKey && { ai_api_key: draft.apiKey }),
     },
   }),

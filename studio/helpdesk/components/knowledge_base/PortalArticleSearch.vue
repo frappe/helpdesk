@@ -316,9 +316,15 @@ const options = computed(() =>
 </script>
 
 <style>
-/* A soft pastel ring that brightens on focus; it should whisper, not shout. */
+/* A soft gray ring from theme tokens that brightens on focus, in light and dark. */
 .search-ring {
-  --ring-gradient: linear-gradient(90deg, #a5b4fc, #d8b4fe, #f9a8d4, #fcd34d);
+  --ring-gradient: linear-gradient(
+    90deg,
+    var(--outline-gray-3),
+    var(--ink-gray-5),
+    var(--outline-gray-4),
+    var(--ink-gray-4)
+  );
 }
 .search-ring-edge,
 .search-ring-glow {

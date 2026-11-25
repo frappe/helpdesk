@@ -53,14 +53,7 @@
         <h1 class="break-words text-xl font-semibold text-ink-gray-9">
           {{ question }}
         </h1>
-        <p v-if="isLimited" class="text-p-base text-ink-gray-6">
-          {{
-            __(
-              "You've used today's AI searches. Here are matching articles instead."
-            )
-          }}
-        </p>
-        <p v-else-if="isFailed" class="text-p-base text-ink-gray-6">
+        <p v-if="isFailed" class="text-p-base text-ink-gray-6">
           {{
             matches.data?.length
               ? __("Something went wrong on our side. These articles may help.")
@@ -114,30 +107,6 @@
           </div>
         </div>
 
-        <div v-if="answer.data.links.length" class="flex flex-col gap-3">
-          <h2 class="text-p-sm font-medium text-ink-gray-6">
-            {{ __("From the docs") }}
-          </h2>
-          <ul
-            class="divide-y divide-outline-gray-1 rounded-6 border border-outline-gray-2"
-          >
-            <li v-for="link in answer.data.links" :key="link.url">
-              <a
-                :href="link.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center gap-3 px-4 py-3 text-base text-ink-gray-8 hover:bg-surface-gray-1 focus-visible:focus-ring"
-              >
-                <LucideGlobe class="size-4 shrink-0 text-ink-gray-5" />
-                <span class="min-w-0 flex-1 truncate">
-                  {{ prettyUrl(link.url) }}
-                </span>
-                <LucideArrowUpRight class="size-4 shrink-0 text-ink-gray-4" />
-              </a>
-            </li>
-          </ul>
-        </div>
-
         <p
           class="flex items-center gap-1.5 text-xs text-ink-gray-5"
           data-testid="powered-by-flow"
@@ -155,8 +124,6 @@ import { computed, onUnmounted, ref, toRef, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Button } from "frappe-ui";
 import LucideArrowLeft from "~icons/lucide/arrow-left";
-import LucideArrowUpRight from "~icons/lucide/arrow-up-right";
-import LucideGlobe from "~icons/lucide/globe";
 import LucideWorkflow from "~icons/lucide/workflow";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { __ } from "@helpdesk/shared/translation";
@@ -179,7 +146,7 @@ const props = defineProps<{ question: string }>();
 
 const router = useRouter();
 const session = useSession();
-const { answer, matches, isFailed, isLimited, isLoading, showMatches } =
+const { answer, matches, isFailed, isLoading, showMatches } =
   useAiAnswer(toRef(props, "question"));
 
 // The status line moves on while the search runs, so a slow one still feels alive.
@@ -211,10 +178,6 @@ const canRaiseTicket = computed(
 function raiseTicket() {
   if (session.isGuest.value) return session.signIn();
   router.push(ROUTES.newTicket({ from: "search", q: props.question }));
-}
-
-function prettyUrl(url: string) {
-  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 </script>
 
