@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-2" role="radiogroup">
+      <div class="flex flex-wrap items-center gap-2" role="radiogroup">
         <Tooltip :text="__('None')">
           <button
             type="button"
@@ -45,7 +45,7 @@
             :aria-label="presetLabel(option.name)"
             :aria-checked="!image && preset === option.name"
             :class="[swatch, ring(!image && preset === option.name)]"
-            :style="{ background: option.background }"
+            :style="{ background: bannerPresetBackground(option.name, dark) }"
             @click="save('', option.name)"
           />
         </Tooltip>
@@ -95,8 +95,14 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { BANNER_PRESETS, findBannerPreset } from "../knowledgeBaseBanner";
-import { Button, FileUploader, Tooltip, SettingsRow } from "frappe-ui";
+import { BANNER_PRESETS, bannerPresetBackground } from "../knowledgeBaseBanner";
+import {
+  Button,
+  FileUploader,
+  Tooltip,
+  SettingsRow,
+  useResolvedColorScheme,
+} from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import LucideBan from "~icons/lucide/ban";
 import LucideSearch from "~icons/lucide/search";
@@ -115,7 +121,7 @@ watch(
 );
 
 const swatch =
-  "size-8 shrink-0 rounded-[8px] border [--banner-pattern-scale:0.4] border-outline-gray-2 outline outline-[1.5px] outline-offset-2 transition-[outline-color]";
+  "size-8 shrink-0 rounded-[8px] border border-outline-gray-2 outline outline-[1.5px] outline-offset-2 transition-[outline-color]";
 
 function ring(selected: boolean) {
   return selected
@@ -123,10 +129,13 @@ function ring(selected: boolean) {
     : "outline-transparent hover:outline-[--outline-gray-2]";
 }
 
+const colorScheme = useResolvedColorScheme();
+const dark = computed(() => colorScheme.value === "dark");
+
 const previewBackground = computed(() =>
   props.image
     ? imageBackground(props.image)
-    : findBannerPreset(props.preset)?.background || ""
+    : bannerPresetBackground(props.preset, dark.value)
 );
 
 function imageBackground(url: string) {
@@ -140,10 +149,11 @@ function uploadLabel(uploading: boolean, progress: number) {
 
 function presetLabel(name: string) {
   return {
-    Gray: __("Gray"),
-    Blue: __("Blue"),
-    Violet: __("Violet"),
-    Lines: __("Lines"),
+    "Soft Grain": __("Soft Grain"),
+    "Aurora Mist": __("Aurora Mist"),
+    "Aurora Mint": __("Aurora Mint"),
+    "Aurora Dusk": __("Aurora Dusk"),
+    "Mesh Blue": __("Mesh Blue"),
   }[name];
 }
 

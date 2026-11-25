@@ -15,9 +15,11 @@ Agents write articles in the desk at `/helpdesk/kb`. Customers and guests read t
 - `public_knowledge_base`: guests can read the KB. If it is off, guests must sign in.
 - `prefer_knowledge_base`: the customer home is the KB (`/help`), not the ticket list (`/help/my-tickets`).
 - `allow_anonymous_article_voting`: guests can vote.
-- `banner_image`, `banner_preset`: the banner on the KB home.
+- `banner_image`, `banner_preset`: the banner on the KB home. The presets (Soft Grain, the default, Aurora Mist, Aurora Mint, Aurora Dusk and Mesh Blue) live in `shared/src/knowledgeBaseBanner.ts`; dark mode derives its colours from them.
 - `banner_title`, `banner_subtitle`: the KB home heading and the text under it. Empty uses the default text.
 - `show_footer`, `footer_tagline`, `footer_copyright`, `footer_items`, `social_links`: the KB footer. `footer_items` is a `Top Bar Item` table, as in Website Settings: a row without `parent_label` is a column; link rows name their column in `parent_label`. `social_links` is a `Top Bar Item` table too. `validate_footer` allows at most four columns with different titles and only web, email and `/` links in both tables.
+
+A category `icon` is a lucide name (`lucide-rocket`) or an image URL. `shared/src/CategoryIcon.vue` draws either, and every place that shows a category icon uses it. The desk category dialog uploads images through `upload_category_icon`, which accepts only images, strips scripts and event handlers from SVGs, and saves them as public files in `Home/Category Icons` under a random name. `get_category_icons` lists those uploads, newest first, and the image icons categories already use.
 
 Within a category, every article list (`get_articles` with a `category`, `get_subcategory_articles`, `get_kb_sidebar`) sorts by `weight` first, heaviest on top. Pins never touch the weight; Featured reads them by `pinned_order`.
 

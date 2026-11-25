@@ -657,7 +657,7 @@ test.describe("customer portal settings", () => {
     const page = await pageAs("admin");
     const dialog = await openSettingsAt(page, "settings/knowledge-base");
     // Switches save at once, so the banner makes the edit.
-    await dialog.getByRole("radio", { name: before.banner_preset === "Blue" ? "None" : "Blue" }).click();
+    await dialog.getByRole("radio", { name: before.banner_preset === "Mesh Blue" ? "None" : "Mesh Blue" }).click();
     await expect(dialog.getByText("Unsaved", { exact: true })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(dialog).toBeVisible();
