@@ -11,7 +11,7 @@
             : 'w-full px-2 hover:bg-surface-gray-3'
         "
       >
-        <Brand :logo="config.brandLogo" size="lg">
+        <Brand :logo="config.brandLogo" size="lg" class="shrink-0">
           <template #fallback>
             <HDLogo class="size-8 shrink-0 rounded-4" />
           </template>
