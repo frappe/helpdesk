@@ -192,6 +192,7 @@ import {
   TabButtons,
   toast,
 } from "frappe-ui";
+import { useTimeoutPoll } from "@vueuse/core";
 import { reactive, ref, watch } from "vue";
 import LucideFileText from "~icons/lucide/file-text";
 import LucideGlobe from "~icons/lucide/globe";
@@ -228,14 +229,13 @@ const POLL_MS = 5000;
 const sources = createResource({ url: `${API}.get_sources`, auto: true });
 
 // Sources sync in the background, so check again while any is syncing.
-let poll: ReturnType<typeof setTimeout> | undefined;
+const { pause, resume } = useTimeoutPoll(() => sources.reload(), POLL_MS, {
+  immediate: false,
+});
 watch(
   () => sources.data,
-  (rows: Source[] | undefined) => {
-    clearTimeout(poll);
-    if (rows?.some((row) => row.status === "Syncing"))
-      poll = setTimeout(() => sources.reload(), POLL_MS);
-  }
+  (rows: Source[] | undefined) =>
+    rows?.some((row) => row.status === "Syncing") ? resume() : pause()
 );
 
 const showAdd = ref(false);

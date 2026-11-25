@@ -47,8 +47,19 @@ SOURCE_STATUS = {
     "Completed": "Ready",
     "Failed": "Failed",
 }
-SOURCE_FIELDS = ["name", "title", "source_type", "url", "file", "knowledge_base"]
-SOURCE_FIELDS += ["status", "error_log"]
+SOURCE_LABELS = {
+    SOURCE_KNOWLEDGE_BASES[value]: label for label, value in SOURCE_VISIBILITY.items()
+}
+SOURCE_FIELDS = [
+    "name",
+    "title",
+    "source_type",
+    "url",
+    "file",
+    "knowledge_base",
+    "status",
+    "error_log",
+]
 URL_CHECK_TIMEOUT = 10
 INSTRUCTIONS = (
     "You are the knowledge base assistant for {product}.\n"
@@ -260,18 +271,13 @@ def get_sources() -> list[dict]:
 
 
 def get_source_row(source) -> dict:
-    audience = next(
-        key for key, kb in SOURCE_KNOWLEDGE_BASES.items() if kb == source.knowledge_base
-    )
     status = SOURCE_STATUS.get(source.status, "Syncing")
     return {
         "name": source.name,
         "title": source.title,
         "source_type": source.source_type,
         "url": source.url,
-        "visibility": next(
-            label for label, value in SOURCE_VISIBILITY.items() if value == audience
-        ),
+        "visibility": SOURCE_LABELS[source.knowledge_base],
         "status": status,
         "error": get_sync_error(source.error_log) if status == "Failed" else None,
     }
