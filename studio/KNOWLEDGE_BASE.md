@@ -131,7 +131,7 @@ A question searches only the bases its asker may read, a guest or a user without
 
 Before any passage reaches the model, its article is read again with `make_article_filters`. An article narrowed, unpublished or deleted after it was indexed is dropped even while the index is behind.
 
-Saving or deleting an article queues `index_article` (queue `short`) while AI search is on. Turning AI search on queues `index_all_articles` (queue `long`). An unpublished or deleted article leaves the index; a narrowed one moves to the base of its new audience.
+Saving or deleting an article queues `index_article` (queue `short`) while AI search is on and an embedding model is set. Turning AI search on queues `index_all_articles` (queue `long`). An unpublished or deleted article leaves the index; a narrowed one moves to the base of its new audience.
 
 ### Answering
 
@@ -147,6 +147,10 @@ Saving or deleting an article queues `index_article` (queue `short`) while AI se
 ```
 
 `related` are the matching articles the asker may read, at most 4. A question nothing readable matches gets `refused` set, "I can only help with <product>." as `message`, and nothing else. No model is called, so there is no answer text or cited sources until the blocker below is fixed.
+
+A passage counts as a match only when its cosine similarity is at least `MIN_VECTOR_SCORE` (0.3), so an off-topic question is refused even though articles exist.
+
+**Blocker: off-topic questions are refused only with Flow's Vector search.** Flow's retriever always returns the top passages, and under Hybrid search (Flow's default) their `score` is LanceDB's rank-fused (RRF) score, which says how a passage ranked, not how relevant it is. Helpdesk cannot tell an off-topic question from an on-topic one there, so it applies the threshold only when **Flow Knowledge Settings → Search Type** is Vector. Fix in Flow: return each hit's vector similarity in hybrid mode too, then apply the threshold always.
 
 **Blocker: Flow cannot run an agent for portal readers.** Flow runs agents only as sessions on its flow server (`frappe.flow.lib.agent.Agent.run`). A session needs read access to the `Flow Agent` and `Flow Model` (roles System Manager and Flow User), belongs to a signed-in owner whose callbacks act as that user, and runs asynchronously. Guests and customers have none of that, and Flow has no synchronous call. Calling the model directly with LiteLLM would bypass Flow's runtime, so Helpdesk does not. Once Flow can run an agent for a guest, send the retrieved articles to `helpdesk/kb-assistant`, add `answer` (citing `[n]`) and `sources` to the response, and render them on the portal page with the streamed answer, follow-ups and "Powered by Flow". Until then the portal does not call the page an answer: the search row reads "See the best matches for …", not "Ask AI".
 

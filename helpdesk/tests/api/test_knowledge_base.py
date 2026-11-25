@@ -2142,6 +2142,19 @@ class TestAnswerQuestion(IntegrationTestCase):
             },
         )
 
+    def test_an_off_topic_question_is_refused_though_articles_exist(self) -> None:
+        frappe.db.set_single_value("Flow Knowledge Settings", "search_type", "Vector")
+        frappe.db.set_single_value("HD Settings", "brand_name", "Acme Desk")
+
+        self.assertEqual(
+            self.ask(self.agent, question="What is the weather today?"),
+            {
+                "refused": True,
+                "message": "I can only help with Acme Desk.",
+                "related": [],
+            },
+        )
+
     def test_the_question_is_capped(self) -> None:
         with patch(
             "frappe.flow.knowledge.retriever.retrieve", return_value=[]
@@ -2165,6 +2178,7 @@ class TestAIIndexUpdates(IntegrationTestCase):
 
     def setUp(self) -> None:
         self.enqueue = self.enterContext(patch("frappe.enqueue"))
+        self.enterContext(fake_flow_knowledge())
 
     def jobs(self) -> list[str]:
         return [
@@ -2190,6 +2204,17 @@ class TestAIIndexUpdates(IntegrationTestCase):
         frappe.delete_doc("HD Article", name, force=True)
 
         self.assertEqual(self.jobs(), [name])
+
+    def test_nothing_is_queued_without_an_embedding_model(self) -> None:
+        enable_ai_search()
+        frappe.db.set_single_value(
+            "Flow Knowledge Settings", "embedding_model", None
+        )
+        frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
+
+        make_article()
+
+        self.assertEqual(self.jobs(), [])
 
     def test_nothing_is_queued_while_ai_search_is_off(self) -> None:
         enable_ai_search(enable_ai_search=0)

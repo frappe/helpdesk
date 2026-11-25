@@ -98,7 +98,7 @@
           <LucideShieldCheck class="mt-0.5 size-3.5 shrink-0" />
           {{
             __(
-              "Results come only from the articles each reader may see, and off-topic questions match nothing."
+              "Results come only from the articles each reader may see."
             )
           }}
         </p>

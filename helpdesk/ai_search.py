@@ -40,6 +40,8 @@ INSTRUCTIONS = (
 )
 RETRIEVE_LIMIT = 8
 RELATED_LIMIT = 4
+# cosine similarity below which a passage is unrelated to the question
+MIN_VECTOR_SCORE = 0.3
 
 
 def is_enabled() -> bool:
@@ -57,8 +59,7 @@ def answer(question: str, user: str) -> dict:
     articles = find_articles(question, user)
     if not articles:
         return refusal()
-    related = [get_related(article) for article in articles.values()]
-    return {"refused": False, "related": related[:RELATED_LIMIT]}
+    return {"refused": False, "related": [get_related(row) for row in articles]}
 
 
 def refusal() -> dict:
@@ -73,15 +74,17 @@ def get_readable_knowledge_bases(user: str) -> list[str]:
     return [KNOWLEDGE_BASES[audience] for audience in audiences]
 
 
-def find_articles(question: str, user: str) -> dict[str, frappe._dict]:
-    """The articles `user` may read that match `question`, best first, each with its passages."""
+def find_articles(question: str, user: str) -> list[frappe._dict]:
+    """The articles `user` may read that match `question`, best first."""
     from frappe.flow.knowledge.retriever import retrieve
 
     passages = retrieve(
         question, kbs=get_readable_knowledge_bases(user), limit=RETRIEVE_LIMIT
     )
     # a passage's source is titled by its article
-    names = list(dict.fromkeys(passage["source"] for passage in passages))
+    names = list(
+        dict.fromkeys(p["source"] for p in passages if is_relevant(p["score"]))
+    )
     readable = {
         row.name: row
         for row in frappe.get_all(
@@ -90,12 +93,15 @@ def find_articles(question: str, user: str) -> dict[str, frappe._dict]:
             fields=["name", "title", "excerpt"],
         )
     }
-    articles: dict[str, frappe._dict] = {}
-    for passage in passages:
-        if row := readable.get(passage["source"]):
-            articles.setdefault(row.name, frappe._dict(row, passages=[]))
-            articles[row.name].passages.append(passage["content"])
-    return articles
+    return [readable[name] for name in names if name in readable][:RELATED_LIMIT]
+
+
+def is_relevant(score: float) -> bool:
+    """Hybrid scores are rank-fused, not absolute, so only vector scores can rule a passage out."""
+    search_type = frappe.get_cached_value(
+        "Flow Knowledge Settings", "Flow Knowledge Settings", "search_type"
+    )
+    return search_type != "Vector" or score >= MIN_VECTOR_SCORE
 
 
 def get_related(article: frappe._dict) -> dict:

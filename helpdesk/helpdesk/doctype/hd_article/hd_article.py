@@ -120,9 +120,13 @@ class HDArticle(Document):
         index_articles([self.name], queue="short")
 
     def update_ai_index(self):
+        from frappe.flow.doctype.flow_knowledge_settings.flow_knowledge_settings import (
+            embeddings_configured,
+        )
+
         from helpdesk import ai_search
 
-        if not ai_search.is_enabled():
+        if not ai_search.is_enabled() or not embeddings_configured():
             return
         frappe.enqueue(
             "helpdesk.ai_search.index_article",
