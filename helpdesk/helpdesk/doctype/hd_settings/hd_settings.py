@@ -6,11 +6,15 @@ from __future__ import unicode_literals
 
 import frappe
 from frappe import _
+from frappe.flow.doctype.flow_knowledge_settings.flow_knowledge_settings import (
+    embeddings_configured,
+)
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
 from frappe.utils.jinja import validate_template
 
+from helpdesk.ai_search import AI_AGENT, AI_MODEL, INSTRUCTIONS, OFF_TOPIC
 from helpdesk.api.auth import validate_uploaded_image
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     sync_brand_to_website_settings,
@@ -36,6 +40,13 @@ class HDSettings(Document):
         # every visitor loads it, so a linked image could track them
         validate_uploaded_image(self.banner_image)
         self.validate_footer()
+        self.validate_ai_search()
+
+    def validate_ai_search(self):
+        self.ai_provider = (self.ai_provider or "").strip().lower()
+        self.ai_model = (self.ai_model or "").strip()
+        if self.enable_ai_search and not (self.ai_provider and self.ai_model):
+            frappe.throw(_("Set a provider and a model to turn on AI search"))
 
     def validate_footer(self):
         """Footer items mirror Website Settings: column rows without a parent, link rows under one."""
@@ -173,11 +184,73 @@ class HDSettings(Document):
     def on_update(self):
         sync_brand_to_website_settings(self)
         sync_home_page_to_website_settings(self)
+        self.sync_ai_search()
 
         event = "helpdesk:settings-updated"
         room = get_website_room()
 
         frappe.publish_realtime(event, room=room, after_commit=True)
+
+    def sync_ai_search(self):
+        """Keep the Flow provider, model and agent the assistant runs on in step with this tab."""
+        if not self.enable_ai_search:
+            return
+        self.sync_flow_provider()
+        model = self.sync_flow_model()
+        self.sync_flow_agent(model)
+        self.index_articles_when_turned_on()
+
+    def sync_flow_provider(self):
+        """A provider the site already has keeps its own key; the model carries ours."""
+        if frappe.db.exists("Flow Provider", self.ai_provider):
+            return
+        frappe.get_doc({"doctype": "Flow Provider", "provider": self.ai_provider}).insert(
+            ignore_permissions=True
+        )
+
+    def sync_flow_model(self) -> str:
+        model = (
+            frappe.get_doc("Flow Model", AI_MODEL)
+            if frappe.db.exists("Flow Model", AI_MODEL)
+            else frappe.new_doc("Flow Model")
+        )
+        model.update(
+            {"title": AI_MODEL, "provider": self.ai_provider, "model_id": self.ai_model, "enabled": 1}
+        )
+        if key := self.get_password("ai_api_key", raise_exception=False):
+            model.api_key = key
+        model.save(ignore_permissions=True)
+        return model.name
+
+    def sync_flow_agent(self, model: str):
+        from frappe.flow.lib.agent import Agent
+
+        agent = Agent(
+            name=AI_AGENT,
+            model=model,
+            description="Answers knowledge base questions from the articles a reader may see",
+            instructions=INSTRUCTIONS.format(
+                product=self.brand_name or "Helpdesk", off_topic=OFF_TOPIC
+            ),
+        )
+        agent.sync()
+        # sync() keeps an existing agent's model, which a settings change must move
+        frappe.db.set_value("Flow Agent", agent.name, "model", model)
+
+    def index_articles_when_turned_on(self):
+        if not self.has_value_changed("enable_ai_search"):
+            return
+        if not embeddings_configured():
+            frappe.msgprint(
+                _("Set an embedding model in Flow Knowledge Settings to index articles"),
+                indicator="orange",
+            )
+            return
+        frappe.enqueue(
+            "helpdesk.ai_search.index_all_articles",
+            queue="long",
+            enqueue_after_commit=True,
+        )
 
     def update_ticket_permissions(self):
         if self.allow_anyone_to_create_tickets:

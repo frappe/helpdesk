@@ -1,4 +1,5 @@
 import json
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -1226,3 +1227,134 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
     cards = HelpdeskDashboard(filters).get_number_card_data()
     return {card["title"]: card for card in cards}
+
+
+def enable_ai_search(**overrides) -> frappe.Document:
+    """Save HD Settings with AI search on and a test provider, key and model; `overrides` win."""
+    settings = frappe.get_single("HD Settings")
+    settings.update(
+        {
+            "enable_ai_search": 1,
+            "ai_provider": "openai",
+            "ai_api_key": "sk-test-key",
+            "ai_model": "gpt-4.1-mini",
+            **overrides,
+        }
+    )
+    return settings.save()
+
+
+EMBEDDING_KEYWORDS = ("wifi", "refund", "password", "invoice")
+
+
+def fake_embed_texts(texts: list[str]) -> list[list[float]]:
+    """Keyword-count vectors, so knowledge search runs offline and ranks by shared words."""
+    return [
+        [float(text.lower().count(word)) for word in EMBEDDING_KEYWORDS] + [0.1]
+        for text in texts
+    ]
+
+
+@contextmanager
+def fake_flow_knowledge():
+    """Run Flow's knowledge indexing and search on `fake_embed_texts`, in a throwaway store.
+    Ingestion commits, so commits are muted to keep the test's rollback whole."""
+    from frappe.flow.knowledge import store
+
+    store.drop_table()
+    model = frappe.get_doc(
+        {
+            "doctype": "Flow Model",
+            "title": unique_name("Test Embeddings"),
+            "model_id": "openai/text-embedding-3-small",
+            "embedding": 1,
+        }
+    ).insert(ignore_permissions=True)
+    frappe.db.set_single_value(
+        "Flow Knowledge Settings",
+        {
+            "embedding_model": model.name,
+            "embedding_dimension": len(EMBEDDING_KEYWORDS) + 1,
+        },
+    )
+    frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
+    try:
+        with (
+            patch("frappe.flow.knowledge.embedder.embed_texts", fake_embed_texts),
+            patch.object(frappe.db, "commit"),
+        ):
+            yield
+    finally:
+        store.drop_table()
+        frappe.clear_document_cache(
+            "Flow Knowledge Settings", "Flow Knowledge Settings"
+        )
+
+
+class FakeWebResponse:
+    """Enough of a `requests` response for Flow to read a web page."""
+
+    def __init__(self, text: str, status_code: int = 200):
+        self.text = text
+        self.status_code = status_code
+        self.is_redirect = False
+        self.headers = {"Content-Type": "text/html"}
+
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            import requests
+
+            raise requests.HTTPError(f"{self.status_code} Error")
+
+    def iter_content(self, _size: int):
+        yield self.text.encode()
+
+    def close(self) -> None:
+        pass
+
+
+@contextmanager
+def fake_web(pages: dict[str, str | int]):
+    """Serve `pages` (url to HTML, or to an HTTP error code) in place of the internet,
+    with every host public. A url not in `pages` is a 404."""
+
+    def get(url, **_kwargs):
+        page = pages.get(url, 404)
+        if isinstance(page, int):
+            return FakeWebResponse("", status_code=page)
+        return FakeWebResponse(page)
+
+    public = [(2, 1, 6, "", ("93.184.216.34", 0))]
+    with (
+        patch("requests.get", side_effect=get),
+        patch("socket.getaddrinfo", return_value=public),
+    ):
+        yield
+
+
+def make_private_file(file_name: str, content: str = "Some text") -> str:
+    """Upload a private File called `file_name` and return its URL."""
+    return (
+        frappe.get_doc(
+            {
+                "doctype": "File",
+                "file_name": file_name,
+                "content": content,
+                "is_private": 1,
+            }
+        )
+        .insert(ignore_permissions=True)
+        .file_url
+    )
+
+
+def clear_ai_sources() -> None:
+    """Delete every knowledge source added in the AI search tab."""
+    from helpdesk.ai_search import SOURCE_KNOWLEDGE_BASES
+
+    for name in frappe.get_all(
+        "Flow Knowledge Source",
+        {"knowledge_base": ["in", list(SOURCE_KNOWLEDGE_BASES.values())]},
+        pluck="name",
+    ):
+        frappe.delete_doc("Flow Knowledge Source", name, ignore_permissions=True)

@@ -61,7 +61,7 @@ Every page embeds `header` and `kb_settings`. The four KB pages also embed `foot
 - `header`: the top bar. It has the brand, breadcrumbs, quick links, the theme toggle and the account menu. Its inputs (`crumb`, `parentRoute`, `drawerToggle` and others) are listed in the JSON.
 - `footer`: the KB footer: brand, tagline, link columns, social icons and copyright. It has no inputs and binds to `footer` from `useKnowledgeBaseHeader`, which is null when the footer is off. Edit its layout in Studio; edit its content in Settings > Knowledge Base > Footer.
 - `kb_settings`: the portal Settings dialog. It has profile, members, knowledge base and portal settings tabs. It has no inputs and binds to `useSettingsModal`.
-- `category_grid`: a Repeater of category cards. `public_kb` and `categories` use it.
+- `category_grid`: a Repeater of category cards (icon chip, name, description, article count), as in the kb-portal-home sketch. `public_kb` and `categories` use it.
 - `home_article_list`: the bordered list of article rows on `public_kb`. Its `articles` input feeds both the tabbed list and the Featured list above a lone category.
 
 ### Custom Vue components

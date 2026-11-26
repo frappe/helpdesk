@@ -17,6 +17,7 @@ Agents write articles in the desk at `/helpdesk/kb`. Customers and guests read t
 - `allow_anonymous_article_voting`: guests can vote.
 - `banner_image`, `banner_preset`: the banner on the KB home.
 - `banner_title`, `banner_subtitle`: the KB home heading and the text under it. Empty uses the default text.
+- `enable_ai_search`, `ai_provider`, `ai_api_key`, `ai_model`: the AI search tab (see [AI search](#ai-search)). System Managers only (permission level 1), and the key is a Password field, so no read path returns it.
 - `show_footer`, `footer_tagline`, `footer_copyright`, `footer_items`, `social_links`: the KB footer. `footer_items` is a `Top Bar Item` table, as in Website Settings: a row without `parent_label` is a column; link rows name their column in `parent_label`. `social_links` is a `Top Bar Item` table too. `validate_footer` allows at most four columns with different titles and only web, email and `/` links in both tables.
 
 Within a category, every article list (`get_articles` with a `category`, `get_subcategory_articles`, `get_kb_sidebar`) sorts by `weight` first, heaviest on top. Pins never touch the weight; Featured reads them by `pinned_order`.
@@ -48,6 +49,7 @@ The `General` category is reserved. It cannot be renamed or deleted.
 `helpdesk/api/knowledge_base.py` has the KB endpoints.
 
 - **Reads** (guests allowed, `GET`): `get_categories`, `get_articles`, `get_featured_articles`, `get_subcategory_articles`, `get_kb_sidebar`, `get_article`, `search_articles`. `/help/articles/<name>.md` serves an article as plain Markdown (`ArticleMarkdownPage`), the link Copy for LLM and Open in Claude/ChatGPT use.
+- **Guest AI search** (`POST`, rate limited): `answer_question`.
 - **Guest writes** (`POST`, rate limited): `vote_on_article`, `increment_views`. A guest voter is known by the `hd_visitor` cookie.
 - **Agent only**:
   - Categories: `create_category`, `merge_category`, `delete_category`, `get_category_delete_summary`, `get_category_options`, `get_category_visibility`, `set_category_visibility`, `get_category_access`, `get_general_category`.
@@ -60,7 +62,9 @@ Other files:
 
 - `helpdesk/api/article.py`: `get_related` (articles for a ticket), `get_article_stats` and search helpers.
 - `helpdesk/search.py`: the RediSearch index for articles. `after_migrate` and a scheduled job build it.
-- `helpdesk/api/config.py`: `get_config` gives the portal its KB flags, banner and KB form scripts.
+- `helpdesk/api/config.py`: `get_config` gives the portal its KB flags, banner, KB form scripts and `ai_search_enabled`.
+- `helpdesk/ai_search.py`: AI search, from article and source indexing to the answer.
+- `helpdesk/api/ai_search.py`: the AI search tab's knowledge sources (System Managers only).
 
 ## Desk: authoring
 
@@ -82,11 +86,95 @@ The desk links to the portal copy of an article with `CUSTOMER_PORTAL_ROOT + ROU
 | `public_kb` | `/help` | `get_categories`, `get_articles` (popular or recent), `get_featured_articles` |
 | `categories` | `/help/categories` | `get_categories` |
 | `category` | `/help/category/:category` | `get_articles` for one category, 20 at a time as the reader scrolls |
+| `search` | `/help/search?q=` | `answer_question` (AI search on), else `search_articles` |
 | `article` | `/help/articles/:name-slug` | `get_article`, `increment_views`, `vote_on_article`, `/help/articles/<name>.md` |
 
-All four pages allow guests and use `useKnowledgeBaseHeader` and the `kb_settings` and `footer` Studio Components. The sidebar, the article cache and hover prefetch are in `studio/helpdesk/stores/knowledgeBase.ts`. The article parts (body, contents, feedback, sidebar, "copy for LLM") are in `studio/helpdesk/components/knowledge_base/`.
+All five pages allow guests and use `useKnowledgeBaseHeader` and the `kb_settings` and `footer` Studio Components. The sidebar, the article cache and hover prefetch are in `studio/helpdesk/stores/knowledgeBase.ts`. The article parts (body, contents, feedback, sidebar, "copy for LLM") are in `studio/helpdesk/components/knowledge_base/`.
 
 Search (`PortalArticleSearch`) and the article suggestions on the new ticket form both use `useArticleSearch`, which calls `search_articles`.
+
+With AI search on, Enter in the home search opens the `search` page (`/help/search?q=`), which asks `answer_question` (see [AI search](#ai-search)).
+
+## AI search
+
+An AI answer to a reader's question, from the articles and sources that reader may read, built on Frappe Flow (`frappe.flow`, which ships with the framework). It is off by default. Until Flow can run an agent for portal readers, it returns the best matches by meaning only, and the portal labels it as search, not as an answer (see [Answering](#answering)).
+
+### Settings
+
+The AI search tab of `HD Settings` (desk Settings > Customer Portal > AI search, `desk/src/components/Settings/AISearch/`) has:
+
+- `enable_ai_search`: on or off. The switch saves on its own, as soon as it changes. Turning it on without a saved provider and model is refused, and the switch stays off.
+- `ai_provider`: a LiteLLM provider name, such as `openai` or `anthropic`.
+- `ai_api_key`: a Password field.
+- `ai_model`: the model at that provider, such as `gpt-4.1-mini`.
+
+Knowledge sources live in Flow, not in `HD Settings`. See [Knowledge sources](#knowledge-sources).
+
+The provider, model and key save together with Save. All of them are System Manager fields (permission level 1). Saving with AI on writes the Flow records the assistant runs on (`HDSettings.sync_ai_search`):
+
+- a `Flow Provider` named after the provider, created only if the site has none; an existing one keeps its own key;
+- a `Flow Model` titled `Helpdesk AI Search`, which carries the key and takes precedence over the provider's;
+- a system-generated `Flow Agent`, `helpdesk/kb-assistant`, holding the guardrail instructions and the model.
+
+The agent is limited to the product (`brand_name`, else "Helpdesk") and to the sources it is given, and answers `OFF_TOPIC` to anything else. The guardrails are on by default and live in `INSTRUCTIONS` in `helpdesk/ai_search.py`.
+
+Articles are embedded with the model in **Flow Knowledge Settings**. Set an embedding model there first; turning AI on without one shows a warning and indexes nothing.
+
+### Knowledge sources
+
+An admin adds documentation pages (URL) and files (PDF, MD or TXT) for the assistant to read, from the tab's Knowledge sources section. `helpdesk/api/ai_search.py` has `get_sources`, `add_source`, `remove_source`, `resync_source` and `set_source_visibility` (all System Managers only); the logic is in `helpdesk/ai_search.py`.
+
+- Each source is a `Flow Knowledge Source` in the base for its "Visible to" setting: `Helpdesk Sources - Public`, `- Customers` or `- Agents` (default Public). These bases are apart from the article bases, so article indexing never removes a source.
+- A link must use http or https, resolve to a public address (Flow's own SSRF check), not redirect, and answer without an error. A file must be PDF, MD or TXT. A source with the same link or file name as one already added is refused.
+- Flow syncs a new source in the background (`after_insert` queues the ingestion). The tab shows Flow's status as Syncing (Pending, Processing), Ready (Completed) or Failed (with the last line of Flow's error as the reason), and checks again every 5 seconds while one syncs.
+- Flow cannot move a source between bases (`knowledge_base` is immutable), so changing "Visible to" adds the source to the new base and deletes the old one.
+- Only sources in the three source bases can be read or changed through these endpoints; any other Flow source is "not found".
+
+### Who is answered from what
+
+`index_article` (`helpdesk/ai_search.py`) keeps every published article in one `Flow Knowledge Source` (type Text, titled with the article's name) in the Flow knowledge base of its audience:
+
+| `visibility` | Knowledge base |
+|---|---|
+| `Public` | `Helpdesk Articles - Public` |
+| `Customers` | `Helpdesk Articles - Customers` |
+| `Private` | `Helpdesk Articles - Agents` |
+
+A question searches only the bases its asker may read, for articles and sources alike: a guest or a user without a customer role gets Public, a customer Public and Customers, an agent all three. Flow itself does not check permissions per chunk: the knowledge base is the boundary, so never search a base that was not chosen by role.
+
+Before any passage reaches the model, its article is read again with `make_article_filters`. An article narrowed, unpublished or deleted after it was indexed is dropped even while the index is behind.
+
+Saving or deleting an article queues `index_article` (queue `short`) while AI search is on and an embedding model is set. Turning AI search on queues `index_all_articles` (queue `long`). An unpublished or deleted article leaves the index; a narrowed one moves to the base of its new audience.
+
+### Answering
+
+`answer_question(question)` in `helpdesk/api/knowledge_base.py` (guests allowed, `POST`):
+
+- calls `validate_public_access()`, so a guest is refused while `public_knowledge_base` is off, and is refused while AI search is off;
+- is rate limited to 10 requests a minute per user, or per IP for a guest, and cuts the question at `ANSWER_QUESTION_LENGTH` (500) characters;
+- retrieves the best 8 passages (`frappe.flow.knowledge.retriever.retrieve`) from the article and source bases its asker may read, keeps the ones whose article the asker may read now, and returns:
+
+```
+{ "refused": bool, "message": "…" (only when refused),
+  "related": [{ "name", "title", "title_slug", "excerpt" }],
+  "links": [{ "url" }] }
+```
+
+`related` are the matching articles the asker may read, at most 4. `links` are the matching web page sources, at most 3; a file source is never linked, as its file is private. A question nothing readable matches gets `refused` set, "I can only help with <product>." as `message`, and nothing else. No model is called, so there is no answer text or cited sources until the blocker below is fixed.
+
+Until the asker's bases can be searched, `answer_question` throws `AISearchNotReadyError` instead of refusing: while Flow Knowledge Settings has no embedding model, or none of the asker's bases holds a `Completed` source yet. The page then shows its error line and the plain `search_articles` matches, so readers keep search while indexing catches up.
+
+A passage counts as a match only when its cosine similarity is at least `MIN_VECTOR_SCORE` (0.3), so an off-topic question is refused even though articles exist.
+
+**Blocker: off-topic questions are refused only with Flow's Vector search.** Flow's retriever always returns the top passages, and under Hybrid search (Flow's default) their `score` is LanceDB's rank-fused (RRF) score, which says how a passage ranked, not how relevant it is. Helpdesk cannot tell an off-topic question from an on-topic one there, so it applies the threshold only when **Flow Knowledge Settings → Search Type** is Vector. Fix in Flow: return each hit's vector similarity in hybrid mode too, then apply the threshold always.
+
+**Blocker: Flow cannot run an agent for portal readers.** Flow runs agents only as sessions on its flow server (`frappe.flow.lib.agent.Agent.run`). A session needs read access to the `Flow Agent` and `Flow Model` (roles System Manager and Flow User), belongs to a signed-in owner whose callbacks act as that user, and runs asynchronously. Guests and customers have none of that, and Flow has no synchronous call. Calling the model directly with LiteLLM would bypass Flow's runtime, so Helpdesk does not. Once Flow can run an agent for a guest, send the retrieved articles to `helpdesk/kb-assistant`, add `answer` (citing `[n]`) and `sources` to the response, and render them on the portal page with the streamed answer, follow-ups and "Powered by Flow". Until then the portal does not call the page an answer: the search row reads "See the best matches for …", not "Ask AI".
+
+### Portal page
+
+`PortalAnswerPage` (`/help/search?q=`, the `search` page) shows the question, a thinking state (a pulsing ✦ with rotating status lines), then the related articles and "From the docs" links below, and "Search powered by Frappe Flow". With no question in the URL it shows "What are you looking for?" and makes no call. A refusal shows its line and a "Raise a ticket" button, which opens the new ticket form with the question (`ROUTES.newTicket({ from: 'search', q })`), or sign-in for a guest, and is hidden when `hide_raise_ticket_button` is on; it never lists plain matches. If the call fails, it says so and lists the plain `search_articles` matches.
+
+With AI search on, the search box (`PortalArticleSearch`) is the "glow ring" of the sketch: a subtle gray gradient edge, built from the `--outline-gray-*` and `--ink-gray-*` theme tokens so it follows dark mode, that brightens, with a faint glow, on focus, and ✦ in place of the magnifier. "/" still focuses it. With it off, the box is the plain one. `get_config` gives the portal `ai_search_enabled`, which is on only when AI search is on and the reader may read the knowledge base. With it off, the home search shows today's dropdown and Enter opens no answer page.
 
 ## Settings shared by both apps
 
@@ -108,7 +196,7 @@ The KB look and feel (banner, pinned categories and articles, header links, foot
 
 ## Tests
 
-- Backend: `helpdesk/tests/api/test_knowledge_base.py` (public reads, customer-only articles, permissions, category access, search), `helpdesk/tests/api/test_article.py`, `helpdesk/tests/test_search.py`, and the DocType tests in `hd_article` and `hd_article_category`.
+- Backend: `helpdesk/tests/api/test_knowledge_base.py` (public reads, customer-only articles, permissions, category access, search, AI answers by role, AI index updates), the AI search tab in `hd_settings/test_hd_settings.py`, `helpdesk/tests/api/test_article.py`, `helpdesk/tests/test_search.py`, and the DocType tests in `hd_article` and `hd_article_category`.
 - End to end: `e2e/tests/knowledge-base/` has the portal walkthrough and the agent spec. `e2e/helpers/portal.ts` makes categories and articles over REST.
 
 When you add a guest endpoint, add a test that a guest is refused while `public_knowledge_base` is off.

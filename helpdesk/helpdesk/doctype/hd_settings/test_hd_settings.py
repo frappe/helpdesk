@@ -12,7 +12,14 @@ from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     KNOWLEDGE_BASE_HOME,
     TICKETS_HOME,
 )
-from helpdesk.test_utils import create_agent
+from unittest.mock import patch
+
+from helpdesk.test_utils import (
+    create_agent,
+    enable_ai_search,
+    fake_flow_knowledge,
+    make_agent_manager,
+)
 
 CUSTOMER = "home-page-customer@example.com"
 AGENT_CUSTOMER = "home-page-agent@example.com"
@@ -194,6 +201,131 @@ class TestBannerImage(IntegrationTestCase):
         self.assertEqual(
             self.save_banner("/files/banner.png").banner_image, "/files/banner.png"
         )
+
+
+class TestAISearchSettings(IntegrationTestCase):
+    """Saving the AI search tab sets up the Flow records the assistant runs on."""
+
+    def test_turning_it_on_without_a_model_is_refused(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            enable_ai_search(ai_model="")
+
+    def test_turning_it_on_without_a_provider_is_refused(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            enable_ai_search(ai_provider="")
+
+    def test_saving_sets_up_the_provider_model_and_agent(self) -> None:
+        enable_ai_search()
+
+        self.assertTrue(frappe.db.exists("Flow Provider", "openai"))
+        model = frappe.get_doc("Flow Model", "Helpdesk AI Search")
+        self.assertEqual(model.model_id, "openai/gpt-4.1-mini")
+        self.assertEqual(model.get_password("api_key"), "sk-test-key")
+        agent = frappe.get_doc("Flow Agent", "helpdesk/kb-assistant")
+        self.assertEqual(agent.model, model.name)
+
+    def test_the_agent_is_limited_to_the_product(self) -> None:
+        frappe.db.set_single_value("HD Settings", "brand_name", "Acme Desk")
+        enable_ai_search()
+
+        instructions = frappe.db.get_value(
+            "Flow Agent", "helpdesk/kb-assistant", "instructions"
+        )
+        self.assertIn("Acme Desk", instructions)
+        self.assertIn("OFF_TOPIC", instructions)
+
+    def test_changing_the_model_moves_the_agent_to_it(self) -> None:
+        enable_ai_search()
+        enable_ai_search(ai_model="gpt-4.1")
+
+        self.assertEqual(
+            frappe.db.get_value("Flow Model", "Helpdesk AI Search", "model_id"),
+            "openai/gpt-4.1",
+        )
+        self.assertEqual(
+            frappe.db.get_value("Flow Agent", "helpdesk/kb-assistant", "model"),
+            "Helpdesk AI Search",
+        )
+
+    def test_a_masked_key_keeps_the_saved_one(self) -> None:
+        enable_ai_search()
+        enable_ai_search(ai_api_key="*****")
+
+        model = frappe.get_doc("Flow Model", "Helpdesk AI Search")
+        self.assertEqual(model.get_password("api_key"), "sk-test-key")
+
+    def test_a_provider_the_site_already_has_keeps_its_key(self) -> None:
+        frappe.get_doc(
+            {"doctype": "Flow Provider", "provider": "mistral", "api_key": "site-key"}
+        ).insert()
+        enable_ai_search(ai_provider="mistral", ai_model="mistral-small-latest")
+
+        provider = frappe.get_doc("Flow Provider", "mistral")
+        self.assertEqual(provider.get_password("api_key"), "site-key")
+
+    def test_turning_it_on_queues_indexing_of_every_article(self) -> None:
+        enable_ai_search(enable_ai_search=0)
+        with fake_flow_knowledge(), patch("frappe.enqueue") as enqueue:
+            enable_ai_search()
+            enable_ai_search(ai_model="gpt-4.1")
+
+        jobs = [call.args[0] for call in enqueue.call_args_list]
+        self.assertEqual(jobs, ["helpdesk.ai_search.index_all_articles"])
+
+    def test_nothing_is_queued_without_an_embedding_model(self) -> None:
+        enable_ai_search(enable_ai_search=0)
+        frappe.db.set_single_value("Flow Knowledge Settings", "embedding_model", None)
+        frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
+        with patch("frappe.enqueue") as enqueue:
+            enable_ai_search()
+
+        enqueue.assert_not_called()
+
+    def test_only_a_system_manager_reads_or_changes_the_tab(self) -> None:
+        enable_ai_search()
+        manager = make_agent_manager()
+
+        with self.set_user(manager):
+            read = frappe.client.get("HD Settings")
+            self.assertNotIn("ai_api_key", read)
+            self.assertNotIn("ai_model", read)
+            settings = frappe.get_doc("HD Settings")
+            settings.ai_model = "gpt-4.1"
+            settings.save()
+
+        self.assertEqual(
+            frappe.db.get_single_value("HD Settings", "ai_model"), "gpt-4.1-mini"
+        )
+
+    def test_turning_it_off_leaves_the_flow_records_alone(self) -> None:
+        enable_ai_search()
+        enable_ai_search(enable_ai_search=0)
+
+        self.assertTrue(frappe.db.exists("Flow Model", "Helpdesk AI Search"))
+
+    def test_the_portal_config_says_whether_it_is_on_and_never_the_key(self) -> None:
+        frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
+        enable_ai_search()
+
+        for user in ("Guest", "Administrator"):
+            with self.set_user(user):
+                config = get_config()
+            self.assertTrue(config.ai_search_enabled)
+            self.assertNotIn("sk-test-key", frappe.as_json(config))
+            self.assertNotIn("ai_api_key", config)
+
+        enable_ai_search(enable_ai_search=0)
+        with self.set_user("Guest"):
+            self.assertFalse(get_config().ai_search_enabled)
+
+    def test_a_guest_is_told_it_is_off_while_the_knowledge_base_is_private(
+        self,
+    ) -> None:
+        frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
+        enable_ai_search()
+
+        with self.set_user("Guest"):
+            self.assertFalse(get_config().ai_search_enabled)
 
 
 def make_customer(email: str) -> None:

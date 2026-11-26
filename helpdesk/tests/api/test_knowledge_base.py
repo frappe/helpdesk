@@ -9,7 +9,14 @@ from frappe.website.serve import get_response
 from redis.exceptions import ResponseError
 
 from helpdesk.api.article import get_related
+from helpdesk.ai_search import (
+    KNOWLEDGE_BASES,
+    AISearchNotReadyError,
+    index_all_articles,
+    index_article,
+)
 from helpdesk.api.knowledge_base import (
+    ANSWER_QUESTION_LENGTH,
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
     archive_articles,
@@ -37,6 +44,7 @@ from helpdesk.api.knowledge_base import (
     search_articles,
     search_categories,
     set_category_visibility,
+    answer_question,
     set_pinned_articles,
     vote_on_article,
 )
@@ -56,6 +64,8 @@ from helpdesk.test_utils import (
     category_names,
     category_row,
     create_user,
+    enable_ai_search,
+    fake_flow_knowledge,
     make_agent,
     make_article,
     make_article_category,
@@ -1967,3 +1977,255 @@ class TestCategoryMerge(IntegrationTestCase):
             frappe.db.get_value("HD Article", article, ["category", "visibility"]),
             (target, PRIVATE),
         )
+
+
+class TestAnswerQuestion(IntegrationTestCase):
+    """The AI answer reads only what its asker may read, and says which articles it used."""
+
+    def setUp(self) -> None:
+        self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
+        self.enterContext(patch("frappe.enqueue"))
+        enable_ai_search()
+        self.enterContext(fake_flow_knowledge())
+        self.customer = make_contact("kb-ai-customer")["user"]
+        self.agent = make_agent(unique_email("kb-ai-agent"))
+        self.category = make_article_category("Fixture AI")
+        self.public = self.make_article("Public wifi guide", PUBLIC, "PUBLIC-FACT")
+        self.members = self.make_article(
+            "Members wifi guide", CUSTOMERS, "MEMBERS-FACT"
+        )
+        self.internal = self.make_article(
+            "Internal wifi guide", PRIVATE, "INTERNAL-FACT"
+        )
+
+    def make_article(self, title, visibility, fact) -> str:
+        name = make_article(
+            title,
+            category=self.category.name,
+            visibility=visibility,
+            content=f"<p>Fix wifi by restarting the router. {fact}</p>",
+        )
+        index_article(name)
+        return name
+
+    def ask(self, user, question="How do I fix my wifi?") -> dict:
+        with self.set_user(user):
+            return answer_question(question)
+
+    def names(self, rows) -> set[str]:
+        return {row["name"] for row in rows}
+
+    def test_it_is_reachable_without_a_session(self) -> None:
+        self.assertIn(answer_question, frappe.guest_methods)
+
+    def test_it_refuses_while_ai_search_is_off(self) -> None:
+        enable_ai_search(enable_ai_search=0)
+        with self.assertRaises(frappe.PermissionError):
+            answer_question("How do I fix my wifi?")
+
+    def test_a_guest_is_refused_while_the_knowledge_base_is_private(self) -> None:
+        frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
+        with self.set_user("Guest"), self.assertRaises(frappe.PermissionError):
+            answer_question("How do I fix my wifi?")
+
+    def test_no_model_is_called_outside_flow(self) -> None:
+        with patch("litellm.completion") as completion:
+            result = self.ask("Guest")
+
+        completion.assert_not_called()
+        self.assertEqual(set(result), {"refused", "related", "links"})
+
+    def test_a_guest_is_shown_public_articles_only(self) -> None:
+        result = self.ask("Guest")
+
+        self.assertEqual(self.names(result["related"]), {self.public})
+        self.assertNotIn("MEMBERS-FACT", frappe.as_json(result))
+        self.assertNotIn("INTERNAL-FACT", frappe.as_json(result))
+
+    def test_a_customer_is_shown_public_and_customers_articles(self) -> None:
+        result = self.ask(self.customer)
+
+        self.assertEqual(self.names(result["related"]), {self.public, self.members})
+
+    def test_an_agent_is_shown_every_article(self) -> None:
+        result = self.ask(self.agent)
+
+        self.assertEqual(
+            self.names(result["related"]), {self.public, self.members, self.internal}
+        )
+
+    def test_a_related_article_carries_what_the_page_links_to(self) -> None:
+        (related,) = self.ask("Guest")["related"]
+
+        self.assertEqual(related["title"], "Public wifi guide")
+        self.assertEqual(related["title_slug"], "public-wifi-guide")
+        self.assertEqual(set(related), {"name", "title", "title_slug", "excerpt"})
+
+    def test_an_article_narrowed_before_the_index_catches_up_stays_hidden(self) -> None:
+        frappe.db.set_value("HD Article", self.public, "visibility", CUSTOMERS)
+
+        result = self.ask("Guest")
+
+        self.assertTrue(result["refused"])
+        self.assertEqual(result["related"], [])
+
+    def test_an_unpublished_article_leaves_the_answers_once_indexed(self) -> None:
+        frappe.db.set_value("HD Article", self.public, "status", "Draft")
+        index_article(self.public)
+
+        self.assertFalse(
+            frappe.db.exists("Flow Knowledge Source", {"title": self.public})
+        )
+        self.assertNotIn(self.public, self.names(self.ask(self.agent)["related"]))
+
+    def test_a_narrowed_article_moves_to_the_knowledge_base_of_its_new_audience(
+        self,
+    ) -> None:
+        frappe.db.set_value("HD Article", self.public, "visibility", PRIVATE)
+        index_article(self.public)
+
+        kbs = frappe.get_all(
+            "Flow Knowledge Source", {"title": self.public}, pluck="knowledge_base"
+        )
+        self.assertEqual(kbs, [KNOWLEDGE_BASES[PRIVATE]])
+
+    def test_a_deleted_article_leaves_the_index(self) -> None:
+        frappe.delete_doc("HD Article", self.members, force=True)
+        index_article(self.members)
+
+        self.assertFalse(
+            frappe.db.exists("Flow Knowledge Source", {"title": self.members})
+        )
+
+    def test_an_edited_article_is_indexed_with_its_new_text(self) -> None:
+        frappe.db.set_value(
+            "HD Article", self.public, "content", "<p>Fix wifi with NEW-FACT.</p>"
+        )
+        index_article(self.public)
+
+        (content,) = frappe.get_all(
+            "Flow Knowledge Source", {"title": self.public}, pluck="content"
+        )
+        self.assertIn("NEW-FACT", content)
+        self.assertNotIn("PUBLIC-FACT", content)
+
+    def test_indexing_everything_covers_published_articles_and_drops_the_rest(
+        self,
+    ) -> None:
+        ours = {self.public, self.members, self.internal}
+
+        def indexed() -> set[str]:
+            return ours & set(
+                frappe.get_all(
+                    "Flow Knowledge Source",
+                    {"knowledge_base": ["in", list(KNOWLEDGE_BASES.values())]},
+                    pluck="title",
+                )
+            )
+
+        for source in frappe.get_all("Flow Knowledge Source", pluck="name"):
+            frappe.delete_doc("Flow Knowledge Source", source, ignore_permissions=True)
+        index_all_articles()
+        self.assertEqual(indexed(), {self.public, self.members, self.internal})
+
+        frappe.db.set_value("HD Article", self.members, "status", "Draft")
+        index_all_articles()
+        self.assertEqual(indexed(), {self.public, self.internal})
+
+    def test_an_off_topic_question_is_refused_though_articles_exist(self) -> None:
+        frappe.db.set_single_value("Flow Knowledge Settings", "search_type", "Vector")
+        frappe.db.set_single_value("HD Settings", "brand_name", "Acme Desk")
+
+        self.assertEqual(
+            self.ask(self.agent, question="What is the weather today?"),
+            {
+                "refused": True,
+                "message": "I can only help with Acme Desk.",
+                "related": [],
+                "links": [],
+            },
+        )
+
+    def test_it_is_not_ready_without_an_embedding_model(self) -> None:
+        frappe.db.set_single_value("Flow Knowledge Settings", "embedding_model", None)
+
+        with self.assertRaises(AISearchNotReadyError):
+            self.ask("Guest")
+
+    def test_it_is_not_ready_before_the_readable_articles_are_indexed(self) -> None:
+        for source in frappe.get_all(
+            "Flow Knowledge Source",
+            {"knowledge_base": KNOWLEDGE_BASES[PUBLIC]},
+            pluck="name",
+        ):
+            frappe.delete_doc("Flow Knowledge Source", source, ignore_permissions=True)
+
+        with self.assertRaises(AISearchNotReadyError):
+            self.ask("Guest")
+        self.assertIn(self.members, self.names(self.ask(self.customer)["related"]))
+
+    def test_the_question_is_capped(self) -> None:
+        with patch(
+            "frappe.flow.knowledge.retriever.retrieve", return_value=[]
+        ) as retrieve:
+            self.ask("Guest", question="wifi " + "x" * 5000)
+
+        self.assertEqual(len(retrieve.call_args.args[0]), ANSWER_QUESTION_LENGTH)
+
+    def test_it_is_rate_limited(self) -> None:
+        frappe.cache.delete_keys("rl:helpdesk.api.knowledge_base.answer_question")
+        set_request(method="POST", path="/api/method/answer_question")
+        self.addCleanup(setattr, frappe.local, "request", None)
+
+        with self.set_user("Guest"), self.assertRaises(frappe.RateLimitExceededError):
+            for _ in range(50):
+                answer_question("How do I fix my wifi?")
+
+
+class TestAIIndexUpdates(IntegrationTestCase):
+    """Changing an article queues an index update, while AI search is on."""
+
+    def setUp(self) -> None:
+        self.enqueue = self.enterContext(patch("frappe.enqueue"))
+        self.enterContext(fake_flow_knowledge())
+
+    def jobs(self) -> list[str]:
+        return [
+            call.kwargs["article"]
+            for call in self.enqueue.call_args_list
+            if call.args[0] == "helpdesk.ai_search.index_article"
+        ]
+
+    def test_saving_an_article_queues_an_update(self) -> None:
+        enable_ai_search()
+        name = make_article()
+        self.assertEqual(self.jobs(), [name])
+
+        frappe.db.set_value("HD Article", name, "visibility", PRIVATE)
+        frappe.get_doc("HD Article", name).save()
+        self.assertEqual(self.jobs(), [name, name])
+
+    def test_deleting_an_article_queues_an_update(self) -> None:
+        enable_ai_search()
+        name = make_article()
+        self.enqueue.reset_mock()
+
+        frappe.delete_doc("HD Article", name, force=True)
+
+        self.assertEqual(self.jobs(), [name])
+
+    def test_nothing_is_queued_without_an_embedding_model(self) -> None:
+        enable_ai_search()
+        frappe.db.set_single_value(
+            "Flow Knowledge Settings", "embedding_model", None
+        )
+        frappe.clear_document_cache("Flow Knowledge Settings", "Flow Knowledge Settings")
+
+        make_article()
+
+        self.assertEqual(self.jobs(), [])
+
+    def test_nothing_is_queued_while_ai_search_is_off(self) -> None:
+        enable_ai_search(enable_ai_search=0)
+        make_article()
+        self.assertEqual(self.jobs(), [])

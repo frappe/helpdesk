@@ -109,13 +109,31 @@ class HDArticle(Document):
 
     def on_update(self):
         self.update_search_index()
+        self.update_ai_index()
 
     def on_trash(self):
         validate_keeps_content(self.category, leaving_article=self.name)
         self.update_search_index()
+        self.update_ai_index()
 
     def update_search_index(self):
         index_articles([self.name], queue="short")
+
+    def update_ai_index(self):
+        from frappe.flow.doctype.flow_knowledge_settings.flow_knowledge_settings import (
+            embeddings_configured,
+        )
+
+        from helpdesk import ai_search
+
+        if not ai_search.is_enabled() or not embeddings_configured():
+            return
+        frappe.enqueue(
+            "helpdesk.ai_search.index_article",
+            queue="short",
+            enqueue_after_commit=True,
+            article=self.name,
+        )
 
     @staticmethod
     def default_list_data():

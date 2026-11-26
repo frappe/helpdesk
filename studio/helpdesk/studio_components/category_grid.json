@@ -6,7 +6,7 @@
     "baseStyles": {
      "--category-columns": "{{ inputs.columns || 3 }}",
      "display": "grid",
-     "gap": "10px",
+     "gap": "16px",
      "gridAutoColumns": "minmax(0, 1fr)",
      "height": "auto",
      "width": "100%"
@@ -16,17 +16,32 @@
       "blockName": "category-card",
       "children": [
        {
-        "classes": [
-         "size-5",
-         "text-ink-gray-6",
-         "transition-colors",
-         "group-hover:text-ink-gray-8"
+        "blockName": "category-icon-chip",
+        "children": [
+         {
+          "classes": [
+           "size-4",
+           "text-ink-white"
+          ],
+          "componentId": "category-grid-icon",
+          "componentName": "Icon",
+          "componentProps": {
+           "icon": "{{ dataItem.icon || 'lucide-folder' }}"
+          }
+         }
         ],
-        "componentId": "category-grid-icon",
-        "componentName": "Icon",
-        "componentProps": {
-         "icon": "{{ dataItem.icon || 'lucide-folder' }}"
-        }
+        "classes": [
+         "flex",
+         "size-8",
+         "shrink-0",
+         "items-center",
+         "justify-center",
+         "rounded-4",
+         "bg-surface-gray-9"
+        ],
+        "componentId": "category-grid-icon-chip",
+        "componentName": "container",
+        "originalElement": "span"
        },
        {
         "blockName": "container",
@@ -58,13 +73,28 @@
            "tag": "p",
            "text": "{{ dataItem.description || t('Browse articles in this category') }}"
           }
+         },
+         {
+          "blockName": "category-count",
+          "classes": [
+           "mt-1.5",
+           "text-ink-gray-5"
+          ],
+          "componentId": "category-grid-count",
+          "componentName": "TextBlock",
+          "componentProps": {
+           "fontSize": "text-sm",
+           "tag": "span",
+           "text": "{{ dataItem.article_count === 1 ? t('1 article') : t('{0} articles', [dataItem.article_count]) }}"
+          },
+          "visibilityCondition": "{{ dataItem.article_count }}"
          }
         ],
         "classes": [
          "flex",
          "flex-col",
          "shrink",
-         "gap-1",
+         "gap-1.5",
          "h-fit",
          "min-w-0",
          "w-full"
@@ -76,10 +106,8 @@
       ],
       "classes": [
        "transition",
-       "hover:bg-surface-gray-1",
        "items-start",
        "border-outline-gray-2",
-       "rounded-5",
        "border",
        "cursor-pointer",
        "flex",
@@ -93,9 +121,11 @@
        "max-sm:px-4",
        "max-sm:py-3.5",
        "group",
-       "gap-4",
        "p-5",
-       "focus-visible:focus-ring"
+       "focus-visible:focus-ring",
+       "rounded-7",
+       "gap-8",
+       "hover:border-outline-gray-3"
       ],
       "componentId": "category-grid-card",
       "componentName": "PortalLink",
