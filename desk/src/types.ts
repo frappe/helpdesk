@@ -676,6 +676,7 @@ declare global {
     setup_complete: boolean;
     setup_pending: boolean;
     needs_password_setup: boolean;
+    hd_config?: Record<string, any>;
   }
 }
 

@@ -7,7 +7,8 @@ export const useConfigStore = defineStore("config", () => {
   const { $socket } = globalStore();
   const configResource = createResource({
     url: "helpdesk.api.config.get_config",
-    auto: true,
+    initialData: window.hd_config,
+    auto: !window.hd_config,
   });
 
   const config = computed(() => configResource.data || {});
