@@ -1,4 +1,3 @@
-
 <template>
   <CommentItem
     :comment="activity"
@@ -226,7 +225,7 @@ function togglePin() {
     {
       onSuccess: () => emit("update"),
       onError: (error: { messages?: string[] }) =>
-        toast.error(error.messages?.[0] ?? __("Could not update the comment")),
+        toast.error(error.messages?.[0] ?? __("Could not pin the comment")),
     }
   );
 }
