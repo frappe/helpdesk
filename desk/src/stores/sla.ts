@@ -1,39 +1,17 @@
 import { SlaValidationErrors } from "@/components/Settings/Sla/types";
+import { __ } from "@/translation";
+import type { HDServiceDay } from "@/types/doctypes";
 import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
-const defaultSupportAndResolution = [
-  {
-    workday: "Monday",
+/** Fresh rows each call, so edits to one new policy never leak into the next. */
+const getDefaultSupportAndResolution = () =>
+  ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((workday) => ({
+    workday,
     start_time: "09:00:00",
     end_time: "17:00:00",
     id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Tuesday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Wednesday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Thursday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Friday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-];
+  }));
 
 export const slaData = ref({
   name: "",
@@ -41,6 +19,7 @@ export const slaData = ref({
   description: "",
   enabled: true,
   default_sla: false,
+  rank: 0,
   apply_sla_for_resolution: true,
   priorities: [],
   holiday_list: "Default",
@@ -48,7 +27,7 @@ export const slaData = ref({
   start_date: "",
   end_date: "",
   loading: false,
-  support_and_resolution: defaultSupportAndResolution,
+  support_and_resolution: getDefaultSupportAndResolution(),
   default_ticket_status: "",
   reopen_ticket_status: "",
   condition: [],
@@ -62,6 +41,7 @@ export const resetSlaData = () => {
     description: "",
     enabled: true,
     default_sla: false,
+    rank: 0,
     apply_sla_for_resolution: true,
     priorities: [],
     holiday_list: "Default",
@@ -69,7 +49,7 @@ export const resetSlaData = () => {
     start_date: "",
     end_date: "",
     loading: false,
-    support_and_resolution: defaultSupportAndResolution,
+    support_and_resolution: getDefaultSupportAndResolution(),
     default_ticket_status: "",
     reopen_ticket_status: "",
     condition: [],
@@ -130,7 +110,7 @@ export function validateSlaData(
     switch (field) {
       case "service_level":
         if (!slaData.value.service_level?.trim()) {
-          slaDataErrors.value.service_level = "SLA policy name is required";
+          slaDataErrors.value.service_level = __("SLA policy name is required.");
         } else {
           slaDataErrors.value.service_level = "";
         }
@@ -140,25 +120,25 @@ export function validateSlaData(
           !Array.isArray(slaData.value.priorities) ||
           slaData.value.priorities.length === 0
         ) {
-          slaDataErrors.value.priorities = "At least one priority is required";
+          slaDataErrors.value.priorities = __("At least one priority is required.");
         } else {
           const prioritiesError: string[] = [];
           slaData.value.priorities.forEach((priority, index) => {
             const priorityNum = index + 1;
             if (!priority.priority?.trim()) {
               prioritiesError.push(
-                `Priority ${priorityNum}: Priority name is required`
+                `Priority ${priorityNum}: Priority name is required.`
               );
             }
             if (!priority.response_time || priority.response_time == 0) {
               prioritiesError.push(
-                `Priority ${priorityNum}: Response time is required`
+                `Priority ${priorityNum}: Response time is required.`
               );
             }
             if (Boolean(slaData.value.apply_sla_for_resolution)) {
               if (!priority.resolution_time || priority.resolution_time == 0) {
                 prioritiesError.push(
-                  `Priority ${priorityNum}: Resolution time is required`
+                  `Priority ${priorityNum}: Resolution time is required.`
                 );
               }
             }
@@ -167,7 +147,7 @@ export function validateSlaData(
               Boolean(slaData.value.apply_sla_for_resolution)
             ) {
               prioritiesError.push(
-                `Priority ${priorityNum}: Response time cannot be greater than resolution time`
+                `Priority ${priorityNum}: Response time cannot be greater than resolution time.`
               );
             }
           });
@@ -201,7 +181,7 @@ export function validateSlaData(
         break;
       case "holiday_list":
         if (!slaData.value.holiday_list) {
-          slaDataErrors.value.holiday_list = "Holiday list is required";
+          slaDataErrors.value.holiday_list = "Holiday list is required.";
         } else {
           slaDataErrors.value.holiday_list = "";
         }
@@ -211,7 +191,7 @@ export function validateSlaData(
           new Date(slaData.value.end_date) < new Date(slaData.value.start_date)
         ) {
           slaDataErrors.value.start_date =
-            "Start date cannot be after end date";
+            "Start date cannot be after end date.";
         } else {
           slaDataErrors.value.start_date = "";
         }
@@ -221,7 +201,7 @@ export function validateSlaData(
           slaData.value.end_date &&
           new Date(slaData.value.end_date) < new Date(slaData.value.start_date)
         ) {
-          slaDataErrors.value.end_date = "End date cannot be before start date";
+          slaDataErrors.value.end_date = "End date cannot be before start date.";
         } else {
           slaDataErrors.value.end_date = "";
         }
@@ -234,7 +214,7 @@ export function validateSlaData(
           slaData.value.condition_json.length > 0 &&
           !validateConditions(slaData.value.condition_json)
         ) {
-          slaDataErrors.value.condition = "Valid conditions are required";
+          slaDataErrors.value.condition = "Valid conditions are required.";
         } else {
           slaDataErrors.value.condition = "";
         }
@@ -252,7 +232,7 @@ export function validateSlaData(
 
         if (!validWorkdays?.length) {
           slaDataErrors.value.support_and_resolution =
-            "At least one valid workday with workday, start time, and end time is required";
+            "At least one valid workday with workday, start time, and end time is required.";
         } else {
           // Check for duplicate workdays
           const workdayMap = new Map();
@@ -280,32 +260,24 @@ export function validateSlaData(
             const startTimeStr = day.start_time.trim();
             const endTimeStr = day.end_time.trim();
 
-            const parseTime = (timeStr: string) => {
-              const [hours, minutes] = timeStr.split(":").map(Number);
-              const date = new Date();
-              date.setHours(hours, minutes || 0, 0, 0);
-              return date;
-            };
-
-            try {
-              const startTime = parseTime(startTimeStr);
-              const endTime = parseTime(endTimeStr);
-
-              if (startTime >= endTime) {
-                invalidTimeRanges.push(
-                  `${day.workday} (${startTimeStr} - ${endTimeStr})`
-                );
-              }
-            } catch (error) {
-              // If time parsing fails, mark as invalid
-              invalidTimeRanges.push(`${day.workday} (Invalid time format)`);
+            if (toMinutes(startTimeStr) >= toMinutes(endTimeStr)) {
+              invalidTimeRanges.push(
+                `${day.workday} (${startTimeStr} - ${endTimeStr})`
+              );
             }
           }
+
+          const invalidBreaks = slaData.value.support_and_resolution
+            .filter((day) => getBreakError(day))
+            .map((day) => `${day.workday}: ${getBreakError(day)}`);
 
           if (invalidTimeRanges.length > 0) {
             slaDataErrors.value.support_and_resolution = `End time must be after start time for: ${invalidTimeRanges.join(
               ", "
             )}`;
+          } else if (invalidBreaks.length > 0) {
+            slaDataErrors.value.support_and_resolution =
+              invalidBreaks.join(" ");
           } else {
             slaDataErrors.value.support_and_resolution = "";
           }
@@ -324,4 +296,33 @@ export function validateSlaData(
   }
 
   return slaDataErrors.value;
+}
+
+/** Why a workday's break is invalid, or "" when it is valid or there is none. */
+export function getBreakError(
+  day: Partial<
+    Pick<HDServiceDay, "start_time" | "end_time" | "break_start" | "break_end">
+  >
+): string {
+  if (!day.break_start && !day.break_end) return "";
+  if (!day.break_start || !day.break_end) {
+    return __("Set both break start and break end, or neither.");
+  }
+  const [start, end, breakStart, breakEnd] = [
+    day.start_time,
+    day.end_time,
+    day.break_start,
+    day.break_end,
+  ].map(toMinutes);
+  if (breakEnd <= breakStart) return __("Break end must be after break start.");
+  if (breakStart <= start || breakEnd >= end) {
+    return __("Break must be within working hours.");
+  }
+  return "";
+}
+
+/** Minutes since midnight for an "H:MM" or "H:MM:SS" time, seconds as a fraction. */
+export function toMinutes(time?: string | null): number {
+  const [hours, minutes, seconds] = (time || "").split(":").map(Number);
+  return (hours || 0) * 60 + (minutes || 0) + (seconds || 0) / 60;
 }

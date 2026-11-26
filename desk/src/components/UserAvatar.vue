@@ -8,12 +8,12 @@
     />
     <span
       v-if="expand"
-      class="truncate capitalize text-base text-ink-gray-9 font-medium"
+      class="truncate capitalize text-base-medium text-ink-gray-9"
       :class="{
         'font-medium': strong,
       }"
     >
-      {{ name }}
+      {{ user.full_name }}
     </span>
   </div>
 </template>

@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Call Logs</div>
+        <div class="text-lg-medium text-ink-gray-9">Call Logs</div>
       </template>
       <template #right-header>
         <Button
@@ -10,7 +10,7 @@
           theme="gray"
           variant="solid"
           @click="newCallLog"
-          icon-left="plus"
+          icon-left="lucide-plus"
         />
       </template>
     </LayoutHeader>
@@ -18,7 +18,6 @@
       ref="listViewRef"
       :options="options"
       @row-click="openCallLog"
-      @empty-state-action="showCallLogModal = true"
     />
     <CallLogDetailModal
       v-model="showCallLogDetailModal"
@@ -38,9 +37,10 @@
 </template>
 
 <script setup lang="ts">
+import Icon from "@helpdesk/shared/Icon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import { Avatar, Badge, Button, FeatherIcon, usePageMeta } from "frappe-ui";
+import { Avatar, Badge, Button, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CallLogDetailModal from "./CallLogDetailModal.vue";
 import CallLogModal from "./CallLogModal.vue";
@@ -92,9 +92,11 @@ const options = computed(() => {
       type: {
         prefix: ({ row }) => {
           let icon =
-            row.type === "Incoming" ? "phone-incoming" : "phone-outgoing";
-          return h(FeatherIcon, {
-            name: icon,
+            row.type === "Incoming"
+              ? "lucide-phone-incoming"
+              : "lucide-phone-outgoing";
+          return h(Icon, {
+            icon,
             class: ["size-3 shrink-0"],
           });
         },
@@ -110,8 +112,8 @@ const options = computed(() => {
       },
       duration: {
         prefix: () => {
-          return h(FeatherIcon, {
-            name: "clock",
+          return h(Icon, {
+            icon: "lucide-clock",
             class: ["size-3 shrink-0"],
           });
         },

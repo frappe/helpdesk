@@ -3,7 +3,6 @@ import { call, createResource } from "frappe-ui";
 import { defineStore } from "pinia";
 import { computed, ComputedRef, Ref, ref } from "vue";
 
-const URI_LOGIN = "login";
 const URI_LOGOUT = "logout";
 const URI_USER_INFO = "helpdesk.api.auth.get_user";
 
@@ -28,6 +27,9 @@ export const useAuthStore = defineStore("auth", () => {
   );
   const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
   const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
+  const hasAgentRecord: ComputedRef<boolean> = computed(
+    () => user__.value.has_agent_record
+  );
   const isManager: ComputedRef<boolean> = computed(
     () => user__.value.is_manager
   );
@@ -41,7 +43,26 @@ export const useAuthStore = defineStore("auth", () => {
   );
   const userName: ComputedRef<string> = computed(() => user__.value.user_name);
   const username: ComputedRef<string> = computed(() => user__.value.username);
+  const availability: ComputedRef<string> = computed(
+    () => user__.value.availability || ""
+  );
+  const availabilityChangedOn: ComputedRef<string> = computed(
+    () => user__.value.availability_changed_on || ""
+  );
+  const availabilityChangedBy: ComputedRef<string> = computed(
+    () => user__.value.availability_changed_by || ""
+  );
+  const availabilityExpiresOn: ComputedRef<string> = computed(
+    () => user__.value.availability_expires_on || ""
+  );
+  const defaultAgentStatus: ComputedRef<string> = computed(
+    () => user__.value.default_agent_status || ""
+  );
   const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
+  const userTeams: ComputedRef<string[]> = computed(
+    () => user__.value.user_teams
+  );
+  const language: ComputedRef<string> = computed(() => user__.value.language);
 
   function sessionUser() {
     const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
@@ -53,17 +74,8 @@ export const useAuthStore = defineStore("auth", () => {
   }
   const user: Ref<string> = ref(sessionUser());
   const isLoggedIn: ComputedRef<boolean> = computed(() => !!user.value);
-  const login = createResource({
-    url: URI_LOGIN,
-    onError() {
-      throw new Error("Invalid email or password");
-    },
-    onSuccess() {
-      user.value = sessionUser();
-      login.reset();
-      router.replace({ path: "/" });
-    },
-  });
+  // No in-SPA login on purpose: the full-page login round trip is what keeps
+  // module-scope userStorage keys in sync with the session cookie.
 
   function logout() {
     user.value = null;
@@ -77,16 +89,23 @@ export const useAuthStore = defineStore("auth", () => {
     init,
     isAdmin,
     isAgent,
+    hasAgentRecord,
     isManager,
     isLoggedIn,
-    login,
     reloadUser,
     userFirstName,
     userId,
     userImage,
     userName,
     username,
+    availability,
+    availabilityChangedOn,
+    availabilityChangedBy,
+    availabilityExpiresOn,
+    defaultAgentStatus,
     timezone,
+    userTeams,
+    language,
     user,
     logout,
   };

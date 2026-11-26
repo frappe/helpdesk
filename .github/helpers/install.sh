@@ -5,8 +5,11 @@ set -e
 cd ~ || ex
 
 sudo apt update
-sudo apt remove mysql-server mysql-client
-sudo apt install libcups2-dev redis-server mariadb-client libmariadb-dev
+sudo apt remove -y mysql-server mysql-client
+sudo apt install -y build-essential pkg-config libcups2-dev redis-server mariadb-client libmariadb-dev libffi-dev libssl-dev libjpeg-dev libcairo2-dev libpango1.0-dev cron wget
+
+# Ubuntu 26.04's mariadb-client (11.8) requires SSL; the mariadb:10.6 service has none.
+printf '[client]\nskip-ssl\n' > ~/.my.cnf
 
 pip install frappe-bench
 git clone "https://github.com/frappe/frappe" --branch "develop" --depth 1 
@@ -40,7 +43,11 @@ sed -i 's/schedule:/# schedule:/g' Procfile
 sed -i 's/socketio:/# socketio:/g' Procfile
 sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
+bench get-app erpnext --branch "develop"
 bench get-app telephony
+# get-app builds helpdesk's Studio portal with frappe's Studio toolchain,
+# which --skip-assets left without its node_modules
+(cd apps/frappe/studio/frontend && yarn install --frozen-lockfile)
 bench get-app helpdesk "${GITHUB_WORKSPACE}"
 bench setup requirements --dev
 
@@ -48,3 +55,7 @@ bench setup requirements --dev
 bench start &>> ~/frappe-bench/bench_start.log &
 CI=Yes bench build --app frappe &
 bench --site test_site reinstall --yes
+
+bench --verbose --site test_site install-app erpnext
+bench --verbose --site test_site install-app telephony
+bench --verbose --site test_site install-app helpdesk

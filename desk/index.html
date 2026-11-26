@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ boot.lang or 'en' }}" dir="{{ boot.dir or 'ltr' }}">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Helpdesk</title>
     <meta name="mobile-web-app-capable" content="yes" />
@@ -206,12 +205,7 @@
     <div id="popovers"></div>
     <script type="module" src="/src/main.js"></script>
     <script>
-      window.favicon = "{{ favicon }}";
       window.site_name = "{{ site_name }}";
-
-      document.querySelectorAll("link[rel='icon']").forEach((link) => {
-        link.href = window.favicon;
-      });
     </script>
   </body>
 </html>

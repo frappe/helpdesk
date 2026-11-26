@@ -7,7 +7,7 @@
           :label="activity?._caller?.label"
           size="md"
         />
-        <span class="font-medium text-ink-gray-8 ml-1">
+        <span class="font-medium text-ink-gray-8 ms-1">
           {{ activity?._caller?.label }}
         </span>
         <span>{{
@@ -16,7 +16,7 @@
             : __("has made a call")
         }}</span>
       </div>
-      <div class="ml-auto whitespace-nowrap">
+      <div class="ms-auto whitespace-nowrap">
         <Tooltip :text="dateFormat(activity.creation, 'MMM D, dddd')">
           <div class="text-sm text-ink-gray-5">
             {{ __(timeAgo(activity.creation)) }}
@@ -26,10 +26,10 @@
     </div>
     <div
       @click="showCallLogDetailModal = true"
-      class="flex flex-col gap-2 cursor-pointer border-transparent shadow rounded-md bg-surface-cards px-3 py-2.5 text-ink-gray-9"
+      class="flex flex-col gap-2 cursor-pointer border-transparent shadow rounded-5 bg-surface-elevation-1 px-3 py-2.5 text-ink-gray-9"
     >
       <div class="flex items-center justify-between">
-        <div class="inline-flex gap-2 items-center text-base font-medium">
+        <div class="inline-flex gap-2 items-center text-base-medium">
           <div>
             {{
               activity.call_type == "Incoming"

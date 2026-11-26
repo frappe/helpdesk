@@ -4,11 +4,9 @@ import {
   Button,
   Dialog,
   ErrorMessage,
-  FeatherIcon,
   FormControl,
   frappeRequest,
   FrappeUI,
-  Input,
   setConfig,
   TextInput,
   toast,
@@ -16,11 +14,11 @@ import {
 } from "frappe-ui";
 import { createPinia } from "pinia";
 import App from "./App.vue";
+import { spritePlugin } from "frappe-ui/experimental";
 import { createDialog } from "./components/dialogs";
 import "./index.css";
 import { router } from "./router";
-import { posthogPlugin } from "./telemetry";
-import { isCustomerPortal } from "@/utils";
+import { telemetryPlugin } from "@framework/ui";
 import { translationPlugin } from "./translation";
 import CircleAlert from "~icons/lucide/circle-alert";
 import { initSocket } from "./socket";
@@ -30,30 +28,34 @@ const globalComponents = {
   Button,
   Dialog,
   ErrorMessage,
-  FeatherIcon,
   FormControl,
-  Input,
   Tooltip,
   TextInput,
 };
 
-setConfig("resourceFetcher", frappeRequest);
-setConfig("serverMessagesHandler", (msgs) => {
-  if (isCustomerPortal.value) {
-    return;
-  }
+// Attached to the fetcher, not set as the global `serverMessagesHandler`: the
+// global one also governs `call()`, which beta.63 started routing a response's
+// `_server_messages` through. Resources keep toasting, `call()` stays silent.
+setConfig("resourceFetcher", (options) =>
+  frappeRequest({ ...options, onServerMessages: showServerMessages })
+);
+
+function showServerMessages(msgs) {
   msgs.forEach((msg) => {
     msg = JSON.parse(msg);
-    if (msg && msg.message == "Feedback email has been sent to the customer") {
+    // `alert` is frappe's own flag for throwaway desk chatter ("Document
+    // renamed from X to Y"), which our own toasts already cover. No helpdesk
+    // msgprint sets it.
+    if (!msg || msg.alert) return;
+    if (msg.message == "Feedback email has been sent to the customer.") {
       toast.success(msg.message);
       return;
     }
-    toast.create({
-      message: msg.message,
-      icon: h(CircleAlert, { class: "text-blue-500" }),
+    toast(msg.message, {
+      icon: () => h(CircleAlert, { class: "text-ink-blue-5" }),
     });
   });
-});
+}
 setConfig("fallbackErrorHandler", (error) => {
   const msg = error.exc_type
     ? (error.messages || error.message || []).join(", ")
@@ -65,10 +67,10 @@ const pinia = createPinia();
 const app = createApp(App);
 
 app.use(FrappeUI);
+app.use(spritePlugin);
 app.use(pinia);
-app.use(router);
-app.use(posthogPlugin);
 app.use(translationPlugin);
+app.use(telemetryPlugin, { app_name: "helpdesk" });
 
 for (const c in globalComponents) {
   app.component(c, globalComponents[c]);
@@ -84,11 +86,16 @@ if (import.meta.env.DEV) {
     for (let key in values) {
       window[key] = values[key];
     }
+    if (window.dir) document.documentElement.dir = window.dir;
+    if (window.lang) document.documentElement.lang = window.lang;
     socket = initSocket();
     app.config.globalProperties.$socket = socket;
+    // The router decides the first page as it is installed, so it waits for the boot values.
+    app.use(router);
     app.mount("#app");
   });
 } else {
+  app.use(router);
   socket = initSocket();
   app.config.globalProperties.$socket = socket;
   app.mount("#app");

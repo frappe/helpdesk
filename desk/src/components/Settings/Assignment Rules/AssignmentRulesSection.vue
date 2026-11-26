@@ -7,13 +7,13 @@
   />
   <div
     v-if="props.conditions.length == 0"
-    class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-gray-300 text-gray-600 rounded-md"
+    class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-outline-gray-2 text-ink-gray-5 rounded-5"
     @click="
       props.conditions.push(['', '', '']);
       validateAssignmentRule(props.name);
     "
   >
-    <FeatherIcon name="plus" class="h-4" />
+    <LucidePlus class="size-4" />
     {{ __("Add a condition") }}
   </div>
   <div class="flex items-center justify-between mt-2">
@@ -25,7 +25,7 @@
     >
       <Button
         :disabled="props.errors !== ''"
-        :icon-right="open ? 'chevron-up' : 'chevron-down'"
+        :icon-right="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
         :label="__('Add condition')"
       />
     </Dropdown>
@@ -38,11 +38,13 @@
 </template>
 
 <script setup lang="ts">
+import LucidePlus from "~icons/lucide/plus";
 import CFConditions from "@/components/conditions-filter/CFConditions.vue";
 import { validateConditions } from "@/utils";
 import { watchDebounced } from "@vueuse/core";
-import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
-import { validateAssignmentRule } from "../../../stores/assignmentRules";
+import { Button, Dropdown, ErrorMessage } from "frappe-ui";
+import { validateAssignmentRule } from "@/stores/assignmentRules";
+import { __ } from "@/translation";
 
 const props = defineProps({
   conditions: Array<any>,
@@ -62,13 +64,13 @@ const getConjunction = () => {
 
 const dropdownOptions = [
   {
-    label: "Add condition",
+    label: __("Add condition"),
     onClick: () => {
       addCondition();
     },
   },
   {
-    label: "Add condition group",
+    label: __("Add condition group"),
     onClick: () => {
       const conjunction = getConjunction();
       props.conditions.push(conjunction, [[]]);

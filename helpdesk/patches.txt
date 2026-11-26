@@ -7,10 +7,10 @@ execute:frappe.delete_doc("DocType", "HD Preset Filter")
 execute:frappe.delete_doc("DocType", "HD Preset Filter Item")
 execute:frappe.delete_doc("DocType", "HD Pause Service Level Agreement On Status")
 execute:frappe.delete_doc("DocType", "HD Service Level Agreement Fulfilled On Status")
+helpdesk.patches.rename_canned_response_to_saved_reply
 
 [post_model_sync]
 execute:frappe.delete_doc("Workspace", "Frappe Desk", force=True)
-helpdesk.patches.add_priority_integer
 helpdesk.patches.template_remove_default_fields
 helpdesk.helpdesk.doctype.hd_ticket.patches.fallback_ticket_type
 execute:frappe.delete_doc("Server Script", "Ticket Auto Set Custom Fields", ignore_missing=True)
@@ -32,3 +32,40 @@ helpdesk.patches.add_status_category_to_tickets
 helpdesk.patches.enable_new_email_notifications
 helpdesk.patches.add_fulltext_index #v2
 helpdesk.patches.add_telephony_app
+helpdesk.patches.add_website_settings_permission
+helpdesk.patches.add_agent_manager_perms_in_assignment_rule
+helpdesk.patches.set_std_views_non_public
+helpdesk.helpdesk.doctype.hd_ticket.patches.backfill_sla_failed_by
+helpdesk.patches.rename_and_update_std_views #v2
+helpdesk.patches.set_hd_ticket_naming_series
+helpdesk.patches.set_default_agent_statuses
+helpdesk.patches.add_customer_field_in_user_invitation
+helpdesk.patches.add_customer_and_customer_manager_role
+helpdesk.patches.move_contact_dynamic_link_to_hd_customer
+helpdesk.patches.set_default_customer_type
+helpdesk.patches.add_user_invitation_perms
+helpdesk.patches.enable_auto_set_customer_from_contact
+helpdesk.patches.show_customer_portal_permission_notice
+helpdesk.patches.backfill_priority_level
+helpdesk.patches.add_tag_custom_fields
+helpdesk.patches.rename_purple_status_color
+helpdesk.patches.set_default_portal_settings
+helpdesk.patches.rename_agent_status_enable_field
+helpdesk.patches.set_default_agent_status_in_settings
+helpdesk.patches.setup_core_comments_schema
+helpdesk.patches.migrate_hd_ticket_comment_to_comment
+helpdesk.patches.migrate_ticket_activities_to_info_comments
+helpdesk.patches.repoint_comment_reactions_and_files
+helpdesk.patches.migrate_hd_notifications_to_notification_log
+helpdesk.patches.relabel_comment_search_index
+helpdesk.patches.mark_old_assignment_notifications_read
+helpdesk.patches.harden_hd_ticket_field_permissions
+helpdesk.patches.grant_ticket_export_to_customers
+helpdesk.patches.backfill_template_field_visible_to
+helpdesk.patches.show_ticket_field_permission_notice
+helpdesk.patches.sync_customer_manager_roles
+helpdesk.patches.set_article_excerpts
+helpdesk.patches.hd_article_category_tree
+helpdesk.patches.set_ticket_source
+helpdesk.patches.show_ticket_source_notice
+helpdesk.patches.mark_existing_sites_set_up

@@ -9,6 +9,7 @@ from helpdesk.api.settings.field_dependency import (
     handle_fields_criteria,
     handle_form_customization,
 )
+from helpdesk.utils import capture_event
 
 
 class HDFormScript(Document):
@@ -45,6 +46,9 @@ class HDFormScript(Document):
             return None
         return [parts[1], parts[2]] if len(parts) > 2 else [parts[1], None]
 
+    def after_insert(self):
+        capture_event("form_script_created")
+
     def on_trash(self):
         if not self.is_standard:
             return
@@ -70,6 +74,7 @@ def get_form_script(
         .where(FormScript.enabled == 1)
         .where(FormScript.apply_on_new_page == apply_on_new_page)
         .where(FormScript.apply_to_customer_portal == is_customer_portal)
+        .where(FormScript.apply_to_knowledge_base == 0)
     )
 
     doc = query.run(as_dict=True)

@@ -1,4 +1,5 @@
-from datetime import timedelta
+from collections.abc import Iterator
+from datetime import datetime, time, timedelta
 from typing import Literal
 
 import frappe
@@ -11,13 +12,10 @@ from frappe.utils import (
     get_weekdays,
     getdate,
     now_datetime,
-    time_diff_in_seconds,
     to_timedelta,
 )
 
-from helpdesk.utils import get_context, publish_event
-
-from .utils import convert_to_seconds
+from helpdesk.utils import capture_event, get_context, is_json_valid, publish_event
 
 
 class HDServiceLevelAgreement(Document):
@@ -28,12 +26,14 @@ class HDServiceLevelAgreement(Document):
         self.validate_priorities()
         self.validate_support_and_resolution()
         self.validate_condition()
+        self.warn_removed_priorities()
+        self.warn_detach_on_untick("default_sla", _("Default SLA turned off"))
+        self.warn_detach_on_untick("enabled", _("SLA disabled"))
 
     def validate_priorities(self):
         self.validate_priority_defaults()
         self.validate_response_and_resolution_time()
         self.validate_unique_priorities()
-        self.validate_all_priorities()
 
     # check if we have more than one default priority
     def validate_priority_defaults(self):
@@ -74,24 +74,53 @@ class HDServiceLevelAgreement(Document):
             repeated_priority = get_repeated(priorities)
             frappe.throw(_("Priority {0} has been repeated.").format(repeated_priority))
 
-    def validate_all_priorities(self):
-        all_priorities = frappe.get_all("HD Ticket Priority", pluck="name")
-        sla_priorities = [p.priority for p in self.priorities]
+    def warn_removed_priorities(self):
+        """Warn when dropping a priority that open tickets on this SLA still use."""
+        before = self.get_doc_before_save()
+        if not before:
+            return
+        removed = {p.priority for p in before.priorities} - {
+            p.priority for p in self.priorities
+        }
+        for priority in removed:
+            count = self.count_open_tickets(priority=priority)
+            if not count:
+                continue
+            frappe.msgprint(
+                _(
+                    "{0} open tickets use priority {1}. They lose this SLA the next time they are updated."
+                ).format(count, priority),
+                title=_("Priority in use"),
+                indicator="orange",
+            )
 
-        for priority in all_priorities:
-            if priority not in sla_priorities:
-                frappe.msgprint(
-                    _("Priority <u>{0}</u> must be included in the SLA {1}.").format(
-                        priority, self.name
-                    )
-                )
+    def warn_detach_on_untick(self, fieldname: str, title: str):
+        """Warn when unticking a checkbox that keeps tickets attached to this policy."""
+        if not self.has_value_changed(fieldname) or self.get(fieldname):
+            return
+        count = self.count_open_tickets()
+        if not count:
+            return
+        frappe.msgprint(
+            _(
+                "{0} open tickets will lose this SLA the next time they are updated, unless another policy matches them."
+            ).format(count),
+            title=title,
+            indicator="orange",
+        )
+
+    def count_open_tickets(self, **filters) -> int:
+        """Tickets still on the clock, so Paused counts too — they detach as well."""
+        return frappe.db.count(
+            self.doctype_ticket,
+            {"sla": self.name, "status_category": ["!=", "Resolved"], **filters},
+        )
 
     def validate_support_and_resolution(self):
         week = get_weekdays()
         support_days = []
 
         for support_and_resolution in self.support_and_resolution:
-
             if to_timedelta(support_and_resolution.start_time) >= to_timedelta(
                 support_and_resolution.end_time
             ):
@@ -100,6 +129,7 @@ class HDServiceLevelAgreement(Document):
                         "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
                     ).format(support_and_resolution.idx)
                 )
+            self.validate_break(support_and_resolution)
 
             support_days.append(support_and_resolution.workday)
 
@@ -108,6 +138,27 @@ class HDServiceLevelAgreement(Document):
         if not len(set(support_days)) == len(support_days):
             repeated_days = get_repeated(support_days)
             frappe.throw(_("Workday {0} has been repeated.").format(repeated_days))
+
+    def validate_break(self, workday: Document):
+        """A break is optional, but needs both ends and must sit inside the workday."""
+        if not workday.break_start and not workday.break_end:
+            return
+        if not (workday.break_start and workday.break_end):
+            frappe.throw(
+                _(
+                    "Set both Break Start and Break End in row <u>{0}</u>, or neither."
+                ).format(workday.idx)
+            )
+        times = [
+            to_timedelta(workday.get(fieldname))
+            for fieldname in ("start_time", "break_start", "break_end", "end_time")
+        ]
+        if not all(earlier < later for earlier, later in zip(times, times[1:])):
+            frappe.throw(
+                _(
+                    "Break must start after Start Time, end after it starts and end before End Time in row <u>{0}</u>."
+                ).format(workday.idx)
+            )
 
     def validate_default_sla(self):
         default_sla_exists = frappe.db.exists(
@@ -126,25 +177,24 @@ class HDServiceLevelAgreement(Document):
                 ).format(self.name, default_sla_exists)
             )
 
-        if not self.default_sla and not default_sla_exists:
-            frappe.throw(
-                _(
-                    "You must set one SLA as Default. Please check the Default SLA option."
-                )
-            )
-
-        if self.has_value_changed("enabled") and not self.enabled and self.default_sla:
-            frappe.throw(_("You cannot disable the default SLA."))
-
     def validate_condition(self):
-        if not self.condition:
-            return
-        try:
-            temp_doc = frappe.new_doc(self.doctype_ticket)
-            frappe.safe_eval(self.condition, None, get_context(temp_doc))
-        except Exception as e:
+        if self.condition:
+            try:
+                temp_doc = frappe.new_doc(self.doctype_ticket)
+                frappe.safe_eval(self.condition, None, get_context(temp_doc))
+            except Exception as e:
+                frappe.throw(
+                    _("The assignment condition '{0}' is invalid: {1}").format(
+                        self.condition, str(e)
+                    )
+                )
+
+        if self.condition_json and not is_json_valid(self.condition_json):
             frappe.throw(
-                _("The Condition '{0}' is invalid: {1}").format(self.condition, str(e))
+                _("The assignment condition json '{0}' is invalid: {1}").format(
+                    self.condition_json,
+                    "Condition format should be like this e.g [['status','==','open']], it's recommended to use portal view to create conditions.",
+                )
             )
 
     def before_save(self):
@@ -157,33 +207,28 @@ class HDServiceLevelAgreement(Document):
             frappe.throw(_("Select a Default Priority."))
 
     def apply(self, doc: Document):
-        self.handle_new(doc)
+        self.set_default_priority(doc)
+        self.start_clock(doc)
         self.handle_doc_status(doc)
         self.handle_targets(doc)
+        self.set_failed_by(doc)
         self.handle_agreement_status(doc)
-        self.validate_all_priorities()
 
-    def handle_new(self, doc: Document):
-        if not doc.is_new():
-            return
-        creation = doc.service_level_agreement_creation or now_datetime()
-        doc.service_level_agreement_creation = creation
+    def set_default_priority(self, doc: Document):
         doc.priority = doc.priority or self.default_priority
 
+    def start_clock(self, doc: Document):
+        """Stamp the moment targets are counted from. Written once, when the SLA
+        attaches, which may be long after the ticket was raised."""
+        if not doc.service_level_agreement_creation:
+            doc.service_level_agreement_creation = now_datetime()
+
     def handle_doc_status(self, doc: Document):
-        if doc.is_new() or not doc.has_value_changed("status"):
+        if not doc.is_valid_status_transition():
             return
-
-        was_resolved = (
-            doc.get_doc_before_save().get("status_category", None) == "Resolved"
-        )
-        is_closed = doc.get("status", None) == "Closed"
-        if was_resolved and is_closed:
-            return
-
         self.set_first_response_time(doc)
-        self.set_resolution_date(doc)
         self.set_hold_time(doc)
+        self.set_resolution_time(doc)
 
     def set_first_response_time(self, doc: Document):
         start_at = doc.service_level_agreement_creation
@@ -192,20 +237,11 @@ class HDServiceLevelAgreement(Document):
             return
         doc.first_response_time = self.calc_elapsed_time(start_at, end_at)
 
-    def set_resolution_date(self, doc: Document):
-        resolved_statuses = (
-            frappe.db.get_all(
-                "HD Ticket Status", {"category": "Resolved"}, pluck="name"
-            )
-            or []
-        )
-        next_state = doc.get("status")
-        is_fulfilled = next_state in resolved_statuses
-        if not is_fulfilled:
-            doc.resolution_date = None
-            doc.resolution_time = None
+    def set_resolution_time(self, doc: Document):
+        """Business-hours duration to resolve. The date itself is stamped by the
+        ticket, which does not need an SLA to know when it was resolved."""
+        if not doc.resolution_date:
             return
-        doc.resolution_date = now_datetime()
         start_at = doc.service_level_agreement_creation
         end_at = doc.resolution_date
         time_took = self.calc_elapsed_time(start_at, end_at)
@@ -223,7 +259,10 @@ class HDServiceLevelAgreement(Document):
         next_state = doc.get("status")
         was_paused = prev_state in paused_statuses
         is_paused = next_state in paused_statuses
-        paused_since = doc.on_hold_since or doc_old.get("resolution_date")
+        paused_since = doc.on_hold_since
+        if not paused_since and doc.status_category != "Resolved":
+            # time spent resolved counts as hold only when the ticket is reopened
+            paused_since = doc_old.get("resolution_date")
         if is_paused and not was_paused:
             doc.response_by = doc.resolution_by if doc.first_responded_on else None
             doc.resolution_date = None
@@ -249,19 +288,27 @@ class HDServiceLevelAgreement(Document):
         self.set_response_by(doc)
         self.set_resolution_by(doc)
 
+    def set_failed_by(self, doc: Document):
+        """Against current targets, so an SLA change re-measures them."""
+        doc.first_response_failed_by = self.get_time_past(
+            doc.response_by, doc.first_responded_on
+        )
+        doc.resolution_failed_by = self.get_time_past(
+            doc.resolution_by, doc.resolution_date
+        )
+
+    def get_time_past(self, due, end) -> int | None:
+        if not (due and end) or get_datetime(end) <= get_datetime(due):
+            return None
+        return self.calc_elapsed_time(due, end)
+
     def set_response_by(self, doc: Document):
-        start = doc.service_level_agreement_creation
         doc.response_by = self.calc_time(
             doc.service_level_agreement_creation, doc.priority, "response_time"
         )
 
     def set_resolution_by(self, doc: Document):
         total_hold_time = doc.total_hold_time or 0
-        start = add_to_date(
-            doc.service_level_agreement_creation,
-            seconds=total_hold_time,
-            as_datetime=True,
-        )
         doc.resolution_by = self.calc_time(
             doc.service_level_agreement_creation,
             doc.priority,
@@ -271,28 +318,34 @@ class HDServiceLevelAgreement(Document):
 
     def handle_agreement_status(self, doc: Document):
         is_failed = self.is_first_response_failed(doc) or self.is_resolution_failed(doc)
-        options = {
-            "Fulfilled": True,
-            "Resolution Due": self.apply_sla_for_resolution and not doc.resolution_date,
-            "First Response Due": not doc.first_responded_on,
-            "Failed": is_failed,
-            "Paused": doc.on_hold_since,
-        }
-        for status in options:
-            if options[status]:
-                doc.agreement_status = status
+
+        if is_failed:
+            doc.agreement_status = "Failed"
+        elif doc.on_hold_since:
+            doc.agreement_status = "Paused"
+        elif not doc.first_responded_on:
+            doc.agreement_status = "First Response Due"
+        elif self.apply_sla_for_resolution and not doc.resolution_date:
+            doc.agreement_status = "Resolution Due"
+        else:
+            doc.agreement_status = "Fulfilled"
 
     def is_first_response_failed(self, doc: Document):
         if not doc.first_responded_on:
-            return get_datetime(doc.response_by) < now_datetime()
+            return get_datetime(doc.response_by) < self.get_active_ticket_time(doc)
         return get_datetime(doc.response_by) < get_datetime(doc.first_responded_on)
 
     def is_resolution_failed(self, doc: Document):
         if not self.apply_sla_for_resolution or not doc.resolution_by:
             return
         if not doc.resolution_date:
-            return get_datetime(doc.resolution_by) < now_datetime()
+            return get_datetime(doc.resolution_by) < self.get_active_ticket_time(doc)
         return get_datetime(doc.resolution_by) < get_datetime(doc.resolution_date)
+
+    def get_active_ticket_time(self, doc: Document):
+        """Hold time is credited only on resume, so an on-hold ticket is measured
+        against when it went on hold."""
+        return get_datetime(doc.on_hold_since) if doc.on_hold_since else now_datetime()
 
     def calc_time(
         self,
@@ -300,158 +353,104 @@ class HDServiceLevelAgreement(Document):
         priority: str,
         target: Literal["response_time", "resolution_time"],
         hold_time: float = 0,
-    ):
+    ) -> datetime:
         """
-        Considerations:
-            - Holidays
-            - Workdays
-            - Working hours
-            - Hold time if target is resolution time (in seconds)
-
-        Returns:
-            - DateTime when the target is expected to be met
+        When the target is expected to be met, counting only working time:
+        holidays, non-workdays, time outside working hours and breaks are skipped.
+        Hold time (in seconds) is added to the resolution target.
         """
-        result = get_datetime(start_at)
-        priorities = self.get_priorities()
-        if priority not in priorities:
-            frappe.throw(
-                _("Please add {0} priority in {1} SLA").format(priority, self.name)
-            )
-        priority = priorities[priority]
-        remaining_target_time = priority.get(
-            target, 0
-        )  # time for response or resolution in seconds
-        holidays = (
-            self.get_holidays()
-        )  # From Holiday List, returns a list of holiday dates
-        days_list = get_weekdays()  # list of weekdays, ["Monday", "Tuesday", ...]
-        working_days = (
-            self.get_workdays()
-        )  # From Working hours table, returns a dict with weekday names as keys and workday objects as values
-
+        cursor = get_datetime(start_at)
+        remaining = self.get_priorities()[priority].get(target) or 0
         if target == "resolution_time":
-            # add hold time to remaining target time
-            remaining_target_time += hold_time
-
-        while remaining_target_time:
-            current_datetime = result
-            current_date = getdate(current_datetime)
-            current_day = days_list[
-                current_datetime.weekday()
-            ]  # Returns the current weekday name like Monday or Tuesday etc.
-
-            is_current_day_working = current_day in working_days
-            is_holiday = current_date in holidays
-
-            if is_holiday or not is_current_day_working:
-                next_date = getdate(add_to_date(result, days=1, as_datetime=True))
-                result = next_date
+            remaining += hold_time
+        if not remaining:
+            return cursor
+        for span_start, span_end in self.iter_working_spans(cursor):
+            if span_end <= cursor:
                 continue
+            cursor = max(span_start, cursor)
+            available = (span_end - cursor).total_seconds()
+            if remaining <= available:
+                return cursor + timedelta(seconds=remaining)
+            remaining -= available
 
-            current_workday_doc = working_days[
-                current_day
-            ]  # Get the workday object for the current day
-            current_time_in_seconds = time_diff_in_seconds(
-                current_datetime, current_date
-            )
-            start_time = max(
-                current_workday_doc.start_time.total_seconds(), current_time_in_seconds
-            )
-            till_start_time = max(start_time - current_time_in_seconds, 0)
-            end_time = max(
-                current_workday_doc.end_time.total_seconds(), current_time_in_seconds
-            )
-            time_left = max(end_time - start_time, 0)
-            if not time_left:
-                next_date = getdate(add_to_date(result, days=1, as_datetime=True))
-                result = next_date
-                continue
-            time_taken = min(remaining_target_time, time_left)
-            remaining_target_time -= time_taken
-            time_required = till_start_time + time_taken
-            result = add_to_date(result, seconds=time_required, as_datetime=True)
-        return result
+    def calc_elapsed_time(self, start_time, end_time) -> int:
+        """Working seconds between start_time and end_time, per calc_time's calendar."""
+        # whole seconds, so durations stay integers
+        start_time = get_datetime(start_time).replace(microsecond=0)
+        end_time = get_datetime(end_time).replace(microsecond=0)
+        total_seconds = 0
+        for span_start, span_end in self.iter_working_spans(start_time, end_time):
+            overlap = min(span_end, end_time) - max(span_start, start_time)
+            total_seconds += max(overlap.total_seconds(), 0)
+        return int(total_seconds)
 
-    def get_working_days(self) -> dict[str, dict]:
-        workdays = []
-        for row in self.support_and_resolution:
-            workdays.append(row.workday)
-        return workdays
-
-    def get_working_hours(self) -> dict[str, dict]:
-        res = {}
-        for row in self.support_and_resolution:
-            res[row.workday] = (row.start_time, row.end_time)
-        return res
-
-    def is_working_time(self, date_time, working_hours):
-        day_of_week = get_weekdays()[date_time.weekday()]
-        start_time, end_time = working_hours.get(day_of_week, (0, 0))
-        date_time = timedelta(
-            hours=date_time.hour, minutes=date_time.minute, seconds=date_time.second
-        )
-        return start_time <= date_time < end_time
-
-    def calc_elapsed_time(self, start_time, end_time):
+    def iter_working_spans(
+        self, from_datetime: datetime, to_datetime: datetime | None = None
+    ) -> Iterator[tuple[datetime, datetime]]:
         """
-        Calculate working time between start_time and end_time, excluding holidays and non-working hours
-
-        :param start_time: Start datetime
-        :param end_time: End datetime
-        :return: Number of working seconds
+        Yield each working interval as (start, end) datetimes, day by day from
+        from_datetime's date, skipping holidays and non-workdays. Endless
+        without to_datetime, so callers stop once they have what they need.
         """
-        start_time = get_datetime(start_time)
-        end_time = get_datetime(end_time)
-
-        if start_time >= end_time:
-            return 0
-
         holidays = set(self.get_holidays())
         workdays = self.get_workdays()
+        day = getdate(from_datetime)
+        last_day = getdate(to_datetime) if to_datetime else None
+        while not last_day or day <= last_day:
+            workday = workdays.get(get_weekdays()[day.weekday()])
+            if workday and day not in holidays:
+                midnight = datetime.combine(day, time())
+                for start, end in self.get_working_intervals(workday):
+                    yield midnight + start, midnight + end
+            day += timedelta(days=1)
 
-        total_seconds = 0
-        current_date = start_time.date()
-        end_date = end_time.date()
+    def get_working_intervals(
+        self, workday: Document
+    ) -> list[tuple[timedelta, timedelta]]:
+        """
+        A workday's working time as (start, end) offsets from midnight: one
+        interval, or two around its break. The only place that reads a workday's
+        hours, so every SLA calculation skips the break the same way.
+        """
+        start, end = to_timedelta(workday.start_time), to_timedelta(workday.end_time)
+        if not (workday.break_start and workday.break_end):
+            return [(start, end)]
+        return [
+            (start, to_timedelta(workday.break_start)),
+            (to_timedelta(workday.break_end), end),
+        ]
 
-        while current_date <= end_date:
-            # Skip holidays
-            if current_date in holidays:
-                current_date = add_to_date(current_date, days=1)
-                continue
+    def get_working_hours(self) -> dict[str, list[tuple[timedelta, timedelta]]]:
+        """Working intervals per weekday name, for is_working_time."""
+        return {
+            row.workday: self.get_working_intervals(row)
+            for row in self.support_and_resolution
+        }
 
-            day_name = get_weekdays()[current_date.weekday()]
+    def is_working_time(self, date_time: datetime, working_hours: dict) -> bool:
+        """True when date_time falls in one of its weekday's working intervals."""
+        day_of_week = get_weekdays()[date_time.weekday()]
+        time_of_day = timedelta(
+            hours=date_time.hour, minutes=date_time.minute, seconds=date_time.second
+        )
+        return any(
+            start <= time_of_day < end
+            for start, end in working_hours.get(day_of_week, [])
+        )
 
-            # Skip non-working days
-            if day_name not in workdays:
-                current_date = add_to_date(current_date, days=1)
-                continue
-
-            workday = workdays[day_name]
-            work_start_seconds = workday.start_time.total_seconds()
-            work_end_seconds = workday.end_time.total_seconds()
-
-            # Calculate day boundaries in seconds
-            if current_date == start_time.date():
-                # First day - convert start time to seconds since midnight
-                start_time_seconds = convert_to_seconds(start_time)
-                day_start_seconds = max(start_time_seconds, work_start_seconds)
-            else:
-                day_start_seconds = work_start_seconds
-
-            if current_date == end_time.date():
-                # Last day - convert end time to seconds since midnight
-                end_time_seconds = convert_to_seconds(end_time)
-                day_end_seconds = min(end_time_seconds, work_end_seconds)
-            else:
-                day_end_seconds = work_end_seconds
-
-            # adding to final total seconds by end - start
-            if day_start_seconds < day_end_seconds:
-                total_seconds += day_end_seconds - day_start_seconds
-
-            current_date = add_to_date(current_date, days=1)
-
-        return total_seconds
+    def get_next_working_day_start(self, from_date):
+        """Start of the first working day after from_date, skipping holidays."""
+        working_hours = self.get_working_hours()
+        holidays = set(self.get_holidays())
+        # a year of lookahead is plenty; None means the calendar has no working day
+        for offset in range(1, 366):
+            next_date = getdate(add_to_date(from_date, days=offset, as_datetime=True))
+            day_name = next_date.strftime("%A")
+            if day_name in working_hours and next_date not in holidays:
+                # the day's start, not the end of its break
+                return get_datetime(next_date) + working_hours[day_name][0][0]
+        return None
 
     def get_holidays(self):
         res = []
@@ -480,27 +479,8 @@ class HDServiceLevelAgreement(Document):
             res[row.workday] = row
         return res
 
-    def on_trash(self):
-        self.handle_default_sla_deletion()
-
-    def handle_default_sla_deletion(self):
-        if not self.default_sla:
-            return
-        default_sla_exists = frappe.db.exists(
-            self.doctype,
-            {
-                "default_sla": True,
-                "name": ["!=", self.name],
-            },
-        )
-        if default_sla_exists:
-            return
-        else:
-            frappe.throw(
-                _(
-                    "Cannot delete the default SLA. At least one SLA must be marked as default."
-                )
-            )
+    def after_insert(self):
+        capture_event("sla_created")
 
 
 def get_repeated(values):

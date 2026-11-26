@@ -11,10 +11,18 @@ from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
 from frappe.utils.jinja import validate_template
 
+from helpdesk.api.auth import validate_uploaded_image
+from helpdesk.helpdesk.doctype.hd_settings.helpers import (
+    sync_brand_to_website_settings,
+    sync_home_page_to_website_settings,
+)
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     remove_guest_ticket_creation_permission,
     set_guest_ticket_creation_permission,
 )
+from helpdesk.utils import is_safe_link
+
+MAX_FOOTER_COLUMNS = 4
 
 
 class HDSettings(Document):
@@ -22,6 +30,83 @@ class HDSettings(Document):
         self.validate_auto_close_days()
         self.validate_email_contents()
         self.validate_send_feedback_when_ticket_closed()
+        self.validate_default_agent_status()
+        self.turn_off_guest_home_when_private()
+        self.validate_guest_only_settings()
+        # every visitor loads it, so a linked image could track them
+        validate_uploaded_image(self.banner_image)
+        self.validate_footer()
+
+    def validate_footer(self):
+        """Footer items mirror Website Settings: column rows without a parent, link rows under one."""
+        for d in self.social_links:
+            d.parent_label = None
+        columns = [d.label for d in self.footer_items if not d.parent_label]
+        links = [d for d in self.footer_items if d.parent_label]
+        if len(columns) > MAX_FOOTER_COLUMNS:
+            frappe.throw(
+                _("The footer can have at most {0} link columns").format(
+                    MAX_FOOTER_COLUMNS
+                )
+            )
+        if len(set(columns)) < len(columns):
+            frappe.throw(_("Each footer column needs a different title"))
+        for d in links:
+            if d.parent_label not in columns:
+                frappe.throw(
+                    _("{0}: No footer column is titled {1}").format(
+                        frappe.bold(d.label), frappe.bold(d.parent_label)
+                    )
+                )
+        parents = {d.parent_label for d in links}
+        for column in columns:
+            if column not in parents:
+                frappe.throw(
+                    _("Footer column {0} needs at least one link").format(
+                        frappe.bold(column)
+                    )
+                )
+        for d in links + self.social_links:
+            if not is_safe_link(d.url or ""):
+                frappe.throw(
+                    _("{0}: Start with http://, https://, mailto: or /").format(
+                        frappe.bold(d.label or _("Row {0}").format(d.idx))
+                    )
+                )
+
+    def turn_off_guest_home_when_private(self):
+        """A private knowledge base turns away guests, so it can't be their home."""
+        if not self.public_knowledge_base and self.has_value_changed(
+            "public_knowledge_base"
+        ):
+            self.knowledge_base_home_page_for_guests = 0
+
+    def validate_guest_only_settings(self):
+        """Guests reach only a public knowledge base. Checked only when turned on,
+        so a site already in that state still saves its other settings."""
+        if self.public_knowledge_base:
+            return
+        for fieldname in (
+            "allow_anonymous_article_voting",
+            "knowledge_base_home_page_for_guests",
+        ):
+            if self.get(fieldname) and self.has_value_changed(fieldname):
+                frappe.throw(
+                    _("Knowledge base must be public to turn on {0}").format(
+                        frappe.bold(_(self.meta.get_label(fieldname)))
+                    )
+                )
+
+    def validate_default_agent_status(self):
+        """The default status should be enabled, else agent creation breaks.
+        Empty is handled by the mandatory check."""
+        if not self.default_agent_status:
+            return
+
+        if frappe.db.get_value("HD Agent Status", self.default_agent_status, "enabled"):
+            return
+
+        frappe.throw(_("The default agent status must be enabled."))
 
     def validate_auto_close_days(self):
         if self.auto_close_tickets and self.auto_close_after_days <= 0:
@@ -82,9 +167,13 @@ class HDSettings(Document):
         return
 
     def before_save(self):
-        self.update_ticket_permissions()
+        if self.has_value_changed("allow_anyone_to_create_tickets"):
+            self.update_ticket_permissions()
 
     def on_update(self):
+        sync_brand_to_website_settings(self)
+        sync_home_page_to_website_settings(self)
+
         event = "helpdesk:settings-updated"
         room = get_website_room()
 

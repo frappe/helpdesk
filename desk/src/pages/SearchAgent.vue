@@ -4,16 +4,16 @@
       <LayoutHeader>
         <template #left-header>
           <Breadcrumbs
-            :items="[{ label: 'Search', route: { name: 'SearchAgent' } }]"
+            :items="[{ label: __('Search'), route: { name: 'SearchAgent' } }]"
           />
         </template>
       </LayoutHeader>
       <div class="mx-auto mt-6 max-w-4xl px-4 sm:px-5">
-        <div class="flex items-center space-x-2 px-2.5">
+        <div class="flex items-center gap-x-2 px-2.5">
           <TextInput
             ref="searchInput"
             class="flex-1"
-            placeholder="Search tickets, comments, and communications..."
+            :placeholder="__('Search tickets, comments, and communications...')"
             autocomplete="off"
             :model-value="query"
             @update:model-value="updateQuery"
@@ -28,7 +28,7 @@
                 <button
                   v-if="query"
                   @click="clearSearch"
-                  class="p-1 size-6 grid place-content-center focus:outline-none focus:ring focus:ring-outline-gray-3 rounded"
+                  class="p-1 size-6 grid place-content-center focus:outline-none focus:ring focus:ring-outline-gray-3 rounded-4"
                 >
                   <LucideX class="w-4 text-ink-gray-7" />
                 </button>
@@ -47,8 +47,8 @@
               @update:model-value="
                 (values) => updateFilter('agent_group', values)
               "
-              placeholder="Team"
-              label="Team"
+              :placeholder="__('Team')"
+              :label="__('Team')"
             />
 
             <!-- Status Filter -->
@@ -56,8 +56,8 @@
               :options="statusFilterOptions"
               :model-value="activeFilters.status || []"
               @update:model-value="(values) => updateFilter('status', values)"
-              placeholder="Status"
-              label="Status"
+              :placeholder="__('Status')"
+              :label="__('Status')"
             />
 
             <!-- Priority Filter -->
@@ -65,8 +65,8 @@
               :options="priorityFilterOptions"
               :model-value="activeFilters.priority || []"
               @update:model-value="(values) => updateFilter('priority', values)"
-              placeholder="Priority"
-              label="Priority"
+              :placeholder="__('Priority')"
+              :label="__('Priority')"
             />
 
             <!-- Document Type Filter -->
@@ -74,16 +74,16 @@
               :options="doctypesFilterOptions"
               :model-value="activeFilters.doctype || []"
               @update:model-value="(values) => updateFilter('doctype', values)"
-              placeholder="Type"
-              label="Type"
+              :placeholder="__('Type')"
+              :label="__('Type')"
             />
             <Button
               v-if="hasActiveFilters()"
               size="sm"
-              class="ml-auto text-ink-gray-5"
+              class="ms-auto text-ink-gray-5"
               variant="gray-ghost"
               @click="clearFilters"
-              label="Clear all filters"
+              :label="__('Clear all filters')"
             />
           </div>
         </div>
@@ -97,38 +97,45 @@
               <ErrorMessage
                 :message="
                   search.error.type == 'HelpdeskSearchIndexMissingError'
-                    ? 'Search index does not exist. Please build the index first.'
+                    ? __(
+                        'Search index does not exist. Please build the index first.'
+                      )
                     : search.error
                 "
               />
             </template>
             <template v-else-if="newSearch && query.length > 2">
-              <p class="text-ink-gray-6">Press enter to search</p>
+              <p class="text-ink-gray-6">{{ __("Press enter to search") }}</p>
             </template>
             <template v-else-if="search.loading">
-              <p class="text-ink-gray-6">Searching...</p>
+              <p class="text-ink-gray-6">{{ __("Searching...") }}</p>
             </template>
             <template v-else-if="searchResponse?.summary">
               <div class="space-y-1">
                 <p class="text-ink-gray-6">
-                  {{ searchResponse.summary.filtered_matches }} matches ({{
-                    searchResponse.summary.duration
-                  }}s)
+                  {{
+                    __("{0} matches", [searchResponse.summary.filtered_matches])
+                  }}
+                  <span>
+                    {{ __("({0}s)", [searchResponse.summary.duration]) }}
+                  </span>
                   <span v-if="hasActiveFilters()">
                     •
                     {{
-                      Object.keys(searchResponse.summary.applied_filters || {})
-                        .length
+                      __("{0} filter(s) applied", [
+                        Object.keys(
+                          searchResponse.summary.applied_filters || {}
+                        ).length,
+                      ])
                     }}
-                    filter(s) applied
                   </span>
                 </p>
                 <p
                   v-if="searchResponse.summary.corrected_query"
                   class="text-ink-gray-6"
                 >
-                  <span class="text-ink-gray-5">Searched for:</span>
-                  <span class="ml-1 font-medium text-primary">
+                  <span class="text-ink-gray-5">{{ __("Searched for:") }}</span>
+                  <span class="ms-1 font-medium text-primary">
                     {{ searchResponse.summary.corrected_query }}
                   </span>
                 </p>
@@ -141,16 +148,16 @@
           <template v-for="item in searchResponse?.results" :key="item.id">
             <router-link
               :to="getItemRoute(item)"
-              class="flex space-x-2 overflow-hidden rounded px-2.5 py-3 hover:bg-surface-gray-2"
+              class="flex gap-x-2 overflow-hidden rounded-4 px-2.5 py-3 hover:bg-surface-gray-2"
             >
-              <div class="flex items-start space-x-2">
+              <div class="flex items-start gap-x-2">
                 <div class="flex-shrink-0">
                   <LucideTicket
                     v-if="item.doctype === 'HD Ticket'"
                     class="h-4 w-4 text-ink-gray-6"
                   />
                   <LucideMessageSquare
-                    v-else-if="item.doctype === 'HD Ticket Comment'"
+                    v-else-if="item.doctype === 'Comment'"
                     class="h-4 w-4 text-ink-gray-6"
                   />
                   <LucideMail
@@ -164,24 +171,24 @@
                 <div class="flex items-center">
                   <div
                     v-if="item.title"
-                    class="text-base font-medium"
+                    class="text-base-medium truncate max-w-[60%]"
                     v-html="item.title"
                   />
-                  <div class="text-base font-medium" v-else>
+                  <div class="text-base-medium" v-else>
                     {{ item.name }}
                   </div>
                   <span class="px-1 leading-none text-sm text-ink-gray-5">
                     &middot;
                     {{
                       item.doctype == "Communication"
-                        ? "Email"
+                        ? __("Email")
                         : item.doctype.replace("HD ", "")
                     }}
                   </span>
                   <span class="px-1 leading-none text-sm text-ink-gray-5">
                     &middot; #{{ getTicketNumber(item) }}
                   </span>
-                  <div class="ml-auto text-sm text-ink-gray-5">
+                  <div class="ms-auto text-sm text-ink-gray-5">
                     {{ formatDate(item.modified) }}
                   </div>
                 </div>
@@ -203,17 +210,18 @@
 <script setup lang="ts">
 import { LayoutHeader } from "@/components";
 import SearchMultiSelect from "@/components/SearchMultiSelect.vue";
-import dayjs from "dayjs";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
+import { __ } from "@/translation";
 import {
   Breadcrumbs,
   createResource,
+  dayjs,
   debounce,
   ErrorMessage,
   TextInput,
 } from "frappe-ui";
-import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
+import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-
 // Icons
 
 // Type Definitions
@@ -340,9 +348,9 @@ const priorityFilterOptions = computed(() => {
 
 const doctypesFilterOptions = computed(() => {
   return [
-    { value: "HD Ticket", label: "Tickets", count: 0 },
-    { value: "Communication", label: "Emails", count: 0 },
-    { value: "HD Ticket Comment", label: "Comments", count: 0 },
+    { value: "HD Ticket", label: __("Tickets"), count: 0 },
+    { value: "Communication", label: __("Emails"), count: 0 },
+    { value: "Comment", label: __("Comments"), count: 0 },
   ];
 });
 
@@ -411,17 +419,19 @@ function getItemRoute(item: SearchResultItem) {
       name: "TicketAgent",
       params: { ticketId: item.name },
     };
-  } else if (item.doctype === "HD Ticket Comment" && item.reference_ticket) {
+  } else if (item.doctype === "Comment" && item.reference_ticket) {
     return {
       name: "TicketAgent",
       params: { ticketId: item.reference_ticket },
-      hash: `#comment-${item.name}`,
+      hash: "#activity",
+      query: { highlight: `comment-${item.name}` },
     };
   } else if (item.doctype === "Communication" && item.reference_name) {
     return {
       name: "TicketAgent",
       params: { ticketId: item.reference_name },
-      hash: `#communication-${item.name}`,
+      hash: "#activity",
+      query: { highlight: `communication-${item.name}` },
     };
   }
   return { name: "SearchAgent" };
@@ -434,7 +444,7 @@ function getTicketNumber(item: SearchResultItem) {
 
   if (item.doctype === "HD Ticket") {
     return item.name || "";
-  } else if (item.doctype === "HD Ticket Comment") {
+  } else if (item.doctype === "Comment") {
     return item.reference_ticket || "";
   } else if (item.doctype === "Communication") {
     return item.reference_name || "";
@@ -516,17 +526,6 @@ watch(
   }
 );
 
-function addFocusShortcut() {
-  nextTick(() => {
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "/") {
-        e.preventDefault();
-        searchInput.value.el.focus();
-      }
-    });
-  });
-}
-
 // Lifecycle
 onMounted(() => {
   const searchQuery = route.query.q as string;
@@ -539,6 +538,8 @@ onMounted(() => {
     clearStoredSearches();
   }
   // add a shortcut when presses "/" focus on this element
-  addFocusShortcut();
+  useShortcut("/", () => {
+    searchInput.value?.focus();
+  });
 });
 </script>

@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "allow_guest_to_view": 1,
  "autoname": "hash",
  "creation": "2022-02-08 18:13:42.039744",
@@ -8,9 +9,16 @@
  "engine": "InnoDB",
  "field_order": [
   "category_name",
+  "parent_article_category",
   "description",
   "column_break_iczs",
-  "icon"
+  "icon",
+  "pinned",
+  "pinned_order",
+  "is_group",
+  "lft",
+  "rgt",
+  "old_parent"
  ],
  "fields": [
   {
@@ -19,6 +27,12 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Name"
+  },
+  {
+   "fieldname": "parent_article_category",
+   "fieldtype": "Link",
+   "label": "Parent Category",
+   "options": "HD Article Category"
   },
   {
    "allow_in_quick_entry": 1,
@@ -34,15 +48,60 @@
   {
    "fieldname": "column_break_iczs",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, this category will appear on the knowledge base home page. When no category is pinned, every category appears.",
+   "fieldname": "pinned",
+   "fieldtype": "Check",
+   "label": "Pinned"
+  },
+  {
+   "default": "0",
+   "fieldname": "pinned_order",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Pinned Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lft",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Left",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Right",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Old Parent",
+   "options": "HD Article Category"
   }
  ],
+ "is_tree": 1,
  "links": [],
- "modified": "2025-01-21 19:52:51.131313",
+ "modified": "2026-10-26 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Category",
  "naming_rule": "Random",
- "nsm_parent_field": "parent_hd_article_category",
+ "nsm_parent_field": "parent_article_category",
  "owner": "Administrator",
  "permissions": [
   {
@@ -70,24 +129,15 @@
    "write": 1
   },
   {
-   "email": 1,
-   "export": 1,
-   "print": 1,
    "read": 1,
-   "report": 1,
-   "role": "All",
-   "share": 1
+   "role": "HD Customer"
   },
   {
-   "email": 1,
-   "export": 1,
-   "print": 1,
    "read": 1,
-   "report": 1,
-   "role": "Guest",
-   "share": 1
+   "role": "HD Customer Manager"
   }
  ],
+ "row_format": "Dynamic",
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

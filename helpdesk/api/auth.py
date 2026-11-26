@@ -1,10 +1,16 @@
 import frappe
+from frappe import _
+from frappe.core.doctype.user.user import get_timezones
 
+from helpdesk.utils import agent_only, get_agent_name, get_agents_team, get_user_contact
 from helpdesk.utils import is_agent as _is_agent
 
 
 @frappe.whitelist()
 def get_user():
+    """The session user's profile and role flags, loaded when the app boots.
+    Name, image, language, time zone, teams, agent availability, and whether they are an
+    agent, agent manager or admin and have desk access."""
     current_user = frappe.session.user
     filters = {"name": current_user}
     fields = [
@@ -14,6 +20,7 @@ def get_user():
         "user_image",
         "username",
         "time_zone",
+        "language",
     ]
     user = frappe.get_value(
         doctype="User",
@@ -22,20 +29,45 @@ def get_user():
         as_dict=True,
     )
 
+    roles = frappe.get_roles(current_user)
+    is_admin = "System Manager" in roles or "Administrator" in roles
+
     is_agent = _is_agent()
-    is_admin = ("System Manager" or "Admistrator") in frappe.get_roles(current_user)
+    agent_name = get_agent_name()
+    has_agent_record = bool(agent_name)
     has_desk_access = is_agent or is_admin
+    availability = (
+        frappe.db.get_value(
+            "HD Agent",
+            agent_name,
+            [
+                "availability",
+                "availability_changed_on",
+                "availability_changed_by",
+                "availability_expires_on",
+            ],
+            as_dict=True,
+        )
+        if agent_name
+        else None
+    ) or {}
     user_image = user.user_image
     user_first_name = user.first_name
     user_name = user.full_name
     user_id = user.name
     username = user.username
     is_manager = ("Agent Manager") in frappe.get_roles(current_user)
+    user_team = get_agents_team()
+    user_team_names = [team["team_name"] for team in user_team]
+    language = user.language or frappe.db.get_single_value(
+        "System Settings", "language"
+    )
 
     return {
         "has_desk_access": has_desk_access,
         "is_admin": is_admin,
         "is_agent": is_agent,
+        "has_agent_record": has_agent_record,
         "user_id": user_id,
         "is_manager": is_manager,
         "user_image": user_image,
@@ -43,45 +75,137 @@ def get_user():
         "user_name": user_name,
         "username": username,
         "time_zone": user.time_zone,
+        "user_teams": user_team_names,
+        "language": language,
+        "availability": availability.get("availability"),
+        "availability_changed_on": availability.get("availability_changed_on"),
+        "availability_changed_by": availability.get("availability_changed_by"),
+        "availability_expires_on": availability.get("availability_expires_on"),
+        # what "Clear now" in the availability menu moves the agent to
+        "default_agent_status": (
+            frappe.db.get_single_value("HD Settings", "default_agent_status")
+            if agent_name
+            else None
+        ),
     }
 
 
-@frappe.whitelist(allow_guest=True)
-def oauth_providers():
-    from frappe.utils.html_utils import get_icon_html
-    from frappe.utils.oauth import get_oauth2_authorize_url, get_oauth_keys
-    from frappe.utils.password import get_decrypted_password
+@frappe.whitelist(methods=["POST"])
+def update_profile(
+    first_name: str | None = None,
+    last_name: str | None = None,
+    image: str | None = None,
+    language: str | None = None,
+    time_zone: str | None = None,
+) -> None:
+    """Update the current user's name, image, language and time zone.
+    Also copies name and image to their contact. None leaves a field as is; an empty
+    `image` removes it. The image must be an uploaded /files/ path and the time zone a
+    known one."""
+    user = frappe.get_doc("User", frappe.session.user)
+    if first_name is not None:
+        user.first_name = first_name
+    if last_name is not None:
+        user.last_name = last_name
+    validate_uploaded_image(image)
+    if image is not None:
+        user.user_image = image or None
+    if language:
+        user.language = language
+    if time_zone:
+        # Autocomplete field: unvalidated, and a bad zone breaks every date
+        if time_zone not in get_timezones()["timezones"]:
+            frappe.throw(_("Unknown time zone: {0}").format(time_zone))
+        user.time_zone = time_zone
+    user.save(ignore_permissions=True)
+    _sync_contact(user)
 
-    out = []
-    providers = frappe.get_all(
-        "Social Login Key",
-        filters={"enable_social_login": 1},
-        fields=["name", "client_id", "base_url", "provider_name", "icon"],
-        order_by="name",
+
+def validate_uploaded_image(image: str | None) -> None:
+    if image and not image.startswith("/files/"):
+        frappe.throw(_("Please upload the picture rather than linking to it"))
+
+
+def _sync_contact(user) -> None:
+    # Frappe syncs Contact after commit, too late for the client reload.
+    contact_name = get_user_contact(user.name)
+    if not contact_name:
+        return
+    # Locked: races the User's own after-commit Contact save.
+    contact = frappe.get_doc("Contact", contact_name, for_update=True)
+    contact.update(
+        {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "image": user.user_image,
+        }
+    )
+    contact.save(ignore_permissions=True)
+
+
+@frappe.whitelist()
+@agent_only
+def get_current_user_email_info():
+    """The current agent's email signature, email and outgoing email accounts.
+    Returns {email_signature, email, outgoing_emails (linked to them), available_emails
+    (every account with outgoing enabled)}. Agents only."""
+    user = frappe.session.user
+
+    email_signature, email = frappe.db.get_value(
+        "User", user, ["email_signature", "email"]
+    )
+    user_emails = frappe.db.get_all(
+        "User Email",
+        filters={"parent": user},
+        fields=["email_account", "email_id"],
+    )
+    available_emails = frappe.db.get_all(
+        "Email Account",
+        filters={"enable_outgoing": 1},
+        fields=["name", "email_id"],
     )
 
-    for provider in providers:
-        client_secret = get_decrypted_password(
-            "Social Login Key", provider.name, "client_secret"
+    outgoing_account_names = {account.name for account in available_emails}
+    outgoing_emails = [
+        row for row in user_emails if row.email_account in outgoing_account_names
+    ]
+
+    return {
+        "email_signature": email_signature,
+        "email": email,
+        "outgoing_emails": outgoing_emails,
+        "available_emails": available_emails,
+    }
+
+
+@frappe.whitelist(methods=["POST"])
+@agent_only
+def set_user_email_accounts(email_accounts: list[str]):
+    """Link the given outgoing email accounts to the current user.
+
+    User Emails is a System Manager-only table, so an agent can neither read
+    nor save it through their User document. Links to accounts without
+    outgoing email are kept.
+    """
+    outgoing_accounts = dict(
+        frappe.get_all(
+            "Email Account",
+            filters={"enable_outgoing": 1},
+            fields=["name", "email_id"],
+            as_list=True,
         )
-        if not client_secret:
-            continue
-
-        icon = None
-        if provider.icon:
-            if provider.provider_name == "Custom":
-                icon = get_icon_html(provider.icon, small=True)
-            else:
-                icon = f"<img src='{provider.icon}' alt={provider.provider_name}>"
-
-        if provider.client_id and provider.base_url and get_oauth_keys(provider.name):
-            out.append(
-                {
-                    "name": provider.name,
-                    "provider_name": provider.provider_name,
-                    "auth_url": get_oauth2_authorize_url(provider.name, "/helpdesk"),
-                    "icon": icon,
-                }
-            )
-
-    return out
+    )
+    user = frappe.get_doc("User", frappe.session.user)
+    rows = {row.email_account: row for row in user.user_emails}
+    kept_links = [
+        row for row in user.user_emails if row.email_account not in outgoing_accounts
+    ]
+    agent_links = [
+        rows.get(account)
+        or {"email_account": account, "email_id": outgoing_accounts[account]}
+        for account in dict.fromkeys(email_accounts)
+        if account in outgoing_accounts
+    ]
+    user.set("user_emails", kept_links + agent_links)
+    user.flags.ignore_permlevel_for_fields = ["user_emails"]
+    user.save()

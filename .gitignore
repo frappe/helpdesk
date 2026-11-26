@@ -29,10 +29,22 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.playwright-mcp
+.claude-flow
+.claude
+.claude-worktrees
+CLAUDE.md
+
 
 helpdesk/docs/current
+helpdesk/public/app_builds
 helpdesk/public/desk
 helpdesk/public/frontend
 helpdesk/public/node_modules
 helpdesk/www/helpdesk/index.html
 desk/components.d.ts
+desk/stats.html
+# Playwright
+e2e/.auth
+playwright-report
+test-results

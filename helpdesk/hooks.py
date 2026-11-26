@@ -6,7 +6,11 @@ app_icon = "octicon octicon-file-directory"
 app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
-required_apps = ["telephony"]
+# As org/app, so `bench get-app helpdesk` fetches whichever is missing.
+required_apps = ["frappe/telephony"]
+require_type_annotated_api_methods = True
+# Open source, so API clients may read a method's code with `frappectl method show`.
+expose_discovery_source = True
 
 add_to_apps_screen = [
     {
@@ -18,26 +22,39 @@ add_to_apps_screen = [
     }
 ]
 
+get_site_info = "helpdesk.activation.get_site_info"
+
 after_install = "helpdesk.setup.install.after_install"
+before_uninstall = "helpdesk.setup.install.before_uninstall"
 after_migrate = [
     "helpdesk.search.build_index_in_background",
     "helpdesk.search.download_corpus",
 ]
 
+
 # Full Text Search
 # ------------------
 
-sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
+sqlite_search = [
+    "helpdesk.search_sqlite.HelpdeskSearch",
+]
 
 scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
-        "helpdesk.search_sqlite.build_index_if_not_exists",
         "helpdesk.search.download_corpus",
     ],
     "daily": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
     ],
+    "hourly_long": [
+        "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.update_sla_status_in_ticket"
+    ],
+    "cron": {
+        "*/5 * * * *": [
+            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.reset_expired_availability"
+        ]
+    },
 }
 
 
@@ -46,44 +63,161 @@ website_route_rules = [
         "from_route": "/helpdesk/<path:app_path>",
         "to_route": "helpdesk",
     },
+    {
+        "from_route": "/help/articles/<name>.md",
+        "to_route": "help-article-markdown",
+    },
+]
+
+page_renderer = ["helpdesk.api.knowledge_base.ArticleMarkdownPage"]
+
+# The old customer portal's URLs keep working through these.
+website_redirects = [
+    {
+        "source": "/helpdesk/my-tickets/new",
+        "target": "/help/my-tickets/new",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/my-tickets",
+        "target": "/help/my-tickets",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": r"/helpdesk/my-tickets/(.*)",
+        "target": r"/help/my-tickets/\1",
+        "forward_query_parameters": True,
+    },
+    # Ticket emails and the new ticket form lived here before they moved under my-tickets.
+    {
+        "source": r"/help/tickets/(.+)",
+        "target": r"/help/my-tickets/\1",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/kb-public",
+        "target": "/help",
+    },
+    {
+        "source": r"/helpdesk/kb-public/articles/(.*)",
+        "target": r"/help/articles/\1",
+    },
+    {
+        "source": r"/helpdesk/kb-public/(.*)",
+        "target": r"/help/category/\1",
+    },
 ]
 
 user_invitation = {
     "allowed_roles": {
-        "Agent Manager": ["Agent", "Agent Manager"],
-        "System Manager": ["Agent", "Agent Manager", "System Manager"],
-    },
-    "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
-}
-
-doc_events = {
-    "Contact": {
-        "before_insert": "helpdesk.overrides.contact.before_insert",
-    },
-    "Assignment Rule": {
-        "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
-    },
-    "HD Ticket": {
-        "on_trash": [
-            "helpdesk.search.remove_doc",
-            "helpdesk.search_sqlite.delete_doc_index",
+        "Agent Manager": [
+            "Agent",
+            "Agent Manager",
+            "HD Customer",
+            "HD Customer Manager",
+        ],
+        "System Manager": [
+            "Agent",
+            "Agent Manager",
+            "System Manager",
+            "HD Customer",
+            "HD Customer Manager",
         ],
     },
+    "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
+    "extra_invite_params": ["customer", "contact"],
 }
 
-has_permission = {
-    "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
+studio_app_boot = {"helpdesk": "helpdesk.helpdesk.hooks.studio_app.get_boot"}
+update_website_context = "helpdesk.helpdesk.hooks.studio_app.update_website_context"
+
+doc_events = {
+    "Assignment Rule": {
+        "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
+        "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
+    },
+    "Customer": {
+        "after_insert": "helpdesk.integrations.erpnext.customer.after_insert",
+        "on_update": "helpdesk.integrations.erpnext.customer.on_update",
+        "before_rename": "helpdesk.integrations.erpnext.customer.before_rename",
+        "after_rename": "helpdesk.integrations.erpnext.customer.after_rename",
+        "on_trash": "helpdesk.integrations.erpnext.customer.on_trash",
+    },
+    "User Permission": {
+        "before_validate": "helpdesk.integrations.erpnext.user_permission.before_validate",
+        "after_insert": "helpdesk.integrations.erpnext.user_permission.after_insert",
+        "on_update": "helpdesk.integrations.erpnext.user_permission.on_update",
+        "on_trash": "helpdesk.integrations.erpnext.user_permission.on_trash",
+    },
+    "DocShare": {
+        "before_validate": "helpdesk.integrations.erpnext.doc_share.before_validate",
+        "after_insert": "helpdesk.integrations.erpnext.doc_share.after_insert",
+        "on_update": "helpdesk.integrations.erpnext.doc_share.on_update",
+        "on_trash": "helpdesk.integrations.erpnext.doc_share.on_trash",
+    },
+    "Notification Log": {
+        "before_insert": "helpdesk.extends.notification_log.before_insert",
+    },
+    "Comment": {
+        "before_insert": "helpdesk.extends.comment.before_insert",
+        "validate": "helpdesk.extends.comment.validate",
+        "on_trash": "helpdesk.extends.comment.on_trash",
+    },
+    "ToDo": {
+        "on_update": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.publish_assignment_update",
+    },
 }
 
+standard_queries = {
+    "HD Article Category": "helpdesk.api.knowledge_base.search_categories",
+}
+
+# For List View
 permission_query_conditions = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
+    "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.permission_query",
+    "HD Article Category": "helpdesk.helpdesk.doctype.hd_article_category.hd_article_category.permission_query",
+    "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
+    "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.permission_query",
 }
+
+
+has_permission = {
+    "HD Agent": "helpdesk.helpdesk.doctype.hd_agent.hd_agent.has_permission",
+    "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
+    "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.has_permission",
+    "HD Article Category": "helpdesk.helpdesk.doctype.hd_article_category.hd_article_category.has_permission",
+    "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
+    "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.has_permission",
+    "Comment": "helpdesk.extends.comment.has_permission",
+}
+
+override_whitelisted_methods = {
+    "frappe.realtime.has_permission": "helpdesk.overrides.realtime.has_permission",
+    "frappe.desk.form.activity.get_activity_timeline": "helpdesk.overrides.activity.get_activity_timeline",
+    "frappe.desk.form.activity.get_more_email_activities": "helpdesk.overrides.activity.get_more_email_activities",
+    "frappe.desk.form.load.getdoc": "helpdesk.overrides.activity.getdoc",
+    "frappe.desk.form.load.getdoctype": "helpdesk.overrides.activity.getdoctype",
+    "frappe.desk.form.load.get_docinfo": "helpdesk.overrides.activity.get_docinfo",
+    "frappe.desk.form.load.get_communications": "helpdesk.overrides.activity.get_communications",
+}
+
+# The article search index; frappe.clear_cache() would otherwise empty it until the next rebuild
+persistent_cache_keys = ["search_doc:*", "search_doc_sections:*"]
+
+notification_skip_email_types = [
+    "Reaction",
+    "Ticket Reopened",
+]
+
 
 # DocType Class
 # ---------------
 # Override standard doctype classes
 override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
+    "Assignment Rule": "helpdesk.overrides.assignment_rule.HelpdeskAssignmentRule",
+    "User Invitation": "helpdesk.overrides.user_invitation.HelpdeskUserInvitation",
 }
 
 ignore_links_on_delete = [
@@ -94,10 +228,12 @@ ignore_links_on_delete = [
 # setup wizard
 # setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
 # setup_wizard_stages = "helpdesk.setup.setup_wizard.get_setup_stages"
-setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
+setup_wizard_success = "helpdesk.setup.setup_wizard.setup_complete"
+setup_wizard_auto_complete = True
 
 
 # Testing
 # ---------------
 
 before_tests = "helpdesk.test_utils.before_tests"
+auth_hooks = ["helpdesk.auth.authenticate"]

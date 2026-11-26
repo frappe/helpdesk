@@ -1,38 +1,73 @@
 <template>
-  <Dialog v-model="showDialog" :options="{ title: 'Move To', actions }">
-    <template #body-content>
-      <div class="flex flex-col flex-1 gap-3">
-        <Link
-          class="form-control"
-          doctype="HD Article Category"
-          placeholder="Select Category"
+  <Dialog
+    v-model:open="showDialog"
+    :title="title || __('Move To')"
+    :actions="actions"
+  >
+    <template #default>
+      <div class="flex flex-col flex-1">
+        <Combobox
+          class="w-full"
           v-model="category"
-          label="Category"
-          :page-length="100"
+          :options="options"
+          :placeholder="__('Select Category')"
         />
+        <AnimatedNote :note="joiningNote" />
       </div>
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Dialog } from "frappe-ui";
-import { Link } from "@/components";
+import { ref, computed, watch } from "vue";
+import { Combobox, Dialog } from "frappe-ui";
+import AnimatedNote from "./AnimatedNote.vue";
+import { categoryOptions, useCategoryVisibility } from "@/stores/knowledgeBase";
+import { __ } from "@/translation";
 
 const emit = defineEmits(["move"]);
 const showDialog = defineModel<boolean>();
-
 const category = ref("");
+const joining = useCategoryVisibility(category);
+// A move only narrows access; Public needs no note.
+const joiningNote = computed(
+  () =>
+    ({
+      Customers: __(
+        "Articles in this category are visible to customers only. Moved public articles will have the same visibility."
+      ),
+      Private: __(
+        "Articles in this category are visible to agents only. Moved articles will have the same visibility."
+      ),
+    }[joining.data])
+);
 
-const actions = [
+const props = defineProps<{
+  excludeCategory?: string;
+  title?: string;
+  actionLabel?: string;
+  defaultCategory?: string;
+}>();
+
+const options = computed(() =>
+  (categoryOptions.data || [])
+    .filter(({ value }) => value !== props.excludeCategory)
+    .map(({ value, label }) => ({ value, label }))
+);
+watch(showDialog, (open) => {
+  if (!open) return;
+  // a pick made before a cancel must not survive
+  category.value = props.defaultCategory || "";
+  // shared with other dialogs: drop their list before it shows here
+  categoryOptions.reset();
+  categoryOptions.submit();
+});
+
+const actions = computed(() => [
   {
-    label: "Move",
+    label: props.actionLabel || __("Move"),
     variant: "solid",
-    onClick: () => {
-      emit("move", category.value);
-      category.value = "";
-    },
+    onClick: () => emit("move", category.value),
   },
-];
+]);
 </script>

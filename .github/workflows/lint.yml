@@ -10,23 +10,25 @@ on:
 jobs:
   commit-lint:
     name: Semantic Commits
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 200
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 24
           check-latest: true
       - name: Check commit titles
+        # Installed outside the repo: npm rejects the root package.json's yarn `link:` dependency.
         run: |
-          npm install @commitlint/cli @commitlint/config-conventional
-          npx commitlint --verbose --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+          cp commitlint.config.mjs "$RUNNER_TEMP/"
+          (cd "$RUNNER_TEMP" && npm install @commitlint/cli @commitlint/config-conventional)
+          "$RUNNER_TEMP/node_modules/.bin/commitlint" --config "$RUNNER_TEMP/commitlint.config.mjs" --verbose --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
 
   linter:
     name: 'Frappe Linter'
-    runs-on: ubuntu-latest
+    runs-on: frappe-arc
     if: github.event_name == 'pull_request'
 
     steps:
@@ -35,7 +37,11 @@ jobs:
       - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: '3.14'
+
+      # pre-commit's own Node (for prettier) needs libatomic, which frappe-arc runners lack.
+      - name: Install libatomic
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends libatomic1
 
       - name: Install and Run Pre-commit
         uses: pre-commit/action@v3.0.1
@@ -48,3 +54,19 @@ jobs:
 
       - name: Run Semgrep rules
         run: semgrep ci --config ./frappe-semgrep-rules/rules --config r/python.lang.correctness
+
+  deps-vulnerable-check:
+    name: 'Vulnerable Dependency Check'
+    runs-on: frappe-arc
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Install and run pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit --cache-dir "$RUNNER_TEMP/pip-audit" --desc on .

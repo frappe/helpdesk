@@ -1,33 +1,28 @@
 <template>
-  <div class="p-6.5 px-5 rounded-xl border border-gray-300">
+  <div class="p-6.5 px-5 rounded-7 border border-outline-gray-2">
     <div class="mb-6.5 flex justify-between items-center">
-      <div class="ml-1">
+      <div class="ms-1">
         <Popover v-if="startYear !== endYear">
-          <template #target="{ togglePopover }">
+          <template #trigger>
             <Button
-              class="flex items-center gap-2 font-semibold text-xl cursor-pointer select-none"
+              class="flex items-center gap-2 text-xl-semibold cursor-pointer select-none"
               variant="ghost"
-              @click="togglePopover"
               :label="currentYear + ''"
-              icon-right="chevron-down"
+              icon-right="lucide-chevron-down"
             />
           </template>
-          <template #body-main="{ togglePopover }">
+          <template #default="{ close: closePopover }">
             <div class="w-24">
               <div ref="yearsContainer" class="max-h-60 overflow-y-auto py-1">
                 <div
                   v-for="year in yearsList"
                   :key="year"
                   ref="yearItems"
-                  class="cursor-pointer px-3 py-1.5 text-sm hover:bg-gray-100 flex items-center justify-between"
-                  @click="onYearChange(togglePopover, year)"
+                  class="cursor-pointer px-3 py-1.5 text-sm hover:bg-surface-gray-2 flex items-center justify-between"
+                  @click="onYearChange(closePopover, year)"
                 >
                   {{ year }}
-                  <FeatherIcon
-                    name="check"
-                    class="size-4"
-                    v-if="year === currentYear"
-                  />
+                  <LucideCheck class="size-4" v-if="year === currentYear" />
                 </div>
               </div>
             </div>
@@ -35,7 +30,7 @@
         </Popover>
         <div
           v-else
-          class="flex items-center gap-2 px-2 font-semibold text-xl select-none"
+          class="flex items-center gap-2 px-2 text-xl-semibold select-none"
         >
           {{ startYear }}
         </div>
@@ -43,14 +38,14 @@
       <div class="flex gap-2 items-center">
         <Button
           variant="ghost"
-          icon="chevron-left"
+          icon="lucide-chevron-left"
           :disabled="visibleMonths === 'first-half'"
           @click="visibleMonths = 'first-half'"
         />
         <Button variant="ghost" label="Today" @click="goToToday()" />
         <Button
           variant="ghost"
-          icon="chevron-right"
+          icon="lucide-chevron-right"
           :disabled="visibleMonths === 'second-half'"
           @click="visibleMonths = 'second-half'"
         />
@@ -85,8 +80,8 @@
         :class="[
           'size-1.5 rounded-full cursor-pointer',
           {
-            'bg-black': visibleMonths === 'first-half',
-            'bg-gray-400': visibleMonths === 'second-half',
+            'bg-surface-gray-10': visibleMonths === 'first-half',
+            'bg-surface-gray-4': visibleMonths === 'second-half',
           },
         ]"
         @click="visibleMonths = 'first-half'"
@@ -95,8 +90,8 @@
         :class="[
           'size-1.5 rounded-full cursor-pointer',
           {
-            'bg-black': visibleMonths === 'second-half',
-            'bg-gray-400': visibleMonths === 'first-half',
+            'bg-surface-gray-10': visibleMonths === 'second-half',
+            'bg-surface-gray-4': visibleMonths === 'first-half',
           },
         ]"
         @click="visibleMonths = 'second-half'"
@@ -105,11 +100,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import LucideCheck from "~icons/lucide/check";
+import { computed, ref, watch } from "vue";
 import HLCalender from "./HLCalender.vue";
-import dayjs from "dayjs";
 import { holidayData } from "@/stores/holidayList";
-import { Button, Popover } from "frappe-ui";
+import { Button, dayjs, Popover } from "frappe-ui";
 
 const visibleMonths = ref<"first-half" | "second-half">("first-half");
 const months = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
@@ -126,7 +121,7 @@ const yearsList = computed(() => {
   return yearList;
 });
 
-const onYearChange = (togglePopover: () => void, year: number) => {
+const onYearChange = (closePopover: () => void, year: number) => {
   currentYear.value = year;
   if (year === dayjs(holidayData.value.from_date).year()) {
     if (dayjs(holidayData.value.from_date).month() >= 6) {
@@ -139,7 +134,7 @@ const onYearChange = (togglePopover: () => void, year: number) => {
   } else {
     visibleMonths.value = "first-half";
   }
-  togglePopover();
+  closePopover();
 };
 
 const goToToday = () => {
@@ -151,17 +146,14 @@ const goToToday = () => {
 watch(
   () => [holidayData.value.from_date, holidayData.value.to_date],
   ([fromDate, toDate]) => {
-    fromDate = dayjs(fromDate);
-    toDate = dayjs(toDate);
+    fromDate = dayjs(fromDate || dayjs());
+    toDate = dayjs(toDate || dayjs());
     startYear.value = fromDate.year();
     endYear.value = toDate.year();
     currentYear.value = fromDate.year();
     visibleMonths.value = fromDate.month() >= 6 ? "second-half" : "first-half";
-  }
+  },
+  // The list is loaded before this view mounts, so a change-only watch never fires.
+  { immediate: true }
 );
-
-onMounted(() => {
-  const fromDate = dayjs(holidayData.value.from_date || dayjs());
-  visibleMonths.value = fromDate.month() >= 6 ? "second-half" : "first-half";
-});
 </script>

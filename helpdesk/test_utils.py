@@ -1,9 +1,31 @@
-import frappe
-from frappe.utils import add_to_date, getdate
+import json
+from datetime import datetime
+from typing import Any
+from unittest.mock import MagicMock, patch
 
+import frappe
+from frappe.cache_manager import clear_doctype_map
+from frappe.core.doctype.communication.test_communication import create_email_account
+from frappe.permissions import rights
+from frappe.tests.classes.context_managers import freeze_time
+from frappe.utils import add_to_date, getdate, now_datetime
+
+from helpdesk.api.banners import BANNERS, dismiss_banner
+from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
+from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
+from helpdesk.integrations.erpnext.utils import create_customer_field
+from helpdesk.integrations.frappe_cloud import TRIAL_DISMISSED_KEY, forget_trial
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_frappe_version
+
+if is_frappe_version("16", above=True):
+    from frappe.tests.utils import make_test_objects
+else:
+    from frappe.test_runner import make_test_objects
+
 
 SLA_PRIORITY_NAME = "SLA Priority"
+TEST_HOLIDAY_LIST_NAME = "Test Holiday List"
 
 
 def before_tests():
@@ -11,8 +33,13 @@ def before_tests():
     frappe.db.set_single_value(
         "HD Settings", "enable_email_ticket_feedback", 0
     )  # nosemgrep
+    frappe.db.set_single_value("HD Settings", "default_priority", None)
     # frappe.flags.mute_emails = True
+    make_holiday_list()
     make_new_sla()
+    make_test_objects("Email Domain", reset=True)
+    create_email_account()
+    create_customer_field()
     frappe.db.commit()  # nosemgrep
 
 
@@ -20,6 +47,7 @@ def make_new_sla():
     condition = "doc.priority in ['High', 'Urgent', 'Low']"
     sla_doc = make_sla(SLA_PRIORITY_NAME, condition)
     sla_doc = sla_doc.reload()
+    sla_doc.holiday_list = TEST_HOLIDAY_LIST_NAME
 
     sla_doc.support_and_resolution = []
     for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]:
@@ -81,21 +109,65 @@ def make_new_sla():
     sla_doc.save()
 
 
-def make_sla(sla_name: str = "Test SLA", condition: str = ""):
-    def_sla = frappe.get_doc("HD Service Level Agreement", "Default")
+def make_holiday_list():
+    if not frappe.db.exists("HD Service Holiday List", TEST_HOLIDAY_LIST_NAME):
+        # from_date = first date of current year
+        from_date = datetime(datetime.today().year, 1, 1).date()
+        to_date = datetime(datetime.today().year + 1, 1, 15).date()
+        frappe.get_doc(
+            {
+                "doctype": "HD Service Holiday List",
+                "holiday_list_name": TEST_HOLIDAY_LIST_NAME,
+                "from_date": from_date,
+                "to_date": to_date,
+            }
+        ).insert()
+
+
+def make_sla(
+    sla_name: str = "Test SLA",
+    condition: str = "",
+    rank: int = 0,
+    priorities: list[str] | None = None,
+):
+    """Copy the seeded SLA. `priorities` replaces its priority rows, the
+    first becoming the default priority, each row slower than the one before."""
+    def_sla = frappe.get_doc("HD Service Level Agreement", DEFAULT_SLA)
     sla_doc = frappe.copy_doc(def_sla)
     sla_doc.service_level = sla_name
     sla_doc.condition = condition
     sla_doc.default_sla = 0
+    sla_doc.rank = rank
+    if priorities:
+        sla_doc.priorities = []
+        for index, priority in enumerate(priorities):
+            sla_doc.append(
+                "priorities",
+                {
+                    "priority": priority,
+                    "default_priority": index == 0,
+                    "response_time": 60 * 60 * (index + 1),
+                    "resolution_time": 60 * 60 * 4 * (index + 1),
+                },
+            )
     sla_doc.insert(ignore_if_duplicate=True, ignore_permissions=True)
     return sla_doc
+
+
+def make_priority(name: str):
+    """Create an HD Ticket Priority. It is not added to any SLA."""
+    if frappe.db.exists("HD Ticket Priority", name):
+        return frappe.get_doc("HD Ticket Priority", name)
+    return frappe.get_doc({"doctype": "HD Ticket Priority", "name": name}).insert(
+        ignore_permissions=True
+    )
 
 
 def make_ticket(
     subject: str = "Test Ticket",
     description: str = "This is a test ticket.",
     save: bool = True,
-    **args
+    **args,
 ):
     """
     Creates a test HD Ticket with the given subject, description, priority, and ticket type.
@@ -106,6 +178,282 @@ def make_ticket(
     if save:
         ticket.insert(ignore_if_duplicate=True, ignore_permissions=True)
     return ticket
+
+
+def make_feedback_option(label: str, rating: float = 1.0):
+    return frappe.get_doc(
+        {"doctype": "HD Ticket Feedback Option", "label": label, "rating": rating}
+    ).insert()
+
+
+def close_emailed_ticket(raised_by: str) -> str:
+    """Only a ticket that arrived by email is ever sent a feedback link."""
+    ticket = make_ticket(subject="Feedback flow", raised_by=raised_by)
+    frappe.db.set_value("HD Ticket", ticket.name, "source", "Email")
+
+    doc = frappe.get_doc("HD Ticket", ticket.name)
+    doc.status = "Closed"
+    doc.save()
+    return doc.name
+
+
+def make_customer_ticket(case, raised_by: str, **values):
+    """A ticket raised by a customer, removed when the test ends."""
+    ticket = make_ticket(raised_by=raised_by, **values)
+    case.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
+    return ticket
+
+
+def make_form_script(
+    case,
+    name: str,
+    body: str,
+    apply_to_customer_portal: bool = False,
+    apply_on_new_page: bool = False,
+    apply_to_knowledge_base: bool = False,
+):
+    """An enabled HD Ticket form script whose source carries `body`; removed when the test ends."""
+    frappe.delete_doc("HD Form Script", name, force=True, ignore_missing=True)
+    frappe.get_doc(
+        {
+            "doctype": "HD Form Script",
+            "name": name,
+            "dt": "HD Ticket",
+            "apply_to": "Form",
+            "enabled": 1,
+            "apply_to_customer_portal": int(apply_to_customer_portal),
+            "apply_on_new_page": int(apply_on_new_page),
+            "apply_to_knowledge_base": int(apply_to_knowledge_base),
+            "script": f"function setupForm() {{ return {{}} }} // {body}",
+        }
+    ).insert()
+    case.addCleanup(
+        frappe.delete_doc, "HD Form Script", name, force=True, ignore_missing=True
+    )
+
+
+def reply_from_the_portal(case, raised_by: str, status: str) -> str:
+    """The customer answers a ticket left at `status`; returns where it lands."""
+    ticket = make_customer_ticket(case, raised_by)
+    frappe.db.set_value("HD Ticket", ticket.name, "status", status)
+    frappe.set_user(raised_by)
+    frappe.get_doc("HD Ticket", ticket.name).create_communication_via_contact(
+        "it is happening again"
+    )
+    frappe.set_user("Administrator")
+    return frappe.db.get_value("HD Ticket", ticket.name, "status")
+
+
+def make_template(name: str, fields: list[dict]):
+    """Create an HD Ticket Template, replacing any leftover with the name."""
+    if frappe.db.exists("HD Ticket Template", name):
+        frappe.db.delete("HD Ticket", {"template": name})
+        frappe.delete_doc("HD Ticket Template", name, force=True)
+    return frappe.get_doc(
+        {"doctype": "HD Ticket Template", "template_name": name, "fields": fields}
+    ).insert()
+
+
+def other_priority(current: str) -> str:
+    """A priority different from `current`."""
+    return "Urgent" if current != "Urgent" else "Low"
+
+
+def default_template_rows() -> list[dict]:
+    """The Default template's rows as plain dicts, for restoring later."""
+    template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+    # every column, so a column added later is restored too
+    return [
+        f.as_dict(no_default_fields=True, no_child_table_fields=True)
+        for f in template.fields
+    ]
+
+
+def set_default_template_rows(rows: list[dict]):
+    """Replace every row of the Default template; returns the saved template."""
+    template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+    template.fields = []
+    for row in rows:
+        template.append("fields", row)
+    template.save()
+    return template
+
+
+def set_custom_field_permlevel(fieldname: str, permlevel: int):
+    frappe.db.set_value(
+        "Custom Field",
+        frappe.db.get_value(
+            "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+        ),
+        "permlevel",
+        permlevel,
+    )
+    frappe.clear_cache(doctype="HD Ticket")
+
+
+def get_custom_field_permlevel(fieldname: str) -> int:
+    return frappe.db.get_value(
+        "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
+    )
+
+
+def ticket_field_permlevel(fieldname: str) -> int:
+    """The live level, Customize Form overrides included."""
+    return frappe.get_meta("HD Ticket").get_field(fieldname).permlevel
+
+
+def set_default_template_visibility(fieldname: str, visible_to: str):
+    """Set who sees a field on the Default template; returns an undo for addCleanup."""
+    template = frappe.get_doc("HD Ticket Template", "Default")
+    row_keys = (
+        "fieldname",
+        "visible_to",
+        "editable_after_creation",
+        "required",
+        "placeholder",
+        "url_method",
+    )
+    original_rows = [{k: row.get(k) for k in row_keys} for row in template.fields]
+
+    row = next((r for r in template.fields if r.fieldname == fieldname), None)
+    if row:
+        row.visible_to = visible_to
+    else:
+        template.append("fields", {"fieldname": fieldname, "visible_to": visible_to})
+    template.save(ignore_permissions=True)
+
+    def undo():
+        doc = frappe.get_doc("HD Ticket Template", "Default")
+        doc.fields = []
+        for original in original_rows:
+            doc.append("fields", original)
+        doc.save(ignore_permissions=True)
+
+    return undo
+
+
+def get_customer_ticket(email: str):
+    """Make a ticket and return it as the customer `email` sees it."""
+    ticket = make_ticket(raised_by=email)
+    frappe.set_user(email)
+    return frappe.get_doc("HD Ticket", ticket.name)
+
+
+def make_article_category(label: str, **values):
+    return frappe.get_doc(
+        {"doctype": "HD Article Category", "category_name": label, **values}
+    ).insert()
+
+
+def make_subcategory(parent: str, label: str = "Sub", **values):
+    """A uniquely named Subcategory of `parent`."""
+    return make_article_category(
+        unique_name(label), parent_article_category=parent, **values
+    )
+
+
+def article_index_jobs(enqueue: MagicMock) -> list[set[str]]:
+    """The articles of each search index job a patched `frappe.enqueue` was given."""
+    jobs = []
+    for call in enqueue.call_args_list:
+        if call.args[0] == "helpdesk.search.update_article_indexes":
+            jobs.append(set(call.kwargs["articles"]))
+    return jobs
+
+
+def category_row(name: str, with_creators: bool = False) -> frappe._dict:
+    from helpdesk.api.knowledge_base import _get_categories
+
+    return next(row for row in _get_categories(with_creators) if row.name == name)
+
+
+def misplaced_categories() -> list[str]:
+    """Categories whose `lft`/`rgt` range does not sit exactly inside their parent's."""
+    rows = frappe.get_all(
+        "HD Article Category", fields=["name", "parent_article_category", "lft", "rgt"]
+    )
+
+    def is_misplaced(row) -> bool:
+        if not row.lft < row.rgt:
+            return True
+        enclosing = set()
+        for other in rows:
+            if other.lft < row.lft < other.rgt < row.rgt:
+                return True  # ranges cross
+            if other.lft < row.lft and row.rgt < other.rgt:
+                enclosing.add(other.name)
+        return enclosing != {row.parent_article_category} - {None}
+
+    # ponytail: O(n²) over categories, fine for test data
+    return [row.name for row in rows if is_misplaced(row)]
+
+
+def category_range(name: str) -> tuple[int, int]:
+    return tuple(frappe.db.get_value("HD Article Category", name, ["lft", "rgt"]))
+
+
+def category_names() -> list[str]:
+    from helpdesk.api.knowledge_base import get_categories
+
+    return [row.name for row in get_categories()]
+
+
+def use_test_index(case, search_class, db_name: str, *modules):
+    """Swaps each module's `search_class` for a throwaway index."""
+    search = search_class(db_name=db_name)
+    search.drop_index()
+    case.addCleanup(search.drop_index)
+    for module in modules:
+        case.enterContext(
+            patch.object(
+                module, search_class.__name__, lambda: search_class(db_name=db_name)
+            )
+        )
+    return search
+
+
+def is_outside_hours_banner_shown(ticket_name: str) -> bool:
+    from helpdesk.helpdesk.doctype.hd_ticket.api import get_outside_hours_banner
+
+    return get_outside_hours_banner(frappe.get_doc("HD Ticket", ticket_name))["show"]
+
+
+def create_agent(
+    email: str, first_name: str | None = None, last_name: str | None = None
+):
+    """
+    Creates a test agent user with the Agent role.
+    """
+    if not frappe.db.exists("User", email):
+        user = frappe.get_doc(
+            {
+                "doctype": "User",
+                "email": email,
+                "first_name": first_name or email.split("@")[0],
+                "last_name": last_name or "Agent",
+                "send_welcome_email": 0,
+            }
+        )
+        user.insert(ignore_permissions=True)
+    else:
+        user = frappe.get_doc("User", email)
+
+    if "Agent" not in frappe.get_roles(email):
+        user.add_roles("Agent")
+
+    agent_name = f"{user.first_name} {user.last_name or ''}".strip()
+    existing_agent = frappe.db.exists("HD Agent", {"user": email})
+    if not existing_agent:
+        frappe.get_doc(
+            {
+                "doctype": "HD Agent",
+                "user": email,
+                "agent_name": agent_name or email,
+                "is_active": 1,
+            }
+        ).insert(ignore_permissions=True)
+
+    return user
 
 
 def get_current_week_monday(hours: int = 11):
@@ -140,27 +488,27 @@ def get_priority_response_resolution_time(
     return expected_response_by, expected_resolution_by
 
 
-def add_holiday(date, description="_Test Holiday"):
+def add_holiday(holiday_date, description="_Test Holiday"):
     """
     Adds a holiday to the system.
     """
 
-    holiday_list = frappe.get_doc("HD Service Holiday List", "Default")
-    holiday_list.append(
+    holiday_list_doc = frappe.get_doc("HD Service Holiday List", "Test Holiday List")
+    holiday_list_doc.append(
         "holidays",
         {
-            "holiday_date": date,
+            "holiday_date": holiday_date,
             "description": description,
         },
     )
-    holiday_list.save()
+    holiday_list_doc.save()
 
 
 def remove_holidays():
     """
     Removes a holiday from the system.
     """
-    holiday_list = frappe.get_doc("HD Service Holiday List", "Default")
+    holiday_list = frappe.get_doc("HD Service Holiday List", TEST_HOLIDAY_LIST_NAME)
     holiday_list.holidays = []
     holiday_list.save()
 
@@ -190,3 +538,691 @@ def make_status(name: str = "Test Status", category: str = "Open"):
         }
     )
     return doc.insert(ignore_if_duplicate=True)
+
+
+def make_agent_status(agent_status: str, category="Away", enabled=1, status_order=None):
+    return frappe.get_doc(
+        {
+            "doctype": "HD Agent Status",
+            "agent_status": agent_status,
+            "category": category,
+            "enabled": enabled,
+            "status_order": status_order,
+        }
+    ).insert()
+
+
+def make_agent(email: str, first_name: str = "Test Agent"):
+    """
+    Creates a test user and HD Agent if they don't exist.
+    Returns the user email.
+    """
+    if not frappe.db.exists("User", email):
+        frappe.get_doc(
+            {"doctype": "User", "first_name": first_name, "email": email}
+        ).insert(ignore_permissions=True)
+
+    if not frappe.db.exists("HD Agent", {"user": email}):
+        frappe.get_doc(
+            {"doctype": "HD Agent", "user": email, "agent_name": first_name}
+        ).insert(ignore_permissions=True)
+
+    return email
+
+
+def set_agent_status_enabled(status: str, enabled: bool | int):
+    """Toggle a status directly in db, skips the controller checks and the
+    agent reset."""
+    frappe.db.set_value("HD Agent Status", status, "enabled", int(enabled))
+
+
+def set_default_agent_status(status: str | None):
+    """Set the default agent status directly in db."""
+    frappe.db.set_single_value("HD Settings", "default_agent_status", status)
+
+
+def set_agent_availability(
+    user: str, availability: str | None, expires_on: str | None = None
+):
+    """Set an agent's availability through the document lifecycle."""
+    agent = frappe.get_doc("HD Agent", {"user": user})
+    agent.availability = availability
+    agent.availability_expires_on = expires_on
+    agent.save(ignore_permissions=True)
+    return agent
+
+
+def get_latest_ticket_communication(ticket_name: str):
+    """
+    Returns the latest Communication doc linked to the given HD Ticket.
+    """
+    name = frappe.get_all(
+        "Communication",
+        filters={
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket_name,
+        },
+        pluck="name",
+        limit=1,
+    )
+    if not name:
+        return None
+    return frappe.get_doc("Communication", name[0])
+
+
+def add_message(
+    ticket: str, direction: str, sender: str, subject: str = "Test message"
+) -> None:
+    """Insert a Communication on a ticket at the current (possibly frozen) time."""
+    frappe.get_doc(
+        {
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "communication_medium": "Email",
+            "sent_or_received": direction,
+            "sender": sender,
+            "subject": subject,
+            "content": subject,
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket,
+        }
+    ).insert(ignore_permissions=True)
+
+
+def timeline_node(result: dict, key: str) -> dict | None:
+    """The milestone with the given key from a ticket analytics response."""
+    return next((n for n in result["timeline"] if n["key"] == key), None)
+
+
+def add_comment(
+    ticket: str,
+    content: str = "This is a test comment.",
+    comment_by: str | None = None,
+    save: bool = True,
+):
+    """
+    Creates a test agent comment (core Comment) for a given ticket.
+    """
+    comment = frappe.get_doc(
+        {
+            "doctype": "Comment",
+            "comment_type": "Comment",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket,
+            "content": content,
+            "comment_email": comment_by,
+        }
+    )
+    if save:
+        return comment.insert(ignore_permissions=True)
+    return comment
+
+
+def set_ticket_status_and_communication_date(ticket_name, status, communication_date):
+    """Force a ticket's status and the date of all its communications directly in the
+    database, bypassing controller side effects. Useful for testing scheduled jobs that
+    key off communication_date (auto close, SLA escalation, reminders)."""
+    frappe.db.set_value(
+        "HD Ticket", ticket_name, "status", status, update_modified=False
+    )
+    for comm_name in frappe.get_all(
+        "Communication",
+        filters={"reference_doctype": "HD Ticket", "reference_name": ticket_name},
+        pluck="name",
+    ):
+        frappe.db.set_value(
+            "Communication",
+            comm_name,
+            "communication_date",
+            communication_date,
+            update_modified=False,
+        )
+
+
+def create_contact(name, email, user=True, role="HD Customer"):
+    result = {}
+
+    # Delete any existing contacts with this email so we always start clean
+    existing = frappe.db.get_all("Contact", filters={"email_id": email}, pluck="name")
+    for c in existing:
+        frappe.delete_doc("Contact", c, force=True)
+
+    contact = frappe.get_doc(
+        {
+            "doctype": "Contact",
+            "first_name": name,
+            # top-level email_id is what set_contact() queries via
+            # frappe.db.get_value("Contact", {"email_id": email_id})
+            "email_id": email,
+        }
+    )
+    contact.append("email_ids", {"email_id": email, "is_primary": 1})
+    contact.insert()
+
+    result["contact"] = contact.name
+    if not user:
+        return result
+
+    if frappe.db.exists("User", email):
+        # User may have linked docs (tickets) — just strip roles and reuse
+        _user = frappe.get_doc("User", email)
+        _user.roles = []
+        _user.save(ignore_permissions=True)
+    else:
+        _user = frappe.get_doc({"doctype": "User", "first_name": name, "email": email})
+        _user.insert(ignore_permissions=True)
+
+    _user.add_roles(role)
+
+    # link the user to the contact so get_customers(user=email) resolves correctly
+    frappe.db.set_value("Contact", contact.name, "user", _user.name)
+
+    result["user"] = _user.name
+    return result
+
+
+def make_contact(prefix: str = "customer") -> dict:
+    email = unique_email(prefix)
+    return create_contact(email.split("@")[0], email)
+
+
+def create_customer(name, contacts=[], primary_contact=None):
+    if frappe.db.exists("HD Customer", name):
+        frappe.delete_doc("HD Customer", name, force=True)
+
+    customer = frappe.get_doc(
+        {
+            "doctype": "HD Customer",
+            "customer_name": name,
+            "primary_contact": primary_contact,
+        }
+    )
+
+    for c in contacts:
+        customer.append("contacts", c)
+    return customer.insert()
+
+
+def create_user(email: str):
+    """Create (or fetch) a plain User with no helpdesk roles."""
+    if frappe.db.exists("User", email):
+        return frappe.get_doc("User", email)
+    return frappe.get_doc(
+        doctype="User",
+        email=email,
+        first_name=email.split("@")[0],
+        send_welcome_email=0,
+    ).insert(ignore_permissions=True)
+
+
+def make_organization(label: str) -> tuple:
+    """Returns `(customer, owner, manager, member)`."""
+    prefix = label.lower().replace(" ", "-")
+    owner, manager, member = (
+        create_contact(f"{label} {role}", unique_email(f"{prefix}-{role.lower()}"))
+        for role in ("Owner", "Manager", "Member")
+    )
+    customer = create_customer(
+        unique_name(f"Test {label}"),
+        [
+            {"contact_name": owner["contact"]},
+            {"contact_name": manager["contact"], "is_manager": 1},
+            {"contact_name": member["contact"]},
+        ],
+        primary_contact=owner["contact"],
+    )
+    return customer, owner, manager, member
+
+
+def make_invitation(email: str, customer: str, contact: str | None = None):
+    return frappe.get_doc(
+        doctype="User Invitation",
+        email=email,
+        roles=[{"role": "HD Customer"}],
+        app_name="helpdesk",
+        redirect_to_path=CUSTOMER_PORTAL_ROOT,
+        customer=customer,
+        contact=contact,
+    ).insert(ignore_permissions=True)
+
+
+def get_invitation(email: str):
+    """Return the helpdesk User Invitation raised for an email, if any."""
+    return frappe.db.get_value(
+        "User Invitation",
+        {"email": email, "app_name": "helpdesk"},
+        ["name", "customer", "contact"],
+        as_dict=True,
+    )
+
+
+def get_organization_members(customer: str) -> dict:
+    from helpdesk.api.customer import get_organization
+
+    return {
+        member["contact"]: member
+        for member in get_organization(customer)["members"]
+        if member.get("contact")
+    }
+
+
+def get_organization_card(customer: str) -> dict:
+    from helpdesk.api.customer import get_portal_account
+
+    return next(
+        organization
+        for organization in get_portal_account()["organizations"]
+        if organization["name"] == customer
+    )
+
+
+def delete_invitations(email: str) -> None:
+    frappe.set_user("Administrator")
+    names = frappe.get_all(
+        "User Invitation", {"email": email, "app_name": "helpdesk"}, pluck="name"
+    )
+    for name in names:
+        frappe.delete_doc("User Invitation", name, force=True)
+
+
+def update_role_in_customer(customer, contact, role="HD Customer", is_primary=False):
+    frappe.set_user("Administrator")
+    is_manager = True if role == "HD Customer Manager" else False
+
+    for c in customer.get("contacts", []):
+        if c.get("contact_name") != contact:
+            continue
+        c.is_manager = is_manager
+
+    if is_primary:
+        customer.primary_contact = contact
+
+    customer.save()
+
+
+def add_contact_in_customer(customer, contact, is_manager=False, is_primary=False):
+    frappe.set_user("Administrator")
+    customer.append(
+        "contacts",
+        {"contact_name": contact, "is_manager": is_manager},
+    )
+    if is_primary:
+        customer.primary_contact = contact
+
+    customer.save()
+
+
+def cleanup_contact_users(contacts, customers=[]):
+    frappe.set_user("Administrator")
+    for contact in contacts:
+        contact_name = contact.get("contact")
+        user_email = contact.get("user")
+
+        # remove from any customer
+        linked_customers = get_customers(contact=contact_name)
+        for customer in linked_customers:
+            customer_doc = frappe.get_doc("HD Customer", customer)
+            customer_doc.contacts = [
+                c
+                for c in customer_doc.contacts
+                if c.get("contact_name") != contact_name
+            ]
+            customer_doc.save()
+
+        if user_email and frappe.db.exists("User", user_email):
+            frappe.delete_doc("User", user_email, force=True)
+
+        existing = (
+            frappe.db.get_all("Contact", filters={"email_id": user_email}, pluck="name")
+            if user_email
+            else []
+        )
+        for c in existing:
+            frappe.delete_doc("Contact", c, force=True)
+
+    for c in customers:
+        if frappe.db.exists("HD Customer", c):
+            frappe.delete_doc("HD Customer", c, force=True)
+        if frappe.db.exists("HD Customer", c):
+            frappe.delete_doc("HD Customer", c, force=True)
+            frappe.delete_doc("HD Customer", c, force=True)
+            frappe.delete_doc("HD Customer", c, force=True)
+            frappe.delete_doc("HD Customer", c, force=True)
+            frappe.delete_doc("HD Customer", c, force=True)
+
+
+def make_team(team_name, members=[], disabled=False):
+    """Create an HD Team with optional members. A default agent is created if no members are provided."""
+    if not members:
+        members = [make_agent("default_team_agent@example.com")]
+
+    # The team's auto-created Assignment Rule lands in the cached doctype map,
+    # which a test rollback cannot undo; re-sync the cache when that happens.
+    frappe.db.after_rollback.add(
+        lambda: clear_doctype_map("Assignment Rule", "HD Ticket")
+    )
+
+    if frappe.db.exists("HD Team", team_name):
+        team = frappe.get_doc("HD Team", team_name)
+        team.disabled = disabled
+        team.users = []
+        for member in members:
+            team.append("users", {"user": member})
+        team.save(ignore_permissions=True)
+        return team
+
+    # Create new team - this will trigger after_insert which creates assignment rule
+    team = frappe.get_doc(
+        {
+            "doctype": "HD Team",
+            "team_name": team_name,
+        }
+    )
+    for member in members:
+        team.append("users", {"user": member})
+    team.disabled = disabled
+    team.insert(ignore_permissions=True)
+    return team
+
+
+def upload_test_file(file_name: str) -> str:
+    """Upload an image from desk/public/ as a standalone private File, returning its name."""
+    file_path = frappe.get_app_path("helpdesk", "..", "desk", "public", file_name)
+    with open(file_path, "rb") as f:
+        content = f.read()
+    file_doc = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": file_name,
+            "is_private": 1,
+            "content": content,
+        }
+    ).insert(ignore_permissions=True)
+    return file_doc.name
+
+
+def make_notification_log(name: str, ticket: str, user: str, **values) -> None:
+    """Write a Notification Log row straight to the table under a fixed name.
+
+    Inserted rather than raised through the real producers so a test can state
+    the exact type, app and read flag it needs.
+    """
+    frappe.db.delete("Notification Log", {"name": name})
+    doc = frappe.new_doc("Notification Log")
+    doc.name = name
+    doc.update(
+        {
+            "for_user": user,
+            "from_user": user,
+            "document_type": "HD Ticket",
+            "document_name": ticket,
+            "subject": "seeded notification",
+            "read": 0,
+            **values,
+        }
+    )
+    doc.db_insert()
+
+
+def unique_name(prefix: str) -> str:
+    """`prefix` plus a random suffix, for records that must not clash across tests."""
+    return f"{prefix}-{frappe.generate_hash(length=8)}"
+
+
+def unique_email(prefix: str) -> str:
+    """A random example.com address starting with `prefix`."""
+    return f"{unique_name(prefix)}@example.com"
+
+
+def make_agent_manager(prefix: str = "agent-manager") -> str:
+    """Create an agent with a unique email and the Agent Manager role, returning the user name."""
+    manager = create_agent(unique_email(prefix)).name
+    frappe.get_doc("User", manager).add_roles("Agent Manager")
+    return manager
+
+
+def make_article(
+    title: str | None = None,
+    status: str = "Published",
+    category: str | None = None,
+    visibility: str | None = "Public",
+    **values,
+) -> str:
+    """Public by default; `visibility=None` keeps the field's default."""
+    title = title or unique_name("Test Article")
+    return (
+        frappe.get_doc(
+            {
+                "doctype": "HD Article",
+                "title": title,
+                "content": f"<p>{title}</p>",
+                "status": status,
+                "category": category,
+                "visibility": visibility,
+                **values,
+            }
+        )
+        .insert(ignore_permissions=True)
+        .name
+    )
+
+
+def make_article_feedback(article: str, feedback: int) -> None:
+    """Record Administrator's feedback on an article (1 like, 2 dislike)."""
+    frappe.get_doc(
+        {
+            "doctype": "HD Article Feedback",
+            "user": "Administrator",
+            "article": article,
+            "feedback": feedback,
+        }
+    ).insert(ignore_permissions=True)
+
+
+def make_search_hit(article: str, section: str = "intro") -> frappe._dict:
+    """A search index hit shaped like helpdesk.search.search items."""
+    name = f"{article}#{section}"
+    return frappe._dict(id=f"HD Article:{name}", name=name, subject=article)
+
+
+def make_search_page(*hits: frappe._dict) -> list[dict]:
+    """A helpdesk.search.search result holding the given article hits."""
+    return [{"title": "Articles", "items": list(hits)}]
+
+
+def make_assignment_rule(
+    name: str, document_type: str, users: list[str] | None = None
+) -> str:
+    """A disabled rule, so it never enters the live assignment rule cache."""
+    rule = frappe.get_doc(
+        {
+            "doctype": "Assignment Rule",
+            "name": name,
+            "assignment_rule_name": name,
+            "document_type": document_type,
+            "description": "Test assignment rule",
+            "assign_condition": "status == 'Open'",
+            "rule": "Round Robin",
+            "priority": 2,
+            "disabled": 1,
+            "assignment_days": [{"day": "Monday"}],
+            "users": [{"user": user} for user in users or []],
+        }
+    ).insert(ignore_permissions=True)
+    return rule.name
+
+
+def make_todo(ticket: str, user: str, creation: str | None = None) -> str:
+    """Open a ToDo for `user` on `ticket`, optionally backdated to `creation`."""
+    todo = frappe.get_doc(
+        {
+            "doctype": "ToDo",
+            "allocated_to": user,
+            "reference_type": "HD Ticket",
+            "reference_name": ticket,
+            "description": "Assigned in test",
+        }
+    ).insert(ignore_permissions=True)
+    if creation:
+        frappe.db.set_value(
+            "ToDo", todo.name, "creation", creation, update_modified=False
+        )
+    return todo.name
+
+
+def make_default_view(
+    user: str, columns: list | None = None, rows: list | None = None
+) -> None:
+    """Replace `user`'s default HD Ticket list view with one of the given columns and rows."""
+    delete_default_views(user)
+    frappe.get_doc(
+        {
+            "doctype": "HD View",
+            "dt": "HD Ticket",
+            "user": user,
+            "is_default": 1,
+            "columns": frappe.as_json(columns or []),
+            "rows": frappe.as_json(rows or []),
+        }
+    ).insert(ignore_permissions=True)
+
+
+def delete_default_views(user: str) -> None:
+    """Delete `user`'s default HD Ticket list views."""
+    frappe.db.delete("HD View", {"user": user, "dt": "HD Ticket", "is_default": 1})
+
+
+def make_tagged_ticket(team: str, created_on: str, *tags: str):
+    """A ticket for `team` created at `created_on`, carrying the given tags."""
+    with freeze_time(created_on):
+        ticket = make_ticket(subject="Tag chart", agent_group=team)
+    for tag in tags:
+        ticket.add_tag(tag)
+    return ticket
+
+
+def make_email_account(**overrides: Any) -> str:
+    """An Email Account on example.com's servers, with a unique name and address.
+
+    Patch EmailServer first, or it tries to log in to the mail server.
+    """
+    suffix = frappe.generate_hash(length=6)
+    account = frappe.get_doc(
+        {
+            "doctype": "Email Account",
+            "email_account_name": f"Support {suffix}",
+            "email_id": f"support-{suffix}@example.com",
+            "password": "app-password",
+            "email_server": "imap.example.com",
+            "smtp_server": "smtp.example.com",
+            "use_imap": 1,
+            "use_ssl": 1,
+            "imap_folder": [{"folder_name": "INBOX", "append_to": "HD Ticket"}],
+            "enable_incoming": 1,
+            "enable_outgoing": 1,
+            **overrides,
+        }
+    )
+    return account.insert().name
+
+
+def get_linked_email_accounts(user: str) -> set[str]:
+    """The Email Accounts linked to a user through their User Emails table."""
+    return set(
+        frappe.get_all("User Email", filters={"parent": user}, pluck="email_account")
+    )
+
+
+def get_user_roles(user: str) -> list[str]:
+    """A user's Has Role rows, duplicates included (unlike frappe.get_roles)."""
+    return frappe.get_all(
+        "Has Role", filters={"parent": user, "parenttype": "User"}, pluck="role"
+    )
+
+
+def get_granted_rights(role: str) -> set[tuple]:
+    """(doctype, permlevel, right, if_owner) for every right the role's DocPerms grant."""
+    perms = frappe.get_all(
+        "DocPerm", {"role": role}, ["parent", "permlevel", "if_owner", *rights]
+    )
+    return {
+        (p.parent, p.permlevel, r, p.if_owner) for p in perms for r in rights if p[r]
+    }
+
+
+def show_only_banners(*banners: str):
+    """Turn on exactly `banners` in HD Settings and turn every other banner off."""
+    for banner, flag in BANNERS.items():
+        frappe.db.set_single_value("HD Settings", flag, int(banner in banners))
+
+
+def fake_cloud_settings(trial: dict | None) -> MagicMock:
+    """Stand-in for Frappe's Cloud Settings on a v2 site whose billing reports `trial`."""
+    cloud_settings = MagicMock()
+    cloud_settings.is_cloud_settings_enabled.return_value = True
+    cloud_settings.get_billing.return_value = {"trial": trial}
+    return cloud_settings
+
+
+def as_v2_site():
+    """Site config that makes `is_v2_site()` true, as a Frappe Cloud v2 bench writes it."""
+    return patch.dict(
+        frappe.local.conf,
+        {"pilot_endpoint": "https://pilot.example.com", "pilot_auth_token": "test"},
+    )
+
+
+def as_non_v2_site():
+    """Site config without pilot credentials, so `is_v2_site()` is false."""
+    return patch.dict(
+        frappe.local.conf, {"pilot_endpoint": None, "pilot_auth_token": None}
+    )
+
+
+def clear_trial_cache(user: str) -> None:
+    """Forget the cached trial and `user`'s dismissal; redis is not rolled back between tests."""
+    forget_trial()
+    frappe.cache.delete_value(TRIAL_DISMISSED_KEY, user=user)
+
+
+def dismiss_banner_as(user: str, banner: str) -> MagicMock:
+    """Dismiss `banner` as `user`, returning the realtime publisher mock."""
+    previous_user = frappe.session.user
+    frappe.set_user(user)
+    try:
+        with patch("frappe.publish_realtime") as publish_realtime:
+            dismiss_banner(banner)
+    finally:
+        frappe.set_user(previous_user)
+    return publish_realtime
+
+
+def ticket_pings(publish_realtime: MagicMock) -> set[str]:
+    return {
+        call.kwargs["user"]
+        for call in publish_realtime.call_args_list
+        if call.args
+        and call.args[0] == "helpdesk:ticket-update"
+        and call.kwargs.get("user")
+        and not call.kwargs.get("room")
+    }
+
+
+def make_assigned_ticket(agent: str, subject: str, status: str | None = None):
+    """A ticket that has been responded to and is assigned to `agent`, so dashboard
+    queries filtered by that agent only see the tickets a test creates."""
+    ticket = make_ticket(subject=subject)
+    ticket.reload()
+    ticket.first_responded_on = now_datetime()
+    if status:
+        ticket.status = status
+    ticket.save()
+    frappe.db.set_value("HD Ticket", ticket.name, "_assign", json.dumps([agent]))
+    return ticket
+
+
+def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict]:
+    """dashboard number cards for tickets assigned to `agent`, keyed by title"""
+    filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
+    cards = HelpdeskDashboard(filters).get_number_card_data()
+    return {card["title"]: card for card in cards}

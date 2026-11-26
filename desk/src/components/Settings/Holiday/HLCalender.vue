@@ -1,12 +1,12 @@
 <template>
   <div class="w-max mx-auto">
-    <div class="text-base font-medium mb-2 text-gray-800 ml-2.5">
+    <div class="text-base-medium mb-2 text-ink-gray-8 ms-2.5">
       {{ formattedMonth }}
     </div>
-    <div class="rounded-md text-sm">
+    <div class="rounded-5 text-sm">
       <div class="flex items-center text-xs uppercase">
         <div
-          class="flex size-7.5 items-center justify-center text-center text-gray-600"
+          class="flex size-7.5 items-center justify-center text-center text-ink-gray-5"
           v-for="(d, i) in ['s', 'm', 't', 'w', 't', 'f', 's']"
           :key="i"
         >
@@ -16,40 +16,54 @@
       <div class="flex items-center" v-for="(week, i) in datesAsWeeks" :key="i">
         <div v-for="date in week" :key="getFormattedDate(date)">
           <Popover v-if="isHoliday(date)">
-            <template #target="{ open, close }">
-              <div
-                class="flex size-7 cursor-pointer text-orange-700 bg-yellow-100 items-center justify-center rounded hover:bg-yellow-100 select-none m-[1px]"
-                :class="{
-                  '!text-ink-gray-4 !bg-gray-100': isWeekOff(date),
-                }"
-                @mouseover="handleMouseEnter(getFormattedDate(date), open)"
-                @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
-                @click="
-                  () => {
-                    if (isWeekOff(date)) return;
-                    close();
-                    editHoliday(date);
-                  }
-                "
-              >
-                {{ date.getDate() }}
+            <template #trigger="{ close, setOpen }">
+              <!--
+                Hover opens this one. reka turns the whole trigger subtree into
+                the toggle, so the cell stops its click before it gets there.
+              -->
+              <div>
+                <div
+                  class="flex size-7 cursor-pointer text-ink-orange-6 bg-surface-yellow-2 items-center justify-center rounded-4 hover:bg-surface-yellow-2 select-none m-[1px]"
+                  :class="{
+                    '!text-ink-gray-4 !bg-surface-gray-2': isWeekOff(date),
+                  }"
+                  @mouseover="
+                    handleMouseEnter(getFormattedDate(date), () =>
+                      setOpen(true)
+                    )
+                  "
+                  @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
+                  @click.stop="
+                    () => {
+                      if (isWeekOff(date)) return;
+                      close();
+                      editHoliday(date);
+                    }
+                  "
+                >
+                  {{ date.getDate() }}
+                </div>
               </div>
             </template>
-            <template #body-main="{ close: closePopover, open: openPopover }">
+            <template
+              #default="{ close: closePopover, setOpen: setPopoverOpen }"
+            >
               <div
-                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-gray-100 rounded-md"
+                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-outline-gray-1 rounded-5"
                 @mouseover="
-                  handleMouseEnter(getFormattedDate(date), openPopover)
+                  handleMouseEnter(getFormattedDate(date), () =>
+                    setPopoverOpen(true)
+                  )
                 "
                 @mouseleave="
                   handleMouseLeave(getFormattedDate(date), closePopover)
                 "
               >
                 <div class="w-[5%]">
-                  <div class="size-3.5 bg-orange-500 rounded-sm mt-1" />
+                  <div class="size-3.5 bg-surface-orange-5 rounded-1 mt-1" />
                 </div>
                 <div class="grow">
-                  <div class="text-sm font-semibold">
+                  <div class="text-sm-semibold">
                     {{ getHolidayDescription(date) }}
                   </div>
                   <div class="text-xs mt-1">
@@ -60,11 +74,10 @@
                   v-if="!isWeekOff(date)"
                   @close="isConfirmingDelete = false"
                 >
-                  <template #target="{ open, close }">
+                  <template #trigger="{ close }">
                     <Button
-                      icon="more-horizontal"
+                      icon="lucide-more-horizontal"
                       variant="ghost"
-                      @click="open"
                       @mouseleave="
                         handleMouseLeave(
                           getFormattedDate(date) + 'dropdown',
@@ -74,15 +87,20 @@
                     />
                   </template>
                   <template
-                    #body-main="{ close: closeDropdown, open: openDropdown }"
+                    #default="{
+                      close: closeDropdown,
+                      setOpen: setDropdownOpen,
+                    }"
                   >
                     <div
-                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-gray-100 rounded-md"
+                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-outline-gray-1 rounded-5"
                       @mouseover="
-                        handleMouseEnter(getFormattedDate(date), openPopover);
+                        handleMouseEnter(getFormattedDate(date), () =>
+                          setPopoverOpen(true)
+                        );
                         handleMouseEnter(
                           getFormattedDate(date) + 'dropdown',
-                          openDropdown
+                          () => setDropdownOpen(true)
                         );
                       "
                       @mouseleave="
@@ -95,7 +113,7 @@
                     >
                       <Button
                         class="w-full flex !justify-start"
-                        icon-left="edit"
+                        icon-left="lucide-edit"
                         variant="ghost"
                         label="Edit"
                         @click="
@@ -108,7 +126,7 @@
                       />
                       <Button
                         class="w-full flex !justify-start"
-                        icon-left="trash-2"
+                        icon-left="lucide-trash-2"
                         variant="ghost"
                         :label="
                           isConfirmingDelete ? 'Confirm Delete' : 'Delete'
@@ -131,13 +149,13 @@
           </Popover>
           <div
             v-else
-            class="flex size-7 items-center justify-center rounded m-[1px] select-none"
+            class="flex size-7 items-center justify-center rounded-4 m-[1px] select-none"
             :class="{
               'cursor-pointer hover:bg-surface-gray-2': isDateInRange(date),
               'text-ink-gray-3':
                 // @ts-ignore
                 date.getMonth() !== currentMonth - 1 || !isDateInRange(date),
-              'bg-black text-ink-white hover:!bg-black/80 hover:text-ink-white':
+              'bg-surface-gray-10 text-ink-base hover:!bg-surface-gray-10/80 hover:text-ink-base':
                 getFormattedDate(date) === dateValue && isDateInRange(date),
               'opacity-50 cursor-not-allowed': !isDateInRange(date),
             }"
@@ -153,12 +171,11 @@
 </template>
 
 <script setup lang="ts">
-import { getFormattedDate, htmlToText } from "@/utils";
-import { Popover } from "frappe-ui";
-import { useDatePicker } from "frappe-ui/src/components/DatePicker/useDatePicker";
-import { ref, watch } from "vue";
 import { holidayData } from "@/stores/holidayList";
-import dayjs from "dayjs";
+import { getFormattedDate, htmlToText } from "@/utils";
+import { dayjs, Popover } from "frappe-ui";
+import { useDatePicker } from "@/composables/useDatePicker";
+import { ref, watch } from "vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
 const dialog = ref({

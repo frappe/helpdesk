@@ -1,7 +1,7 @@
 <template>
-  <div class="rounded-md border px-2 border-gray-300 text-sm">
+  <div class="rounded-5 border px-2 border-outline-gray-2 text-sm">
     <div
-      class="grid p-2 px-4 items-center"
+      class="grid gap-2 p-2 md:px-4 items-center"
       :style="{
         gridTemplateColumns: getGridTemplateColumnsForTable(columns),
       }"
@@ -10,13 +10,13 @@
       <div
         v-for="column in columns"
         :key="column.key"
-        class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
+        class="text-ink-gray-5 whitespace-normal"
         :class="{
-          'ml-2': column.key === 'workday',
+          'ms-2': column.key === 'workday',
         }"
       >
         {{ column.label }}
-        <span v-if="column.isRequired" class="text-red-500">*</span>
+        <span v-if="column.isRequired" class="text-ink-red-6">*</span>
       </div>
     </div>
     <hr v-if="slaData.support_and_resolution?.length !== 0" />
@@ -29,7 +29,7 @@
     />
     <div
       v-if="slaData.support_and_resolution?.length === 0"
-      class="text-center p-4 text-gray-600"
+      class="text-center p-4 text-ink-gray-5"
     >
       No workdays in the list
     </div>
@@ -40,7 +40,7 @@
       variant="subtle"
       label="Add row"
       @click="addWorkDay"
-      icon-left="plus"
+      icon-left="lucide-plus"
     />
     <ErrorMessage :message="slaDataErrors.support_and_resolution" />
   </div>
@@ -51,11 +51,15 @@ import { Button } from "frappe-ui";
 import SlaWorkDaysListItem from "./SlaWorkDaysListItem.vue";
 import { slaData, slaDataErrors } from "@/stores/sla";
 import { getGridTemplateColumnsForTable } from "@/utils";
+import { __ } from "@/translation";
+import { useMediaQuery } from "@vueuse/core";
+import { computed } from "vue";
 
 interface Column {
   key: string;
   label: string;
   isRequired?: boolean;
+  width?: number | string;
 }
 
 const allDays = [
@@ -82,11 +86,16 @@ const addWorkDay = () => {
   });
 };
 
-const columns: Column[] = [
+// Below lg a Break column squeezes the day names, so rows show the break on a second line instead.
+const isWide = useMediaQuery("(min-width: 1024px)");
+
+const columns = computed<Column[]>(() => [
   {
     label: "Day",
     key: "workday",
     isRequired: true,
+    // Room for "Wednesday" in the 640px settings panel.
+    width: "minmax(6.5rem, 1fr)",
   },
   {
     label: "Start time",
@@ -98,5 +107,6 @@ const columns: Column[] = [
     key: "end_time",
     isRequired: true,
   },
-];
+  ...(isWide.value ? [{ label: __("Break"), key: "break", width: 1.7 }] : []),
+]);
 </script>

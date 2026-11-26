@@ -1,32 +1,31 @@
 <template>
-  <Autocomplete
+  <Combobox
     v-if="!sortValues?.size"
     :options="options"
-    value=""
-    :placeholder="'First Name'"
-    @change="(e) => setSort(e)"
+    :model-value="null"
+    @update:model-value="(value) => value && setSort(value)"
   >
-    <template #target="{ togglePopover }">
-      <Button :label="'Sort'" @click="togglePopover()">
-        <template v-if="hideLabel">
+    <template #trigger>
+      <Button :label="__('Sort')">
+        <template v-if="hideLabel" #icon>
           <SortIcon class="h-4" />
         </template>
-        <template v-if="!hideLabel && !sortValues?.size" #prefix>
+        <template v-else-if="!sortValues?.size" #prefix>
           <SortIcon class="h-4" />
         </template>
       </Button>
     </template>
-  </Autocomplete>
-  <NestedPopover v-else>
-    <template #target="{ open }">
-      <Button v-if="sortValues.size > 1" :label="'Sort'">
-        <template v-if="hideLabel">
+  </Combobox>
+  <Popover v-else bare :offset="8">
+    <template #trigger="{ open }">
+      <Button v-if="sortValues.size > 1" :label="__('Sort')">
+        <template v-if="hideLabel" #icon>
           <SortIcon class="h-4" />
         </template>
-        <template v-if="!hideLabel" #prefix><SortIcon class="h-4" /></template>
+        <template v-else #prefix><SortIcon class="h-4" /></template>
         <template v-if="sortValues?.size" #suffix>
           <div
-            class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
+            class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
           >
             {{ sortValues.size }}
           </div>
@@ -35,7 +34,7 @@
       <div v-else class="flex items-center justify-center">
         <Button
           v-if="sortValues.size"
-          class="rounded-r-none border-r"
+          class="rounded-e-none border-e"
           @click.stop="
             () => {
               Array.from(sortValues)[0].direction =
@@ -52,26 +51,28 @@
         </Button>
         <Button
           :label="getSortLabel()"
-          :class="sortValues.size ? 'rounded-l-none' : ''"
+          :class="sortValues.size ? 'rounded-s-none' : ''"
         >
           <template v-if="!hideLabel && !sortValues?.size" #prefix>
             <SortIcon class="h-4" />
           </template>
           <template v-if="sortValues?.size" #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
-              class="h-4 text-gray-600"
+            <component
+              :is="open ? LucideChevronUp : LucideChevronDown"
+              class="h-4 text-ink-gray-5"
             />
           </template>
         </Button>
       </div>
     </template>
-    <template #body="{ close }">
-      <div class="my-2 rounded-lg border border-gray-100 bg-white shadow-xl">
+    <template #default="{ close }">
+      <div
+        class="rounded-6 border border-outline-gray-1 bg-surface-base shadow-xl"
+      >
         <div class="min-w-60 p-2">
           <div
             v-if="sortValues?.size"
-            id="sort-list"
+            ref="sortList"
             class="mb-3 flex flex-col gap-2"
           >
             <div
@@ -80,12 +81,12 @@
               class="flex items-center gap-1"
             >
               <div class="handle flex h-7 w-7 items-center justify-center">
-                <DragIcon class="h-4 w-4 cursor-grab text-gray-600" />
+                <DragIcon class="h-4 w-4 cursor-grab text-ink-gray-5" />
               </div>
               <div class="flex">
                 <Button
                   size="md"
-                  class="rounded-r-none border-r"
+                  class="rounded-e-none border-e"
                   @click="
                     () => {
                       sort.direction = sort.direction == 'asc' ? 'desc' : 'asc';
@@ -96,80 +97,78 @@
                   <AscendingIcon v-if="sort.direction == 'asc'" class="h-4" />
                   <DescendingIcon v-else class="h-4" />
                 </Button>
-                <Autocomplete
-                  class="!w-32"
-                  :value="sort.fieldname"
-                  :options="sortOptions.data"
-                  @change="(e) => updateSort(e, i)"
-                  :placeholder="'First Name'"
-                >
-                  <template
-                    #target="{ togglePopover, selectedValue, displayValue }"
+                <!-- width on the wrapper: a Combobox with its own #trigger
+                     slot drops the class it is handed -->
+                <div class="w-32">
+                  <Combobox
+                    :model-value="sort.fieldname"
+                    :options="sortOptions.data || []"
+                    @update:model-value="
+                      (value) => value && updateSort(value, i)
+                    "
                   >
-                    <Button
-                      class="flex w-full items-center justify-between rounded-l-none !text-gray-600 text-xs"
-                      size="md"
-                      @click="togglePopover()"
-                    >
-                      {{ displayValue(selectedValue) }}
-                      <template #suffix>
-                        <FeatherIcon
-                          name="chevron-down"
-                          class="h-4 text-gray-600"
-                        />
-                      </template>
-                    </Button>
-                  </template>
-                </Autocomplete>
+                    <template #trigger="{ displayValue }">
+                      <Button
+                        class="flex w-full items-center justify-between rounded-s-none !text-ink-gray-5 text-xs"
+                        size="md"
+                      >
+                        {{ __(displayValue) }}
+                        <template #suffix>
+                          <LucideChevronDown class="size-4 text-ink-gray-5" />
+                        </template>
+                      </Button>
+                    </template>
+                  </Combobox>
+                </div>
               </div>
-              <Button variant="ghost" icon="x" @click="removeSort(i)" />
+              <Button variant="ghost" icon="lucide-x" @click="removeSort(i)" />
             </div>
           </div>
           <div
             v-else
-            class="mb-3 flex h-7 items-center px-3 text-sm text-gray-600"
+            class="mb-3 flex h-7 items-center px-3 text-sm text-ink-gray-5"
           >
-            {{ "Empty - Choose a field to sort by" }}
+            {{ __("Empty - Choose a field to sort by") }}
           </div>
           <div class="flex items-center justify-between gap-2">
-            <Autocomplete
+            <Combobox
               :options="options"
-              value=""
-              :placeholder="'First Name'"
-              @change="(e) => setSort(e)"
+              :model-value="null"
+              @update:model-value="(value) => value && setSort(value)"
             >
-              <template #target="{ togglePopover }">
+              <template #trigger>
                 <Button
-                  class="!text-gray-600"
+                  class="!text-ink-gray-5"
                   variant="ghost"
-                  @click="togglePopover()"
-                  :label="'Add Sort'"
+                  :label="__('Add Sort')"
                 >
                   <template #prefix>
-                    <FeatherIcon name="plus" class="h-4" />
+                    <LucidePlus class="size-4" />
                   </template>
                 </Button>
               </template>
-            </Autocomplete>
+            </Combobox>
             <Button
               v-if="sortValues?.size"
-              class="!text-gray-600"
+              class="!text-ink-gray-5"
               variant="ghost"
-              :label="'Clear Sort'"
+              :label="__('Clear Sort')"
               @click="clearSort(close)"
             />
           </div>
         </div>
       </div>
     </template>
-  </NestedPopover>
+  </Popover>
 </template>
 
 <script setup>
-import { computed, inject } from "vue";
-import { NestedPopover } from "frappe-ui";
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucidePlus from "~icons/lucide/plus";
+import { computed, inject, ref } from "vue";
 import { useSortable } from "@vueuse/integrations/useSortable";
-import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
+import { Combobox, Popover } from "frappe-ui";
 import {
   AscendingIcon,
   DescendingIcon,
@@ -213,39 +212,42 @@ const options = computed(() => {
   if (!sortOptions.data) return [];
   if (!sortValues.value.size) return sortOptions.data;
   const selectedOptions = [...sortValues.value].map((sort) => sort.fieldname);
-  restartSort();
   return sortOptions.data.filter((option) => {
     return !selectedOptions.includes(option.value);
   });
 });
 
-const sortSortable = useSortable("#sort-list", sortValues, {
+const sortList = ref(null);
+
+// watchElement, and a ref rather than a selector: the popover panel unmounts on
+// close, so a one-shot document.querySelector at mount binds nothing.
+useSortable(sortList, sortValues, {
   handle: ".handle",
   animation: 200,
+  watchElement: true,
   onEnd: () => apply(),
 });
 
 function getSortLabel() {
-  if (!sortValues.value.size) return "Sort";
+  if (!sortValues.value.size) return __("Sort");
   let values = Array.from(sortValues.value);
   let label = sortOptions.data?.find(
     (option) => option.value === values[0].fieldname
   )?.label;
 
-  return label || sort.fieldname;
+  return __(label) || __(values[0].fieldname);
 }
 
-function setSort(data) {
-  sortValues.value.add({ fieldname: data.value, direction: "asc" });
-  restartSort();
+function setSort(fieldname) {
+  sortValues.value.add({ fieldname, direction: "asc" });
   apply();
 }
 
-function updateSort(data, index) {
+function updateSort(fieldname, index) {
   let oldSort = Array.from(sortValues.value)[index];
   sortValues.value.delete(oldSort);
   sortValues.value.add({
-    fieldname: data.value,
+    fieldname,
     direction: oldSort.direction,
   });
   apply();
@@ -273,10 +275,5 @@ function convertToString(values) {
   });
   _sortValues = _sortValues.slice(0, -2);
   return _sortValues;
-}
-
-function restartSort() {
-  sortSortable.stop();
-  sortSortable.start();
 }
 </script>

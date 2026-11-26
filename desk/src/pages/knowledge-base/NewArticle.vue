@@ -7,18 +7,16 @@
       <template #right-header> </template>
     </LayoutHeader>
     <div class="pt-6 mx-auto w-full max-w-4xl px-5">
-      <div class="flex flex-col gap-3 rounded-lg border w-full p-4">
+      <div class="flex flex-col gap-3 rounded-6 border w-full p-4">
         <div class="flex justify-between items-center mb-3">
           <!-- Author Info -->
-          <div
-            class="flex gap-1 items-center flex-1 mr-7 max-w-fit overflow-hidden"
-          >
+          <div class="flex gap-1 items-center flex-1 me-7 max-w-fit">
             <UserAvatar :name="user.name" :expand="true" />
-            <span>in</span>
+            <span>{{ __("in") }}</span>
             <Link
               class="form-control"
               doctype="HD Article Category"
-              placeholder="Select Category"
+              :placeholder="__('Select Category')"
               v-model="categoryId"
               :pageLength="100"
               :hide-clear-button="true"
@@ -26,9 +24,9 @@
           </div>
           <!-- Action Buttons -->
           <div class="flex gap-2">
-            <Button label="Discard" @click="handleArticleDiscard" />
+            <Button :label="__('Discard')" @click="handleArticleDiscard" />
             <Button
-              label="Create"
+              :label="__('Create')"
               variant="solid"
               @click="handleCreateArticle"
             />
@@ -36,9 +34,9 @@
         </div>
         <!-- Title -->
         <textarea
-          class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200"
+          class="w-full resize-none border-0 bg-transparent text-3xl-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-outline-elevation-2 focus:ring-0 focus:border-outline-elevation-2"
           v-model="title"
-          placeholder="Title"
+          :placeholder="__('Title')"
           rows="1"
           wrap="soft"
           maxlength="140"
@@ -51,34 +49,47 @@
           "
         />
         <!-- Article Content -->
-        <TextEditor
-          :content="content"
-          @change="content = $event"
-          placeholder="Write your article here..."
-          editor-class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
+        <Editor
+          v-model="content"
+          :extensions="extensions"
+          :upload-function="
+            (file: any, options: any) =>
+              uploadFunction(file, 'HD Article', null, false, options)
+          "
+          :placeholder="__('Write your article here...')"
         >
-          <template #bottom>
-            <TextEditorFixedMenu
-              class="-ml-1 overflow-x-auto w-full"
-              :buttons="textEditorMenuButtons"
+          <template #default>
+            <EditorContent
+              class="rounded-b-6 max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
+              :class="ARTICLE_IMAGE_CLASSES"
             />
+            <EditorFixedMenu
+              class="-ms-1 overflow-x-auto w-full"
+              :items="fullToolbar"
+            />
+            <EditorTableMenu />
           </template>
-        </TextEditor>
+        </Editor>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Breadcrumbs, toast, usePageMeta } from "frappe-ui";
 import {
-  Breadcrumbs,
-  TextEditor,
-  TextEditorFixedMenu,
-  toast,
-  usePageMeta,
-} from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
+  Editor,
+  EditorContent,
+  EditorFixedMenu,
+  EditorTableMenu,
+} from "frappe-ui/editor";
+import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
+import { ARTICLE_IMAGE_CLASSES } from "@helpdesk/shared/tiptap";
+const extensions = buildEditorExtensions();
+import { useOnboarding } from "@framework/ui";
+import Link from "@/components/frappe-ui/Link.vue";
 import { computed, ref } from "vue";
+import { __ } from "@/translation";
 
 import { LayoutHeader, UserAvatar } from "@/components";
 import { useAuthStore } from "@/stores/auth";
@@ -86,7 +97,7 @@ import { globalStore } from "@/stores/globalStore";
 import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { Article } from "@/types";
-import { textEditorMenuButtons } from "@/utils";
+import { uploadFunction } from "@/utils";
 import { useRoute, useRouter } from "vue-router";
 
 const userStore = useUserStore();
@@ -94,7 +105,7 @@ const user = userStore.getUser();
 const { $dialog } = globalStore();
 const router = useRouter();
 const route = useRoute();
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager } = useAuthStore();
 
 const title = ref("");
@@ -115,9 +126,9 @@ function handleCreateArticle() {
     { title: title.value, content: content.value, category: categoryId.value },
     {
       onSuccess: (article: Article) => {
-        toast.success("Article created");
+        toast.success(__("Article created successfully."));
         if (isManager) {
-          updateOnboardingStep("first_article");
+          updateOnboardingStep?.("first_article");
         }
         resetState();
         router.push({
@@ -141,13 +152,13 @@ function handleArticleDiscard() {
     return;
   }
   $dialog({
-    title: "Discard Article",
-    message: "Are you sure you want to discard this article?",
+    title: __("Discard Article"),
+    message: __("Are you sure you want to discard this article?"),
     actions: [
       {
-        label: "Confirm",
+        label: __("Confirm"),
         variant: "solid",
-        onClick(close: Function) {
+        onClick({ close }: { close: () => void }) {
           router.push({
             name: "AgentKnowledgeBase",
           });
@@ -167,25 +178,19 @@ function resetState() {
 const breadcrumbs = computed(() => {
   const options: Array<{ label: string; route?: { name: string } }> = [
     {
-      label: "Knowledge Base",
+      label: __("Knowledge Base"),
       route: { name: "AgentKnowledgeBase" },
     },
   ];
-  if (categoryName.value) {
-    options.push({
-      label: categoryName.value,
-      route: { name: "AgentKnowledgeBase" },
-    });
-  }
   options.push({
-    label: "New Article",
+    label: __("New Article"),
   });
   return options;
 });
 
 usePageMeta(() => {
   return {
-    title: "New Article",
+    title: __("New Article"),
   };
 });
 </script>

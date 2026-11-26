@@ -4,6 +4,7 @@ export const filterableFields = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
   params: {
     doctype: "HD Ticket",
+    ignore_team_restrictions: true,
   },
   transform: (data) => {
     data = data

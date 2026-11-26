@@ -3,7 +3,8 @@ import {
   HolidayErrors,
   RepetitionPattern,
 } from "@/components/Settings/Holiday/types";
-import dayjs, { Dayjs } from "dayjs";
+import { dayjs } from "frappe-ui";
+import type { Dayjs } from "dayjs";
 import { ref } from "vue";
 
 export const holidayListActiveScreen = ref<{
@@ -132,11 +133,9 @@ export function updateWeeklyOffDates() {
   holidayData.value.holidays = newHolidays;
 }
 
+// Which occurrence of its weekday the date is, so the 1st to 7th is always the first.
 function getWeekOfMonth(date: Dayjs): number {
-  const firstDayOfMonth = date.startOf("month");
-  const firstDayOfWeek = firstDayOfMonth.day();
-  const offset = (date.date() + firstDayOfWeek - 1) / 7;
-  return Math.ceil(offset);
+  return Math.ceil(date.date() / 7);
 }
 
 function getWeeklyOffDateList(

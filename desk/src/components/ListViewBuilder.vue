@@ -1,36 +1,161 @@
 <template>
   <!-- View Controls -->
   <div
-    class="flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6"
-    v-if="showViewControls"
+    :class="[
+      'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
+      groupBy || isLoadingRows || list?.data?.data?.length > 0
+        ? 'relative'
+        : 'absolute inset-x-0',
+    ]"
+    v-if="!options.hideViewControls"
   >
-    <QuickFilters v-if="!isMobileView" class="flex-1" />
-    <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
-      <Button
-        label="Save Changes"
-        v-if="isViewUpdated && canSaveView"
-        @click="handleViewUpdate"
-      />
-      <Reload @click="handleReload" :loading="list.loading" />
-      <Filter :default_filters="defaultParams.filters" />
-      <SortBy :hide-label="isMobileView" />
-      <ColumnSettings
-        :hide-label="isMobileView"
-        v-if="!options.hideColumnSetting"
-      />
-    </div>
-    <div v-else class="flex justify-between items-center w-full">
-      <Filter :default_filters="defaultParams.filters" />
-      <div class="flex items-center gap-2">
+    <ViewControlsSkeleton
+      v-if="!viewControlsReady"
+      :is-mobile-view="isMobileView"
+      :group-by="Boolean(options.groupBy)"
+      :column-setting="!options.hideColumnSetting"
+    />
+    <template v-else>
+      <QuickFilters v-if="!isMobileView" />
+      <div v-if="!isMobileView" class="-ms-2 h-5 border-s"></div>
+      <div
+        class="flex items-start gap-2 justify-end h-full py-1 ps-0.5"
+        v-if="!isMobileView"
+      >
+        <Button
+          :label="__('Save Changes')"
+          v-if="isViewUpdated && canSaveView"
+          @click="handleViewUpdate"
+        />
         <Reload @click="handleReload" :loading="list.loading" />
-        <SortBy :hide-label="isMobileView" />
+        <Filter />
+        <!-- a grouped list sorts and sizes from its own column headers -->
+        <SortBy v-if="!groupBy" :hide-label="isMobileView" />
+        <GroupBy
+          v-if="options.groupBy"
+          :modelValue="groupBy"
+          :doctype="options.doctype"
+          :exclude="options.groupByExclude"
+          @update:modelValue="updateGroupBy"
+        />
+        <Dropdown v-if="groupBy" :options="exportGroupOptions">
+          <Button :label="__('Export')" icon-left="lucide-download" />
+        </Dropdown>
+        <ColumnSettings
+          :hide-label="isMobileView"
+          v-if="!options.hideColumnSetting && !groupBy"
+        />
       </div>
-    </div>
+      <div v-else class="flex justify-between items-center w-full">
+        <Filter />
+        <div class="flex items-center gap-2">
+          <Reload @click="handleReload" :loading="list.loading" />
+          <SortBy v-if="!groupBy" :hide-label="isMobileView" />
+          <GroupBy
+            v-if="options.groupBy"
+            :modelValue="groupBy"
+            :doctype="options.doctype"
+            :exclude="options.groupByExclude"
+            hideLabel
+            @update:modelValue="updateGroupBy"
+          />
+          <Dropdown v-if="groupBy" :options="exportGroupOptions">
+            <Button :tooltip="__('Export')" icon="lucide-download" />
+          </Dropdown>
+        </div>
+      </div>
+    </template>
   </div>
 
+  <!-- Group By summary: one row per group instead of the records -->
+  <template v-if="groupBy">
+    <div class="flex min-h-0 flex-1 flex-col px-3 sm:px-5">
+      <GroupByTable
+        class="[&_[data-slot=list-header-border]]:hidden [&_[data-slot=list-header]]:mb-2 [&_[data-slot=list-header]]:rounded-4 [&_[data-slot=list-header]]:bg-surface-gray-2"
+        :doctype="options.doctype"
+        :groupBy="groupBy"
+        :rows="groups.rows.value"
+        :totals="groups.totals.value"
+        :loading="groups.loading.value"
+        @update:groupBy="updateGroupBy"
+      >
+        <template #cell="{ row, column, value, total }">
+          <div
+            class="flex items-center gap-2 truncate text-base"
+            :class="[
+              column.align === 'right' ? 'tabular-nums' : '',
+              total ? 'font-medium text-ink-gray-9' : 'text-ink-gray-8',
+            ]"
+          >
+            <Avatar
+              v-if="!total && column.options === 'User' && row[column.key]"
+              size="sm"
+              :label="getUser(row[column.key]).full_name"
+              :image="getUser(row[column.key]).user_image"
+            />
+            <IndicatorIcon
+              v-else-if="!total && statusColor(column, row[column.key])"
+              :class="statusColor(column, row[column.key])"
+            />
+            <Tooltip
+              v-if="ratingStars(column, row[column.key]) !== null"
+              :text="formatRating(Number(row[column.key]), column.options)"
+            >
+              <Rating
+                :model-value="ratingStars(column, row[column.key])"
+                :max="Number(column.options) || 5"
+                :step="0.5"
+                disabled
+              />
+            </Tooltip>
+            <span v-else class="truncate">{{
+              groupCellText(row, column, value)
+            }}</span>
+          </div>
+        </template>
+        <template v-if="groups.error.value" #empty>
+          <div class="flex flex-col items-center gap-3 py-16 text-center">
+            <span class="text-base text-ink-gray-7">{{
+              __("Couldn't load the groups")
+            }}</span>
+            <Button :label="__('Retry')" @click="groups.reload" />
+          </div>
+        </template>
+      </GroupByTable>
+    </div>
+    <div v-if="groups.rowCount.value" class="border-t sm:px-5 px-3 py-2">
+      <ListFooter v-model="groups.pageLength.value">
+        <template #left>
+          <TabButtons
+            :model-value="groups.pageLength.value"
+            :options="
+              [20, 50, 100].map((o) => ({ label: String(o), value: o }))
+            "
+            @update:model-value="(count) => (groups.pageLength.value = count)"
+          />
+        </template>
+        <template #right>
+          <Button
+            v-if="groups.hasNextPage.value"
+            :label="__('Load More')"
+            @click="groups.loadMore"
+          />
+        </template>
+      </ListFooter>
+    </div>
+  </template>
+  <!-- Loading State -->
+  <ListViewSkeleton
+    v-else-if="isLoadingRows"
+    :columns="columns"
+    :row-count="Math.min(defaultParams.page_length_count, 20)"
+    :selectable="options.selectable"
+    :footer="false"
+    aria-busy="true"
+  />
   <!-- List View -->
   <ListView
-    v-if="list.data?.data.length > 0"
+    v-else-if="list.data?.data.length > 0"
     class="flex-1"
     :columns="columns"
     :rows="rows"
@@ -38,7 +163,7 @@
     :options="{
       selectable: options.selectable,
       showTooltip: false,
-      resizeColumn: false,
+      resizeColumn: true,
       getRowRoute: (row) => ({
         name: options.rowRoute?.name,
         params: { [options.rowRoute?.prop]: row.name },
@@ -52,13 +177,14 @@
         v-for="column in columns"
         :key="column.key"
         :item="column"
-        @columnWidthUpdated="(width) => console.log(width)"
+        @columnWidthUpdated="handleColumnResize"
       />
     </ListHeader>
     <ListRows
       :rows="rows"
       v-slot="{ idx, column, item, row }"
       :group-by-actions="options.groupByActions"
+      :reveal-group="options.revealGroup"
       @scrollend="handleListScroll"
       class="list-rows"
     >
@@ -72,9 +198,19 @@
     </ListRows>
     <ListSelectBanner v-if="options.showSelectBanner">
       <template #actions="{ selections, unselectAll }">
-        <Dropdown :options="selectBannerOptions(selections, unselectAll)">
-          <Button icon="more-horizontal" variant="ghost" />
-        </Dropdown>
+        <div class="flex items-center gap-1">
+          <Button
+            v-for="action in selectBannerOptions(selections, unselectAll, true)"
+            :key="action.label"
+            :label="action.label"
+            :icon-left="action.icon"
+            variant="ghost"
+            @click="action.onClick"
+          />
+          <Dropdown :options="selectBannerOptions(selections, unselectAll)">
+            <Button icon="lucide-more-horizontal" variant="ghost" />
+          </Dropdown>
+        </div>
       </template>
     </ListSelectBanner>
   </ListView>
@@ -82,7 +218,7 @@
   <!-- List Footer -->
   <div
     class="p-20 border-t sm:px-5 px-3 py-2"
-    v-if="list.data?.data.length > 0"
+    v-if="!groupBy && list.data?.data.length > 0"
   >
     <ListFooter
       :options="{
@@ -97,33 +233,49 @@
           handlePageLength(count);
         }
       "
-    />
-  </div>
-  <!-- Loading State -->
-  <div
-    v-else-if="list.loading"
-    class="w-full h-full flex items-center justify-center -mt-48"
-  >
-    <LoadingIndicator :scale="10" />
+    >
+      <!-- frappe-ui's ListFooter still feeds TabButtons the removed `buttons`
+           prop, so its own page-length picker renders nothing. -->
+      <template #left>
+        <TabButtons
+          :model-value="defaultParams.page_length_count"
+          :options="[20, 50, 100].map((o) => ({ label: String(o), value: o }))"
+          @update:model-value="(count) => handlePageLength(count)"
+        />
+      </template>
+    </ListFooter>
   </div>
   <!-- Empty State -->
   <EmptyState
-    v-else
+    v-else-if="!groupBy && !isLoadingRows"
     :title="emptyState.title"
     :icon="emptyState.icon"
-    @emptyStateAction="emit('emptyStateAction')"
+    :description="emptyState.description"
   />
 </template>
 
 <script setup lang="ts">
 import { MultipleAvatar, StarRating } from "@/components";
+import { IndicatorIcon } from "@/components/icons";
+import { useGroupedList } from "@/composables/useGroupedList";
+import { useUserStore } from "@/stores/user";
+import {
+  formatRating,
+  GroupBy,
+  GroupByTable,
+  parseGroupBy,
+  serializeGroupBy,
+} from "@framework/ui/GroupBy";
+import type { GroupByColumn, GroupBySettings } from "@framework/ui/GroupBy";
 import {
   ColumnSettings,
-  Filter,
   QuickFilters,
   Reload,
   SortBy,
+  ViewControlsSkeleton,
 } from "@/components/view-controls";
+import { Filter, normalizeFilters } from "@helpdesk/shared/filter";
+import ListViewSkeleton from "@helpdesk/shared/ListViewSkeleton.vue";
 import { useScreenSize } from "@/composables/screen";
 import {
   currentView as headerView,
@@ -132,30 +284,37 @@ import {
 } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
-import { capture } from "@/telemetry";
-import { View, ViewType } from "@/types";
-import { formatTimeShort, getIcon } from "@/utils";
-import { useStorage } from "@vueuse/core";
-
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { capture } from "@/telemetry";
+import { __ } from "@/translation";
+import { View, ViewType } from "@/types";
+import { getIcon } from "@/utils";
+import { useStorage } from "@vueuse/core";
 import {
-  call,
+  Avatar,
   createResource,
+  dayjsLocal,
   Dropdown,
-  FeatherIcon,
+  frappeRequest,
+  Rating,
+  TabButtons,
+  toast,
+  Tooltip,
+} from "frappe-ui";
+import {
+  Icon as SpriteIcon,
   ListFooter,
   ListHeader,
   ListHeaderItem,
   ListRowItem,
   ListSelectBanner,
   ListView,
-  LoadingIndicator,
-  toast,
-} from "frappe-ui";
+} from "frappe-ui/experimental";
 import {
   computed,
   h,
   onMounted,
+  onUnmounted,
   provide,
   reactive,
   ref,
@@ -163,7 +322,9 @@ import {
   watch,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
 import EmptyState from "./EmptyState.vue";
+import { listFilters } from "./listViewFilters";
 import ListRows from "./ListRows.vue";
 
 interface P {
@@ -171,26 +332,28 @@ interface P {
     doctype: string;
     defaultFilters?: Record<string, any>;
     columnConfig?: Record<string, any>;
+    // what a Link quick filter shows for its value, by fieldname
+    quickFilterTitles?: Record<string, (value: string) => string | undefined>;
     emptyState?: {
       // type of a h componnt
       icon?: string | VNode;
       title: string;
+      description?: string;
     };
     hideViewControls?: boolean;
     hideColumnSetting?: boolean;
     selectable?: boolean;
     view?: ViewType;
     groupByActions?: Array<any>;
+    revealGroup?: string;
     showSelectBanner?: boolean;
     selectBannerActions?: Record<string, any>;
     default_page_length?: number;
-    isCustomerPortal?: boolean;
     rowRoute?: Record<string, string>;
   };
 }
 
 interface E {
-  (event: "emptyStateAction"): void;
   (event: "rowClick", row: any): void;
 }
 const props = defineProps<P>();
@@ -198,7 +361,7 @@ const emit = defineEmits<E>();
 const route = useRoute();
 const router = useRouter();
 const { isManager } = useAuthStore();
-const { $dialog } = globalStore();
+const { $dialog, $socket } = globalStore();
 const { getStatus } = useTicketStatusStore();
 
 const listSelections = ref(new Set());
@@ -213,7 +376,6 @@ const defaultOptions = reactive({
   },
   groupByActions: [],
   default_page_length: 20,
-  isCustomerPortal: false,
   hideColumnSetting: true,
   rowRoute: {
     name: "",
@@ -221,16 +383,20 @@ const defaultOptions = reactive({
   },
   selectBannerActions: [
     {
-      label: "Delete",
-      icon: "trash-2",
+      label: __("Delete"),
+      icon: "lucide-trash-2",
       onClick: (selections: Set<string>) => {
         $dialog({
-          title: "Delete",
-          message: `Are you sure you want to delete ${selections.size} item(s)?`,
+          title: __("Delete"),
+          message: __("Are you sure you want to delete {0} item(s)?", [
+            selections.size,
+          ]),
           actions: [
             {
-              label: "Confirm",
+              label: __("Delete"),
               variant: "solid",
+              theme: "red",
+              iconLeft: "lucide-trash-2",
               onClick({ close }) {
                 handleBulkDelete(close, selections);
               },
@@ -238,18 +404,76 @@ const defaultOptions = reactive({
           ],
         });
       },
-      condition: () => !options.value.isCustomerPortal && isManager,
+      condition: () => isManager,
     },
   ],
 });
 
 function handleBulkDelete(hide: Function, selections: Set<string>) {
   capture("bulk_delete" + props.options.doctype);
-  call("frappe.desk.reportview.delete_items", {
-    items: JSON.stringify(Array.from(selections)),
-    doctype: props.options.doctype,
-  }).then(() => {
-    toast.success("Item(s) deleted successfully");
+  const requested = Array.from(selections);
+  const requestedCount = requested.length;
+
+  const failureMessages: string[] = [];
+  let successMessage = "";
+  let failedCount = 0;
+
+  const onBulkResult = (data: { message: string; title: string }) => {
+    const isFailure =
+      data.title === __("Bulk Operation Failed") ||
+      data.title === "Bulk Operation Failed";
+    const isSuccess =
+      data.title === __("Bulk Operation Successful") ||
+      data.title === "Bulk Operation Successful";
+    if (!isFailure && !isSuccess) return;
+
+    if (isFailure) {
+      // Parse how many items failed from the message (Frappe includes the count)
+      const match = data.message.match(/Failed to delete (\d+) documents?/);
+      if (match) {
+        failedCount = parseInt(match[1], 10);
+      }
+      failureMessages.push(data.message);
+    } else {
+      successMessage = data.message;
+    }
+  };
+
+  $socket.on("msgprint", onBulkResult);
+
+  // Use frappeRequest (not `call`) so per-item delete errors surfaced in
+  // `_server_messages` get routed through the app's serverMessagesHandler.
+  // `call` silently drops them on 200 responses.
+  frappeRequest({
+    url: "frappe.desk.reportview.delete_items",
+    params: {
+      items: JSON.stringify(requested),
+      doctype: props.options.doctype,
+    },
+  }).finally(() => {
+    $socket.off("msgprint", onBulkResult);
+
+    const deletedCount = requestedCount - failedCount;
+
+    if (failureMessages.length > 0 && deletedCount > 0) {
+      // Partial success: some deleted, some failed — show both toasts
+      toast.success(__("{0} item(s) deleted successfully", [deletedCount]));
+      for (const msg of failureMessages) {
+        toast.error(msg);
+      }
+    } else if (failureMessages.length > 0) {
+      // All failed
+      for (const msg of failureMessages) {
+        toast.error(msg);
+      }
+    } else if (successMessage) {
+      // All succeeded
+      toast.success(successMessage);
+    } else {
+      // Fallback: no socket messages received (e.g. enqueued for >10 items)
+      toast.success(__("{0} item(s) queued for deletion", [requestedCount]));
+    }
+
     hide();
     reset();
   });
@@ -271,20 +495,24 @@ const { isMobileView } = useScreenSize();
 
 const defaultEmptyState = {
   icon: "",
-  title: "No Data Found",
+  title: __("No Data Found"),
 };
+
+const pageLengthCount = useStorage(
+  `list_page_length_count+${props.options.doctype}`,
+  options.value.default_page_length
+);
 
 const defaultParams = reactive({
   doctype: options.value.doctype,
   filters: {},
   default_filters: options.value.defaultFilters,
   order_by: "modified desc",
-  page_length: options.value.default_page_length,
-  page_length_count: options.value.default_page_length,
+  page_length: pageLengthCount.value,
+  page_length_count: pageLengthCount.value,
   view: options.value.view,
   columns: [],
   rows: [],
-  show_customer_portal_fields: options.value.isCustomerPortal,
   is_default: false,
 });
 
@@ -310,13 +538,24 @@ const list = createResource({
   },
 });
 
+// Until the first response lands there is nothing to call empty, so keep the skeleton up.
+const isLoadingRows = computed(
+  () =>
+    !list.data?.data?.length && (list.loading || (!list.fetched && !list.error))
+);
+
 const exposeFunctions = {
   list,
   reload,
   unselectAll: () => {},
 };
 
-function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
+/** Banner actions. `inline` picks the ones shown as buttons; the rest fill the "..." menu. */
+function selectBannerOptions(
+  selections: Set<string>,
+  unselectAll = () => {},
+  inline = false
+) {
   exposeFunctions["unselectAll"] = unselectAll;
 
   // Get the user-provided actions
@@ -339,8 +578,10 @@ function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
       onClick: () => action.onClick?.(selections),
     }));
 
-  // Return combined actions
-  return [...userActions, ...defaultActions];
+  return [...userActions, ...defaultActions].filter(
+    (action) =>
+      Boolean(action.inline) === inline && (action.condition?.() ?? true)
+  );
 }
 
 const rows = computed(() => {
@@ -370,8 +611,8 @@ function getGroupedByRows(listRows, groupByField) {
       group: option || " ",
       collapsed: false,
       rows: filteredRows,
-      icon: h(FeatherIcon, {
-        name: "folder",
+      icon: h(SpriteIcon, {
+        name: option.icon?.replace(/^lucide-/, "") || "folder",
         class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
       }),
     };
@@ -403,7 +644,6 @@ const filterableFields = createResource({
   params: {
     doctype: options.value.doctype,
     append_assign: true,
-    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
     data = data.map((field) => {
@@ -422,7 +662,6 @@ const sortableFields = createResource({
   auto: !options.value.hideViewControls,
   params: {
     doctype: options.value.doctype,
-    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
 });
 
@@ -431,7 +670,6 @@ const quickFilters = createResource({
   auto: !options.value.hideViewControls,
   params: {
     doctype: options.value.doctype,
-    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
     if (Boolean(data.length)) return;
@@ -453,15 +691,15 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   if (column.type === "Datetime") {
     return h("span", {
-      class: "text-p-xs",
-      textContent: formatTimeShort(item),
+      class: "text-base",
+      textContent: dayjsLocal(item).fromNow(),
     });
   }
   if (column.type === "MultipleAvatar") {
     return h(MultipleAvatar, {
       avatars: item,
-      hideName: true,
-      class: "flex items-center truncate flex-1 flex-row-reverse justify-end",
+      hideName: false,
+      class: "flex items-center flex-1 min-w-0",
     });
   }
   if (column.type === "Rating") {
@@ -493,35 +731,34 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
   }
 
   if (column.type === "MultipleAvatar") {
-    if (item.length > 1) {
-      let target = e.target as HTMLElement;
-      target = target.closest(".user-avatar");
-      if (target) {
-        item = target.getAttribute("data-name");
-      }
-    } else {
-      item = item[0].name;
-    }
-    applyFilters({ ...defaultParams.filters, [column.key]: ["LIKE", item] });
+    const avatar = (e.target as HTMLElement).closest(".user-avatar");
+    // the gap between the faces, and the "+n" chip, name nobody to filter by
+    const name = avatar?.getAttribute("data-name");
+    if (!name) return;
+    applyColumnFilter(column.key, "LIKE", `%${name}%`);
     return;
   }
-  applyFilters({ ...defaultParams.filters, [column.key]: item });
+  applyColumnFilter(column.key, "=", item);
 }
 
-const showViewControls = computed(() => {
-  return (
-    !options.value.hideViewControls &&
-    filterableFields.data &&
-    sortableFields.data &&
-    quickFilters.data
+function applyColumnFilter(key: string, operator: string, value: any) {
+  const conditions = normalizeFilters(defaultParams.filters).filter(
+    (condition) => condition[0] !== key
   );
-});
+  conditions.push([key, operator, value]);
+  applyFilters(conditions);
+}
+
+const viewControlsReady = computed(() =>
+  Boolean(filterableFields.data && sortableFields.data && quickFilters.data)
+);
 
 const listViewData = reactive({
   list,
   filterableFields,
   quickFilters,
   sortableFields,
+  quickFilterTitles: computed(() => options.value?.quickFilterTitles || {}),
 });
 
 provide("listViewData", listViewData);
@@ -533,10 +770,18 @@ provide("listViewActions", {
   reload,
 });
 
+// Also published module-scope, for the command palette: it renders in the
+// sidebar, outside this provide chain.
+listFilters.value = {
+  current: () => normalizeFilters(list?.params?.filters),
+  apply: applyFilters,
+};
+onUnmounted(() => (listFilters.value = null));
+
 function applyFilters(filters) {
   isViewUpdated.value = true;
-  defaultParams.filters = { ...filters };
-  list.submit({ ...defaultParams });
+  defaultParams.filters = normalizeFilters(filters);
+  loadList();
 
   // automatically update filters for default view
   if (!defaultParams.is_default) return;
@@ -544,10 +789,87 @@ function applyFilters(filters) {
   isViewUpdated.value = false;
 }
 
+// one summary row per group, saved with the view like sort and filters
+const groupBy = ref<GroupBySettings | null>(null);
+const groups = useGroupedList(
+  () => options.value.doctype,
+  groupBy,
+  () => defaultParams.filters
+);
+// read by useView's create flow, which only gets the list resource
+list.groupBy = groupBy;
+
+// A grouped list hides the records, so only their params move until grouping is cleared.
+let listSkipped = false;
+function loadList() {
+  listSkipped = Boolean(groupBy.value);
+  if (listSkipped) list.params = { ...defaultParams };
+  else list.submit({ ...defaultParams });
+}
+watch(groupBy, (value) => {
+  if (!value && listSkipped) loadList();
+});
+
+function updateGroupBy(value: GroupBySettings | null) {
+  isViewUpdated.value = true;
+  groupBy.value = value;
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
+}
+
+const { getUser } = useUserStore();
+
+// downloads the groups on screen, through the same filter handling as the grouped list
+function exportGroups(fileFormat: "Excel" | "CSV") {
+  const grouped = serializeGroupBy(groupBy.value!);
+  const params = new URLSearchParams({
+    doctype: options.value.doctype,
+    title: options.value.doctype,
+    file_format_type: fileFormat,
+    fields: JSON.stringify(grouped.fields),
+    filters: JSON.stringify(defaultParams.filters),
+    group_by: grouped.group_by,
+    order_by: grouped.order_by,
+    view: "Report",
+  });
+  window.location.href = `/api/method/helpdesk.api.doc.export_grouped_list?${params}`;
+}
+
+const exportGroupOptions = [
+  { label: __("Excel"), onClick: () => exportGroups("Excel") },
+  { label: __("CSV"), onClick: () => exportGroups("CSV") },
+];
+
+function statusColor(column: GroupByColumn, value: unknown): string {
+  if (options.value.doctype !== "HD Ticket" || column.key !== "status")
+    return "";
+  return value ? getStatus(String(value))?.parsed_color ?? "" : "";
+}
+
+// a Rating is stored as a fraction of its stars (0.6 of 5 is 3 stars)
+function ratingStars(column: GroupByColumn, value: unknown): number | null {
+  if (column.fieldtype !== "Rating" || typeof value !== "number") return null;
+  return value * (Number(column.options) || 5);
+}
+
+function groupCellText(
+  row: Record<string, unknown>,
+  column: GroupByColumn,
+  value: string
+): string {
+  const raw = row[column.key];
+  if (column.options === "User" && raw) return getUser(String(raw)).full_name;
+  return value;
+}
+
 function applySort(order_by: string) {
   isViewUpdated.value = true;
   defaultParams.order_by = order_by;
-  list.submit({ ...defaultParams, order_by });
+  loadList();
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
 }
 
 function updateColumns(obj) {
@@ -559,24 +881,27 @@ function updateColumns(obj) {
   });
   columns.value = defaultParams.columns = isDefault ? "" : _columns;
   defaultParams.rows = isDefault ? "" : rows;
-  list.reload({ ...defaultParams });
+  loadList();
 }
 
 function reload(reset: boolean = false) {
   if (reset) {
-    defaultParams.filters = options.value.defaultFilters || {};
+    defaultParams.filters = normalizeFilters(options.value.defaultFilters);
     defaultParams.order_by = "modified desc";
     defaultParams.page_length = options.value.default_page_length;
-    defaultParams.page_length_count = options.value.default_page_length;
+    pageLengthCount.value = options.value.default_page_length;
+    defaultParams.page_length_count = pageLengthCount.value;
     defaultParams.columns = [];
     defaultParams.rows = [];
     defaultParams.is_default = true;
   }
-  list.reload({ ...defaultParams });
+  loadList();
+  groups.reload();
 }
 
 function handlePageLength(count: number, loadMore: boolean = false) {
-  defaultParams.page_length_count = count;
+  pageLengthCount.value = count;
+  defaultParams.page_length_count = pageLengthCount.value;
   if (loadMore) {
     defaultParams.page_length += count;
   } else {
@@ -598,20 +923,51 @@ function handleViewUpdate() {
     columns: JSON.stringify(defaultParams.columns),
     rows: JSON.stringify(defaultParams.rows),
     order_by: defaultParams.order_by,
+    list_group_by: groupBy.value ? JSON.stringify(groupBy.value) : "",
     name: (route.query.view as string) || "default",
     dt: options.value.doctype,
     route_name: route.name,
-    is_customer_portal: options.value.isCustomerPortal,
+    is_customer_portal: false,
   };
-  updateView(view, () => {
-    isViewUpdated.value = false;
-  });
+  const currentView = findView(route.query.view as string).value;
+  if (currentView && currentView.public) {
+    $dialog({
+      title: __("Confirm Changes"),
+      message: __(
+        "This view is public. Changes made will be visible to everyone."
+      ),
+      actions: [
+        {
+          label: __("Save"),
+          variant: "solid",
+          onClick({ close }) {
+            updateView(view, () => {
+              isViewUpdated.value = false;
+            });
+            close();
+          },
+        },
+        {
+          label: __("Cancel"),
+          variant: "outline",
+          onClick({ close }) {
+            close();
+          },
+        },
+      ],
+    });
+  } else {
+    updateView(view, () => {
+      isViewUpdated.value = false;
+    });
+  }
 }
 
 const { findView, updateView, defaultView } = useView(options.value.doctype);
 
 const canSaveView = computed(() => {
   let currentView: View = findView(route.query.view as string).value;
+  if (currentView?.is_standard) return false;
   if (!currentView || !currentView.public) return true;
   if (currentView.public && isManager) {
     return true;
@@ -625,18 +981,70 @@ function handleReload() {
 }
 
 function handleViewChanges() {
-  let currentView: View = findCurrentView();
-  if (!currentView) {
-    router.push({ name: route.name });
-    reload(true);
+  if (!switchToView(route.query.view as string)) return;
+  applyUrlFilters();
+  loadList();
+}
+
+/** Base for URL filters, so repeated pushes layer on the view, not each other. */
+let viewFilters = [];
+
+/** Owns sort, columns and rows. False means a redirect is in flight. */
+function switchToView(view: string): boolean {
+  defaultParams.view.name = view;
+  const currentView: View = findCurrentView();
+  if (currentView) {
+    // normalize so legacy dict-format saved views become list conditions
+    viewFilters = normalizeFilters(currentView.filters);
+    defaultParams.order_by = currentView.order_by || "modified desc";
+    defaultParams.columns = currentView.columns;
+    defaultParams.rows = currentView.rows;
+    groupBy.value = options.value.groupBy
+      ? parseGroupBy(currentView.list_group_by)
+      : null;
+    return true;
+  }
+  if (view) {
+    // Stale ?view: drop it but keep the filters, unlike a push to the bare route.
+    router.replace({
+      name: route.name,
+      query: { ...route.query, view: undefined },
+    });
+    return false;
+  }
+  viewFilters = normalizeFilters(options.value.defaultFilters);
+  defaultParams.order_by = "modified desc";
+  defaultParams.columns = [];
+  defaultParams.rows = [];
+  groupBy.value = null;
+  defaultParams.is_default = true;
+  headerView.value.label = __("List");
+  headerView.value.icon = LucideAlignJustify;
+  return true;
+}
+
+/** Touches `filters` only, so filtering never resets the user's sort. */
+function applyUrlFilters() {
+  const urlFilters = parseUrlFilters();
+  if (!urlFilters) {
+    defaultParams.filters = viewFilters;
     return;
   }
-  defaultParams.filters = currentView.filters;
-  defaultParams.order_by = currentView.order_by || "modified desc";
-  defaultParams.columns = currentView.columns;
-  defaultParams.rows = currentView.rows;
+  const overriddenFields = new Set(urlFilters.map((c) => c[0]));
+  defaultParams.filters = urlFilters.length
+    ? [...viewFilters.filter((c) => !overriddenFields.has(c[0])), ...urlFilters]
+    : [];
+}
 
-  list.submit({ ...defaultParams });
+/** null when the URL carries no filters; [] means "clear them". */
+function parseUrlFilters() {
+  if (!route.query.filters) return null;
+  try {
+    return normalizeFilters(JSON.parse(route.query.filters as string));
+  } catch (e) {
+    console.error("Failed to parse filters from URL", e);
+    return null;
+  }
 }
 
 function findCurrentView() {
@@ -651,15 +1059,14 @@ function findCurrentView() {
   return currentView;
 }
 
+// The view is re-read only when it changes; re-reading it on every filter
+// change is what let a filter silently reset the sort.
 watch(
-  () => route.query.view,
-  (val: string) => {
-    defaultParams.view.name = val;
-    handleViewChanges();
-    if (!val) {
-      headerView.value.label = "List";
-      headerView.value.icon = "lucide:align-justify";
-    }
+  [() => route.query.view as string, () => route.query.filters as string],
+  ([view], [previousView]) => {
+    if (view !== previousView && !switchToView(view)) return;
+    applyUrlFilters();
+    loadList();
   }
 );
 
@@ -678,6 +1085,17 @@ function handleScrollPosition() {
   }, 200);
 }
 
+function handleColumnResize({ key, width, save } = {}) {
+  const column = columns.value.find((c) => c.key === key);
+  if (column) column.width = width;
+  if (!save) return;
+  isViewUpdated.value = true;
+  defaultParams.columns = columns.value;
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
+}
+
 onMounted(async () => {
   handleScrollPosition();
 
@@ -691,7 +1109,7 @@ onMounted(async () => {
     if (route.query.view) {
       const currentView = findCurrentView();
       if (!currentView) return;
-      headerView.value.label = currentView.label || "List";
+      headerView.value.label = currentView.label || __("List");
       headerView.value.icon = getIcon(currentView.icon);
     }
     return;

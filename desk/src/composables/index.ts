@@ -1,1 +1,1 @@
-export { useDevice } from "./device";
+export { useDevice } from "@helpdesk/shared/device";

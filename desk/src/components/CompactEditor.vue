@@ -1,0 +1,206 @@
+<template>
+  <div class="flex flex-col">
+    <Editor
+      ref="editorRef"
+      v-model="internalContent"
+      :extensions="extensions"
+      v-bind="uploadFn ? { uploadFunction: uploadFn } : {}"
+      :placeholder="placeholder"
+    >
+      <template #default>
+        <EditorBubbleMenu :items="commentToolbar" />
+        <div
+          class="flex items-center overflow-x-auto rounded-t-4 border border-b-0 border-outline-gray-1 bg-surface-gray-1 px-1 py-1"
+        >
+          <div
+            v-if="showAttachments"
+            class="inline-flex items-center gap-1.5 pe-1"
+          >
+            <FileUploader private @success="addAttachment">
+              <template #default="{ openFileSelector, uploading }">
+                {{ syncUploadingState(uploading) }}
+                <button
+                  class="flex rounded-4 p-1 text-ink-gray-8 transition-colors hover:bg-surface-gray-3 disabled:opacity-40"
+                  :disabled="uploading"
+                  @click="openFileSelector()"
+                >
+                  <LoadingIndicator v-if="uploading" class="h-4 w-4" />
+                  <AttachmentIcon
+                    v-else
+                    class="h-4 w-4"
+                    style="stroke-width: 1.5 !important"
+                  />
+                </button>
+              </template>
+            </FileUploader>
+            <div class="h-4 w-[2px] border-s ml-1" />
+          </div>
+          <EditorFixedMenu :items="fullToolbar" />
+          <EditorTableMenu />
+        </div>
+        <EditorContent :class="editorClass" />
+      </template>
+    </Editor>
+    <AttachmentList
+      v-if="showAttachments && attachments?.length"
+      class="mt-2"
+      :attachments="attachments ?? []"
+      @remove="removeAttachment"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { AttachmentList } from "@/components";
+import {
+  buildEditorExtensions,
+  commentToolbar,
+  fullToolbar,
+} from "@/components/editor/config";
+import { AttachmentIcon } from "@/components/icons";
+import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
+import { isContentEmpty } from "@/utils";
+import { FileUploader, LoadingIndicator, type UploadedFile } from "frappe-ui";
+import {
+  Editor,
+  EditorBubbleMenu,
+  EditorContent,
+  EditorFixedMenu,
+  EditorTableMenu,
+} from "frappe-ui/editor";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
+
+type UploadFunction = (file: File) => Promise<UploadedFile>;
+
+const props = withDefaults(
+  defineProps<{
+    placeholder?: string;
+    minHeight?: string;
+    maxHeight?: string;
+    extensions?: any[];
+    showSignature?: boolean;
+    showAttachments?: boolean;
+    uploadFn?: UploadFunction;
+  }>(),
+  {
+    placeholder: "",
+    minHeight: "min-h-[180px]",
+    maxHeight: "max-h-80",
+    extensions: () => [],
+    showSignature: false,
+    showAttachments: false,
+  }
+);
+
+const internalContent = defineModel<string>({ default: "" });
+
+const editorRef = ref<any>(null);
+const attachments = defineModel<UploadedFile[] | null>("attachments", {
+  default: () => [],
+});
+const isUploading = ref(false);
+
+const extensions = buildEditorExtensions({ extra: props.extensions });
+
+const contentClass = [
+  "!prose-sm max-w-full overflow-auto py-1.5 px-3",
+  "rounded-b-4 border border-outline-gray-1 bg-surface-base",
+  "placeholder-ink-gray-4 text-ink-gray-8 -mt-0.5",
+];
+
+const editorClass = computed(() => [
+  ...contentClass,
+  props.minHeight,
+  props.maxHeight,
+]);
+
+const userResource = getUserEmailInfo();
+
+function getDefaultContent(signature: string): string {
+  return `<p></p><p></p>${signature}`;
+}
+
+function applySignature(signature: string) {
+  if (!isContentEmpty(internalContent.value)) return;
+  const commands = editorRef.value?.editor?.commands;
+  if (commands) {
+    commands.setContent(signature);
+    setTimeout(() => {
+      editorRef.value?.editor?.commands?.focus("start");
+    }, 0);
+  } else {
+    internalContent.value = signature;
+  }
+}
+
+function addAttachment(file: UploadedFile) {
+  attachments.value = [...(attachments.value ?? []), file];
+}
+
+function removeAttachment(attachment: UploadedFile) {
+  attachments.value = (attachments.value ?? []).filter((a) => a !== attachment);
+}
+
+// FileUploader exposes `uploading` only via slot scope, so mirror it into a
+// ref that the parent can read through the exposed `isUploading`.
+function syncUploadingState(uploading: boolean): string {
+  isUploading.value = uploading;
+  return "";
+}
+
+function getContent(): string {
+  return editorRef.value?.editor?.getHTML() ?? "";
+}
+
+function isEmpty(): boolean {
+  return !editorRef.value?.editor?.state?.doc?.textContent?.trim()?.length;
+}
+
+function reset() {
+  const commands = editorRef.value?.editor?.commands;
+  if (!commands) {
+    internalContent.value = "";
+    return;
+  }
+  const data = userResource?.data as { email_signature?: string } | null;
+  const sig = data?.email_signature
+    ? getDefaultContent(data.email_signature)
+    : "";
+  commands.setContent(sig || "<p></p>");
+  internalContent.value = sig;
+  attachments.value = null;
+  setTimeout(() => {
+    editorRef.value?.editor?.commands?.focus("start");
+  }, 0);
+}
+
+if (props.showSignature) {
+  // Late arrival: resource resolves after mount
+  watch(
+    () => userResource.data,
+    (data: { email_signature?: string } | null) => {
+      if (!data?.email_signature) return;
+      applySignature(getDefaultContent(data.email_signature));
+    }
+  );
+}
+
+onMounted(() => {
+  if (!props.showSignature) return;
+
+  nextTick(() => {
+    const data = userResource.data as { email_signature?: string } | null;
+    if (data?.email_signature) {
+      applySignature(getDefaultContent(data.email_signature));
+    }
+  });
+});
+
+defineExpose({
+  getContent,
+  isEmpty,
+  reset,
+  editorRef,
+  isUploading,
+});
+</script>

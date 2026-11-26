@@ -1,0 +1,84 @@
+<template>
+  <Popover
+    bare
+    :side="splitPlacement(props.placement).side"
+    :align="splitPlacement(props.placement).align"
+  >
+    <template #trigger>
+      <Button
+        class="flex items-center justify-between min-w-36"
+        :class="targetClass"
+        icon-right="lucide-chevron-down"
+      >
+        <div class="w-full truncate">
+          {{
+            options?.find((option) => option.value == model)?.label || "Select"
+          }}
+        </div>
+      </Button>
+    </template>
+    <template #default="{ close: closePopover }">
+      <div
+        class="mt-1 p-1 text-ink-gray-6 w-[--reka-popper-anchor-width] bg-surface-base shadow-2xl rounded-4"
+        :class="bodyClass"
+      >
+        <div class="max-h-52 overflow-y-auto">
+          <div
+            v-for="option in options"
+            :key="option.value"
+            class="p-2 cursor-pointer hover:bg-surface-gray-3 text-base flex items-center justify-between rounded-4"
+            @click="
+              () => {
+                onChange(option.value);
+                closePopover();
+              }
+            "
+          >
+            <div class="w-full truncate">
+              {{ option.label }}
+            </div>
+            <LucideCheck v-if="model == option.value" class="size-4 ms-2" />
+          </div>
+        </div>
+        <hr class="my-1" />
+        <Button
+          variant="ghost"
+          :label="__('Reset')"
+          icon-left="lucide-refresh-ccw"
+          class="w-full focus-visible:ring-0"
+          @click="onReset(closePopover)"
+        />
+      </div>
+    </template>
+  </Popover>
+</template>
+
+<script setup lang="ts">
+import { splitPlacement } from "@/utils";
+import LucideCheck from "~icons/lucide/check";
+import { Button, Popover } from "frappe-ui";
+
+const model = defineModel();
+
+interface Props {
+  options: Array<{ value: string; label: string }>;
+  targetClass?: string;
+  bodyClass?: string;
+  placement?: string;
+  defaultValue?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  placement: "bottom-start",
+  defaultValue: undefined,
+});
+
+const onReset = (closePopover: () => void) => {
+  model.value = props.defaultValue !== undefined ? props.defaultValue : null;
+  closePopover();
+};
+
+const onChange = (value: string) => {
+  model.value = value;
+};
+</script>

@@ -21,6 +21,8 @@ class HDServiceHolidayList(Document):
 
     @frappe.whitelist()
     def get_weekly_off_dates(self):
+        """Add each `weekly_off` day in the list's date range to its holidays table.
+        Skips dates already in it. Does not save; throws if no weekly off day is set."""
         self.validate_values()
         date_list = self.get_weekly_off_date_list(self.from_date, self.to_date)
         last_idx = max(
@@ -91,37 +93,42 @@ class HDServiceHolidayList(Document):
             filters={"holiday_list": self.name},
             pluck="name",
         )
+        frappe.flags.ignore_validation = True
         for sla in linked_sla:
             linked_tickets = frappe.get_all(
                 "HD Ticket",
-                filters={"sla": sla, "status": ["in", ["Open"]]},
+                filters={"sla": sla, "status_category": ["in", ["Open"]]},
                 pluck="name",
             )
+
             for ticket in linked_tickets:
-                ticket_doc = frappe.get_doc("HD Ticket", ticket).save()
+                frappe.get_doc("HD Ticket", ticket).save()
+        frappe.flags.ignore_validation = False
 
     @frappe.whitelist()
     def clear_table(self):
+        """Empty the holidays table. Does not save."""
         self.set("holidays", [])
 
 
 @frappe.whitelist()
-def get_events(start, end, filters=None):
+def get_events(start: str, end: str, filters: str | None = None):
     """Returns events for Gantt / Calendar view rendering.
 
     :param start: Start date-time.
     :param end: End date-time.
     :param filters: Filters (JSON).
     """
+    _filters = []
     if filters:
-        filters = json.loads(filters)
+        _filters = json.loads(filters)
     else:
-        filters = []
+        _filters = []
 
     if start:
-        filters.append(["HD Holiday", "holiday_date", ">", getdate(start)])
+        _filters.append(["HD Holiday", "holiday_date", ">", getdate(start)])
     if end:
-        filters.append(["HD Holiday", "holiday_date", "<", getdate(end)])
+        _filters.append(["HD Holiday", "holiday_date", "<", getdate(end)])
 
     return frappe.get_list(
         "HD Service Holiday List",
@@ -131,7 +138,7 @@ def get_events(start, end, filters=None):
             "`tabHD Holiday`.description",
             "`tabHD Service Holiday List`.color",
         ],
-        filters=filters,
+        filters=_filters,
         update={"allDay": 1},
     )
 

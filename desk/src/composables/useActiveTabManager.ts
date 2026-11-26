@@ -1,106 +1,80 @@
+import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useDebounceFn, useStorage } from "@vueuse/core";
 
-export function useActiveTabManager(tabs, storageKey) {
-  const activeTab = useStorage(storageKey, "activity");
+/**
+ * Keeps the selected tab in sync with the URL hash. frappe-ui v1 Tabs are
+ * keyed by `tab.value`, so this tracks the value rather than an index; the
+ * first tab is the default and carries no hash.
+ */
+export function useActiveTabManager(tabs) {
   const route = useRoute();
   const router = useRouter();
+  const telephonyStore = useTelephonyStore();
+  const { isLoading: isTelephonyLoading } = storeToRefs(telephonyStore);
 
-  const changeTabTo = (tabName) => {
-    let index = findTabIndex(tabName);
-    if (index == -1) return;
-    tabIndex.value = index;
+  const activeTab = ref("");
+
+  const firstTab = () => tabs.value?.[0]?.value;
+
+  const changeTabTo = (tab) => {
+    activeTab.value = tab;
+    if (tab === firstTab()) {
+      router.replace({ path: route.path, query: route.query });
+    } else {
+      setActiveTabInUrl(tab);
+    }
   };
 
-  const preserveLastVisitedTab = useDebounceFn((tabName) => {
-    activeTab.value = tabName.toLowerCase();
-  }, 300);
-
-  function setActiveTabInUrl(tabName) {
-    let hash = "#" + tabName?.toLowerCase();
+  function setActiveTabInUrl(tab) {
+    const hash = "#" + tab?.toLowerCase();
     if (route.hash === hash) return;
-    router.push({ hash });
+    router.push({ hash, query: route.query });
   }
 
-  function getActiveTabFromUrl() {
-    return route.hash.replace("#", "");
+  function findTab(hash) {
+    return tabs.value?.find((tab) => tab.value.toLowerCase() === hash)?.value;
   }
 
-  function findTabIndex(tabName) {
-    return tabs.value?.findIndex(
-      (tabOptions) => tabOptions.name.toLowerCase() === tabName
-    );
-  }
-
-  function getTabIndex(tabName) {
-    let index = findTabIndex(tabName);
-    return index !== -1 ? index : 0; // Default to the first tab if not found
-  }
-
-  function getActiveTab() {
-    let _activeTab = getActiveTabFromUrl();
-    if (_activeTab) {
-      let index = findTabIndex(_activeTab);
-      if (index !== -1) {
-        preserveLastVisitedTab(_activeTab);
-        return index;
-      }
-      return 0;
+  const setActiveTab = () => {
+    const fromHash = findTab(route.hash.replace("#", ""));
+    if (fromHash) {
+      activeTab.value = fromHash;
+      setActiveTabInUrl(fromHash);
+      return;
     }
 
-    let lastVisitedTab = activeTab.value;
-    if (lastVisitedTab) {
-      return getTabIndex(lastVisitedTab);
-    }
+    activeTab.value = firstTab();
+    router.replace({ path: route.path, query: route.query });
+  };
 
-    return 0; // Default to the first tab if nothing is found
-  }
-
-  const tabIndex = ref(getActiveTab());
-
-  watch(tabIndex, (tabIndexValue) => {
-    let currentTab = tabs.value?.[tabIndexValue].name;
-    setActiveTabInUrl(currentTab);
-    preserveLastVisitedTab(currentTab);
-  });
-
+  // Handle when page is navigated
   watch(
     () => route.hash,
-    (tabValue) => {
-      if (!tabValue) return;
+    (newHash) => {
+      const tab = findTab(newHash.replace("#", "")) ?? firstTab();
 
-      let tabName = tabValue.replace("#", "");
-      let index = findTabIndex(tabName);
-      if (index === -1) index = 0;
+      if (tab === firstTab()) {
+        router.replace({ path: route.path, query: route.query });
+      }
 
-      let currentTab = tabs.value?.[index].name;
-      preserveLastVisitedTab(currentTab);
-      tabIndex.value = index;
+      activeTab.value = tab;
     }
   );
 
+  // Handle when tabs array is updated. `immediate` also applies the URL hash
+  // when the panel remounts on soft navigation between tickets.
   watch(
-    tabs,
-    (tabsValue) => {
+    [tabs, isTelephonyLoading],
+    ([tabsValue, isLoading]) => {
       if (!tabsValue?.length) return;
-
-      const currentTab = getActiveTab();
-      tabIndex.value = currentTab;
-
-      const tab = tabsValue.find(
-        (t) => t.name.toLowerCase() === activeTab.value
-      );
-
-      if (tab) {
-        setActiveTabInUrl(tab.name);
-      } else if (tabsValue.length > 0) {
-        setActiveTabInUrl(tabsValue[0].name);
-        tabIndex.value = 0;
+      if (!isLoading) {
+        setActiveTab();
       }
     },
-    { immediate: true, deep: true }
+    { deep: true, flush: "post", immediate: true }
   );
 
-  return { tabIndex, changeTabTo };
+  return { activeTab, changeTabTo };
 }

@@ -1,0 +1,133 @@
+import frappe
+from frappe import _
+from frappe.model import no_value_fields
+
+from helpdesk.consts import (
+    CUSTOMER_ALWAYS_WRITABLE_FIELDS,
+    PORTAL_INSERT_EXEMPT_FIELDS,
+    SERVER_COMPUTED_FIELDS,
+)
+from helpdesk.ticket_fields import TicketFields
+from helpdesk.utils import is_agent
+
+FEEDBACK_FIELDS = ("feedback", "feedback_rating", "feedback_extra")
+
+
+class CustomerEditController:
+    """What a customer may fill on insert and change after it; mixed into HDTicket."""
+
+    def apply_ticket_insert_rules(self):
+        """The permlevel reset after this hook wipes fields the user cannot write;
+        exempt server-set fields and the ones the template lets a customer fill."""
+        # a System Manager pulling emails is not the sender of the pulled tickets
+        if is_agent() or "System Manager" in frappe.get_roles():
+            return
+        self.check_no_feedback_on_insert()
+        self.reset_read_only_fields()
+        if frappe.session.user != "Guest":
+            self.raised_by = frappe.session.user
+        self.source = "Portal"
+        self.flags.ignore_permlevel_for_fields = [
+            *PORTAL_INSERT_EXEMPT_FIELDS,
+            *(row.fieldname for row in self.customer_writable_rows()),
+        ]
+
+    def check_no_feedback_on_insert(self):
+        # feedback is permlevel 0 so a customer can rate a resolved ticket, not a new one
+        if any(self.get(f) for f in FEEDBACK_FIELDS):
+            text = _("Feedback cannot be given while raising a ticket")
+            frappe.throw(text, frappe.PermissionError)
+
+    def reset_read_only_fields(self):
+        # a read-only field at permlevel 0 survives the framework's permlevel reset
+        defaults = frappe.new_doc("HD Ticket", as_dict=True)
+        for df in self.meta.fields:
+            if (
+                df.read_only
+                and df.fieldtype not in no_value_fields
+                and df.fieldname not in PORTAL_INSERT_EXEMPT_FIELDS
+            ):
+                self.set(df.fieldname, defaults.get(df.fieldname))
+
+    def check_update_perms(self):
+        # not gated on source: agent-raised tickets are still the customer's
+        old_doc = self.get_doc_before_save()
+        if not old_doc or is_agent():
+            return
+        # before the email flag below, so the feedback link cannot re-rate either
+        self.check_feedback_is_final(old_doc)
+        # rating the ticket is the one thing a closing email asks the customer to do
+        if self.flags.get("ignore_closed_ticket_guard"):
+            return
+        # `feedback` is never cleared, so a rated ticket stays frozen even after an agent reopens it
+        if old_doc.status == "Closed" or old_doc.feedback:
+            text = _("Closed or rated tickets cannot be updated by non-agents")
+            frappe.throw(text, frappe.PermissionError)
+
+    def check_feedback_is_final(self, old_doc):
+        if not (old_doc.feedback or old_doc.feedback_rating):
+            return
+        if any(self.get(f) != old_doc.get(f) for f in FEEDBACK_FIELDS):
+            text = _("Feedback cannot be changed once given")
+            frappe.throw(text, frappe.PermissionError)
+
+    def prevent_customer_edits(self):
+        """restrict customer from changing ticket values post submission of ticket."""
+        if self.is_new() or is_agent():
+            return
+
+        # custom flag created to allow insertion in special cases
+        if self.flags.get("ignore_customer_edit_guard"):
+            return
+        editable = self.customer_writable_after_create()
+        # the framework's reset runs next and would revert what the template opens
+        self.flags.ignore_permlevel_for_fields = list(editable)
+        # a customer is never sent what it cannot read, so a whole-document save
+        # carries those blank; the framework's reset puts them back
+        unreadable = TicketFields().unreadable_fields
+        changed = [
+            df
+            for df in self.meta.fields
+            if df.fieldtype not in no_value_fields
+            and df.fieldname not in editable
+            and not (df.fieldname in unreadable and not self.get(df.fieldname))
+            and self.has_value_changed(df.fieldname)
+        ]
+        if not changed:
+            return
+        writable_levels = self.get_permlevel_access("write")
+        not_permitted = [df for df in changed if df.permlevel not in writable_levels]
+        message = (
+            _("You do not have permission to change {0}")
+            if not_permitted
+            else _("You cannot change {0} after the ticket is raised")
+        )
+        labels = ", ".join(
+            self.meta.get_translated_label(df.fieldname)
+            for df in not_permitted or changed
+        )
+        frappe.throw(message.format(labels), frappe.PermissionError)
+
+    def customer_writable_after_create(self) -> set[str]:
+        """Close, rate, and what the template opens; replies reopen server-side."""
+        writable = set(CUSTOMER_ALWAYS_WRITABLE_FIELDS) | {
+            row.fieldname
+            for row in self.customer_writable_rows()
+            if row.editable_after_creation
+        }
+        # the portal only closes; Resolved is the agent's call and stops the SLA
+        if self.status == "Closed" or self.flags.get("customer_reply_reopen"):
+            writable.add("status")
+        return writable
+
+    def customer_writable_rows(self) -> list[frappe._dict]:
+        """Template rows a customer may fill: shown, readable, not server-set."""
+        levels = self.get_permlevel_access("read")
+        readable = {df.fieldname for df in self.meta.fields if df.permlevel in levels}
+        return [
+            row
+            for row in TicketFields().template_rows
+            if row.visible_to != "Agents"
+            and row.fieldname in readable
+            and row.fieldname not in SERVER_COMPUTED_FIELDS
+        ]

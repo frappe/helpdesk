@@ -1,180 +1,143 @@
 <template>
-  <!-- Teleport to App Header -->
-  <teleport to="#app-header">
+  <div v-if="cards.length" class="space-y-0.5">
     <div
-      class="flex items-center mx-5 md:mr-0 text-p-sm gap-3 text-[14px] mb-[13px]"
+      v-for="card in cards"
+      :key="card.title"
+      class="flex min-h-7 items-center gap-2 leading-5"
     >
-      <!-- Source -->
-      <div class="flex items-center gap-1">
-        <p
-          @click="
-            copyToClipboard(
-              ticket.doc.name,
-              `Ticket #${ticket.doc.name} copied to clipboard`
-            )
-          "
-          class="cursor-copy"
+      <FieldLabel :label="card.title" />
+      <!-- 9px = field controls' 8px padding + 1px transparent border, so the
+           value lines up with the other sidebar field values -->
+      <div class="flex min-w-0 flex-1 items-center gap-1.5 ps-[9px]">
+        <span
+          class="min-w-0 truncate text-base"
+          :class="slaTextColor(card.metric)"
         >
-          #{{ ticket.doc.name }}
-        </p>
-        <!-- Via Email -->
-        <div
-          v-if="!ticket.doc.via_customer_portal"
-          class="text-ink-gray-4 flex items-center"
-        >
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
-          <EmailIcon class="size-4 inline-block mr-1" />
-          <span class="">Email</span>
-        </div>
-        <!-- Via Portal -->
-        <div v-else class="text-ink-gray-4 flex items-center">
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
-          <GlobeIcon class="size-4 inline-block mr-1" />
-          <span class="font-medium">Portal</span>
-        </div>
-      </div>
-      <!-- divider -->
-      <div class="border-l border-outline-gray-2 h-[13px]" />
-      <!-- First Response -->
-      <div class="flex items-center gap-1">
-        <span>First Response</span>
-        <Badge
-          :label="firstResponse.label"
-          variant="subtle"
-          :theme="firstResponse.color"
-        />
-      </div>
-      <!-- divider -->
-      <div class="border-l border-outline-gray-2 h-[13px]" />
-      <!-- Resolution by -->
-      <div class="flex items-center gap-1">
-        <span>Resolution </span>
-        <Badge
-          v-if="resolutionBy"
-          :label="resolutionBy.label"
-          variant="subtle"
-          :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
-          :class="
-            resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
-          "
-        />
+          {{ cardValue(card) }}
+        </span>
+        <!-- HoverCard, not Popover: this opens on hover, and reka's popover
+             trigger would also toggle it on click -->
+        <HoverCard side="bottom" align="center">
+          <template #trigger>
+            <LucideInfo
+              class="size-3.5 shrink-0 cursor-pointer text-ink-gray-5"
+            />
+          </template>
+          <template #default>
+            <div class="flex min-w-[170px] flex-col gap-2.5 p-4 text-sm">
+              <div
+                v-for="row in cardDetails(card)"
+                :key="row.label"
+                class="flex items-baseline justify-between gap-8"
+              >
+                <span class="text-ink-gray-5">{{ __(row.label) }}</span>
+                <span
+                  class="tabular-nums"
+                  :class="row.danger ? 'text-ink-red-6' : 'text-ink-gray-8'"
+                >
+                  {{ row.value }}
+                </span>
+              </div>
+            </div>
+          </template>
+        </HoverCard>
       </div>
     </div>
-  </teleport>
+  </div>
 </template>
 
 <script setup lang="ts">
+import FieldLabel from "@/components/FieldLabel.vue";
+import { slaTextColor, useSLA, type SLAMetric } from "@/composables/useSLA";
+import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
-import { copyToClipboard } from "@/utils";
-import { dayjs } from "frappe-ui";
-import Badge from "frappe-ui/src/components/Badge/Badge.vue";
+import { dateFormat } from "@/utils";
+import { HoverCard } from "frappe-ui";
 import { computed, inject } from "vue";
+import LucideInfo from "~icons/lucide/info";
 
-const ticket = inject(TicketSymbol);
+interface SLACard {
+  title: string;
+  metric: SLAMetric;
+  fulfilledLabel: string;
+  actualLabel: string;
+}
 
-const firstResponse = computed(() => {
-  if (ticket.value?.get?.loading) return { label: "", color: "" };
-  if (
-    !ticket.value.doc.first_responded_on &&
-    dayjs().isBefore(dayjs(ticket.value.doc.response_by))
-  ) {
-    let responseBy = formatTimeShort(ticket.value.doc.response_by);
-    return {
-      label: `Due in ${responseBy}`,
-      color: "orange",
-    };
-  } else if (
-    dayjs(ticket.value.doc.first_responded_on).isBefore(
-      dayjs(ticket.value.doc.response_by)
-    )
-  ) {
-    let responseBy = formatTimeShort(
-      ticket.value.doc.first_responded_on,
-      ticket.value.doc.creation
-    );
-    return {
-      label: `Fulfilled in ${responseBy}`,
-      color: "green",
-    };
-  } else {
-    let responseBy = formatTimeShort(
-      String(new Date()),
-      ticket.value.doc.response_by
-    );
-    return {
-      label: `Failed by ${responseBy}`,
-      color: "red",
-    };
+const ticket = inject(TicketSymbol)!;
+const { firstResponse, resolution } = useSLA(ticket);
+
+const cards = computed<SLACard[]>(() =>
+  [
+    {
+      title: "First Response",
+      metric: firstResponse.value,
+      fulfilledLabel: "Fulfilled",
+      actualLabel: "Responded on",
+    },
+    {
+      title: "Resolution",
+      metric: resolution.value,
+      fulfilledLabel: "Fulfilled",
+      actualLabel: "Resolved on",
+    },
+  ].filter((card): card is SLACard => Boolean(card.metric))
+);
+
+function cardValue(card: SLACard): string {
+  if (card.metric.state !== "fulfilled") return __(card.metric.value);
+  if (!card.metric.fulfilledIn) return __(card.fulfilledLabel);
+  return `${__(card.fulfilledLabel)} ${__("in")} ${card.metric.fulfilledIn}`;
+}
+
+function cardDetails(card: SLACard) {
+  const metric = card.metric;
+  const rows = [];
+  if (metric.dueBy) {
+    rows.push({ label: "Due by", value: fmt(metric.dueBy), danger: false });
   }
-});
-
-const resolutionBy = computed(() => {
-  if (ticket.value?.get?.loading) return { label: "", color: "" };
-
-  if (
-    ticket.value.doc?.status_category === "Paused" &&
-    ticket.value.doc?.on_hold_since &&
-    dayjs(ticket.value.doc?.resolution_by).isAfter(
-      dayjs(ticket.value.doc?.on_hold_since)
-    )
-  ) {
-    return {
-      label: `On Hold`,
-      color: "blue",
-    };
-  } else if (
-    !ticket.value.doc?.resolution_date &&
-    dayjs().isBefore(dayjs(ticket.value.doc?.resolution_by))
-  ) {
-    let resolutionBy = formatTimeShort(ticket.value.doc?.resolution_by);
-    return {
-      label: `Due in ${resolutionBy}`,
-      color: "purple",
-    };
-  } else if (
-    dayjs(ticket.value.doc?.resolution_date).isBefore(
-      dayjs(ticket.value.doc?.resolution_by)
-    )
-  ) {
-    let resolutionBy = formatTimeShort(
-      ticket.value.doc?.resolution_date,
-      ticket.value.doc?.creation
-    );
-    return {
-      label: `Fulfilled in ${resolutionBy}`,
-      color: "green",
-    };
-  } else {
-    let resolutionBy = formatTimeShort(
-      String(new Date()),
-      ticket.value.doc?.resolution_by
-    );
-    return {
-      label: `Failed by ${resolutionBy}`,
-      color: "red",
-    };
+  if (metric.state === "hold") {
+    rows.push({
+      label: "On hold since",
+      value: fmt(ticket.value.doc.on_hold_since as string),
+      danger: false,
+    });
   }
-});
-
-function formatTimeShort(date: string, end?: string): string {
-  if (!end) {
-    end = dayjs().toString();
+  if (metric.actual) {
+    // The timestamp is neutral fact; only the Delay rows carry the failure
+    // signal, so the responded/resolved date stays in the default ink.
+    rows.push({
+      label: card.actualLabel,
+      value: fmt(metric.actual),
+      danger: false,
+    });
   }
-  let _date = dayjs(date);
-  let duration = dayjs.duration(_date.diff(dayjs(end)));
-
-  let days = duration.days();
-  let hours = duration.hours();
-  let minutes = duration.minutes();
-
-  if (days > 0) {
-    return `${days}d ${hours}h`;
-  } else if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  } else {
-    return `${minutes}m`;
+  if (metric.delay) {
+    rows.push({
+      label: metric.delayInWorkingHours ? "Delay (working hours)" : "Delay",
+      value: metric.delay,
+      danger: true,
+    });
+    if (metric.calendarDelay) {
+      rows.push({
+        label: "Delay (total)",
+        value: `+${metric.calendarDelay}`,
+        danger: true,
+      });
+    }
   }
+  if (metric.fulfilledIn) {
+    rows.push({
+      label: "Fulfilled in",
+      value: metric.fulfilledIn,
+      danger: false,
+    });
+  }
+  return rows;
+}
+
+function fmt(date: string): string {
+  // Year included: SLA breaches span months/years, so a bare "MMM D" makes the
+  // due/actual dates read as contradictory (e.g. resolved "before" the due date).
+  return dateFormat(date, "MMM D, YYYY, h:mm A");
 }
 </script>
-
-<style scoped></style>

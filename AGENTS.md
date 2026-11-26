@@ -1,8 +1,21 @@
 # Copilot Instructions for Frappe Helpdesk
 
+## Skills
+
+For Frappe development tasks, reference the frappe-dev skill:
+- **Location**: `~/.agents/skills/frappe-dev/`
+- **Usage**: When working on DocType, controllers, whitelisted APIs, background jobs, permissions, or frontend tasks, read the relevant skill reference files:
+  - `doctype.md` — Creating/modifying DocTypes and fields
+  - `controllers.md` — Document lifecycle and server logic
+  - `api.md` — REST endpoints with `@frappe.whitelist()`
+  - `database.md` — `frappe.db`, queries, raw SQL
+  - `background-jobs.md` — `frappe.enqueue`, scheduled jobs
+  - `permissions.md` — Roles, DocType permissions
+  - `frontend-desk.md`, `frontend-vue.md`, `frontend-portal.md` — Frontend references
+
 ## Project Overview
 
-Frappe Helpdesk is an open-source ticket management tool built on the [Frappe Framework](https://github.com/frappe/frappe) (Python backend) and [Frappe UI](https://github.com/frappe/frappe-ui) (Vue.js frontend). It provides agent/customer portals, SLAs, assignment rules, a knowledge base, and canned responses.
+Frappe Helpdesk is an open-source ticket management tool built on the [Frappe Framework](https://github.com/frappe/frappe) (Python backend) and [Frappe UI](https://github.com/frappe/frappe-ui) (Vue.js frontend). It provides agent/customer portals, SLAs, assignment rules, a knowledge base, and saved replies.
 
 ## Tech Stack & Architecture
 
@@ -25,6 +38,8 @@ Frappe Helpdesk is an open-source ticket management tool built on the [Frappe Fr
   - State: `desk/src/stores/`
   - Routing: `desk/src/router/`
   - Styles: Tailwind via `desk/index.css`, config in `desk/tailwind.config.js`
+- **Customer portal and knowledge base (Studio app):** Located in `studio/helpdesk/`, served at `/help`. Read `studio/README.md` and `studio/KNOWLEDGE_BASE.md` before working on them.
+- **Shared frontend code:** `shared/src`, imported as `@helpdesk/shared` by the desk and the portal.
 
 # Frontend: Vue 3 Development Standards
 
@@ -144,8 +159,12 @@ apiCall.submit({ ticket_id: "<id>", agent_id: "<agent>" });
 ### Icons
 
 - **Primary icon system**: Lucide icons via unplugin-icons for consistency and modern design
-- **Secondary**: FeatherIcon component from frappe-ui (legacy usage, prefer Lucide for new components)
-- Use Lucide icons for all new components:
+- **Secondary**: FeatherIcon component from frappe-ui (legacy usage only)
+- **Rule**: Never introduce `FeatherIcon` in new code. New components must use Lucide
+  icons (`<LucideInfo />`, `<LucidePlus />`, …) — no exceptions, including small
+  helper icons like tooltip/info glyphs.
+- Use Lucide icons for all new components. They are globally auto-registered
+  (see `desk/components.d.ts`), so no import is needed when used as a template tag:
   ```vue
   <template>
     <LucidePlus class="size-4" />
@@ -198,7 +217,9 @@ apiCall.submit({ ticket_id: "<id>", agent_id: "<agent>" });
 
 **Data Query Patterns**:
 
-- Always prefer `frappe.qb.get_query()` over `frappe.db.get_all()` for new code
+- Always prefer `frappe.get_list()` over `frappe.get_all()` for new code. It handles perms out of the box and is more flexible.
+- `frappe.get_all()` is fine for child tables (e.g. `Has Role`, `HD Customer Member`), which have no permissions of their own.
+- When `frappe.get_all()` is used on a parent DocType, make sure the caller may see the result some other way, for example a `frappe.has_permission(...)` check first, or `@agent_only` / `@agent_manager_only` (`helpdesk/utils.py`) on the endpoint.
 - Use `frappe.qb.get_query(..., ignore_permissions=False)` when permission checks are needed
 - Example query patterns from helpdesk context
 
@@ -214,6 +235,48 @@ apiCall.submit({ ticket_id: "<id>", agent_id: "<agent>" });
 - Implement custom permission logic in `has_permission` hooks
 - Use proper field types and validation in DocType definitions
 - Leverage DocType methods for business logic encapsulation
+
+## Controller Code Structure
+
+All controller logic must follow this structure strictly:
+
+**Rule: Lifecycle hooks call methods. Methods are defined below on the class.**
+
+```python
+class HDFoo(Document):
+    # 1. Lifecycle hooks at the top — each hook calls methods, no inline logic
+    def after_insert(self):
+        self.do_a()
+        self.do_b()
+
+    def on_update(self):
+        self.do_a()
+
+    # 2. Methods below — one responsibility each
+    def do_a(self):
+        pass
+
+    def do_b(self):
+        pass
+
+
+```
+
+**Rules:**
+
+- Lifecycle hooks (`after_insert`, `on_update`, `before_save`, `on_trash`, `after_rename`, etc.) contain **no inline logic** — they only call `self.method()`.
+- All logic lives in methods on the class, not in module-level helper functions.
+- Methods that mutate a related document (e.g. an Assignment Rule) receive that doc as an argument and mutate it in memory. The **caller** is responsible for the final `doc.save()` — this keeps saves to a minimum (one save per hook).
+- Never fetch the same document twice in one hook. Fetch once, pass the doc through the call chain.
+- `@staticmethod` is allowed for pure transformations (e.g. building a condition string) that don't touch `self` or any Frappe doc.
+- If there is an issue in framework/ui or frappe-ui or frappe framework, dont do a workaround. Instead, raise a blocker in the spec and wait for a fix. Do not implement workarounds that will be removed later. If possible, raise a PR to fix the issue in the framework instead of implementing a workaround in helpdesk.
+
+**Save discipline:**
+
+- Mutate all fields on a document before calling `.save()` once.
+- Never call `.save()` inside a helper method — save in the hook or the method that owns the full mutation.
+- Exception: if a method truly owns a complete document lifecycle (e.g. `create_assignment_rule` creates and fully initialises a new doc), it may save internally.
+Take inspiration from "helpdesk.doctype.hd_team.hd_team.HDTeam" for examples of this pattern in practice.
 
 ## Conventions & Patterns
 
@@ -313,7 +376,7 @@ const ticket = createDocumentResource({
 - Use ESLint with Vue 3 recommended rules and Prettier for consistency
 - Write meaningful commit messages and maintain clean git history
 - Document complex logic with JSDoc/TSDoc comments
-- Only add comments that explain why something is done, not what is done
+- Keep a comment to 2 lines at most. If it needs more to explain, simplify the code instead
 - Keep dependencies updated and audit for security vulnerabilities
 
 ## References
@@ -326,4 +389,85 @@ const ticket = createDocumentResource({
 
 ---
 
+## Agent Working Rules
+
+These rules apply to all agents working in this codebase. Follow them without exception.
+
+### 1. Site Data — Read Before You Write
+
+When a Frappe site is referenced in the conversation (e.g. `erp-hd.localhost`, `hd-tests`),
+treat it as the **source of truth for current data state**.
+
+- Before assuming anything about existing records, custom fields, settings, or DocType state —
+  query the site first using the bench venv Python or `bench execute`.
+- **Never write data to a site unless the user explicitly asks you to.**
+  Querying is always safe. Mutations (insert, update, delete, migrate, patch) require explicit
+  user instruction.
+- If you need to verify a fix worked, re-query the site — do not assume success from code
+  inspection alone.
+
+```python
+# Safe pattern for querying a site
+import sys, os
+sys.path.insert(0, 'apps/frappe')
+os.chdir('sites')
+import frappe
+frappe.init(site='<site-name>', sites_path='.')
+frappe.connect()
+
+# ... read-only queries here ...
+
+frappe.destroy()
+```
+
+Run via: `cd /path/to/frappe-bench && env/bin/python /tmp/your_script.py`
+
+---
+
+### 2. Spec-Driven Development — Keep the Spec Current
+
+When a feature has a spec document (e.g. `docs/erpnext-customer-sync.md`), the spec is the
+**living source of truth** for that feature. It must be kept in sync with the actual
+implementation at all times.
+
+**Rules:**
+
+- **Update the spec in the same session as the code change.** Never defer spec updates to a
+  later session.
+- **The spec reflects what is implemented, not what was originally planned.** If a decision
+  changes mid-build (e.g. removing a scheduler job, changing how a field is set), update the
+  spec immediately after the code change.
+- **Removed features must be removed from the spec.** Do not leave stale sections, blockers, or
+  file manifest entries for things that no longer exist.
+- **New features must be added to the spec.** If a new API, component, or behaviour is
+  introduced, add a corresponding section.
+- **Decisions and their rationale belong in the spec.** If something was done a specific way to
+  avoid a bug or framework limitation (e.g. not setting `customer_group` to avoid the group-node
+  error), document that in the relevant Blocker section.
+- When in doubt about whether a spec update is needed — update it.
+
+---
+
+### 3. Test Utilities — Always Use `helpdesk/test_utils.py`
+
+All backend test helpers must live in `helpdesk/test_utils.py` and be imported from there.
+Never define helper functions (factories, enable/disable toggles, fixture builders) directly
+inside individual test files.
+
+**Rules:**
+
+- **Before writing a helper in a test file**, check `helpdesk/test_utils.py` first — it may
+  already exist.
+- **If a helper doesn't exist**, add it to `helpdesk/test_utils.py` and import it in the test
+  file. Do not leave it inline.
+- **If you write helpers inline during development**, move them to `test_utils.py` before
+  finishing the task.
+- Helper functions in `test_utils.py` must have a docstring explaining what they create or do. Only if the function is completely self-explanatory (e.g. `enable_erpnext_sync`) can the docstring be omitted.
+- Naming conventions:
+  - Factories: `make_<doctype>(...)` — e.g. `make_hd_customer`, `make_ticket`, `make_team`
+  - Toggle helpers: `enable_<feature>()` / `disable_<feature>()` — e.g. `enable_erpnext_sync`
+  - Query helpers: descriptive verb — e.g. `get_latest_ticket_communication`
+
 **For updates, merge new conventions here. If anything is unclear or missing, ask for clarification.**
+
+**In the end your code will be reviewed by Codex, but following these rules will help ensure a smooth review process and a high-quality codebase.**

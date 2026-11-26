@@ -1,5 +1,5 @@
 <template>
-  <div class="px-10 h-full overflow-y-auto flex flex-col isolate">
+  <div class="h-full overflow-y-auto flex flex-col isolate">
     <NotificationList v-if="curNotification === null" :onSelect="onSelect" />
     <component
       v-else

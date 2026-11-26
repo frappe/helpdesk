@@ -4,7 +4,11 @@ import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
-from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY
+from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY, DEFAULT_SLA
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+from helpdesk.helpdesk.doctype.hd_settings.helpers import clear_website_home_page
+from helpdesk.setup.comments import setup_comments_and_notifications
+from helpdesk.setup.default_views import add_default_views
 
 from .default_template import create_default_template
 from .file import create_helpdesk_folder
@@ -13,15 +17,23 @@ from .ticket_type import create_fallback_ticket_type, create_ootb_ticket_types
 from .welcome_ticket import create_welcome_ticket
 
 
+def before_uninstall():
+    # The portal's route goes with the app
+    clear_website_home_page()
+
+
 def after_install():
     create_custom_fields(get_custom_fields())
     add_default_status()
+    add_default_agent_status()
     add_default_categories_and_articles()
     add_default_ticket_priorities()
     add_default_sla()
     add_default_agent_groups()
     update_agent_role_permissions()
     add_agent_manager_permissions()
+    setup_comments_and_notifications()
+    setup_customer_role()
     add_default_assignment_rule()
     create_default_template()
     create_fallback_ticket_type()
@@ -30,6 +42,8 @@ def after_install():
     create_welcome_ticket()
     create_ticket_feedback_options()
     add_property_setters()
+    add_website_settings_permission()
+    add_default_views()
     # Always keep this at last, because sql_ddl makes the db commit
     add_fts_index()
 
@@ -59,11 +73,11 @@ def add_default_categories_and_articles():
 def add_default_sla():
     add_default_ticket_priorities()
     add_default_holiday_list()
-    if frappe.db.exists("HD Service Level Agreement", "Default"):
+    if frappe.db.exists("HD Service Level Agreement", DEFAULT_SLA):
         return
     sla_doc = frappe.new_doc("HD Service Level Agreement")
 
-    sla_doc.service_level = "Default"
+    sla_doc.service_level = DEFAULT_SLA
     sla_doc.document_type = "HD Ticket"
     sla_doc.default_sla = 1
     sla_doc.enabled = 1
@@ -145,12 +159,7 @@ def add_default_holiday_list():
 
 
 def add_default_ticket_priorities():
-    ticket_priorities = {
-        "Urgent": 100,
-        "High": 200,
-        "Medium": 300,
-        "Low": 400,
-    }
+    ticket_priorities = ["Urgent", "High", "Medium", "Low"]
 
     for priority in ticket_priorities:
         if frappe.db.exists("HD Ticket Priority", priority):
@@ -158,7 +167,7 @@ def add_default_ticket_priorities():
 
         doc = frappe.new_doc("HD Ticket Priority")
         doc.name = priority
-        doc.integer_value = ticket_priorities[priority]
+        doc.level = priority
         doc.insert()
 
 
@@ -169,7 +178,7 @@ def add_default_agent_groups():
         if not frappe.db.exists("HD Team", agent_group):
             agent_group_doc = frappe.new_doc("HD Team")
             agent_group_doc.team_name = agent_group
-            agent_group_doc.insert()
+            agent_group_doc.insert(ignore_mandatory=True)
 
 
 def update_agent_role_permissions():
@@ -198,16 +207,61 @@ def add_agent_manager_permissions():
     doc_to_permissions = {
         "Email Account": ["create", "delete", "write"],
         "File": ["create", "delete", "write"],
-        "Contact": ["create", "delete", "write"],
+        "Contact": ["create", "delete", "write", "select"],
         "Communication": ["create", "delete", "write"],
         "User Invitation": ["create", "write"],
         "Role": [],
+        "Assignment Rule": ["create", "delete", "write"],
     }
     for dt in doc_to_permissions.keys():
         # this adds read permission to the role
         add_permission(dt, "Agent Manager")
         for p in doc_to_permissions[dt]:
             update_permission_property(dt, "Agent Manager", 0, p, 1)
+
+
+def setup_customer_role(fresh_install=True):
+    for role_name in CUSTOMER_ROLES:
+        if frappe.db.exists("Role", role_name):
+            role_doc = frappe.get_doc("Role", role_name)
+        else:
+            role_doc = frappe.new_doc("Role")
+            role_doc.role_name = role_name
+        role_doc.home_page = "/helpdesk"
+        role_doc.desk_access = 0
+        role_doc.save()
+
+    if fresh_install:
+        set_portal_defaults(overwrite=True)
+        # Single defaults aren't stored on install; the home pages assume it
+        frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 1)
+
+
+def set_portal_defaults(overwrite=False):
+    """Writes the Single directly: a save fails on stale menu rows."""
+    defaults = {
+        "default_role": "HD Customer",
+        # agents fall back to it; customers get theirs from their role
+        "default_portal_home": "/helpdesk",
+    }
+    if overwrite:
+        to_set = defaults
+    else:
+        current = frappe.db.get_singles_dict("Portal Settings")
+        to_set = {
+            field: value for field, value in defaults.items() if not current.get(field)
+        }
+    if to_set:
+        frappe.db.set_single_value("Portal Settings", to_set)
+
+
+def add_website_settings_permission():
+    doctype = "Website Settings"
+    role = "System Manager"
+    permissions = ["create", "write", "delete"]
+    add_permission(doctype, role)
+    for p in permissions:
+        update_permission_property(doctype, role, 0, p, 1)
 
 
 def add_default_assignment_rule():
@@ -229,8 +283,9 @@ def add_property_setters():
 
 
 def get_custom_fields():
-    """Helpdesk specific custom fields that needs to be added to the Assignment Rule DocType."""
+    """Helpdesk specific custom fields added to framework DocTypes."""
     return {
+        "Tag": get_tag_custom_fields(),
         "Assignment Rule": [
             {
                 "description": "Autogenerated field by Helpdesk App",
@@ -247,6 +302,24 @@ def get_custom_fields():
                 "label": "Unassign Condition JSON",
                 "insert_after": "unassign_condition",
                 "depends_on": "eval: doc.unassign_condition_json",
+            },
+        ],
+        "User Invitation": [
+            {
+                "fieldname": "contact",
+                "label": "Contact",
+                "fieldtype": "Link",
+                "options": "Contact",
+                "insert_after": "roles",
+                "set_only_once": 1,
+            },
+            {
+                "fieldname": "customer",
+                "label": "Customer",
+                "fieldtype": "Link",
+                "options": "HD Customer",
+                "insert_after": "contact",
+                "set_only_once": 1,
             },
         ],
     }
@@ -344,6 +417,36 @@ def add_default_status():
     frappe.db.set_single_value("HD Settings", "ticket_reopen_status", "Open")
 
 
+def add_default_agent_status():
+    statuses = [
+        {
+            "agent_status": "Active",
+            "category": "Active",
+            "color": "Green",
+            "status_order": 10,
+        },
+        {
+            "agent_status": "Away",
+            "category": "Away",
+            "color": "Amber",
+            "status_order": 20,
+        },
+        {
+            "agent_status": "Unavailable",
+            "category": "Unavailable",
+            "color": "Red",
+            "status_order": 30,
+        },
+    ]
+    for status in statuses:
+        if not frappe.db.exists("HD Agent Status", status["agent_status"]):
+            frappe.get_doc(
+                {"doctype": "HD Agent Status", "enabled": 1, **status}
+            ).insert()
+
+    frappe.db.set_single_value("HD Settings", "default_agent_status", "Active")
+
+
 def add_fts_index():
     indexes = [
         {"table": "tabHD Ticket", "column": "subject", "index_name": "ft_subject"},
@@ -359,21 +462,20 @@ def add_fts_index():
 
 
 def add_index_if_not_exists(table, column, index_name):
-    index_exists = frappe.db.sql(
-        """
-        SHOW INDEX FROM `{table}` 
-            WHERE Column_name = '{column}' 
-            AND Index_type = 'FULLTEXT'
-        """.format(
-            table=table, column=column
-        ),
-        as_dict=True,
+    statistics = frappe.qb.Schema("information_schema").statistics
+    index_names = (
+        frappe.qb.from_(statistics)
+        .select(statistics.index_name)
+        .where(statistics.table_schema == frappe.db.cur_db_name)
+        .where(statistics.table_name == table)
+        .where(statistics.column_name == column)
+        .where(statistics.index_type == "FULLTEXT")
+        .run(pluck=True)
     )
-    print("\n\n", index_exists, "\n\n")
-    if index_exists:
+    if index_names:
         frappe.db.sql_ddl(
             "DROP INDEX `{index_name}` ON `{table}`".format(
-                index_name=index_exists[0].Key_name, table=table
+                index_name=index_names[0], table=table
             )
         )
 
@@ -382,3 +484,27 @@ def add_index_if_not_exists(table, column, index_name):
             table=table, index_name=index_name, column=column
         )
     )
+
+
+def get_tag_custom_fields():
+    fields = [
+        {
+            "fieldname": "app",
+            "label": "App",
+            "fieldtype": "Select",
+            "options": "\nhelpdesk",
+            "insert_after": "description",
+        },
+    ]
+    # Newer Frappe versions ship color as a standard Tag field
+    if not frappe.get_meta("Tag").has_field("color"):
+        fields.append(
+            {
+                "fieldname": "color",
+                "label": "Color",
+                "fieldtype": "Select",
+                "options": "\nGray\nBlack\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nViolet\nPurple",
+                "insert_after": "app",
+            }
+        )
+    return fields

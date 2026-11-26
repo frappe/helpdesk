@@ -25,8 +25,6 @@ except ImportError:
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
-from helpdesk.utils import is_agent
-
 if TYPE_CHECKING:
     from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
 
@@ -95,7 +93,7 @@ def get_synonym_words() -> list[str]:
 
 
 class Search:
-    unsafe_chars = re.compile(r"[\[\]{}<>+!-]")
+    unsafe_chars = re.compile(r"[^a-zA-Z0-9\s]")
 
     def __init__(self, index_name, prefix, schema) -> None:
         self.redis = frappe.cache()
@@ -158,10 +156,11 @@ class Search:
         page_length=NUM_RESULTS,
         highlight=False,
     ):
-        query = self.clean_query(query)
+        # `search` already cleaned it; recleaning strips its `*`, `%`, `|`
         query = Query(query).paging(start, page_length)
         if highlight:
-            query = query.highlight()
+            # bare HIGHLIGHT marks only SUMMARIZE fields, not titles
+            query = query.highlight(fields=["subject", "description"])
 
         query.summarize(fields=["description"])
         query.scorer("DISMAX")
@@ -182,6 +181,8 @@ class Search:
     def clean_query(self, query):
         query = query.strip().replace("-*", "*")
         query = self.unsafe_chars.sub(" ", query)
+        # Collapse multiple spaces
+        query = re.sub(r"\s+", " ", query)
         return query.strip().lower()
 
     def spellcheck(self, query, **kwargs):
@@ -213,14 +214,6 @@ class Search:
 
 class HelpdeskSearch(Search):
     DOCTYPE_FIELDS = {
-        "HD Ticket": [
-            "name",
-            "subject",
-            "description",
-            "agent_group",
-            "modified",
-            "creation",
-        ],
         "HD Article": [
             "name",
             "category",
@@ -239,7 +232,6 @@ class HelpdeskSearch(Search):
             {"name": "subject", "weight": settings.subject_weight or 6},
             {"name": "description", "weight": settings.description_weight or 5},
             {"name": "headings", "weight": settings.headings_weight or 8},
-            {"name": "team", "type": "tag"},
             {"name": "modified", "sortable": True},
             {"name": "creation", "sortable": True},
         ]
@@ -248,7 +240,7 @@ class HelpdeskSearch(Search):
     def build_index(self):
         self.drop_index()
         self.create_index()
-        records = self.get_records("HD Ticket") + self.get_records("HD Article")
+        records = self.get_records("HD Article")
         total = len(records)
         for i, doc in enumerate(records):
             self.index_doc(doc)
@@ -257,15 +249,6 @@ class HelpdeskSearch(Search):
 
     def index_doc(self, doc):
         id = f"{doc.doctype}:{doc.name}"
-        fields = None
-        if doc.doctype == "HD Ticket":
-            fields = {
-                "doctype": doc.doctype,
-                "name": doc.name,
-                "subject": doc.subject,
-                "team": doc.agent_group,
-                "modified": doc.modified,
-            }
         if doc.doctype == "HD Article":
             fields = {
                 "doctype": doc.doctype,
@@ -275,8 +258,14 @@ class HelpdeskSearch(Search):
                 "headings": doc.headings,
                 "modified": doc.modified,
             }
-        if fields:
             self.add_document(id, fields)
+            # update_article_index reads this instead of scanning the keyspace
+            key = self.redis.make_key(f"{self.prefix}:{id}").decode()
+            self.redis.sadd(self.get_sections_key(doc.name.split("#")[0]), key)
+
+    def get_sections_key(self, article: str) -> str:
+        # outside the index prefix, so RediSearch never sees it
+        return f"{self.prefix}_sections:{article}"
 
     def remove_doc(self, doc):
         key = f"{doc.doctype}:{doc.name}"
@@ -319,16 +308,15 @@ class HelpdeskSearch(Search):
         return re.sub(r"[^a-zA-Z0-9]+", "-", text).lower()
 
     def get_count(self, doctype):
-        if doctype == "HD Ticket":
-            return frappe.db.count(doctype)
         if doctype == "HD Article":
             return len(self.get_records(doctype))
 
-    def get_records(self, doctype):
+    def get_records(self, doctype, filters: dict | None = None):
         records = []
-        filters = {"status": "Published"} if doctype == "HD Article" else {}
         for d in frappe.db.get_all(
-            doctype, filters=filters, fields=self.DOCTYPE_FIELDS[doctype]
+            doctype,
+            filters={"status": "Published", **(filters or {})},
+            fields=self.DOCTYPE_FIELDS[doctype],
         ):
             d.doctype = doctype
             if doctype == "HD Article":
@@ -338,29 +326,24 @@ class HelpdeskSearch(Search):
                     cd.content = section
                     cd.headings = heading
                     records.append(cd)
-            elif doctype == "HD Ticket":
-                d.headings = self.extract_headings(d.description)
-                records.append(d)
         return records
 
 
-@frappe.whitelist()
-def search(
-    query, only_articles=False, qtype: Literal["and", "or"] = "and"
-) -> list[dict[str, list[dict]]]:
+def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[dict]]]:
     search = HelpdeskSearch()
     query = search.clean_query(query)
     query_parts: list[str] = query.split()
     query = ""
     sep = " " if qtype == "and" else "|"
-    for part in query_parts:
+    for index, part in enumerate(query_parts):
         if part in get_synonym_words():
             query += f"{sep}{part}"
             continue
         if part in get_stopwords():
             continue
-        if len(part) > 3:
-            query += f"{sep}%{part}%"
+        # The last word may still be typed: fuzzy would match "autho" to "auto".
+        if len(part) > 3 and index < len(query_parts) - 1:
+            query += f"{sep}(%{part}%|{part}*)"
         else:
             query += f"{sep}{part}*"
 
@@ -371,10 +354,6 @@ def search(
         doctype, name = r.id.split(":")
         r.doctype = doctype
         r.name = name
-        if doctype == "HD Ticket" and not only_articles:
-            if not is_agent():
-                r = []
-            groups.setdefault("Tickets", []).append(r)
         if doctype == "HD Article":
             groups.setdefault("Articles", []).append(r)
 
@@ -387,10 +366,40 @@ def search(
 @frappe.whitelist()
 @filelock("helpdesk_search_indexing", timeout=1)
 def build_index():
+    """Rebuild the help article search index from published articles.
+    One entry per section. Needs write on HD Settings; fails if a rebuild is
+    already running."""
+    # whitelisted only for the HD Settings button
+    frappe.has_permission("HD Settings", "write", throw=True)
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
     search = HelpdeskSearch()
     search.build_index()
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", False)
+
+
+def update_article_index(article: str) -> None:
+    update_article_indexes([article])
+
+
+def update_article_indexes(articles: list[str]) -> None:
+    search = HelpdeskSearch()
+    try:
+        search.redis.ft(search.index_name).info()
+    except ResponseError:
+        return  # build_index_if_not_exists builds the whole index
+    # skips index_exists, which counts every article's sections
+    search._index_exists = True
+    for article in articles:
+        _reindex_article(search, article)
+
+
+def _reindex_article(search: "HelpdeskSearch", article: str) -> None:
+    # one key per section; after_migrate's full rebuild fills the set
+    sections_key = search.get_sections_key(article)
+    if keys := search.redis.smembers(sections_key):
+        search.redis.delete(*keys, search.redis.make_key(sections_key))
+    for record in search.get_records("HD Article", {"name": article}):
+        search.index_doc(record)
 
 
 def build_index_in_background():

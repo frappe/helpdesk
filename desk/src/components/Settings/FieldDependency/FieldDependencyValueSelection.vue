@@ -7,7 +7,9 @@
       <span class="block text-xs text-ink-gray-5">
         Select parent field value
       </span>
-      <div class="border flex-1 border-r-0 rounded-l p-2 flex flex-col gap-2">
+      <div
+        class="border border-outline-elevation-2 flex-1 border-e-0 rounded-s-4 p-2 flex flex-col gap-2"
+      >
         <template v-if="state.selectedParentField">
           <FormControl
             v-model="state.parentSearch"
@@ -16,7 +18,7 @@
             class="w-full"
           >
             <template #prefix>
-              <LucideSearch class="h-4 w-4 text-gray-500" />
+              <LucideSearch class="h-4 w-4 text-ink-gray-4" />
             </template>
           </FormControl>
           <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
@@ -24,7 +26,7 @@
               <li
                 v-for="value in filteredParentFieldValues"
                 :key="value"
-                class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1 overflow-hidden max-w-full"
+                class="py-2 mb-1 px-2.5 cursor-pointer rounded-4 flex justify-between items-center hover:bg-surface-gray-1 overflow-hidden max-w-full"
                 :class="{
                   'bg-surface-gray-2 hover:bg-surface-gray-3':
                     state.currentParentSelection === value,
@@ -35,7 +37,7 @@
                   value
                 }}</span>
                 <LucideChevronRight
-                  class="h-4 w-4 text-ink-gray-6"
+                  class="h-4 w-4 text-ink-gray-6 rtl:rotate-180"
                   v-if="
                     getSelectedChildValueCount(value) === 0 ||
                     state.currentParentSelection === value
@@ -63,10 +65,12 @@
     </div>
     <!-- right box -->
     <div class="flex-1 flex flex-col gap-1.5">
-      <span class="block text-xs text-ink-gray-5 pl-1.5">
+      <span class="block text-xs text-ink-gray-5 ps-1.5">
         Select child field value
       </span>
-      <div class="border flex-1 rounded-r p-2 flex flex-col gap-2">
+      <div
+        class="border border-outline-elevation-2 flex-1 rounded-e-4 p-2 flex flex-col gap-2"
+      >
         <template
           v-if="state.selectedChildField && state.currentParentSelection"
         >
@@ -77,21 +81,21 @@
             class="w-full"
           >
             <template #prefix>
-              <LucideSearch class="h-4 w-4 text-gray-500" />
+              <LucideSearch class="h-4 w-4 text-ink-gray-4" />
             </template>
           </FormControl>
           <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
             <!-- Master Check box -->
             <li
-              class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center bg-surface-gray-1 hover:bg-surface-gray-2"
+              class="py-2 mb-1 px-2.5 cursor-pointer rounded-4 flex items-center bg-surface-gray-1 hover:bg-surface-gray-2"
               @click="handleSelectAllChildValues(!toggleAllChildValues)"
             >
               <FormControl
                 type="checkbox"
                 :model-value="toggleAllChildValues"
-                class="mr-2"
+                class="me-4"
               />
-              <span class="text-base text-ink-gray-8 font-medium">
+              <span class="text-base-medium text-ink-gray-8">
                 {{ toggleCheckboxLabel }}
               </span>
             </li>
@@ -99,13 +103,13 @@
               <li
                 v-for="value in filteredChildFieldValues"
                 :key="value"
-                class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1 max-w-full truncate"
+                class="py-2 mb-1 px-2.5 cursor-pointer rounded-4 flex items-center hover:bg-surface-gray-1 max-w-full truncate"
                 @click="handleChildValueClick(value)"
               >
                 <FormControl
                   type="checkbox"
                   :model-value="isChildValueSelected(value)"
-                  class="mr-2"
+                  class="me-4"
                 />
                 <span class="text-base text-ink-gray-6">{{ value }}</span>
               </li>
@@ -149,9 +153,27 @@ const filteredParentFieldValues = computed(() => {
   );
 });
 
+// Order values that were already selected when the screen loaded to the top.
+// Uses the saved selections (not the live ones) so the list stays put while
+// the user is checking/unchecking values.
+const orderedChildFieldValues = computed(() => {
+  const parent = state.value.currentParentSelection;
+  const initialSelections = state.value.initialChildSelections?.[parent];
+  const values = state.value.childFieldValues;
+  if (!(initialSelections instanceof Set) || initialSelections.size === 0) {
+    return values;
+  }
+  const selected = [];
+  const unselected = [];
+  values.forEach((value) => {
+    (initialSelections.has(value) ? selected : unselected).push(value);
+  });
+  return [...selected, ...unselected];
+});
+
 const filteredChildFieldValues = computed(() => {
-  if (!state.value.childSearch) return state.value.childFieldValues;
-  return state.value.childFieldValues.filter((v) =>
+  if (!state.value.childSearch) return orderedChildFieldValues.value;
+  return orderedChildFieldValues.value.filter((v) =>
     v.toLowerCase().includes(state.value.childSearch.toLowerCase())
   );
 });

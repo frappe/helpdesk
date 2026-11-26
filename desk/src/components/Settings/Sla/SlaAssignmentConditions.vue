@@ -7,10 +7,10 @@
   />
   <div
     v-if="props.conditions.length == 0"
-    class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-gray-300 text-gray-600 rounded-md"
+    class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-outline-gray-2 text-ink-gray-5 rounded-5"
     @click="props.conditions.push(['', '', ''])"
   >
-    <FeatherIcon name="plus" class="h-4" />
+    <LucidePlus class="size-4" />
     {{ __("Add a custom condition") }}
   </div>
   <div class="flex items-center justify-between mt-2">
@@ -21,7 +21,7 @@
     >
       <Button
         :disabled="slaDataErrors.condition != ''"
-        :icon-right="open ? 'chevron-up' : 'chevron-down'"
+        :icon-right="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
         :label="__('Add condition')"
       />
     </Dropdown>
@@ -30,7 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
+import LucidePlus from "~icons/lucide/plus";
+import { Button, Dropdown, ErrorMessage } from "frappe-ui";
 import { slaDataErrors, validateSlaData } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
 import CFConditions from "@/components/conditions-filter/CFConditions.vue";

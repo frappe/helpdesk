@@ -1,0 +1,277 @@
+<template>
+  <SettingsLayoutBase
+    :back-label="__('Email Settings')"
+    :on-back="goBack"
+    :dirty="isDirty"
+  >
+    <template #header-actions>
+      <Transition name="fade">
+        <div v-if="isDirty">
+          <Button
+            variant="solid"
+            :label="__('Update')"
+            :loading="user.save.loading || saveEmailAccountsResource.loading"
+            @click="update"
+          /></div
+      ></Transition>
+    </template>
+    <template #content>
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1">
+          <span class="text-base-medium text-ink-gray-8">
+            {{ __("Signature") }}
+          </span>
+          <span class="text-p-sm text-ink-gray-6">
+            {{ __("Manage your email signature.") }}
+          </span>
+        </div>
+        <div>
+          <CompactEditor
+            v-model="user.doc.email_signature"
+            :upload-fn="
+              (file: any, options: any) =>
+                uploadFunction(file, 'User', userId, false, options)
+            "
+            :placeholder="__('Write your email signature here.')"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col gap-4 mt-6">
+        <div class="flex flex-col gap-1">
+          <span class="text-base-medium text-ink-gray-8">
+            {{ __("Emails") }}
+          </span>
+          <span class="text-p-sm text-ink-gray-6">
+            {{
+              __(
+                "Switch between outgoing email accounts when sending emails from your configured accounts."
+              )
+            }}
+          </span>
+        </div>
+        <div>
+          <div
+            v-if="linkedEmails.length"
+            class="w-full border rounded-5 mb-2 border-outline-elevation-2"
+          >
+            <div
+              class="grid grid-cols-[4fr_4fr_0.3fr] gap-2 px-4 py-3 text-sm-medium text-ink-gray-5 border-b border-outline-elevation-2"
+            >
+              <span>{{ __("Email Account") }}</span>
+              <span>{{ __("Email") }}</span>
+              <span></span>
+            </div>
+            <div
+              v-for="e in linkedEmails"
+              :key="e.email_account"
+              class="grid grid-cols-[4fr_4fr_0.3fr] gap-2 group items-center px-4 py-2.5 text-base border-b border-outline-elevation-2 last:border-b-0"
+            >
+              <span class="text-ink-gray-8 font-medium truncate">
+                {{ e.email_account }}
+              </span>
+              <span class="text-ink-gray-6 truncate">{{ e.email_id }}</span>
+              <div
+                class="group-hover:opacity-100 opacity-0 transition-opacity [@media(hover:none)]:opacity-100"
+              >
+                <Button
+                  class="w-10"
+                  variant="ghost"
+                  :tooltip="__('Remove')"
+                  :aria-label="__('Remove')"
+                  icon="lucide-x"
+                  @click.prevent="removeEmail(e)"
+                />
+              </div>
+            </div>
+          </div>
+          <Combobox
+            :model-value="null"
+            :options="filteredEmails"
+            @update:selected-option="(option) => option && addEmail(option)"
+          >
+            <template #trigger>
+              <Button
+                class="!bg-surface-elevation-2"
+                variant="outline"
+                :label="__('Add Email')"
+                iconLeft="lucide-plus"
+              />
+            </template>
+            <template #item-label="{ item }">
+              <div class="flex flex-col gap-1 text-ink-gray-9">
+                <div>{{ item.label }}</div>
+                <div class="text-ink-gray-4 text-sm">
+                  {{ item.email }}
+                </div>
+              </div>
+            </template>
+          </Combobox>
+        </div>
+      </div>
+    </template>
+  </SettingsLayoutBase>
+  <ConfirmDialog
+    v-model="showConfirmDialog.show"
+    :title="showConfirmDialog.title"
+    :message="showConfirmDialog.message"
+    :onConfirm="showConfirmDialog.onConfirm"
+    :onCancel="
+      () => {
+        if (showConfirmDialog.onCancel) {
+          showConfirmDialog.onCancel();
+        } else {
+          showConfirmDialog.show = false;
+        }
+      }
+    "
+  />
+</template>
+<script setup>
+import CompactEditor from "@/components/CompactEditor.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
+import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
+import { normalize, uploadFunction } from "@/utils";
+import {
+  Button,
+  Combobox,
+  createDocumentResource,
+  createResource,
+  toast,
+} from "frappe-ui";
+import { computed, ref, watch } from "vue";
+import { disableSettingModalOutsideClick } from "../settingsModal";
+
+const { userId } = useAuthStore();
+const user = createDocumentResource({ doctype: "User", name: userId });
+const emit = defineEmits(["updateStep"]);
+
+const currentUserEmailInfo = getUserEmailInfo();
+
+// user_emails is System Manager-only, so the User doc never carries it for
+// agents; the list comes from the email info API and is saved through it
+const linkedEmails = ref([]);
+watch(
+  () => currentUserEmailInfo.data?.outgoing_emails,
+  (emails, previousEmails) => {
+    // the info is shared with the composer; a reload from there must not
+    // wipe unsaved edits here
+    if (
+      sortedAccountNames(linkedEmails.value) !==
+      sortedAccountNames(previousEmails)
+    )
+      return;
+    linkedEmails.value = [...(emails || [])];
+  },
+  { immediate: true }
+);
+
+const saveEmailAccountsResource = createResource({
+  url: "helpdesk.api.auth.set_user_email_accounts",
+  makeParams: () => ({
+    email_accounts: linkedAccountNames(linkedEmails.value),
+  }),
+});
+
+const filteredEmails = computed(() => {
+  if (!currentUserEmailInfo.data?.available_emails) return [];
+  const linkedAccounts = linkedAccountNames(linkedEmails.value);
+  return currentUserEmailInfo.data.available_emails
+    .map((doc) => ({
+      label: doc.name,
+      value: doc.name,
+      email: doc.email_id,
+    }))
+    .filter((e) => !linkedAccounts.includes(e.value));
+});
+
+const isSignatureDirty = computed(() => {
+  return (
+    normalize(currentUserEmailInfo.data?.email_signature) !==
+    normalize(user?.doc?.email_signature)
+  );
+});
+
+const isUserEmailListDirty = computed(() => {
+  return (
+    sortedAccountNames(currentUserEmailInfo.data?.outgoing_emails) !==
+    sortedAccountNames(linkedEmails.value)
+  );
+});
+
+const isDirty = computed(() => {
+  return isSignatureDirty.value || isUserEmailListDirty.value;
+});
+
+if (isDirty.value) {
+  disableSettingModalOutsideClick.value = true;
+} else {
+  disableSettingModalOutsideClick.value = false;
+}
+
+function linkedAccountNames(list = []) {
+  return list.map((e) => e.email_account);
+}
+
+function sortedAccountNames(list) {
+  return linkedAccountNames(list).sort().join();
+}
+
+function addEmail(email) {
+  linkedEmails.value.push({
+    email_account: email.value,
+    email_id: email.email,
+  });
+}
+
+function removeEmail(email) {
+  linkedEmails.value = linkedEmails.value.filter(
+    (e) => e.email_account !== email.email_account
+  );
+}
+
+async function update() {
+  // one after the other, since both save the same User doc
+  try {
+    if (isSignatureDirty.value) await user.save.submit();
+    if (isUserEmailListDirty.value) await saveEmailAccountsResource.submit();
+  } catch {
+    return; // the fallback error handler already showed a toast
+  }
+  toast.success(__("Email settings updated successfully."));
+  user.reload();
+  await currentUserEmailInfo.reload();
+  linkedEmails.value = [...currentUserEmailInfo.data.outgoing_emails];
+}
+
+watch(isDirty, (val) => {
+  disableSettingModalOutsideClick.value = val;
+});
+
+const showConfirmDialog = ref({
+  show: false,
+  title: "",
+  message: "",
+  onConfirm: () => {},
+});
+
+const goBack = () => {
+  const confirmDialogInfo = {
+    show: true,
+    title: __("Unsaved changes"),
+    message: __(
+      "Are you sure you want to go back? Unsaved changes will be lost."
+    ),
+    onConfirm: goBack,
+  };
+  if (isDirty.value && !showConfirmDialog.value.show) {
+    showConfirmDialog.value = confirmDialogInfo;
+    return;
+  }
+
+  showConfirmDialog.value.show = false;
+  emit("updateStep", "profile");
+};
+</script>

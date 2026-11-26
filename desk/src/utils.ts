@@ -1,133 +1,143 @@
-import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
-import dayjs from "dayjs";
-import { FeatherIcon, call, toast, useFileUpload } from "frappe-ui";
-import { gemoji } from "gemoji";
-import { h, markRaw, ref } from "vue";
+import { router } from "@/router";
+import { useAuthStore } from "@/stores/auth";
+import { call, dayjsLocal, useFileUpload } from "frappe-ui";
+import { h, ref } from "vue";
 import zod from "zod";
-import TicketIcon from "./components/icons/TicketIcon.vue";
+import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
+import { Icon } from "frappe-ui/experimental";
 import { getMeta } from "./stores/meta";
-/**
- * Wrapper to create toasts, supplied with default options.
- * https://frappeui.com/components/toast.html
- * @param options - `Toast` options
- */
+import { __ } from "./translation";
+import { copyToClipboard, countLabel, isEmoji } from "@helpdesk/shared/utils";
 
-/**
- * Copy a string to clipboard, and create a toast
- * @param s - String to copy
- */
-export async function copy(s: string) {
-  const { copy: c } = useClipboard();
-  c(s).then(() => toast.success("Copied to clipboard"));
+// TODO: drop after #3846/#3847 merge; import from shared directly.
+export {
+  ConfirmDelete,
+  CUSTOMER_PORTAL_ROOT,
+  getErrorMessage,
+  handleInviteUserSuccess,
+  isContentEmpty,
+  parseApiOptions,
+  prettyDate,
+  timeAgo,
+} from "@helpdesk/shared/utils";
+
+export type AgentRole = "Agent" | "Agent Manager" | "System Manager";
+export const AGENT_ROLES: AgentRole[] = [
+  "Agent",
+  "Agent Manager",
+  "System Manager",
+];
+
+export const BRAND_NAME_MAX_LENGTH = 30;
+
+/** The roles `invite_by_email` grants for `role`: it and every agent role below it. */
+export function getInviteByEmailRoles(role: AgentRole): AgentRole[] {
+  return AGENT_ROLES.slice(0, AGENT_ROLES.indexOf(role) + 1);
 }
 
-/**
- * Get assigned user from `_assign` string. The return value is a `string`,
- * not a `User` object.
- * @param s - `_assign` string (JSON)
- * @returns user id
- */
-export function getAssign(s: string): string | undefined {
-  const assignJson = JSON.parse(s);
-  const arr = Array.isArray(assignJson) ? assignJson : [];
-  return arr.slice(-1).pop();
-}
-
-export function validateEmail(email) {
-  const regExp =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return regExp.test(email);
+export function extractEmail(input: string) {
+  const match = input.match(/<([^>]+)>$/); // grabs the part inside <>
+  return match ? match[1] : input;
 }
 
 export function validateEmailWithZod(email: string) {
-  const success = zod.string().email().safeParse(email).success;
+  const extractedEmail = extractEmail(email);
+  const success = zod.string().email().safeParse(extractedEmail).success;
   return success;
 }
 
+/** Dayjs date format derived from the site's System Settings (boot data). */
+export function getDateFormat(): string {
+  return ((window as any).date_format || "dd-mm-yyyy").toUpperCase();
+}
+
+/** Time format from the site's System Settings (boot data). */
+export function getTimeFormat(): string {
+  return (window as any).time_format || "HH:mm:ss";
+}
+
 export function dateFormat(date, format?: string) {
-  const _format = format || "DD-MM-YYYY HH:mm:ss";
-  return useDateFormat(date, _format).value;
+  const _format = format || `${getDateFormat()} ${getTimeFormat()}`;
+  if (!date) return "";
+  const tzDate = dayjsLocal(date);
+  return tzDate.format(_format);
 }
 
-export function timeAgo(date) {
-  return useTimeAgo(date).value;
-}
-
-export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
-
-export function errorMessage(title, message) {
-  toast.error(message);
-}
-
-export function formatTime(seconds) {
+export function formatTime(
+  seconds: number,
+  config: {
+    day?: boolean;
+    hour?: boolean;
+    minute?: boolean;
+    second?: boolean;
+    maxUnits?: number;
+  } = {
+    day: true,
+    hour: true,
+    minute: true,
+    second: true,
+  }
+) {
   const days = Math.floor(seconds / (3600 * 24));
   const hours = Math.floor((seconds % (3600 * 24)) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = Math.floor(seconds % 60);
 
-  let formattedTime = "";
+  const parts: string[] = [];
 
-  if (days > 0) {
-    formattedTime += `${days}d `;
+  if (config.day && days > 0) {
+    parts.push(`${days}d`);
   }
 
-  if (hours > 0 || days > 0) {
-    formattedTime += `${hours}h `;
+  if (config.hour && (hours > 0 || days > 0)) {
+    parts.push(`${hours}h`);
   }
 
-  if (minutes > 0 || hours > 0 || days > 0) {
-    formattedTime += `${minutes}m `;
+  if (config.minute && (minutes > 0 || hours > 0 || days > 0)) {
+    parts.push(`${minutes}m`);
   }
 
-  formattedTime += `${
-    remainingSeconds >= 10
-      ? remainingSeconds
-      : remainingSeconds > 1
-      ? "0" + remainingSeconds
-      : "0"
-  }s`;
+  if (config.second) {
+    parts.push(
+      `${
+        remainingSeconds >= 10
+          ? remainingSeconds
+          : remainingSeconds > 1
+          ? "0" + remainingSeconds
+          : "0"
+      }s`
+    );
+  }
 
-  return formattedTime.trim();
+  const limited = config.maxUnits ? parts.slice(0, config.maxUnits) : parts;
+  return limited.join(" ").trim();
 }
 
-export function getTimeInSeconds(time: string) {
-  // time in the format 1h 2m 3s
-  let timeParts = time.split(" ");
-  let seconds = 0;
-  timeParts.forEach((part) => {
-    if (part.endsWith("d")) {
-      seconds += parseInt(part) * 24 * 60 * 60; // days
-    } else if (part.endsWith("h")) {
-      seconds += parseInt(part) * 60 * 60; // hours
-    } else if (part.endsWith("m")) {
-      seconds += parseInt(part) * 60; // minutes
-    } else if (part.endsWith("s")) {
-      seconds += parseInt(part); // seconds
-    }
-  });
-  return seconds;
-}
-
-export const isCustomerPortal = ref(false);
-
-export async function copyToClipboard(
-  msg: string = "",
-  toastMessage: string = "Copied to clipboard"
+/**
+ * Shareable link to one row of the ticket feed. `?highlight` is what
+ * TicketTimeline scrolls to; the hash only selects the Activity tab.
+ */
+export function copyActivityLink(
+  prefix: "comment" | "communication",
+  name: string
 ) {
-  if (navigator.clipboard && window.isSecureContext) {
-    await navigator.clipboard.writeText(msg);
-  } else {
-    let input = document.createElement("input");
-    let body = document.querySelector("body");
-    body.appendChild(input);
-    input.value = msg;
-    input.select();
-    document.execCommand("copy");
-    input.remove();
-  }
-
-  toast.success(toastMessage);
+  const { href } = router.resolve({
+    name: "TicketAgent",
+    params: { ticketId: router.currentRoute.value.params.ticketId },
+    hash: "#activity",
+    query: { highlight: `${prefix}-${name}` },
+  });
+  copyToClipboard(window.location.origin + href, __("Link copied."));
 }
+
+export const ClearFormattingUtility = {
+  label: "Clear formatting",
+  icon: LucideBrushCleaning,
+  action: (editor) => {
+    editor.chain().focus().unsetAllMarks().clearNodes().cleanStyles().run();
+  },
+  isActive: () => false,
+};
 
 export const textEditorMenuButtons = [
   "Paragraph",
@@ -135,14 +145,11 @@ export const textEditorMenuButtons = [
   "Separator",
   "Bold",
   "Italic",
+  "FontColor",
   "Separator",
+  ["Align Left", "Align Center", "Align Right"],
   "Bullet List",
   "Numbered List",
-  "Separator",
-  "Align Left",
-  "Align Center",
-  "Align Right",
-  "FontColor",
   "Separator",
   "Image",
   "Video",
@@ -165,49 +172,45 @@ export const textEditorMenuButtons = [
     "ToggleHeaderCell",
     "DeleteTable",
   ],
+  "Separator",
+  ClearFormattingUtility,
 ];
 
-export function isContentEmpty(content: string) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(content, "text/html");
-  return doc.body.textContent === "";
+export function normalize(value: any) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  return value;
 }
 
 export function isTouchScreenDevice() {
   return "ontouchstart" in document.documentElement;
 }
 
-export function isEmoji(str) {
-  const emojiList = gemoji.map((emoji) => emoji.emoji);
-  return emojiList.includes(str);
-}
-
+/**
+ * Resolves a stored icon value into a renderable component.
+ * Supports Lucide icon names from the frappe-ui IconPicker, emojis stored by
+ * older views, and pre-resolved icon components, falling back to the ticket icon.
+ */
 export function getIcon(icon) {
-  if (isEmoji(icon)) {
-    return h("div", icon);
+  if (!icon) {
+    return h(Icon, { name: "ticket" });
   }
-  return icon || markRaw(TicketIcon);
+  if (isEmoji(icon)) {
+    return h(
+      "div",
+      { class: "flex items-center justify-center leading-none" },
+      icon
+    );
+  }
+  if (typeof icon === "string" && icon.startsWith("lucide-")) {
+    return h("span", { class: icon });
+  }
+  if (typeof icon === "string") {
+    return h(Icon, { name: icon });
+  }
+  return icon;
 }
-export function formatTimeShort(date: string) {
-  const now = dayjs();
-  const inputDate = dayjs.tz(date);
-  const diffSeconds = now.diff(inputDate, "second");
-  const diffMinutes = now.diff(inputDate, "minute");
-  const diffHours = now.diff(inputDate, "hour");
-  const diffDays = now.diff(inputDate, "day");
-  const diffWeeks = now.diff(inputDate, "week");
-  const diffMonths = now.diff(inputDate, "month");
-  const diffYears = now.diff(inputDate, "year");
-
-  if (diffSeconds < 60) return `${diffSeconds} s`;
-  if (diffMinutes < 60) return `${diffMinutes} m`;
-  if (diffHours < 24) return `${diffHours} h`;
-  if (diffDays < 7) return `${diffDays} d`;
-  if (diffWeeks < 4) return `${diffWeeks} w`;
-  if (diffMonths < 12) return `${diffMonths} M`;
-  return `${diffYears}Y`;
-}
-
 function hasArabicContent(content: string) {
   const arabicRegex = /[\u0600-\u06FF]/;
   return arabicRegex.test(content);
@@ -215,14 +218,14 @@ function hasArabicContent(content: string) {
 
 export function getFontFamily(content: string) {
   const langMap = {
-    default: "!font-[InterVar]",
+    default: "!font-[Inter]",
     arabic: "!font-[system-ui]",
   };
-  let lang = "default";
+  let lang = "";
   if (hasArabicContent(content)) {
     lang = "arabic";
   }
-  return langMap[lang];
+  return langMap[lang] || "";
 }
 
 /**
@@ -257,35 +260,10 @@ export function htmlToText(html: string): string {
  */
 export function getFormattedDate(date) {
   if (!date) return "";
-
-  const dateObj = dayjs(date);
+  const dateObj = dayjsLocal(date);
   if (!dateObj.isValid()) return "";
 
-  return dateObj.format("DD-MM-YYYY");
-}
-
-export function TemplateOption({ active, option, variant, icon, onClick }) {
-  return h(
-    "button",
-    {
-      class: [
-        active ? "bg-surface-gray-2" : "text-ink-gray-8",
-        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base",
-        variant == "danger" ? "text-ink-red-3 hover:bg-ink-red-1" : "",
-      ],
-      onClick: onClick,
-    },
-    [
-      icon
-        ? h(FeatherIcon, {
-            name: icon,
-            class: ["h-4 w-4 shrink-0"],
-            "aria-hidden": true,
-          })
-        : null,
-      h("span", { class: "whitespace-nowrap" }, option),
-    ]
-  );
+  return dateObj.format(getDateFormat());
 }
 
 export function getGridTemplateColumnsForTable(columns) {
@@ -301,16 +279,23 @@ export function getGridTemplateColumnsForTable(columns) {
   return columnsWidth + " 22px";
 }
 
+/**
+ * `options` carries the editor's `{ signal, onProgress }`, which is what drives
+ * the upload's progress ring and its cancel button.
+ */
 export function uploadFunction(
   file: File,
-  doctype: string = null,
-  docname: string = null
+  doctype: string | null = null,
+  docname: string | null = null,
+  isPrivate: boolean = true,
+  options: { signal?: AbortSignal; onProgress?: (p: unknown) => void } = {}
 ) {
   let fileUpload = useFileUpload();
   return fileUpload.upload(file, {
-    private: true,
+    private: isPrivate,
     doctype: doctype,
     docname: docname,
+    ...options,
   });
 }
 
@@ -500,48 +485,6 @@ export function getFieldDependencyLabel(name: string) {
   return `${parent} → ${child}`;
 }
 
-/**
- * @param {Object} config - Configuration object
- * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
- * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
- * @returns {Array} Array of option objects for use in dropdowns
- */
-export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
-  return [
-    {
-      label: "Delete",
-      component: (props) =>
-        TemplateOption({
-          option: "Delete",
-          icon: "trash-2",
-          active: props.active,
-          variant: "grey",
-          onClick: (event) => {
-            event.preventDefault();
-            isConfirmingDelete.value = true;
-          },
-        }),
-      condition: () => !isConfirmingDelete.value,
-    },
-    {
-      label: "Confirm Delete",
-      component: (props) =>
-        TemplateOption({
-          option: "Confirm Delete",
-          icon: "trash-2",
-          active: props.active,
-          variant: "danger",
-          onClick: () => {
-            onConfirmDelete();
-            // Reset state after confirming
-            isConfirmingDelete.value = false;
-          },
-        }),
-      condition: () => isConfirmingDelete.value,
-    },
-  ];
-}
-
 export function getRandom(len = 4) {
   let text = "";
   const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -553,25 +496,70 @@ export function getRandom(len = 4) {
   return text;
 }
 
-export function parseColor(color: string): string {
-  color = color.toLowerCase();
-  let textColor = `!text-${color}-600`;
-  if (color == "black") {
-    textColor = "!text-ink-gray-9";
-  } else if (["gray", "green"].includes(color)) {
-    textColor = `!text-${color}-700`;
-  }
-
-  return textColor;
+export function openContact(name: string) {
+  const url = window.location.origin + "/helpdesk/contacts/" + name;
+  window.open(url, "_blank");
 }
 
-export function isElementInViewport(el: HTMLElement) {
-  if (!el) return false;
-  const rect = el.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= window.innerHeight &&
-    rect.right <= window.innerWidth
+// Shared reactive mirror of <html data-theme> for JS-driven theme-aware components
+export const dataTheme = ref<string>(
+  (typeof document !== "undefined" &&
+    document.documentElement.getAttribute("data-theme")) ||
+    "light"
+);
+
+if (typeof window !== "undefined") {
+  new MutationObserver(() => {
+    const next = document.documentElement.getAttribute("data-theme") || "light";
+    if (next !== dataTheme.value) dataTheme.value = next;
+  }).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+}
+
+export function buildPercentageChange(
+  value: number | null,
+  negativeIsBetter: boolean = true
+) {
+  // No change (or no comparison): stay neutral — never green/red, no up/down arrow.
+  if (value === null || value === undefined || value === 0) {
+    return { icon: "", value: "0", color: "text-ink-gray-5" };
+  }
+  const isPositive = value > 0;
+  const isGood = negativeIsBetter ? !isPositive : isPositive;
+  // Cap the magnitude at 100% so large swings (e.g. +3186%) stay readable.
+  const capped = Math.min(Math.abs(value), 100);
+  return {
+    icon: isPositive ? "lucide-arrow-up-right" : "lucide-arrow-down-left",
+    value: isPositive ? `+${capped}` : `-${capped}`,
+    color: isGood ? "text-ink-green-6" : "text-ink-red-6",
+  };
+}
+
+export function hasPermission() {
+  const authStore = useAuthStore();
+  return authStore.isAdmin || authStore.isManager;
+}
+
+/**
+ * Splits a legacy `placement` string ("bottom-start") into frappe-ui v1's
+ * `side` + `align` pair. A bare side means centred alignment.
+ */
+export function splitPlacement(placement?: string) {
+  const [side = "bottom", align = "center"] = (placement || "").split("-");
+  return { side, align } as { side: any; align: any };
+}
+
+// Delete dialogs say it when a ticket links any of the articles.
+export function citedMessage(cited: number) {
+  return countLabel(
+    cited,
+    __(
+      "1 article is linked to a ticket. Archive it to keep the link, or delete it and remove it from the ticket."
+    ),
+    __(
+      "{0} articles are linked to tickets. Archive them to keep the links, or delete them and remove them from those tickets."
+    )
   );
 }

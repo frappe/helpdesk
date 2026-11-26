@@ -21,37 +21,43 @@
           column.key === 'response_time' || column.key === 'resolution_time'
         "
       >
-        <Popover>
-          <template #target="{ togglePopover }">
+        <Popover bare>
+          <template #trigger>
             <div
-              @click="togglePopover()"
-              class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-gray-200 rounded"
+              class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-surface-gray-3 rounded-4"
             >
               {{ formatTimeHMS(props.row[column.key]) }}
             </div>
           </template>
-          <template #body>
-            <div class="absolute bg-white top-2">
+          <template #default>
+            <div class="absolute bg-surface-base top-2">
               <DurationPicker v-model="props.row[column.key]" />
             </div>
           </template>
         </Popover>
       </div>
-      <div v-else>
-        <Select
-          class="w-full bg-transparent cursor-pointer border-0 focus-visible:!ring-0 bg-none"
-          :options="priorityOptions"
+      <div v-else class="ms-2">
+        <select
+          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-5 p-0 ps-2 pe-5 bg-transparent -ms-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
           v-model="props.row[column.key]"
-        />
+        >
+          <option
+            v-for="option in priorityOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
       </div>
     </div>
     <div class="flex justify-end">
-      <Dropdown placement="right" :options="dropdownOptions">
-        <Button
-          icon="more-horizontal"
-          variant="ghost"
-          @click="isConfirmingDelete = false"
-        />
+      <Dropdown
+        align="end"
+        :options="dropdownOptions"
+        @update:open="(open) => open && (isConfirmingDelete = false)"
+      >
+        <Button icon="lucide-more-horizontal" variant="ghost" />
       </Dropdown>
     </div>
   </div>
@@ -63,7 +69,7 @@
 import DurationPicker from "@/components/frappe-ui/DurationPicker.vue";
 import { slaData } from "@/stores/sla";
 import { ConfirmDelete } from "@/utils";
-import { Button, Checkbox, Popover, Select } from "frappe-ui";
+import { Button, Checkbox, Dropdown, Popover } from "frappe-ui";
 import { inject, ref } from "vue";
 import EditResponseResolutionModal from "./Modals/EditResponseResolutionModal.vue";
 import { formatTimeHMS } from "./utils";
@@ -98,7 +104,7 @@ const dropdownOptions = [
   {
     label: "Edit",
     onClick: () => editItem(),
-    icon: "edit",
+    icon: "lucide-edit",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteItem(),

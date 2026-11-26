@@ -132,7 +132,7 @@
 		},
 		{
 			"hidden": 0,
-			"is_query_report": 0,
+			"is_query_report": 1,
 			"label": "Ticket Analytics",
 			"link_count": 0,
 			"link_to": "Ticket Analytics",
@@ -142,7 +142,7 @@
 		},
 		{
 			"hidden": 0,
-			"is_query_report": 0,
+			"is_query_report": 1,
 			"label": "Ticket Summary",
 			"link_count": 0,
 			"link_to": "Ticket Summary",
@@ -151,7 +151,7 @@
 			"type": "Link"
 		}
 	],
-	"modified": "2022-12-02 16:07:39.761267",
+	"modified": "2025-12-30 19:50:39.761267",
 	"modified_by": "Administrator",
 	"module": "Helpdesk",
 	"name": "Helpdesk",

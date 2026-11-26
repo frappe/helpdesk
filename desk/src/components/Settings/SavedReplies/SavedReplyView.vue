@@ -1,0 +1,487 @@
+<template>
+  <SettingsLayoutBase
+    :back-label="savedReplyData.title || __('New Saved Reply')"
+    :on-back="goBack"
+    :dirty="isDirty"
+  >
+    <template #header-actions>
+      <div class="flex items-center gap-2">
+        <Button
+          v-if="savedReplyData.name"
+          :label="__('Preview')"
+          size="sm"
+          @click="onShowPreview()"
+          icon-left="lucide-eye"
+          :disabled="
+            Boolean(
+              !savedReplyData.message?.replace(/<[^>]*>/g, '')?.trim()?.length
+            ) || isDirty
+          "
+        />
+        <Button
+          :label="__('Save')"
+          variant="solid"
+          theme="gray"
+          @click="onSave"
+          :loading="
+            savedRepliesListResource?.insert.loading ||
+            savedRepliesListResource?.setValue.loading ||
+            renameSavedReplyResource.loading ||
+            getSavedReplyData.loading
+          "
+          :disabled="Boolean(!isDirty)"
+        />
+      </div>
+    </template>
+    <template #content>
+      <div
+        v-if="getSavedReplyData.loading"
+        class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
+      >
+        <LoadingIndicator class="w-4" />
+      </div>
+      <div v-else class="flex flex-col gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="space-y-1.5">
+            <FormControl
+              :label="__('Name')"
+              type="text"
+              v-model="savedReplyData.title"
+              required
+              maxLength="50"
+              @change="validateData('title')"
+            />
+            <ErrorMessage class="text-p-sm" :message="errors.title" />
+          </div>
+          <div class="space-y-1.5">
+            <Select
+              :label="__('Visibility')"
+              v-model="savedReplyData.scope"
+              :options="scopeDropdownOptions"
+              required
+              class="w-full"
+            >
+              <template #item-prefix="{ item }">
+                <component :is="item.icon" class="size-4 text-ink-gray-9" />
+              </template>
+            </Select>
+            <FormLabel
+              :label="__('Choose who can view and use this response.')"
+            />
+          </div>
+        </div>
+        <div v-if="savedReplyData.scope === 'Team'" class="space-y-1.5">
+          <FormLabel :label="__('Teams')" required />
+          <MultiSelect
+            :options="teamsList"
+            v-model="savedReplyData.teams"
+            :placeholder="__('Select teams')"
+            @update:modelValue="validateData('teams')"
+            class="w-full"
+          />
+          <div class="text-xs text-ink-gray-5 cursor-default">
+            {{ __("Restrict visibility to these teams") }}
+          </div>
+          <ErrorMessage class="text-p-sm" :message="errors.teams" />
+        </div>
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <FormLabel :label="__('Response')" required />
+            <DocumentationButton
+              url="https://docs.frappe.io/helpdesk/saved-replies"
+            />
+          </div>
+          <PreviewDialog v-model="previewDialog" />
+          <CompactEditor
+            ref="content"
+            v-model="savedReplyData.message"
+            :upload-fn="
+              (file: any, options: any) =>
+                uploadFunction(
+                  file,
+                  'HD Saved Reply',
+                  savedReplyData.name,
+                  false,
+                  options
+                )
+            "
+            :extensions="[FieldAutocomplete]"
+            :placeholder="
+              __(
+                'Hello {{ contact }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'
+              )
+            "
+            @update:modelValue="validateData('message')"
+          />
+          <ErrorMessage class="text-p-sm" :message="errors.message" />
+        </div>
+        <ActionsEditor
+          v-model="savedReplyData.actions"
+          :error="errors.actions"
+        />
+      </div>
+    </template>
+  </SettingsLayoutBase>
+  <ConfirmDialog
+    v-model="showConfirmDialog.show"
+    :title="showConfirmDialog.title"
+    :message="showConfirmDialog.message"
+    :onConfirm="showConfirmDialog.onConfirm"
+    :onCancel="() => (showConfirmDialog.show = false)"
+  />
+</template>
+
+<script setup lang="ts">
+import CompactEditor from "@/components/CompactEditor.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import DocumentationButton from "@/components/DocumentationButton.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
+import { __ } from "@/translation";
+import { uploadFunction } from "@/utils";
+import { createFieldAutocomplete } from "@helpdesk/shared/tiptap";
+import {
+  Button,
+  createListResource,
+  createResource,
+  ErrorMessage,
+  FormControl,
+  FormLabel,
+  LoadingIndicator,
+  MultiSelect,
+  Select,
+  toast,
+} from "frappe-ui";
+import { storeToRefs } from "pinia";
+import { computed, inject, onUnmounted, ref, watch } from "vue";
+import GlobeIcon from "~icons/lucide/globe";
+import UserIcon from "~icons/lucide/user";
+import UsersIcon from "~icons/lucide/users";
+import { SavedReply, SavedReplyListResourceSymbol, Team } from "../../../types";
+import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import { disableSettingModalOutsideClick } from "../settingsModal";
+import ActionsEditor from "./components/ActionsEditor.vue";
+import { actionNeedsValue, isActionValueEmpty } from "./components/actionTypes";
+import PreviewDialog from "./components/PreviewDialog.vue";
+import { getTemplateFields } from "./savedReplies";
+
+const FieldAutocomplete = createFieldAutocomplete(getTemplateFields);
+
+const showConfirmDialog = ref({
+  show: false,
+  title: "",
+  message: "",
+  onConfirm: () => {},
+});
+
+const savedRepliesActiveScreen = inject<any>("savedRepliesActiveScreen");
+const savedRepliesListResource = inject(SavedReplyListResourceSymbol);
+
+const previewDialog = ref({
+  show: false,
+  ticketId: "",
+  savedReply: "",
+  preview: null,
+});
+const content = ref();
+
+const { teamRestrictionApplied, disableGlobalScopeForSavedReplies } =
+  storeToRefs(useConfigStore());
+const { userTeams, isAdmin } = storeToRefs(useAuthStore());
+
+const savedReplyData = ref({
+  name: "",
+  title: "",
+  scope: savedRepliesActiveScreen.value.data?.scope || "Personal",
+  message: "",
+  teams: [],
+  actions: [],
+});
+const initialData = ref("");
+const errors = ref({
+  title: "",
+  message: "",
+  teams: "",
+  actions: "",
+});
+
+const scopeDropdownOptions = computed(() => {
+  const options = [
+    {
+      label: __("Personal"),
+      value: "Personal",
+      icon: UserIcon,
+    },
+    {
+      label: __("Team"),
+      value: "Team",
+      icon: UsersIcon,
+    },
+    {
+      label: __("Global"),
+      value: "Global",
+      icon: GlobeIcon,
+    },
+  ];
+
+  if (teamRestrictionApplied.value && disableGlobalScopeForSavedReplies.value) {
+    options.pop();
+  }
+
+  return options;
+});
+
+const getSavedReplyData = createResource({
+  url: "frappe.client.get",
+  makeParams() {
+    return {
+      doctype: "HD Saved Reply",
+      name: savedRepliesActiveScreen.value.data?.name,
+    };
+  },
+  auto: false,
+  onSuccess: (data: SavedReply) => {
+    savedReplyData.value = {
+      name: data.name,
+      title: data.title,
+      scope: data.scope,
+      message: data.message,
+      teams: data.teams?.map((team) => team.team) || [],
+      actions: JSON.parse(data.actions || "[]"),
+    };
+    initialData.value = JSON.stringify(savedReplyData.value);
+  },
+});
+
+const getTeamsListResource = createListResource({
+  doctype: "HD Team",
+  auto: true,
+  fields: ["name"],
+  filters: {
+    disabled: 0,
+  },
+  start: 0,
+  pageLength: 999,
+  transform: (data: Array<Team>) => {
+    return data.map((item) => ({
+      value: item.name,
+      label: item.name,
+    }));
+  },
+});
+
+const teamsList = computed(() => {
+  if (!isAdmin.value && teamRestrictionApplied.value) {
+    return (
+      userTeams.value?.map((team: string) => ({
+        value: team,
+        label: team,
+      })) || []
+    );
+  }
+  return getTeamsListResource.data || [];
+});
+
+const onShowPreview = () => {
+  previewDialog.value.show = true;
+  previewDialog.value.savedReply = savedReplyData.value.name;
+};
+
+if (savedRepliesActiveScreen.value.data?.name) {
+  getSavedReplyData.submit();
+} else {
+  initialData.value = JSON.stringify(savedReplyData.value);
+}
+
+const isDirty = ref(false);
+
+const goBack = () => {
+  const confirmDialogInfo = {
+    show: true,
+    title: __("Unsaved changes"),
+    message: __(
+      "Are you sure you want to go back? Unsaved changes will be lost."
+    ),
+    onConfirm: goBack,
+  };
+  if (isDirty.value && !showConfirmDialog.value.show) {
+    showConfirmDialog.value = confirmDialogInfo;
+    return;
+  }
+  // Workaround fix for settings modal not closing after going back
+  setTimeout(() => {
+    savedRepliesActiveScreen.value = {
+      screen: "list",
+      data: null,
+    };
+  }, 250);
+  showConfirmDialog.value.show = false;
+};
+
+const onSave = () => {
+  validateData();
+
+  // Each field shows its own inline error; no toast needed
+  if (Object.values(errors.value).some((e) => e)) return;
+
+  if (savedRepliesActiveScreen.value.data?.name) {
+    updateSavedReply();
+  } else {
+    createSavedReply();
+  }
+};
+
+const createSavedReply = () => {
+  savedRepliesListResource?.insert.submit(
+    {
+      title: savedReplyData.value.title,
+      message: savedReplyData.value.message,
+      scope: savedReplyData.value.scope,
+      teams: savedReplyData.value.teams.map((team) => ({
+        team: team,
+      })),
+      actions: savedReplyData.value.actions,
+    },
+    {
+      onSuccess: (data) => {
+        toast.success(__("Saved reply saved successfully."));
+        savedReplyData.value = {
+          ...savedReplyData.value,
+          name: data.name,
+        };
+        initialData.value = JSON.stringify(savedReplyData.value);
+        savedRepliesActiveScreen.value = {
+          screen: "view",
+          data: { name: data.name },
+        };
+      },
+    }
+  );
+};
+
+const renameSavedReplyResource = createResource({
+  url: "frappe.client.rename_doc",
+  makeParams() {
+    return {
+      doctype: "HD Saved Reply",
+      old_name: savedRepliesActiveScreen.value.data.name,
+      new_name: savedReplyData.value.title,
+    };
+  },
+});
+
+const updateSavedReply = async () => {
+  await savedRepliesListResource?.setValue.submit({
+    name: savedReplyData.value.name,
+    title: savedReplyData.value.title,
+    subject: savedReplyData.value.title,
+    message: savedReplyData.value.message,
+    scope: savedReplyData.value.scope,
+    teams: savedReplyData.value.teams.map((team) => ({
+      team: team,
+    })),
+    actions: savedReplyData.value.actions,
+  });
+
+  if (savedReplyData.value.name !== savedReplyData.value.title) {
+    await renameSavedReplyResource.submit().catch(async (err: any) => {
+      const error =
+        err?.messages?.[0] ||
+        __("Some error occurred while renaming saved reply");
+      toast.error(error);
+      // Reset saved reply to previous state
+      await getSavedReplyData.reload();
+    });
+
+    await getSavedReplyData.submit({
+      doctype: "HD Saved Reply",
+      name: savedReplyData.value.title,
+    });
+
+    savedRepliesActiveScreen.value = {
+      screen: "view",
+      data: { name: savedReplyData.value.title },
+    };
+  } else {
+    await getSavedReplyData.reload();
+  }
+
+  savedRepliesListResource?.reload();
+  isDirty.value = false;
+  toast.success(__("Saved reply updated successfully."));
+};
+
+const validateData = (key?: string) => {
+  const validateField = (key: string) => {
+    switch (key) {
+      case "title":
+        if (!savedReplyData.value.title) {
+          errors.value.title = __("Title is required");
+        } else {
+          errors.value.title = "";
+        }
+        break;
+
+      case "message":
+        if (
+          !savedReplyData.value.message?.replace(/<[^>]*>/g, "")?.trim()?.length
+        ) {
+          errors.value.message = __("Response is required");
+        } else {
+          errors.value.message = "";
+        }
+        break;
+
+      case "teams":
+        if (
+          savedReplyData.value.scope === "Team" &&
+          !savedReplyData.value.teams.length
+        ) {
+          errors.value.teams = __("At least one team is required");
+        } else {
+          errors.value.teams = "";
+        }
+        break;
+
+      case "actions": {
+        const hasEmpty = savedReplyData.value.actions.some(
+          (action) =>
+            actionNeedsValue(action.action_type) &&
+            isActionValueEmpty(action.action_type, action.value)
+        );
+        errors.value.actions = hasEmpty ? __("Values can't be empty") : "";
+        break;
+      }
+
+      default:
+        break;
+    }
+  };
+  if (key) {
+    validateField(key);
+  } else {
+    (Object.keys(errors.value) as string[]).forEach(validateField);
+  }
+
+  return errors.value;
+};
+
+watch(
+  savedReplyData,
+  (newVal) => {
+    if (errors.value.actions) validateData("actions");
+    if (!initialData.value) return;
+    isDirty.value = JSON.stringify(newVal) != initialData.value;
+    if (isDirty.value) {
+      disableSettingModalOutsideClick.value = true;
+    } else {
+      disableSettingModalOutsideClick.value = false;
+    }
+  },
+  { deep: true }
+);
+
+onUnmounted(() => {
+  disableSettingModalOutsideClick.value = false;
+});
+</script>

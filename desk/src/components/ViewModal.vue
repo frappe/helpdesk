@@ -1,34 +1,43 @@
 <template>
-  <Dialog
-    v-model="viewDialog.show"
-    :options="{
-      title: modalInfo.modalTitle,
-    }"
-  >
-    <template #body-content>
-      <div class="mb-1.5 block text-base text-ink-gray-5">View Name</div>
-      <div class="flex gap-2">
-        <IconPicker v-model="view.icon" v-slot="{ togglePopover }">
-          <Button
-            size="md"
-            class="flex size-8 text-2xl leading-none"
-            :label="view.icon"
-            @click="togglePopover"
+  <Dialog v-model:open="viewDialogConfig.show" :title="modalInfo.modalTitle">
+    <template #default>
+      <div class="flex flex-col gap-4">
+        <div>
+          <div class="mb-1.5 text-base text-ink-gray-5">
+            {{ __("Name") }} <span class="text-ink-red-3">*</span>
+          </div>
+          <FormControl
+            size="sm"
+            type="text"
+            placeholder="My Open Tickets"
+            v-model="view.label"
           />
-        </IconPicker>
-        <FormControl
-          class="flex-1"
-          size="md"
-          type="text"
-          placeholder="My Open Tickets"
-          v-model="view.label"
-        />
+        </div>
+        <ViewIconField v-model="view.icon" />
+        <!-- A view is either pinned (private, in "Private Views") or public (in
+        "Public Views") - never both - so checking one disables the other. -->
+        <div v-if="isCreateMode" class="grid grid-cols-2 gap-2">
+          <FormControl
+            type="checkbox"
+            :label="__('Pin to sidebar')"
+            v-model="view.pinned"
+            :disabled="Boolean(view.public)"
+          />
+          <FormControl
+            v-if="isManager"
+            type="checkbox"
+            :label="__('Make it public')"
+            v-model="view.public"
+            :disabled="Boolean(view.pinned)"
+          />
+        </div>
       </div>
     </template>
     <template #actions>
       <Button
         :label="modalInfo.buttonLabel"
         variant="solid"
+        :disabled="!view.label.trim()"
         @click="emit('update', view, modalInfo.action)"
         class="w-full"
       />
@@ -37,37 +46,48 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
+import ViewIconField from "@helpdesk/shared/ViewIconField.vue";
 import { Dialog } from "frappe-ui";
-import IconPicker from "@/components/IconPicker.vue";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
-let viewDialog = defineModel();
+let viewDialogConfig = defineModel();
+
+const { isManager } = useAuthStore();
+
+// New views start with the ticket icon preselected - it is also what an
+// empty icon falls back to when rendering.
+const isCreate = !["edit", "duplicate"].includes(viewDialogConfig.value.mode);
 
 const view = ref({
-  label: viewDialog.value.view.label || "",
-  icon: viewDialog.value.view.icon || "",
-  name: viewDialog.value.view.name || "",
+  label: viewDialogConfig.value.view.label || "",
+  icon: viewDialogConfig.value.view.icon || (isCreate ? "ticket" : ""),
+  name: viewDialogConfig.value.view.name || "",
+  pinned: false,
+  public: false,
 });
+
+const isCreateMode = computed(() => modalInfo.value.action === "create");
 
 const modalInfo = computed(() => {
   return {
     modalTitle:
-      viewDialog.value.mode === "edit"
+      viewDialogConfig.value.mode === "edit"
         ? "Edit View"
-        : viewDialog.value.mode === "duplicate"
+        : viewDialogConfig.value.mode === "duplicate"
         ? "Duplicate View"
         : "Create View",
     buttonLabel:
-      viewDialog.value.mode === "edit"
+      viewDialogConfig.value.mode === "edit"
         ? "Update"
-        : viewDialog.value.mode === "duplicate"
+        : viewDialogConfig.value.mode === "duplicate"
         ? "Duplicate"
         : "Create",
     action:
-      viewDialog.value.mode === "edit"
+      viewDialogConfig.value.mode === "edit"
         ? "update"
-        : viewDialog.value.mode === "duplicate"
+        : viewDialogConfig.value.mode === "duplicate"
         ? "duplicate"
         : "create",
   };

@@ -1,43 +1,46 @@
 <template>
-  <Dropdown :options="options">
+  <Dropdown :options="options" :match-trigger-width="!collapsed">
     <template #default="{ open }">
       <button
-        class="flex h-12 items-center rounded-md py-2 duration-300 ease-in-out"
+        class="flex h-12 items-center rounded-5 py-2 duration-300 ease-in-out"
         :class="
-          !sidebarStore.isExpanded
+          collapsed
             ? 'w-auto px-0'
             : open
-            ? 'w-52 bg-white px-1 shadow-sm'
-            : 'w-52 px-1 hover:bg-gray-200'
+            ? 'w-full px-2 bg-surface-base shadow-sm'
+            : 'w-full px-2 hover:bg-surface-gray-3'
         "
       >
-        <BrandLogo />
+        <Brand :logo="config.brandLogo" size="lg" class="shrink-0">
+          <template #fallback>
+            <HDLogo class="size-8 shrink-0 rounded-4" />
+          </template>
+        </Brand>
         <div
-          class="flex flex-1 flex-col text-left duration-300 ease-in-out"
+          class="flex flex-1 flex-col text-start duration-300 ease-in-out overflow-hidden rtl:items-start pe-2"
           :class="
-            !sidebarStore.isExpanded
-              ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 w-auto opacity-100'
+            collapsed
+              ? 'ms-0 w-0 overflow-hidden opacity-0'
+              : 'ms-2 w-auto opacity-100'
           "
         >
-          <div class="text-base font-medium leading-none text-gray-900">
-            Helpdesk
+          <div class="text-base-medium leading-none text-ink-gray-9 truncate">
+            {{ config.brandName || "Helpdesk" }}
           </div>
-          <div class="mt-1 text-sm leading-none text-gray-700">
+          <div class="mt-1 text-sm text-ink-gray-7">
             {{ authStore.userName }}
           </div>
         </div>
         <div
           class="duration-300 ease-in-out"
           :class="
-            !sidebarStore.isExpanded
-              ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 w-auto opacity-100'
+            collapsed
+              ? 'ms-0 w-0 overflow-hidden opacity-0'
+              : 'ms-2 relative start-[-2.5px] w-auto opacity-100'
           "
         >
-          <FeatherIcon
-            name="chevron-down"
-            class="h-4 w-4 text-gray-600"
+          <LucideChevronDown
+            class="h-4 w-4 text-ink-gray-5"
             aria-hidden="true"
           />
         </div>
@@ -47,21 +50,30 @@
 </template>
 
 <script setup lang="ts">
-import { Dropdown, Avatar } from "frappe-ui";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import HDLogo from "@/assets/logos/HDLogo.vue";
+import Brand from "../../../studio/helpdesk/components/header/Brand.vue";
 import { useAuthStore } from "@/stores/auth";
-import { useSidebarStore } from "@/stores/sidebar";
 import { useConfigStore } from "@/stores/config";
-import BrandLogo from "@/components/BrandLogo.vue";
+import { useSidebarStore } from "@/stores/sidebar";
+import { Dropdown } from "frappe-ui";
+import { computed } from "vue";
 
 const config = useConfigStore();
 
-defineProps({
+const props = defineProps({
   options: {
     type: Array,
     required: true,
+  },
+  isCollapsed: {
+    type: Boolean,
+    default: null,
   },
 });
 
 const authStore = useAuthStore();
 const sidebarStore = useSidebarStore();
+
+const collapsed = computed(() => props.isCollapsed ?? !sidebarStore.isExpanded);
 </script>

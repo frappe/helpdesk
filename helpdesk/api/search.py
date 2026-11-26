@@ -8,7 +8,9 @@ from frappe import _
 
 
 @frappe.whitelist()
-def search(query, filters=None, limit=20, title_only=False):
+def search(
+    query: str, filters: str | None = None, limit: int = 20, title_only: bool = False
+):
     """Main search endpoint for the dedicated search page"""
     # Input validation
     if not query or len(query.strip()) < 2:
@@ -21,21 +23,30 @@ def search(query, filters=None, limit=20, title_only=False):
         limit = 20
 
     # Parse filters safely
+    _filters = {}
     if isinstance(filters, str):
         try:
-            filters = json.loads(filters) if filters else {}
+            _filters = json.loads(filters) if filters else {}
         except json.JSONDecodeError:
-            filters = {}
+            _filters = {}
 
-    from helpdesk.search_sqlite import HelpdeskSearch, HelpdeskSearchIndexMissingError
+    from frappe.search.sqlite_search import SQLiteSearchIndexMissingError
+
+    from helpdesk.search_sqlite import HelpdeskSearch
 
     search = HelpdeskSearch()
 
     try:
-        result = search.search(query, filters=filters, title_only=title_only)
+        result = search.search(query, filters=_filters, title_only=title_only)
         return result
-    except HelpdeskSearchIndexMissingError:
-        frappe.throw(_("Search index not available. Please contact administrator."))
+    except SQLiteSearchIndexMissingError:
+        if "System Manager" in frappe.get_roles():
+            frappe.throw(
+                _(
+                    "Search index not available. Build it by running helpdesk.search_sqlite.build_index."
+                )
+            )
+        frappe.throw(_("Search is temporarily unavailable. Please try again later."))
 
 
 @frappe.whitelist()

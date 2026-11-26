@@ -1,0 +1,37 @@
+# Runs from develop only: scheduled workflows always use the default branch.
+name: Create weekly release pull requests
+on:
+  schedule:
+    # 3:30 UTC => 9 AM IST Wednesday
+    - cron: "30 3 * * 3"
+  workflow_dispatch:
+
+jobs:
+  stable-release:
+    name: Release
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["15", "16"]
+
+    steps:
+      - name: Get Frappe Release Bot token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.FRAPPE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.FRAPPE_BOT_PRIVATE_KEY }}
+          permission-pull-requests: write
+      - uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/{owner}/{repo}/pulls
+          owner: frappe
+          repo: helpdesk
+          title: |-
+            "chore: release v${{ matrix.version }}"
+          body: "Automated weekly release."
+          base: version-${{ matrix.version }}
+          head: version-${{ matrix.version }}-hotfix
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}

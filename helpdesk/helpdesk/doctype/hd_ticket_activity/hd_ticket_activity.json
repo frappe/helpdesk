@@ -2,6 +2,7 @@
  "actions": [],
  "autoname": "hash",
  "creation": "2022-03-20 22:12:24.118862",
+ "deprecated": 1,
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -19,14 +20,14 @@
   },
   {
    "fieldname": "action",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Action"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-25 11:26:08.120059",
- "modified_by": "Administrator",
+ "modified": "2026-04-09 03:08:25.416283",
+ "modified_by": "sanjay@erpnext.com",
  "module": "Helpdesk",
  "name": "HD Ticket Activity",
  "naming_rule": "Random",

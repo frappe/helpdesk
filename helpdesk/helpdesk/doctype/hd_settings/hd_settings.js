@@ -3,6 +3,10 @@
 
 frappe.ui.form.on("HD Settings", {
   refresh: function (frm) {
+    frm.fields_dict.social_links.grid.set_column_disp_in_list_view(
+      "parent_label",
+      false
+    );
     frm.add_custom_button(__("Regenerate Search Index"), () => {
       frappe.call({
         method: "helpdesk.search.build_index",
