@@ -56,8 +56,9 @@
           key="portal"
           class="relative flex h-full w-[840px] flex-col"
         >
+          <!-- Content stays 840px to fit the visible part of the window; the header line and hero run on to its edge. -->
           <header
-            class="flex h-14 shrink-0 items-center gap-2.5 border-b border-outline-gray-1 px-8"
+            class="flex h-14 shrink-0 items-center gap-2.5 border-b border-outline-gray-1 px-8 -me-[280px] pe-[calc(2rem+280px)]"
           >
             <span
               class="flex size-7 items-center justify-center overflow-hidden rounded-[7px] text-base-semibold"
@@ -93,7 +94,7 @@
           >
             <div v-if="page === 'home'" key="home">
               <div
-                class="relative overflow-hidden bg-surface-gray-1 px-10 pb-16 pt-20 text-center"
+                class="relative overflow-hidden bg-surface-gray-1 px-10 pb-16 pt-20 text-center -me-[280px] pe-[calc(2.5rem+280px)]"
               >
                 <div
                   class="absolute inset-0 text-ink-gray-2 opacity-70 bg-[repeating-linear-gradient(135deg,currentColor_0,currentColor_1px,transparent_1px,transparent_12px)]"
