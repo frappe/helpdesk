@@ -6,6 +6,7 @@ from frappe.utils import get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
+from helpdesk.api.config import get_config
 from helpdesk.api.setup import is_setup_pending
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
 from helpdesk.integrations import frappe_cloud
@@ -80,6 +81,7 @@ def get_boot():
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
             "cloud_settings": frappe_cloud.get_boot_context(),
+            "hd_config": get_config(),
         }
     )
 
