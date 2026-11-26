@@ -327,7 +327,7 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
     options: fieldMeta?.options || "",
     placeholder:
       fieldTemplate.placeholder ||
-      `Set ${fieldMeta?.label || fieldTemplate.fieldname}...`,
+      __("Set {0}...", [__(fieldMeta?.label || fieldTemplate.fieldname)]),
     readonly: Boolean(fieldMeta.read_only),
     disabled: Boolean(fieldMeta.read_only),
     url_method: fieldTemplate.url_method || "",
