@@ -1132,7 +1132,7 @@ class TestHDTicket(IntegrationTestCase):
     def test_if_banner_not_shown_after_next_working_day(self):
         outside_working_hour_day_1 = get_current_week_monday(hours=20)
         with self.freeze_time(outside_working_hour_day_1):
-            ticket = make_ticket(priority="low")
+            ticket = make_ticket(priority="Low")
 
         ticket.reload()
         next_working_day = add_to_date(get_current_week_monday(hours=20), days=1)
