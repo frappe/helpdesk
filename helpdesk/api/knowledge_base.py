@@ -383,7 +383,7 @@ def move_to_category(category: str, articles: list[str]):
 
 
 # Guest endpoints: make_article_filters limits guests to Public articles.
-@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+@frappe.whitelist(allow_guest=True, methods=["GET"], rate_limit=None)  # nosemgrep
 def get_articles(
     category: str | None = None,
     limit: int | None = None,
@@ -416,7 +416,7 @@ def get_articles(
     )
 
 
-@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+@frappe.whitelist(allow_guest=True, methods=["GET"], rate_limit=None)  # nosemgrep
 def get_featured_articles(names: str | list | None = None) -> list[dict]:
     """The home page's Featured articles: name, title and excerpt, in pin order.
     `names` reads Settings Preview's unsaved pins instead, in their order. Never
@@ -497,7 +497,7 @@ def _parse_guest_names(value, limit: int) -> list[str]:
     return [name for name in names if isinstance(name, str) and name][:limit]
 
 
-@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+@frappe.whitelist(allow_guest=True, methods=["GET"], rate_limit=None)  # nosemgrep
 def get_subcategory_articles(category: str) -> dict[str, list[dict]]:
     """The articles of each Subcategory of `category`, heaviest then newest first,
     skipping empty ones."""
@@ -553,7 +553,7 @@ def get_kb_sidebar() -> list[dict]:
     return categories
 
 
-@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+@frappe.whitelist(allow_guest=True, methods=["GET"], rate_limit=None)  # nosemgrep
 def get_article(name: str) -> dict:
     """Get a readable article: content, author, category, reading time, caller's vote.
     `name` may be the URL path `<name>-<title slug>`. `feedback` is 0 none, 1 helpful,
@@ -595,7 +595,7 @@ def get_article(name: str) -> dict:
     return article
 
 
-@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+@frappe.whitelist(allow_guest=True, methods=["GET"], rate_limit=None)  # nosemgrep
 def get_article_markdown(name: str) -> None:
     """Download a readable article as a Markdown file, `<name>.md`.
     Served inline. Takes the bare name, not the URL slug."""
@@ -641,7 +641,7 @@ def _get_viewable_article(name: str, fields: list[str] | None = None) -> frappe.
     return article
 
 
-@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+@frappe.whitelist(allow_guest=True, methods=["GET"], rate_limit=None)  # nosemgrep
 def get_categories() -> list[dict]:
     """List categories that have a published article the caller can read, directly or
     in a Subcategory. Each has name, category_name, description, icon, pinned,
@@ -988,6 +988,7 @@ def get_general_category():
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])  # nosemgrep
+@rate_limit(limit=120, seconds=60, user_based=True)
 def increment_views(article: str):
     """Count one view of a published article, at most once an hour per reader.
     A reader is a signed-in user or a Guest IP. Drafts aren't counted; an article the
