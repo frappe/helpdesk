@@ -1,3 +1,4 @@
+import { __ } from "@/translation";
 import { isSlaMissed, twoUnitDuration } from "@helpdesk/shared/utils";
 import { dayjsLocal } from "frappe-ui";
 import { computed, type ComputedRef, type Ref } from "vue";
@@ -98,7 +99,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
       );
     }
     const overdue = coarseDuration(d.response_by);
-    return metric("overdue", `Overdue by ${overdue}`, "red", {
+    return metric("overdue", __("Overdue by {0}", [overdue]), "red", {
       dueBy: d.response_by,
       delay: `+${overdue}`,
     });
@@ -161,7 +162,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
       );
     }
     const overdue = coarseDuration(d.resolution_by);
-    return metric("overdue", `Overdue by ${overdue}`, "red", {
+    return metric("overdue", __("Overdue by {0}", [overdue]), "red", {
       dueBy: d.resolution_by,
       delay: `+${overdue}`,
     });

@@ -60,6 +60,7 @@ import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { reloadTicketFeed } from "@/composables/useTicket";
 import { useTelephonyStore } from "@/stores/telephony";
+import { __ } from "@/translation";
 import { TabObject, TicketSymbol } from "@/types";
 import { TabList, TabPanel, TabTrigger, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
@@ -79,17 +80,17 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs: TabObject[] = [
     {
       value: "activity",
-      label: "Activity",
+      label: __("Activity"),
       iconLeft: ActivityIcon,
     },
     {
       value: "email",
-      label: "Emails",
+      label: __("Emails"),
       iconLeft: EmailIcon,
     },
     {
       value: "comment",
-      label: "Comments",
+      label: __("Comments"),
       iconLeft: CommentIcon,
     },
   ];
@@ -97,13 +98,13 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   if (isCallingEnabled.value) {
     _tabs.push({
       value: "call",
-      label: "Calls",
+      label: __("Calls"),
       iconLeft: PhoneIcon,
     });
   }
   _tabs.push({
     value: "analytics",
-    label: "Analytics",
+    label: __("Analytics"),
     iconLeft: LucideChartNoAxesColumn,
   });
   return _tabs;
