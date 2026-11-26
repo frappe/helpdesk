@@ -1,3 +1,4 @@
+
 <template>
   <CommentItem
     :comment="activity"
@@ -17,7 +18,7 @@
           </Badge>
         </div>
         <div class="flex items-center gap-2">
-          <Tooltip :text="postedAt.format(TOOLTIP_DATE_FORMAT)">
+          <Tooltip :text="postedAt.format(`${getDateFormat()} ${getTimeFormat()}`)">
             <span class="whitespace-nowrap text-sm leading-6 text-ink-gray-5">
               {{ postedAt.fromNow() }}
             </span>
@@ -63,7 +64,13 @@ import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
-import { ConfirmDelete, copyActivityLink, isContentEmpty } from "@/utils";
+import {
+  ConfirmDelete,
+  copyActivityLink,
+  getDateFormat,
+  getTimeFormat,
+  isContentEmpty,
+} from "@/utils";
 import {
   AttachmentChip,
   CommentItem,
@@ -89,8 +96,6 @@ export interface CommentExtras {
 
 // mirrors MAX_PINNED_COMMENTS in helpdesk/extends/comment.py, which enforces it
 const MAX_PINNED_COMMENTS = 5;
-// same as the framework's timeline, so every row's time reads alike
-const TOOLTIP_DATE_FORMAT = "ddd, MMM D, YYYY h:mm A";
 
 const props = defineProps<{
   activity: CommentActivity;
@@ -221,7 +226,7 @@ function togglePin() {
     {
       onSuccess: () => emit("update"),
       onError: (error: { messages?: string[] }) =>
-        toast.error(error.messages?.[0] ?? __("Could not pin the comment")),
+        toast.error(error.messages?.[0] ?? __("Could not update the comment")),
     }
   );
 }
