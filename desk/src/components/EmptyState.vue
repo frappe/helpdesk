@@ -92,6 +92,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { Button, type ButtonProps } from "frappe-ui";
 import { VNode, computed } from "vue";
 interface Props {
@@ -114,9 +115,7 @@ const props = withDefaults(defineProps<Props>(), {
 const descriptionText = computed(() =>
   props.description !== undefined && props.description !== ""
     ? props.description
-    : `Create new ${props.title
-        .split(" ")[1]
-        .toLocaleLowerCase()} using the Create button.`
+    : __("Create a new one using the Create button.")
 );
 </script>
 

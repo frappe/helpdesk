@@ -429,7 +429,8 @@ const ticketFields = computed(() => {
         fieldtype: fieldMeta?.fieldtype,
         options: fieldMeta?.options || "",
         placeholder:
-          f.placeholder || `Enter ${fieldMeta?.label || f.fieldname}`,
+          f.placeholder ||
+          __("Enter {0}", [__(fieldMeta?.label || f.fieldname)]),
         readonly: Boolean(fieldMeta.read_only),
         disabled: Boolean(fieldMeta.read_only),
         url_method: f.url_method || "",
