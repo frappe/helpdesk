@@ -32,7 +32,7 @@ AGENT_FIELDS = [
 FOOTER_ROW_FIELDS = ["label", "url", "parent_label", "open_in_new_tab"]
 
 
-@frappe.whitelist(allow_guest=True)  # nosemgrep
+@frappe.whitelist(allow_guest=True, methods=["GET", "POST"], rate_limit=None)  # nosemgrep  # fmt: skip
 def get_config():
     """Each caller gets only the settings its app reads: guests the knowledge base look,
     signed-in users the portal switches, agents the desk workflow"""

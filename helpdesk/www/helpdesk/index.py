@@ -42,7 +42,7 @@ def redirect_customer_home():
     raise frappe.Redirect(302)
 
 
-@frappe.whitelist(methods=["POST"], allow_guest=True)  # nosemgrep
+@frappe.whitelist(methods=["POST"], allow_guest=True, rate_limit=None)  # nosemgrep
 def get_context_for_dev():
     """The helpdesk app's boot data, for the frontend dev server.
     Session user, agent, site, formats, timezone, CSRF token and installed apps.
