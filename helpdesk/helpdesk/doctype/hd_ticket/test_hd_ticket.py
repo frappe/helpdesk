@@ -29,6 +29,7 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     permission_query,
 )
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_ticket_form
+from helpdesk.overrides.email_account import CustomInboundMail
 from helpdesk.patches import set_ticket_source
 from helpdesk.patches.set_ticket_source import OLD_FIELD
 from helpdesk.test_utils import (
@@ -49,6 +50,7 @@ from helpdesk.test_utils import (
     is_outside_hours_banner_shown,
     make_agent,
     make_assignment_rule,
+    make_email_account,
     make_feedback_option,
     make_form_script,
     make_notification_log,
@@ -1692,8 +1694,28 @@ class TestHDTicket(IntegrationTestCase):
 
         subject = sendmail.call_args.kwargs["subject"]
         self.assertFalse(subject.startswith("Re:"), subject)
-        self.assertIn(str(ticket.name), subject)
+        self.assertTrue(subject.endswith(f"(#{ticket.name})"), subject)
         self.assertIsNone(sendmail.call_args.kwargs.get("in_reply_to"))
+
+    def test_headerless_reply_to_reply_notice_lands_on_the_ticket(self):
+        """With In-Reply-To lost (mail client, purged Email Queue), Frappe reads the
+        ticket from the subject's last `#`."""
+        ticket = make_ticket()
+        ticket.assign_agent(agent)
+        with patch("frappe.sendmail") as sendmail:
+            ticket.send_reply_email_to_agent("Customer reply")
+        subject = sendmail.call_args.kwargs["subject"]
+        account = frappe.get_doc(
+            "Email Account", make_email_account(enable_incoming=0, enable_outgoing=0)
+        )
+        raw = (
+            f"From: {agent}\r\nTo: {account.email_id}\r\nSubject: Re: {subject}\r\n"
+            f"Message-ID: <{frappe.generate_hash()}@example.com>\r\n\r\nOn it."
+        )
+
+        reply = CustomInboundMail(raw, account, None, None, "HD Ticket").process()
+
+        self.assertEqual(reply.reference_name, str(ticket.name))
 
     def test_feedback_email_replies_to_an_emailed_communication(self):
         """A portal reply has no message_id, so the feedback mail skips past it."""

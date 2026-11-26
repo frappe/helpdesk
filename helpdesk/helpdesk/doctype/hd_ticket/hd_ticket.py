@@ -963,7 +963,7 @@ class HDTicket(Document, CustomerEditController):
             frappe.sendmail(
                 recipients=recipients,
                 # a notice, not a reply to a mail the agents got, so no `Re:`
-                subject=_("New reply on #{0}: {1}").format(self.name, self.subject),
+                subject=_("New reply on {0} (#{1})").format(self.subject, self.name),
                 message=self._get_rendered_template(
                     email_content,
                     default_email_content,
