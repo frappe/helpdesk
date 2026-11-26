@@ -44,8 +44,6 @@ def after_install():
     add_property_setters()
     add_website_settings_permission()
     add_default_views()
-    # Always keep this at last, because sql_ddl makes the db commit
-    add_fts_index()
 
 
 def add_default_categories_and_articles():
@@ -445,45 +443,6 @@ def add_default_agent_status():
             ).insert()
 
     frappe.db.set_single_value("HD Settings", "default_agent_status", "Active")
-
-
-def add_fts_index():
-    indexes = [
-        {"table": "tabHD Ticket", "column": "subject", "index_name": "ft_subject"},
-        {
-            "table": "tabHD Ticket",
-            "column": "description",
-            "index_name": "ft_description",
-        },
-    ]
-
-    for i in indexes:
-        add_index_if_not_exists(i["table"], i["column"], i["index_name"])
-
-
-def add_index_if_not_exists(table, column, index_name):
-    statistics = frappe.qb.Schema("information_schema").statistics
-    index_names = (
-        frappe.qb.from_(statistics)
-        .select(statistics.index_name)
-        .where(statistics.table_schema == frappe.db.cur_db_name)
-        .where(statistics.table_name == table)
-        .where(statistics.column_name == column)
-        .where(statistics.index_type == "FULLTEXT")
-        .run(pluck=True)
-    )
-    if index_names:
-        frappe.db.sql_ddl(
-            "DROP INDEX `{index_name}` ON `{table}`".format(
-                index_name=index_names[0], table=table
-            )
-        )
-
-    frappe.db.sql_ddl(
-        "ALTER TABLE `{table}` ADD FULLTEXT INDEX `{index_name}` (`{column}`)".format(
-            table=table, index_name=index_name, column=column
-        )
-    )
 
 
 def get_tag_custom_fields():
