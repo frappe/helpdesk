@@ -19,6 +19,7 @@ from helpdesk.api.knowledge_base import (
     delete_articles,
     delete_category,
     delete_category_icon,
+    discard_category_icon_uploads,
     get_article,
     get_article_markdown,
     get_articles,
@@ -41,7 +42,7 @@ from helpdesk.api.knowledge_base import (
     search_categories,
     set_category_visibility,
     set_pinned_articles,
-    upload_category_icon,
+    save_category_icon,
     vote_on_article,
 )
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
@@ -70,7 +71,6 @@ from helpdesk.test_utils import (
     make_subcategory,
     make_ticket,
     misplaced_categories,
-    post_file,
     unique_email,
     unique_name,
 )
@@ -1976,25 +1976,29 @@ class TestCategoryMerge(IntegrationTestCase):
 
 class TestCategoryIcons(IntegrationTestCase):
     def upload(self, filename: str, content: bytes | None = None):
-        post_file(self, filename, content or frappe.generate_hash().encode())
-        self.addCleanup(frappe.form_dict.clear)
-        file = upload_category_icon()
-        self.addCleanup(file.delete)
+        file = save_category_icon(filename, content or frappe.generate_hash().encode())
+        self.addCleanup(frappe.delete_doc, "File", file.name, ignore_permissions=True)
         return file
 
-    def test_an_upload_is_public_under_a_random_name(self) -> None:
-        frappe.form_dict.is_private = 1
+    def attached_to(self, file) -> str | None:
+        return frappe.db.get_value("File", file.name, "attached_to_name")
 
+    def test_an_upload_is_public_and_unattached_under_a_random_name(self) -> None:
         file = self.upload("Company Logo.SVG")
 
         self.assertRegex(file.file_name, r"^[0-9a-f]{16}\.svg$")
         self.assertTrue(file.file_url.endswith(file.file_name))
         self.assertFalse(file.is_private)
         self.assertEqual(file.folder, CATEGORY_ICON_FOLDER)
+        self.assertFalse(file.attached_to_name)
 
-    def test_only_images_are_accepted(self) -> None:
-        with self.assertRaisesRegex(frappe.ValidationError, "PNG, JPG or SVG"):
-            self.upload("page.html", b"<html><script>alert(1)</script></html>")
+    def test_only_png_jpg_and_svg_are_accepted(self) -> None:
+        for filename in ("page.html", "scan.tiff", "photo.heic", "logo.svgz"):
+            with (
+                self.subTest(filename),
+                self.assertRaisesRegex(frappe.ValidationError, "PNG, JPG or SVG"),
+            ):
+                self.upload(filename, b"<html><script>alert(1)</script></html>")
 
     def test_scripts_are_stripped_from_an_svg(self) -> None:
         svg = (
@@ -2010,13 +2014,68 @@ class TestCategoryIcons(IntegrationTestCase):
         self.assertNotIn("onload", content)
         self.assertIn("<path", content)
 
+    def test_an_upload_is_listed_once_a_category_uses_it(self) -> None:
+        file = self.upload("logo.png")
+        self.assertNotIn(file.file_url, [icon["url"] for icon in get_category_icons()])
+
+        category = make_article_category(unique_name("Fixture"), icon=file.file_url)
+
+        self.assertEqual(self.attached_to(file), category.name)
+        self.assertIn(file.file_url, [icon["url"] for icon in get_category_icons()])
+
+    def test_editing_a_category_attaches_its_new_icon(self) -> None:
+        file = self.upload("logo.png")
+        category = make_article_category(unique_name("Fixture"), icon="lucide-rocket")
+
+        category.icon = file.file_url
+        category.save()
+
+        self.assertEqual(self.attached_to(file), category.name)
+
     def test_uploads_list_newest_first(self) -> None:
         older = self.upload("older.png").file_url
         newer = self.upload("newer.png").file_url
+        make_article_category(unique_name("Fixture Older"), icon=older)
+        make_article_category(unique_name("Fixture Newer"), icon=newer)
 
         urls = [icon["url"] for icon in get_category_icons()]
 
         self.assertLess(urls.index(newer), urls.index(older))
+
+    def test_discarding_deletes_only_unclaimed_uploads(self) -> None:
+        unused = self.upload("unused.png")
+        used = self.upload("used.png")
+        make_article_category(unique_name("Fixture"), icon=used.file_url)
+
+        discard_category_icon_uploads([unused.file_url, used.file_url])
+
+        self.assertFalse(frappe.db.exists("File", unused.name))
+        self.assertTrue(frappe.db.exists("File", used.name))
+
+    def test_discarding_leaves_other_users_uploads(self) -> None:
+        file = self.upload("logo.png")
+
+        with self.set_user(create_user(unique_email("kb-other")).name):
+            discard_category_icon_uploads([file.file_url])
+
+        self.assertTrue(frappe.db.exists("File", file.name))
+
+    def test_deleting_a_category_hands_its_icon_to_another_using_it(self) -> None:
+        file = self.upload("logo.png")
+        owner = make_article_category(unique_name("Fixture Owner"), icon=file.file_url)
+        heir = make_article_category(unique_name("Fixture Heir"), icon=file.file_url)
+
+        frappe.delete_doc("HD Article Category", owner.name)
+
+        self.assertEqual(self.attached_to(file), heir.name)
+
+    def test_deleting_the_last_category_using_an_icon_deletes_it(self) -> None:
+        file = self.upload("logo.png")
+        category = make_article_category(unique_name("Fixture"), icon=file.file_url)
+
+        frappe.delete_doc("HD Article Category", category.name)
+
+        self.assertFalse(frappe.db.exists("File", file.name))
 
     def test_icons_list_the_categories_that_use_them(self) -> None:
         url = self.upload("logo.png").file_url
@@ -2060,6 +2119,10 @@ class TestCategoryIcons(IntegrationTestCase):
 
         self.assertTrue(frappe.db.exists("File", file.name))
 
+    def test_a_url_that_is_not_text_is_refused(self) -> None:
+        with self.assertRaises(frappe.FrappeTypeError):
+            delete_category_icon(["/files/logo.png"])
+
     def test_only_image_icons_can_be_deleted(self) -> None:
         category = make_article_category(
             unique_name("Fixture Lucide"), icon="lucide-rocket"
@@ -2073,9 +2136,10 @@ class TestCategoryIcons(IntegrationTestCase):
         )
 
     def test_only_category_editors_upload_list_or_delete(self) -> None:
-        post_file(self, "logo.png", b"png")
         with self.set_user(create_user(unique_email("kb-reader")).name):
-            self.assertRaises(frappe.PermissionError, upload_category_icon)
+            self.assertRaises(
+                frappe.PermissionError, save_category_icon, "logo.png", b"png"
+            )
             self.assertRaises(frappe.PermissionError, get_category_icons)
             self.assertRaises(
                 frappe.PermissionError, delete_category_icon, "/files/logo.png"

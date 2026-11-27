@@ -98,7 +98,8 @@
         <IconPicker
           v-model="icon"
           :uploads="uploadedIcons"
-          @change="categoryIcons.reload()"
+          @upload="(url) => sessionUploads.push(url)"
+          @delete="onIconDelete"
         />
         <TextInput
           ref="nameInput"
@@ -156,6 +157,7 @@
 import { computed, nextTick, ref, watch } from "vue";
 import {
   Button,
+  call,
   Checkbox,
   Combobox,
   createResource,
@@ -182,7 +184,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update", "create"]);
+const emit = defineEmits(["update", "create", "icon-delete"]);
 
 const showDialog = defineModel<boolean>();
 const newTitle = defineModel<string>("title");
@@ -217,8 +219,10 @@ const categoryIcons = createResource({
   url: "helpdesk.api.knowledge_base.get_category_icons",
 });
 
+const sessionUploads = ref<string[]>([]);
+
 watch(showDialog, async (open) => {
-  if (!open) return;
+  if (!open) return discardUnusedUploads();
   // shared with other dialogs: drop their list before it shows here
   categoryOptions.reset();
   categoryOptions.submit();
@@ -244,11 +248,30 @@ const hasSubcategories = computed(
       ?.has_subcategories
 );
 
+function discardUnusedUploads() {
+  const urls = sessionUploads.value;
+  sessionUploads.value = [];
+  if (!urls.length) return;
+  call("helpdesk.api.knowledge_base.discard_category_icon_uploads", { urls });
+}
+
+function onIconDelete(url: string) {
+  sessionUploads.value = sessionUploads.value.filter(
+    (upload) => upload !== url
+  );
+  categoryIcons.reload();
+  emit("icon-delete");
+}
+
 const uploadedIcons = computed<UploadedIcon[]>(() => {
   const icons = categoryIcons.data || [];
-  const listed =
-    !isImageIcon(icon.value) || icons.some(({ url }) => url === icon.value);
-  return listed ? icons : [{ url: icon.value, used_by: [] }, ...icons];
+  const unlisted = [...sessionUploads.value.slice().reverse(), icon.value]
+    .filter(isImageIcon)
+    .filter((url) => !icons.some((listed) => listed.url === url));
+  return [
+    ...[...new Set(unlisted)].map((url) => ({ url, used_by: [] })),
+    ...icons,
+  ];
 });
 
 const parentIcon = computed(

@@ -59,7 +59,7 @@
             <div :class="[GRID, 'mb-2.5 mt-1.5']">
               <FileUploader
                 v-if="!needle"
-                :file-types="['image/*']"
+                :file-types="['.png', '.jpg', '.jpeg', '.svg']"
                 :private="false"
                 upload-endpoint="/api/method/helpdesk.api.knowledge_base.upload_category_icon"
                 @success="(file) => uploaded(file.file_url)"
@@ -163,7 +163,7 @@ const props = defineProps<{
 }>();
 
 const icon = defineModel<string>();
-const emit = defineEmits<{ change: [] }>();
+const emit = defineEmits<{ upload: [url: string]; delete: [url: string] }>();
 const open = ref(false);
 const query = ref("");
 const GRID = "grid grid-cols-[repeat(8,2rem)] justify-between gap-y-1";
@@ -211,7 +211,7 @@ function clearIcon() {
 }
 
 function uploaded(url: string) {
-  emit("change");
+  emit("upload", url);
   pick(url);
 }
 
@@ -225,7 +225,7 @@ async function remove(upload: UploadedIcon) {
     return;
   }
   if (icon.value === upload.url) icon.value = "";
-  emit("change");
+  emit("delete", upload.url);
 }
 
 function pick(value: string) {
