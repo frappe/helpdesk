@@ -3,8 +3,15 @@ from frappe import _
 from frappe.realtime import get_website_room
 
 from helpdesk.integrations.frappe_cloud import dismiss_trial, forget_trial, get_trial
-from helpdesk.utils import agent_manager_only, is_agent_manager
+from helpdesk.utils import agent_manager_only, is_agent, is_agent_manager
+from helpdesk.whats_new import (
+    get_unseen_notes,
+    group_by_release,
+    load_notes,
+    mark_all_seen,
+)
 
+WHATS_NEW = "whats_new"
 BANNERS = {
     "customer_portal_permission": "show_customer_portal_permission_notice",
     "ticket_field_permission": "show_ticket_field_permission_notice",
@@ -39,23 +46,39 @@ OLD_FIELD_LIKE = r"%via\_customer\_portal%"
 @frappe.whitelist()
 def get_banners() -> list[dict]:
     """Sidebar notices as `{"name": ...}`; one that needs data carries it under its own key.
+    "whats_new" (with `title` and `releases`) goes to any agent with an unseen note.
     "customer_portal_permission", "ticket_field_permission", "ticket_source" (with `scripts`)
-    or "trial" (with `trial`). Always empty for anyone but agent managers and admins."""
+    or "trial" (with `trial`) go to agent managers and admins only."""
+    banners = get_whats_new_banners() if is_agent() else []
     if not is_agent_manager():
-        return []
+        return banners
 
-    banners = [
+    manager_banners = [
         {"name": banner}
         for banner, flag in BANNERS.items()
         if frappe.db.get_single_value("HD Settings", flag)
     ]
-    for banner in banners:
+    for banner in manager_banners:
         if banner["name"] == "ticket_source":
             banner["scripts"] = get_scripts_using_old_source_field()
     trial = get_trial()
     if trial:
-        banners.append({"name": "trial", "trial": trial})
-    return banners
+        manager_banners.append({"name": "trial", "trial": trial})
+    return banners + manager_banners
+
+
+def get_whats_new_banners() -> list[dict]:
+    """The What's new banner when the current user has an unseen note, else nothing."""
+    unseen = get_unseen_notes()
+    if not unseen:
+        return []
+    return [
+        {
+            "name": WHATS_NEW,
+            "title": unseen[0]["title"],
+            "releases": group_by_release(load_notes()),
+        }
+    ]
 
 
 def get_scripts_using_old_source_field() -> list[dict]:
@@ -92,13 +115,21 @@ def doctypes_with_old_field() -> set[str]:
 
 
 @frappe.whitelist(methods=["POST"])
-@agent_manager_only
 def dismiss_banner(banner: str) -> None:
-    """Hide a sidebar notice. Agent managers only.
-    "trial" hides the trial card for this user for a day; any other banner
-    turns that notice off for everyone."""
-    if banner == "trial":
-        dismiss_trial()
+    """Hide a sidebar notice. "whats_new" is for any agent and hides it for them
+    until a newer note. The others are for agent managers: "trial" hides the card
+    for this user for a day, any other turns that notice off for everyone."""
+    if not (is_agent() if banner == WHATS_NEW else is_agent_manager()):
+        frappe.throw(
+            msg=_("You are not permitted to access this resource."),
+            title=_("Not Allowed"),
+            exc=frappe.PermissionError,
+        )
+    if banner in (WHATS_NEW, "trial"):
+        if banner == WHATS_NEW:
+            mark_all_seen()
+        else:
+            dismiss_trial()
         # Only this user's other tabs need to hide the card
         frappe.publish_realtime(
             "helpdesk:settings-updated", user=frappe.session.user, after_commit=True

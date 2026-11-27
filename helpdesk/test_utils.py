@@ -1,5 +1,8 @@
 import json
+import shutil
+import tempfile
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -16,6 +19,7 @@ from helpdesk.api.settings.field_dependency import create_update_field_dependenc
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.integrations.frappe_cloud import TRIAL_DISMISSED_KEY, forget_trial
+from helpdesk import whats_new
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_frappe_version
 
 if is_frappe_version("16", above=True):
@@ -1226,3 +1230,35 @@ def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict
     filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
     cards = HelpdeskDashboard(filters).get_number_card_data()
     return {card["title"]: card for card in cards}
+
+
+def use_whats_new_notes(test_case, notes: dict[str, str]) -> Path:
+    """Serve `notes` ({slug: file text}) as the What's new notes for this test,
+    returning the temp media dir so a test can drop image files into it."""
+    root = Path(tempfile.mkdtemp())
+    test_case.addCleanup(lambda: shutil.rmtree(root, ignore_errors=True))
+    notes_dir, media_dir = root / "notes", root / "media"
+    notes_dir.mkdir()
+    media_dir.mkdir()
+    write_whats_new_notes(notes_dir, notes)
+    test_case.enterContext(patch.object(whats_new, "NOTES_DIR", notes_dir))
+    test_case.enterContext(patch.object(whats_new, "MEDIA_DIR", media_dir))
+    whats_new.load_notes.cache_clear()
+    test_case.addCleanup(whats_new.load_notes.cache_clear)
+    return media_dir
+
+
+def write_whats_new_notes(notes_dir: Path, notes: dict[str, str]) -> None:
+    """Write each `{slug: file text}` as `<slug>.md` in `notes_dir` and forget the loaded notes."""
+    for slug, text in notes.items():
+        (notes_dir / f"{slug}.md").write_text(text)
+    whats_new.load_notes.cache_clear()
+
+
+def whats_new_note(
+    title: str, version: str = "unreleased", body: str = "Text.", **meta
+) -> str:
+    """The text of a note file with `title`, `version` and any other frontmatter in `meta`."""
+    lines = [f"title: {title}", f"version: {version}"]
+    lines += [f"{key}: {value}" for key, value in meta.items()]
+    return "---\n" + "\n".join(lines) + "\n---\n" + body + "\n"
