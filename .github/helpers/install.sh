@@ -11,6 +11,7 @@ curl -fsSL https://raw.githubusercontent.com/frappe/pilot/develop/install.sh | s
 pilot new frappe-bench --frappe-branch "${FRAPPE_BRANCH:-develop}"
 pilot -b frappe-bench set-bench-config python "3.14"
 pilot -b frappe-bench set-bench-config admin_allow_site_to_pilot_communication false
+pilot -b frappe-bench set-bench-config watch_apps_js false
 pilot -b frappe-bench set-bench-config mariadb_existing true
 pilot -b frappe-bench set-bench-config mariadb_host 127.0.0.1
 pilot -b frappe-bench set-bench-config mariadb_port 3306
@@ -35,7 +36,8 @@ curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 1
   http://127.0.0.1:7000/api/v1/health
 
 pilot new-site test_site --admin-password admin --apps frappe erpnext telephony helpdesk --skip-assets
-mkdir -p sites/assets && echo '{}' > sites/assets/assets.json
+pilot build --apps helpdesk
+test -f sites/assets/assets.json || { mkdir -p sites/assets && echo '{}' > sites/assets/assets.json; }
 
 pilot frappe --site test_site set-config allow_tests true
 pilot frappe --site test_site set-config host_name "http://test_site:8000"
