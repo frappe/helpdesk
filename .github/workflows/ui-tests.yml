@@ -46,6 +46,11 @@ jobs:
       - name: Clone
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -79,10 +84,12 @@ jobs:
 
       - name: Setup Pilot
         run: |
+          export UV_PYTHON=3.14
           curl -fsSL https://raw.githubusercontent.com/frappe/pilot/develop/install.sh | sh -s -- --ci
           export PATH="$HOME/pilot/bin:$HOME/.local/bin:$PATH"
           printf '%s\n' "$HOME/pilot/bin" "$HOME/.local/bin" >> "$GITHUB_PATH"
           pilot new frappe-bench --frappe-branch "$FRAPPE_BRANCH"
+          pilot -b frappe-bench set-bench-config python "3.14"
           pilot -b frappe-bench set-bench-config admin_allow_site_to_pilot_communication false
           pilot -b frappe-bench set-bench-config watch_apps_js false
           pilot -b frappe-bench set-bench-config reload_python false
@@ -163,10 +170,9 @@ jobs:
 
       - name: Show Pilot Logs on Failure
         if: failure()
-        working-directory: /home/runner/pilot/benches/frappe-bench
         run: |
           cat "$RUNNER_TEMP/pilot.log" || true
-          cat logs/*.log || true
+          cat ~/pilot/benches/frappe-bench/logs/*.log || true
 
   merge-reports:
     name: Merge Playwright Reports

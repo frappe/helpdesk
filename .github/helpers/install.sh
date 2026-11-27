@@ -3,11 +3,13 @@
 set -eo pipefail
 
 export PATH="$HOME/pilot/bin:$HOME/.local/bin:$PATH"
+export UV_PYTHON="${UV_PYTHON:-3.14}"
 printf '%s\n' "$HOME/pilot/bin" "$HOME/.local/bin" >> "$GITHUB_PATH"
 
 curl -fsSL https://raw.githubusercontent.com/frappe/pilot/develop/install.sh | sh -s -- --ci
 
 pilot new frappe-bench --frappe-branch "${FRAPPE_BRANCH:-develop}"
+pilot -b frappe-bench set-bench-config python "3.14"
 pilot -b frappe-bench set-bench-config admin_allow_site_to_pilot_communication false
 pilot -b frappe-bench set-bench-config mariadb_existing true
 pilot -b frappe-bench set-bench-config mariadb_host 127.0.0.1

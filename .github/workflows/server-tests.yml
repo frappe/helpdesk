@@ -38,6 +38,11 @@ jobs:
       - name: Clone
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
       - name: Check for valid Python & Merge Conflicts
         if: github.event.pull_request.base.ref == 'develop'
         run: |
@@ -88,10 +93,9 @@ jobs:
 
       - name: Show Pilot logs on failure
         if: failure()
-        working-directory: /home/runner/pilot/benches/frappe-bench
         run: |
           cat "$RUNNER_TEMP/pilot.log" || true
-          cat logs/*.log || true
+          cat ~/pilot/benches/frappe-bench/logs/*.log || true
 
   coverage:
     name: Coverage Wrap Up
