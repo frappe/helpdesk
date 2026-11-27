@@ -98,8 +98,10 @@
         <IconPicker
           v-model="icon"
           :uploads="uploadedIcons"
+          upload-endpoint="/api/method/helpdesk.api.knowledge_base.upload_category_icon"
+          :deleting="deleteIcon.loading ? deleteIcon.params?.url : ''"
           @upload="(url) => sessionUploads.push(url)"
-          @delete="onIconDelete"
+          @delete="(url) => deleteIcon.submit({ url })"
         />
         <TextInput
           ref="nameInput"
@@ -164,12 +166,14 @@ import {
   Dialog,
   Textarea,
   TextInput,
+  toast,
   Tooltip,
 } from "frappe-ui";
 import { categoryOptions } from "@/stores/knowledgeBase";
 import CategoryIcon from "@helpdesk/shared/CategoryIcon.vue";
 import { isImageIcon, type UploadedIcon } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
+import { getErrorMessage } from "@/utils";
 import IconPicker from "@helpdesk/shared/IconPicker.vue";
 
 const props = defineProps({
@@ -255,13 +259,20 @@ function discardUnusedUploads() {
   call("helpdesk.api.knowledge_base.discard_category_icon_uploads", { urls });
 }
 
-function onIconDelete(url: string) {
-  sessionUploads.value = sessionUploads.value.filter(
-    (upload) => upload !== url
-  );
-  categoryIcons.reload();
-  emit("icon-delete");
-}
+const deleteIcon = createResource({
+  url: "helpdesk.api.knowledge_base.delete_category_icon",
+  onSuccess() {
+    const { url } = deleteIcon.params;
+    sessionUploads.value = sessionUploads.value.filter(
+      (upload) => upload !== url
+    );
+    if (icon.value === url) icon.value = "";
+    categoryIcons.reload();
+    emit("icon-delete");
+    toast.success(__("Icon deleted"));
+  },
+  onError: (error) => getErrorMessage(error, true),
+});
 
 const uploadedIcons = computed<UploadedIcon[]>(() => {
   const icons = categoryIcons.data || [];

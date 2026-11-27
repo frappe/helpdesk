@@ -52,16 +52,16 @@
           class="-mx-2 max-h-72 overflow-y-auto px-2"
           :class="{ 'mt-2.5': !field }"
         >
-          <template v-if="uploads && (!needle || customMatches.length)">
+          <template v-if="uploads && (!search || customMatches.length)">
             <div class="flex h-5 items-center">
               <p class="text-xs text-ink-gray-5">{{ __("Custom") }}</p>
             </div>
             <div :class="[GRID, 'mb-2.5 mt-1.5']">
               <FileUploader
-                v-if="!needle"
+                v-if="!search && uploadEndpoint"
                 :file-types="['.png', '.jpg', '.jpeg', '.svg']"
                 :private="false"
-                upload-endpoint="/api/method/helpdesk.api.knowledge_base.upload_category_icon"
+                :upload-endpoint="uploadEndpoint"
                 @success="(file) => uploaded(file.file_url)"
               >
                 <template #default="{ uploading, openFileSelector }">
@@ -99,8 +99,10 @@
                   size="xs"
                   icon="lucide-x"
                   :aria-label="__('Delete {0}', [uploadLabel(upload)])"
-                  class="absolute -right-1 -top-1 !size-4 rounded-full !p-0 opacity-0 shadow-sm transition-opacity focus-visible:opacity-100 group-hover:opacity-100 [&_.lucide-x]:!size-2.5"
-                  @click="remove(upload)"
+                  :loading="deleting === upload.url"
+                  class="absolute -right-1 -top-1 !size-4 rounded-full !p-0 shadow-sm transition-opacity focus-visible:opacity-100 group-hover:opacity-100 [&_.lucide-x]:!size-2.5"
+                  :class="deleting === upload.url ? 'opacity-100' : 'opacity-0'"
+                  @click="emit('delete', upload.url)"
                 />
               </div>
             </div>
@@ -142,7 +144,6 @@
 import { computed, ref, watch } from "vue";
 import {
   Button,
-  call,
   FileUploader,
   Popover,
   TextInput,
@@ -153,13 +154,14 @@ import { CATEGORY_ICONS, type UploadedIcon } from "./categoryIcons";
 import CategoryIcon from "./CategoryIcon.vue";
 import Icon from "./Icon.vue";
 import { __ } from "./translation";
-import { getErrorMessage } from "./utils";
 
 // `field` shows a full-width input that searches as you type.
 const props = defineProps<{
   field?: boolean;
   placeholder?: string;
   uploads?: UploadedIcon[];
+  uploadEndpoint?: string;
+  deleting?: string;
 }>();
 
 const icon = defineModel<string>();
@@ -182,17 +184,17 @@ const fieldValue = computed({
     open.value = true;
   },
 });
-const needle = computed(() => query.value.trim().toLowerCase());
+const search = computed(() => query.value.trim().toLowerCase());
 const matches = computed(() =>
-  CATEGORY_ICONS.filter((value) => iconLabel(value).includes(needle.value))
+  CATEGORY_ICONS.filter((value) => iconLabel(value).includes(search.value))
 );
 const customMatches = computed(() =>
   (props.uploads || [])
     .map((upload, index) => ({ ...upload, index }))
     .filter(
       (upload) =>
-        !needle.value ||
-        upload.used_by.some((name) => name.toLowerCase().includes(needle.value))
+        !search.value ||
+        upload.used_by.some((name) => name.toLowerCase().includes(search.value))
     )
 );
 const nothing = computed(
@@ -213,19 +215,6 @@ function clearIcon() {
 function uploaded(url: string) {
   emit("upload", url);
   pick(url);
-}
-
-async function remove(upload: UploadedIcon) {
-  try {
-    await call("helpdesk.api.knowledge_base.delete_category_icon", {
-      url: upload.url,
-    });
-  } catch (error) {
-    getErrorMessage(error, true);
-    return;
-  }
-  if (icon.value === upload.url) icon.value = "";
-  emit("delete", upload.url);
 }
 
 function pick(value: string) {
