@@ -7,6 +7,12 @@ from frappe.utils import add_days, nowdate
 
 from helpdesk.api.agent_home.utils import calculate_percentage_change
 
+
+def assigned_to_condition(Ticket, user: str):
+    """Tickets whose `_assign` list holds `user`, written so every database can run it."""
+    return Ticket._assign.like(f'%"{user}"%')
+
+
 Scope = str  # Literal["agent", "customer", "contact"]
 
 
@@ -23,9 +29,7 @@ def _apply_scope(query, Ticket, scope: Scope, identifier: str | None):
     """
     if scope == "agent":
         query = query.where(
-            Function(
-                "JSON_SEARCH", Ticket._assign, "one", identifier or frappe.session.user
-            ).isnotnull()
+            assigned_to_condition(Ticket, identifier or frappe.session.user)
         )
     elif scope == "customer":
         query = query.where(Ticket.customer == identifier)
@@ -57,9 +61,7 @@ def get_avg_time(
         identifier = frappe.session.user
 
     Ticket = DocType("HD Ticket")
-    to_date_plus_one = Function(
-        "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
-    )
+    to_date_plus_one = add_days(to_date, 1)
 
     query = frappe.qb.from_(Ticket)
 
