@@ -36,7 +36,7 @@ curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 1
   http://127.0.0.1:7000/api/v1/health
 
 pilot new-site test_site --admin-password admin --apps frappe erpnext telephony helpdesk --skip-assets
-pilot build --apps helpdesk
+yarn --cwd apps/helpdesk install && yarn --cwd apps/helpdesk build
 test -f sites/assets/assets.json || { mkdir -p sites/assets && echo '{}' > sites/assets/assets.json; }
 
 pilot frappe --site test_site set-config allow_tests true
