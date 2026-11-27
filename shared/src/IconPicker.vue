@@ -37,22 +37,28 @@
       </Button>
     </template>
     <template #default>
-      <div class="w-[19.5rem] max-w-[calc(100vw-2rem)] p-2">
+      <div
+        class="w-[19.5rem] max-w-[calc(100vw-2rem)] px-2 pt-2"
+        :class="uploads ? 'pb-1.5' : 'pb-2'"
+      >
         <TextInput
           v-if="!field"
           v-model="query"
           v-focus
-          class="mb-2"
           :placeholder="__('Search icons')"
           :aria-label="__('Search icons')"
         />
-        <ScrollArea viewport-class="max-h-72">
-          <template v-if="uploads">
-            <p class="px-1 pb-1 text-xs text-ink-gray-5">
-              {{ __("Your icons") }}
-            </p>
-            <div class="mb-3 grid grid-cols-8 gap-1">
+        <div
+          class="-mx-2 max-h-72 overflow-y-auto px-2"
+          :class="{ 'mt-2.5': !field }"
+        >
+          <template v-if="uploads && (!needle || customMatches.length)">
+            <div class="flex h-5 items-center">
+              <p class="text-xs text-ink-gray-5">{{ __("Custom") }}</p>
+            </div>
+            <div :class="[GRID, 'mb-2.5 mt-1.5']">
               <FileUploader
+                v-if="!needle"
                 :file-types="['image/*']"
                 :private="false"
                 upload-endpoint="/api/method/helpdesk.api.knowledge_base.upload_category_icon"
@@ -61,6 +67,7 @@
                 <template #default="{ uploading, openFileSelector }">
                   <Tooltip :text="__('Upload an icon')">
                     <Button
+                      size="md"
                       variant="ghost"
                       icon="lucide-plus"
                       class="border border-dashed border-outline-gray-3"
@@ -71,40 +78,58 @@
                   </Tooltip>
                 </template>
               </FileUploader>
-              <Button
-                v-for="(url, index) in uploads"
-                :key="url"
-                :variant="url === icon ? 'subtle' : 'ghost'"
-                :aria-label="__('Uploaded icon {0}', [index + 1])"
-                :aria-pressed="url === icon"
-                @click="pick(url)"
+              <div
+                v-for="upload in customMatches"
+                :key="upload.url"
+                class="group relative"
               >
-                <template #icon>
-                  <CategoryIcon :icon="url" class="size-4" />
-                </template>
-              </Button>
+                <Button
+                  size="md"
+                  :variant="isPicked(upload.url) ? 'subtle' : 'ghost'"
+                  :aria-label="uploadLabel(upload)"
+                  :aria-pressed="isPicked(upload.url)"
+                  @click="pick(upload.url)"
+                >
+                  <template #icon>
+                    <CategoryIcon :icon="upload.url" class="size-4" />
+                  </template>
+                </Button>
+                <Button
+                  variant="solid"
+                  size="xs"
+                  icon="lucide-x"
+                  :aria-label="__('Delete {0}', [uploadLabel(upload)])"
+                  class="absolute -right-1 -top-1 !size-4 rounded-full !p-0 opacity-0 shadow-sm transition-opacity focus-visible:opacity-100 group-hover:opacity-100 [&_.lucide-x]:!size-2.5"
+                  @click="remove(upload)"
+                />
+              </div>
             </div>
-            <p class="px-1 pb-1 text-xs text-ink-gray-5">{{ __("Icons") }}</p>
           </template>
-          <div class="grid grid-cols-8 gap-1">
-            <Button
-              v-for="value in matches"
-              :key="value"
-              :icon="value"
-              :variant="value === icon ? 'subtle' : 'ghost'"
-              :title="iconLabel(value)"
-              :aria-label="iconLabel(value)"
-              :aria-pressed="value === icon"
-              @click="pick(value)"
-            />
-          </div>
-        </ScrollArea>
-        <p v-if="!matches.length" class="px-1 py-4 text-p-sm text-ink-gray-5">
-          {{ __("No icons found") }}
-        </p>
+          <template v-if="matches.length">
+            <div v-if="uploads" class="flex h-5 items-center">
+              <p class="text-xs text-ink-gray-5">{{ __("Icons") }}</p>
+            </div>
+            <div :class="[GRID, { 'mt-1.5': uploads }]">
+              <Button
+                v-for="value in matches"
+                :key="value"
+                size="md"
+                :icon="value"
+                :variant="value === icon ? 'subtle' : 'ghost'"
+                :title="iconLabel(value)"
+                :aria-label="iconLabel(value)"
+                :aria-pressed="value === icon"
+                @click="pick(value)"
+              />
+            </div>
+          </template>
+          <p v-if="nothing" class="py-4 text-p-sm text-ink-gray-5">
+            {{ __("No icons found") }}
+          </p>
+        </div>
         <p
           v-if="uploads"
-          class="mt-2 border-t border-outline-gray-1 px-1 pt-2 text-p-xs text-ink-gray-5"
+          class="mt-2 border-t border-outline-gray-1 pt-1.5 text-xs text-ink-gray-5"
         >
           {{ __("Square SVG or PNG, at least 64 px.") }}
         </p>
@@ -117,29 +142,31 @@
 import { computed, ref, watch } from "vue";
 import {
   Button,
+  call,
   FileUploader,
   Popover,
-  ScrollArea,
   TextInput,
   Tooltip,
   vFocus,
 } from "frappe-ui";
-import { CATEGORY_ICONS } from "./categoryIcons";
+import { CATEGORY_ICONS, type UploadedIcon } from "./categoryIcons";
 import CategoryIcon from "./CategoryIcon.vue";
 import Icon from "./Icon.vue";
 import { __ } from "./translation";
+import { getErrorMessage } from "./utils";
 
 // `field` shows a full-width input that searches as you type.
 const props = defineProps<{
   field?: boolean;
   placeholder?: string;
-  uploads?: string[];
+  uploads?: UploadedIcon[];
 }>();
 
 const icon = defineModel<string>();
-const emit = defineEmits<{ upload: [] }>();
+const emit = defineEmits<{ change: [] }>();
 const open = ref(false);
 const query = ref("");
+const GRID = "grid grid-cols-[repeat(8,2rem)] justify-between gap-y-1";
 
 const iconLabel = (value: string) =>
   value.replace("lucide-", "").replace(/-/g, " ");
@@ -155,10 +182,26 @@ const fieldValue = computed({
     open.value = true;
   },
 });
-const matches = computed(() => {
-  const needle = query.value.trim().toLowerCase();
-  return CATEGORY_ICONS.filter((value) => iconLabel(value).includes(needle));
-});
+const needle = computed(() => query.value.trim().toLowerCase());
+const matches = computed(() =>
+  CATEGORY_ICONS.filter((value) => iconLabel(value).includes(needle.value))
+);
+const customMatches = computed(() =>
+  (props.uploads || [])
+    .map((upload, index) => ({ ...upload, index }))
+    .filter(
+      (upload) =>
+        !needle.value ||
+        upload.used_by.some((name) => name.toLowerCase().includes(needle.value))
+    )
+);
+const nothing = computed(
+  () => !matches.value.length && !customMatches.value.length
+);
+
+const isPicked = (url: string) => url === icon.value;
+const uploadLabel = (upload: { index: number }) =>
+  __("Uploaded icon {0}", [upload.index + 1]);
 
 watch(open, () => (query.value = ""));
 
@@ -168,8 +211,21 @@ function clearIcon() {
 }
 
 function uploaded(url: string) {
-  emit("upload");
+  emit("change");
   pick(url);
+}
+
+async function remove(upload: UploadedIcon) {
+  try {
+    await call("helpdesk.api.knowledge_base.delete_category_icon", {
+      url: upload.url,
+    });
+  } catch (error) {
+    getErrorMessage(error, true);
+    return;
+  }
+  if (icon.value === upload.url) icon.value = "";
+  emit("change");
 }
 
 function pick(value: string) {

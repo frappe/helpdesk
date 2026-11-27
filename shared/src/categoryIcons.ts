@@ -300,6 +300,8 @@ export const CATEGORY_ICONS = [
 
 const KNOWN_ICONS = new Set(CATEGORY_ICONS)
 
+export type UploadedIcon = { url: string; used_by: string[] }
+
 export function isImageIcon(icon?: string | null): icon is string {
   return Boolean(icon && /^(\/|https?:\/\/)/.test(icon))
 }

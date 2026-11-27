@@ -18,6 +18,7 @@ from helpdesk.api.knowledge_base import (
     create_category,
     delete_articles,
     delete_category,
+    delete_category_icon,
     get_article,
     get_article_markdown,
     get_articles,
@@ -2013,21 +2014,69 @@ class TestCategoryIcons(IntegrationTestCase):
         older = self.upload("older.png").file_url
         newer = self.upload("newer.png").file_url
 
-        icons = get_category_icons()
+        urls = [icon["url"] for icon in get_category_icons()]
 
-        self.assertLess(icons.index(newer), icons.index(older))
+        self.assertLess(urls.index(newer), urls.index(older))
 
-    def test_image_icons_categories_use_are_listed(self) -> None:
-        make_article_category(unique_name("Fixture Logo"), icon="/files/logo.png")
+    def test_icons_list_the_categories_that_use_them(self) -> None:
+        url = self.upload("logo.png").file_url
+        name = unique_name("Fixture Logo")
+        make_article_category(name, icon=url)
+        make_article_category(unique_name("Fixture Image"), icon="/files/logo.png")
         make_article_category(unique_name("Fixture Lucide"), icon="lucide-rocket")
 
-        icons = get_category_icons()
+        icons = {icon["url"]: icon["used_by"] for icon in get_category_icons()}
 
+        self.assertEqual(icons[url], [name])
         self.assertIn("/files/logo.png", icons)
         self.assertNotIn("lucide-rocket", icons)
 
-    def test_only_category_editors_upload_or_list(self) -> None:
+    def test_deleting_an_icon_resets_the_categories_using_it(self) -> None:
+        file = self.upload("logo.png")
+        category = make_article_category(
+            unique_name("Fixture Logo"), icon=file.file_url
+        )
+
+        delete_category_icon(file.file_url)
+
+        self.assertFalse(frappe.db.exists("File", file.name))
+        self.assertFalse(
+            frappe.db.get_value("HD Article Category", category.name, "icon")
+        )
+        self.assertNotIn(file.file_url, [icon["url"] for icon in get_category_icons()])
+
+    def test_deleting_leaves_files_outside_the_icon_folder(self) -> None:
+        file = frappe.get_doc(
+            {
+                "doctype": "File",
+                "file_name": f"{frappe.generate_hash()}.png",
+                "content": b"png",
+                "is_private": 0,
+            }
+        ).insert()
+        self.addCleanup(file.delete)
+
+        delete_category_icon(file.file_url)
+
+        self.assertTrue(frappe.db.exists("File", file.name))
+
+    def test_only_image_icons_can_be_deleted(self) -> None:
+        category = make_article_category(
+            unique_name("Fixture Lucide"), icon="lucide-rocket"
+        )
+
+        with self.assertRaisesRegex(frappe.ValidationError, "image icons"):
+            delete_category_icon("lucide-rocket")
+        self.assertEqual(
+            frappe.db.get_value("HD Article Category", category.name, "icon"),
+            "lucide-rocket",
+        )
+
+    def test_only_category_editors_upload_list_or_delete(self) -> None:
         post_file(self, "logo.png", b"png")
         with self.set_user(create_user(unique_email("kb-reader")).name):
             self.assertRaises(frappe.PermissionError, upload_category_icon)
             self.assertRaises(frappe.PermissionError, get_category_icons)
+            self.assertRaises(
+                frappe.PermissionError, delete_category_icon, "/files/logo.png"
+            )

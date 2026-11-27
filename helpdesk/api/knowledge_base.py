@@ -6,8 +6,8 @@ from pathlib import Path
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
-from frappe.core.utils import html2text
 from frappe.core.api.file import create_new_folder
+from frappe.core.utils import html2text
 from frappe.handler import upload_file
 from frappe.query_builder.functions import Coalesce
 from frappe.rate_limiter import rate_limit
@@ -77,6 +77,7 @@ TITLES_LIMIT = 1000
 WEIGHT_ORDER = "weight desc"
 
 CATEGORY_ICON_FOLDER = "Home/Category Icons"
+IMAGE_ICON_PREFIXES = ("/", "http://", "https://")
 
 VISITOR_COOKIE = "hd_visitor"
 VISITOR_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
@@ -264,9 +265,9 @@ def upload_category_icon():
 
 
 @frappe.whitelist()
-def get_category_icons() -> list[str]:
-    """URLs of uploaded category icons, newest first, then image icons categories
-    already use. Needs write permission on categories."""
+def get_category_icons() -> list[dict]:
+    """Uploaded category icons, newest first, then image icons categories already
+    use, each with the names of the categories that use it."""
     frappe.has_permission("HD Article Category", "write", throw=True)
     uploaded = frappe.get_all(
         "File",
@@ -274,11 +275,33 @@ def get_category_icons() -> list[str]:
         pluck="file_url",
         order_by="creation desc",
     )
-    used = frappe.get_all(
-        "HD Article Category", filters={"icon": ["is", "set"]}, pluck="icon"
-    )
-    images = [icon for icon in used if icon.startswith(("/", "http://", "https://"))]
-    return list(dict.fromkeys(uploaded + images))
+    used_by = {}
+    for row in frappe.get_all(
+        "HD Article Category",
+        filters={"icon": ["is", "set"]},
+        fields=["icon", "category_name"],
+        order_by="category_name asc",
+    ):
+        if row.icon.startswith(IMAGE_ICON_PREFIXES):
+            used_by.setdefault(row.icon, []).append(row.category_name)
+    return [
+        {"url": url, "used_by": used_by.get(url, [])}
+        for url in dict.fromkeys(uploaded + list(used_by))
+    ]
+
+
+@frappe.whitelist(methods=["POST"])
+def delete_category_icon(url: str) -> None:
+    """Remove an image icon: categories using it go back to the default icon, and
+    its uploads in the category icon folder are deleted."""
+    frappe.has_permission("HD Article Category", "write", throw=True)
+    if not url.startswith(IMAGE_ICON_PREFIXES):
+        frappe.throw(_("Only image icons can be deleted"))
+    frappe.db.set_value("HD Article Category", {"icon": url}, "icon", None)
+    for name in frappe.get_all(
+        "File", filters={"folder": CATEGORY_ICON_FOLDER, "file_url": url}, pluck="name"
+    ):
+        frappe.delete_doc("File", name, ignore_permissions=True)
 
 
 def _validate_category(category: str) -> None:

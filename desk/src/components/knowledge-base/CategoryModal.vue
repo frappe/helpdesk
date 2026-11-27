@@ -98,7 +98,7 @@
         <IconPicker
           v-model="icon"
           :uploads="uploadedIcons"
-          @upload="categoryIcons.reload()"
+          @change="categoryIcons.reload()"
         />
         <TextInput
           ref="nameInput"
@@ -166,7 +166,7 @@ import {
 } from "frappe-ui";
 import { categoryOptions } from "@/stores/knowledgeBase";
 import CategoryIcon from "@helpdesk/shared/CategoryIcon.vue";
-import { isImageIcon } from "@helpdesk/shared/categoryIcons";
+import { isImageIcon, type UploadedIcon } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
 import IconPicker from "@helpdesk/shared/IconPicker.vue";
 
@@ -244,11 +244,12 @@ const hasSubcategories = computed(
       ?.has_subcategories
 );
 
-const uploadedIcons = computed(() => [
-  ...new Set(
-    [icon.value, ...(categoryIcons.data || [])].filter(isImageIcon)
-  ),
-]);
+const uploadedIcons = computed<UploadedIcon[]>(() => {
+  const icons = categoryIcons.data || [];
+  const listed =
+    !isImageIcon(icon.value) || icons.some(({ url }) => url === icon.value);
+  return listed ? icons : [{ url: icon.value, used_by: [] }, ...icons];
+});
 
 const parentIcon = computed(
   () =>
