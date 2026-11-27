@@ -213,7 +213,10 @@ let linkModel: FieldValue = null;
 
 const listeners = computed(() => {
   const fieldtype = props.field.fieldtype;
-  if ([...textFields, ...numberFields].includes(fieldtype)) {
+  if (
+    !usesCombobox.value &&
+    [...textFields, ...numberFields].includes(fieldtype)
+  ) {
     return {
       blur: (event: FocusEvent) =>
         emitUpdate(
