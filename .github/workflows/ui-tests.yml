@@ -124,8 +124,9 @@ jobs:
         working-directory: /home/runner/pilot/benches/frappe-bench
         run: |
           pilot new-site "$SITE" --admin-password admin --apps frappe telephony helpdesk --skip-assets
+          pilot build --apps frappe
           # Never prebuilt: e2e must exercise this checkout's frontend, not a download.
-          pilot build --apps frappe,helpdesk --force
+          pilot build --apps helpdesk --force
         env:
           CI: "Yes"
 
