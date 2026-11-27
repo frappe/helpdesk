@@ -1,61 +1,44 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
 
-cd ~ || ex
+export PATH="$HOME/pilot/bin:$HOME/.local/bin:$PATH"
+printf '%s\n' "$HOME/pilot/bin" "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-sudo apt update
-sudo apt remove -y mysql-server mysql-client
-sudo apt install -y build-essential pkg-config libcups2-dev redis-server mariadb-client libmariadb-dev libffi-dev libssl-dev libjpeg-dev libcairo2-dev libpango1.0-dev cron wget
+curl -fsSL https://raw.githubusercontent.com/frappe/pilot/develop/install.sh | sh -s -- --ci
 
-# Ubuntu 26.04's mariadb-client (11.8) requires SSL; the mariadb:10.6 service has none.
+pilot new frappe-bench --frappe-branch "${FRAPPE_BRANCH:-develop}"
+pilot -b frappe-bench set-bench-config admin_allow_site_to_pilot_communication false
+pilot -b frappe-bench set-bench-config mariadb_existing true
+pilot -b frappe-bench set-bench-config mariadb_host 127.0.0.1
+pilot -b frappe-bench set-bench-config mariadb_port 3306
+pilot -b frappe-bench set-bench-config mariadb_admin_user root
+pilot -b frappe-bench set-bench-config mariadb_password root
+pilot -b frappe-bench init --skip-frontend
+
+# Ubuntu 26.04's mariadb-client (11.8) requires SSL; container MariaDB has none.
 printf '[client]\nskip-ssl\n' > ~/.my.cnf
-
-pip install frappe-bench
-git clone "https://github.com/frappe/frappe" --branch "develop" --depth 1 
-bench init --skip-assets --frappe-path ~/frappe --python "$(which python)" frappe-bench
-
-mkdir ~/frappe-bench/sites/test_site
-
-cp -r "${GITHUB_WORKSPACE}/.github/helpers/site_config_mariadb.json" ~/frappe-bench/sites/test_site/site_config.json
-
 mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL character_set_server = 'utf8mb4'"
 mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
 
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "CREATE USER 'test_frappe'@'localhost' IDENTIFIED BY 'test_frappe'"
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "CREATE DATABASE test_frappe"
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "GRANT ALL PRIVILEGES ON \`test_frappe\`.* TO 'test_frappe'@'localhost'"
+cd "$HOME/pilot/benches/frappe-bench" || exit 1
 
-mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "FLUSH PRIVILEGES"
+uv pip install --python env/bin/python -e "apps/frappe[test]"
+pilot get-app https://github.com/frappe/erpnext --branch "${FRAPPE_BRANCH:-develop}" --skip-assets
+pilot get-app https://github.com/frappe/telephony --skip-assets
+pilot get-app "$GITHUB_WORKSPACE" --branch "$GITHUB_SHA" --skip-assets
 
-install_whktml() {
-    wget -O /tmp/wkhtmltox.tar.xz https://github.com/frappe/wkhtmltopdf/raw/master/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
-    tar -xf /tmp/wkhtmltox.tar.xz -C /tmp
-    sudo mv /tmp/wkhtmltox/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
-    sudo chmod o+x /usr/local/bin/wkhtmltopdf
-}
-install_whktml &
+pilot -b frappe-bench start > "$RUNNER_TEMP/pilot.log" 2>&1 &
+curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 1 \
+  http://127.0.0.1:7000/api/v1/health
 
-cd ~/frappe-bench || exit
+pilot new-site test_site --admin-password admin --apps frappe erpnext telephony helpdesk --skip-assets
+mkdir -p sites/assets && echo '{}' > sites/assets/assets.json
 
-sed -i 's/watch:/# watch:/g' Procfile
-sed -i 's/schedule:/# schedule:/g' Procfile
-sed -i 's/socketio:/# socketio:/g' Procfile
-sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
-
-bench get-app erpnext --branch "develop"
-bench get-app telephony
-# get-app builds helpdesk's Studio portal with frappe's Studio toolchain,
-# which --skip-assets left without its node_modules
-(cd apps/frappe/studio/frontend && yarn install --frozen-lockfile)
-bench get-app helpdesk "${GITHUB_WORKSPACE}"
-bench setup requirements --dev
-
-
-bench start &>> ~/frappe-bench/bench_start.log &
-CI=Yes bench build --app frappe &
-bench --site test_site reinstall --yes
-
-bench --verbose --site test_site install-app erpnext
-bench --verbose --site test_site install-app telephony
-bench --verbose --site test_site install-app helpdesk
+pilot frappe --site test_site set-config allow_tests true
+pilot frappe --site test_site set-config host_name "http://test_site:8000"
+pilot frappe --site test_site set-config -p throttle_user_limit 100
+pilot frappe --site test_site set-config auto_email_id "test@example.com"
+pilot frappe --site test_site set-config mail_server "smtp.example.com"
+pilot frappe --site test_site set-config mail_login "test@example.com"
+pilot frappe --site test_site set-config mail_password "test"
