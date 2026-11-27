@@ -335,13 +335,12 @@ async function drag(page: Page, widget: Locator, handle: Locator, dx: number, dy
     .toBe(true);
 }
 
-/** New docs only reach the search index through scheduled jobs; run them now. */
+/** Ensure the selected backend is built, then wait for committed document jobs. */
 async function indexForSearch(api: Api, token: string) {
-  await runScheduledJob(api, "frappe.search.sqlite_search.build_index_if_not_exists");
+  await runScheduledJob(api, "helpdesk.ticket_search.build_index_if_not_exists");
   await expect
     .poll(
       async () => {
-        await runScheduledJob(api, "frappe.search.sqlite_search.index_docs_in_queue");
         const found = await api
           .call("helpdesk.api.search.search", { query: token })
           .catch(() => ({ results: [] }));
