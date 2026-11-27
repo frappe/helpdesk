@@ -38,11 +38,11 @@ from helpdesk.api.knowledge_base import (
     increment_views,
     merge_category,
     move_to_category,
+    save_category_icon,
     search_articles,
     search_categories,
     set_category_visibility,
     set_pinned_articles,
-    save_category_icon,
     vote_on_article,
 )
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
