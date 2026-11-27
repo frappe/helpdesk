@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import CategoryIcon from "@helpdesk/shared/CategoryIcon.vue"
+import CategoryIcon from "@helpdesk/shared/CategoryIcon.vue";
 
-defineProps<{ icon?: string | null }>()
+defineProps<{ icon?: string | null }>();
 </script>
