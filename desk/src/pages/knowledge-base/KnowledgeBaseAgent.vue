@@ -35,6 +35,7 @@
       :category-id="category.id"
       @update="handleCategoryUpdate"
       @create="handleCategoryCreate"
+      @icon-delete="listViewRef?.reload()"
     />
     <ArticleWeightModal
       v-model="weightModal"

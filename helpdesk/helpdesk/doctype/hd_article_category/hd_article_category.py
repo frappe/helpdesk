@@ -10,6 +10,13 @@ from frappe.utils.nestedset import NestedSet
 
 from helpdesk.utils import is_agent
 
+CATEGORY_ICON_FOLDER = "Home/Category Icons"
+IMAGE_ICON_PREFIXES = ("/", "http://", "https://")
+ICON_ATTACHMENT = {
+    "attached_to_doctype": "HD Article Category",
+    "attached_to_field": "icon",
+}
+
 
 class HDArticleCategory(NestedSet):
     def validate(self):
@@ -105,7 +112,38 @@ class HDArticleCategory(NestedSet):
             "parent_article_category"
         ):
             self.narrow_to_parent()
+        if self.has_value_changed("icon"):
+            self.attach_icon()
         super().on_update()
+
+    def attach_icon(self):
+        """Attach the icon's unclaimed upload to this category, so the picker lists it."""
+        if not (self.icon or "").startswith(IMAGE_ICON_PREFIXES):
+            return
+        frappe.db.set_value(
+            "File",
+            {
+                "file_url": self.icon,
+                "folder": CATEGORY_ICON_FOLDER,
+                "attached_to_name": ("is", "not set"),
+            },
+            {**ICON_ATTACHMENT, "attached_to_name": self.name},
+        )
+
+    def handle_icon_delete(self):
+        """Move this category's icon uploads to another category using them, before
+        Frappe deletes the attachments of a deleted doc."""
+        for file in frappe.get_all(
+            "File",
+            filters={**ICON_ATTACHMENT, "attached_to_name": self.name},
+            fields=["name", "file_url"],
+        ):
+            heir = frappe.db.get_value(
+                "HD Article Category",
+                {"icon": file.file_url, "name": ("!=", self.name)},
+            )
+            if heir:
+                frappe.db.set_value("File", file.name, "attached_to_name", heir)
 
     def narrow_to_parent(self):
         # the parent's branch already counts this category in: leave it out
@@ -117,6 +155,7 @@ class HDArticleCategory(NestedSet):
 
     def on_trash(self):
         self.validate_general_category_delete()
+        self.handle_icon_delete()
         if self.parent_article_category:
             move_category_articles(self.name, self.parent_article_category)
             # its moved articles, if any, fill the parent

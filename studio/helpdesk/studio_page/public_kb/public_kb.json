@@ -23,11 +23,24 @@
      "blockName": "scroll-wrapper",
      "children": [
       {
-       "baseStyles": {
-        "background": "{{ bannerBackground }}"
-       },
        "blockName": "hero-section",
        "children": [
+        {
+         "baseStyles": {
+          "background": "{{ bannerBackground }}"
+         },
+         "blockName": "hero-background",
+         "classes": [
+          "absolute",
+          "inset-0",
+          "pointer-events-none",
+          "[mask-image:linear-gradient(to_bottom,black_55%,transparent)]"
+         ],
+         "componentId": "container-hero-background",
+         "componentName": "container",
+         "originalElement": "div",
+         "visibilityCondition": "{{ bannerBackground }}"
+        },
         {
          "baseStyles": {
           "height": "100%",
@@ -76,21 +89,22 @@
               "color": "{{ bannerTextColor }}"
              },
              "classes": [
-              "font-semibold",
               "text-center",
-              "leading-[1.15]"
+              "font-newsreader",
+              "font-medium",
+              "leading-[1.1]"
              ],
              "componentId": "TextBlock-m3x3mi17k",
              "componentName": "TextBlock",
              "componentProps": {
-              "fontSize": "text-[34px] sm:text-[40px]",
+              "fontSize": "text-[36px] sm:text-[44px]",
               "tag": "h1",
               "text": "{{ bannerTitle }}"
              }
             },
             {
              "baseStyles": {
-              "color": "{{ bannerTextColor }}"
+              "color": "{{ bannerSubtitleColor }}"
              },
              "classes": [
               "text-center",
@@ -197,15 +211,16 @@
         },
         {
          "classes": [
-          "font-semibold",
           "text-center",
-          "leading-[1.15]",
-          "text-ink-gray-8"
+          "text-ink-gray-8",
+          "font-newsreader",
+          "font-medium",
+          "leading-[1.1]"
          ],
          "componentId": "TextBlock-empty-home-title",
          "componentName": "TextBlock",
          "componentProps": {
-          "fontSize": "text-[34px] sm:text-[40px]",
+          "fontSize": "text-[36px] sm:text-[44px]",
           "tag": "h1",
           "text": "{{ t(\"How can we help?\") }}"
          }
@@ -354,11 +369,12 @@
         "flex-col",
         "gap-5",
         "mx-auto",
-        "max-w-[832px]",
+        "max-w-5xl",
         "pb-2",
         "sm:pb-4",
         "w-full",
         "px-4",
+        "sm:px-6",
         "pt-8",
         "sm:pt-[41px]",
         "portal-reveal"
@@ -577,10 +593,11 @@
         "flex-col",
         "gap-4",
         "mx-auto",
-        "max-w-[832px]",
+        "max-w-5xl",
         "pb-0",
         "w-full",
         "px-4",
+        "sm:px-6",
         "pt-8",
         "sm:pt-[41px]",
         "portal-reveal"
@@ -634,7 +651,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-11-22 12:00:00.000000",
+ "modified": "2026-11-24 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

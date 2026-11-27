@@ -5,6 +5,7 @@ import { nestFooterRows } from '@helpdesk/shared/knowledgeBaseFooter'
 import { isValidLink, runFormScripts } from '@helpdesk/shared/utils'
 import { navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
+import { articleCountLabel } from '@app/stores/knowledgeBase'
 import { accountMenuOptions, themeIcon, toggleTheme, useSettingsModal } from '@app/stores/settings'
 
 const SERVICE_ICONS = {
@@ -86,6 +87,7 @@ export function useKnowledgeBaseHeader(context) {
   }
   return {
     ...useSettingsModal(context),
+    articleCountLabel,
     customActions,
     headerLinks,
     footer,

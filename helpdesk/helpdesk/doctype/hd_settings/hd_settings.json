@@ -300,13 +300,13 @@
    "label": "Banner image"
   },
   {
-   "default": "Lines",
+   "default": "Soft Grain",
    "depends_on": "eval:!doc.banner_image",
-   "description": "Background color used when no banner image is set.",
+   "description": "Background used when no banner image is set.",
    "fieldname": "banner_preset",
    "fieldtype": "Select",
    "label": "Banner preset",
-   "options": "\nLines\nGray\nBlue\nViolet"
+   "options": "\nSoft Grain\nAurora Mist\nAurora Mint\nAurora Dusk\nMesh Blue"
   },
   {
    "fieldname": "banner_title",
@@ -704,7 +704,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-23 12:00:00.000000",
+ "modified": "2026-11-25 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

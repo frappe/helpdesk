@@ -203,10 +203,11 @@
      "mx-auto",
      "flex",
      "w-full",
-     "max-w-[832px]",
+     "max-w-5xl",
      "flex-col",
      "gap-10",
      "px-4",
+     "sm:px-6",
      "py-10"
     ],
     "componentId": "footer-content",
@@ -234,7 +235,7 @@
  "idx": 0,
  "inputs": [],
  "is_disabled": 0,
- "modified": "2026-11-24 19:00:00.000000",
+ "modified": "2026-11-25 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "footer",
  "owner": "Administrator"

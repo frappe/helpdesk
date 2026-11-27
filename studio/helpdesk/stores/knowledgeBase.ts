@@ -1,5 +1,7 @@
 import { reactive, ref, toValue, watch, type MaybeRefOrGetter } from 'vue'
 import { createResource, frappeRequest } from 'frappe-ui'
+import { __ } from '@helpdesk/shared/translation'
+import { countLabel } from '@helpdesk/shared/utils'
 
 // Module-level, not `cache`: what a reader sees depends on who they are.
 const sidebar = createResource({
@@ -8,6 +10,8 @@ const sidebar = createResource({
 })
 
 // Two or four cards only fill their rows in two columns.
+export const articleCountLabel = (count: number) => countLabel(count, __('1 article'), __('{0} articles'))
+
 export const homeCategoryColumns = (count: number) => (count === 2 || count === 4 ? 2 : 3)
 
 export function useKnowledgeBase() {

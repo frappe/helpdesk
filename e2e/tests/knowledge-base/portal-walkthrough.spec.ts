@@ -373,7 +373,7 @@ test.describe("header", () => {
         ([pinned]) =>
           localStorage.setItem(
             "kb:preview",
-            JSON.stringify({ banner_image: "", banner_preset: "Violet", pinned: [pinned], links: [{ label: "E2E Preview link", url: "https://example.com", open_in_new_tab: false }] })
+            JSON.stringify({ banner_image: "", banner_preset: "Aurora Dusk", pinned: [pinned], links: [{ label: "E2E Preview link", url: "https://example.com", open_in_new_tab: false }] })
           ),
         [category.name]
       );
@@ -391,15 +391,15 @@ test.describe("knowledge base home", () => {
   usePersona("customer");
 
   test("K1 the hero shows the title and the banner preset", async ({ page, kb }) => {
-    await kb({ banner_preset: "Blue" });
+    await kb({ banner_preset: "Mesh Blue" });
     await page.goto("/help");
     const title = page.getByRole("heading", { name: "Here's what might help", level: 1 });
     await expect(title).toBeVisible();
     await expect(page.getByText("Explore answers to frequently asked questions")).toBeVisible();
     const background = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>("*")].map((el) => el.style.background).find((bg) => bg.includes("surface-blue"))
+      [...document.querySelectorAll<HTMLElement>("*")].map((el) => el.style.background).find((bg) => bg.includes("radial-gradient(60% 80% at 20% 25%"))
     );
-    expect(background).toContain("surface-blue");
+    expect(background).toContain("rgb(215, 233, 251)");
   });
 
   test("K9 recently viewed is kept per user", async ({ page, api }) => {
@@ -844,7 +844,7 @@ test.describe("knowledge base settings", () => {
       await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).allow_anonymous_article_voting).toBe(1);
       await expect(dialog.getByText("Unsaved")).toBeHidden();
       await dialog.getByRole("tab", { name: "Home page" }).click();
-      await dialog.getByRole("radio", { name: "Blue" }).click();
+      await dialog.getByRole("radio", { name: "Mesh Blue" }).click();
       await expect(dialog.getByText("Unsaved")).toBeVisible();
       // Pins save from their own dialog, apart from the draft.
       await dialog.getByRole("button", { name: "Add category" }).click();
@@ -875,7 +875,7 @@ test.describe("knowledge base settings", () => {
       await dialog.getByRole("button", { name: "Save" }).click();
       await expect(dialog.getByText("Unsaved")).toBeHidden();
       const settings = await api.get("HD Settings", "HD Settings");
-      expect(settings.banner_preset).toBe("Blue");
+      expect(settings.banner_preset).toBe("Mesh Blue");
       expect((await api.get("HD Article Category", category.name)).pinned).toBe(1);
       expect((await api.get("HD Form Script", QUICK_LINKS)).script).toContain(label);
     } finally {

@@ -20,7 +20,7 @@
                 class="grid size-8 shrink-0 place-items-center rounded-4 bg-surface-gray-2 text-ink-gray-7"
                 aria-hidden="true"
               >
-                <span :class="parentIcon" class="size-4" />
+                <CategoryIcon :icon="parentIcon" class="size-4" />
               </span>
               <Combobox
                 v-model="parent"
@@ -95,7 +95,14 @@
             />
           </svg>
         </Transition>
-        <IconPicker v-model="icon" />
+        <IconPicker
+          v-model="icon"
+          :uploads="uploadedIcons"
+          upload-endpoint="/api/method/helpdesk.api.knowledge_base.upload_category_icon"
+          :deleting="deleteIcon.loading ? deleteIcon.params?.url : ''"
+          @upload="(url) => sessionUploads.push(url)"
+          @delete="(url) => deleteIcon.submit({ url })"
+        />
         <TextInput
           ref="nameInput"
           v-model="newTitle"
@@ -152,16 +159,21 @@
 import { computed, nextTick, ref, watch } from "vue";
 import {
   Button,
+  call,
   Checkbox,
   Combobox,
+  createResource,
   Dialog,
   Textarea,
   TextInput,
+  toast,
   Tooltip,
 } from "frappe-ui";
 import { categoryOptions } from "@/stores/knowledgeBase";
-import { categoryIcon } from "@helpdesk/shared/categoryIcons";
+import CategoryIcon from "@helpdesk/shared/CategoryIcon.vue";
+import { isImageIcon, type UploadedIcon } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
+import { getErrorMessage } from "@/utils";
 import IconPicker from "@helpdesk/shared/IconPicker.vue";
 
 const props = defineProps({
@@ -176,7 +188,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update", "create"]);
+const emit = defineEmits(["update", "create", "icon-delete"]);
 
 const showDialog = defineModel<boolean>();
 const newTitle = defineModel<string>("title");
@@ -207,12 +219,18 @@ function onUndrawn() {
 }
 
 const nameInput = ref<InstanceType<typeof TextInput> | null>(null);
+const categoryIcons = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_icons",
+});
+
+const sessionUploads = ref<string[]>([]);
 
 watch(showDialog, async (open) => {
-  if (!open) return;
+  if (!open) return discardUnusedUploads();
   // shared with other dialogs: drop their list before it shows here
   categoryOptions.reset();
   categoryOptions.submit();
+  categoryIcons.submit();
   nesting.value = drawn.value = Boolean(parent.value);
   await nextTick();
   nameInput.value?.focus();
@@ -234,10 +252,42 @@ const hasSubcategories = computed(
       ?.has_subcategories
 );
 
-const parentIcon = computed(() =>
-  categoryIcon(
+function discardUnusedUploads() {
+  const urls = sessionUploads.value;
+  sessionUploads.value = [];
+  if (!urls.length) return;
+  call("helpdesk.api.knowledge_base.discard_category_icon_uploads", { urls });
+}
+
+const deleteIcon = createResource({
+  url: "helpdesk.api.knowledge_base.delete_category_icon",
+  onSuccess() {
+    const { url } = deleteIcon.params;
+    sessionUploads.value = sessionUploads.value.filter(
+      (upload) => upload !== url
+    );
+    if (icon.value === url) icon.value = "";
+    categoryIcons.reload();
+    emit("icon-delete");
+    toast.success(__("Icon deleted"));
+  },
+  onError: (error) => getErrorMessage(error, true),
+});
+
+const uploadedIcons = computed<UploadedIcon[]>(() => {
+  const icons = categoryIcons.data || [];
+  const unlisted = [...sessionUploads.value.slice().reverse(), icon.value]
+    .filter(isImageIcon)
+    .filter((url) => !icons.some((listed) => listed.url === url));
+  return [
+    ...[...new Set(unlisted)].map((url) => ({ url, used_by: [] })),
+    ...icons,
+  ];
+});
+
+const parentIcon = computed(
+  () =>
     categoryOptions.data?.find((option) => option.value === parent.value)?.icon
-  )
 );
 
 const dialogTitle = computed(() => {

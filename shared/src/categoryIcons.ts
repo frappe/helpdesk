@@ -300,6 +300,12 @@ export const CATEGORY_ICONS = [
 
 const KNOWN_ICONS = new Set(CATEGORY_ICONS)
 
+export type UploadedIcon = { url: string; used_by: string[] }
+
+export function isImageIcon(icon?: string | null): icon is string {
+  return Boolean(icon && /^(\/|https?:\/\/)/.test(icon))
+}
+
 // A name outside the list has no CSS in the portal build: show the folder.
 export function categoryIcon(icon?: string | null) {
   return icon && KNOWN_ICONS.has(icon) ? icon : 'lucide-folder'

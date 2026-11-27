@@ -1,6 +1,8 @@
 import { computed, ref, watch } from 'vue'
+import { useResolvedColorScheme } from 'frappe-ui'
+import '@app/styles/newsreader.css'
 import { __ } from '@helpdesk/shared/translation'
-import { defaultBannerSubtitle, defaultBannerTitle, findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
+import { bannerPresetBackground, defaultBannerSubtitle, defaultBannerTitle } from '@helpdesk/shared/knowledgeBaseBanner'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useRememberedCount } from '@app/composables/useRememberedCount'
@@ -17,12 +19,18 @@ export default function setup(context) {
   const preview = computed(() => config.value && readKnowledgeBasePreview())
   const bannerImage = computed(() => (preview.value ? preview.value.banner_image : config.value?.banner_image))
 
-  // Uploaded images sit under a dark scrim, so take white text.
-  const bannerPreset = computed(() =>
-    bannerImage.value ? null : findBannerPreset(preview.value ? preview.value.banner_preset : config.value?.banner_preset),
+  const colorScheme = useResolvedColorScheme()
+  const bannerBackground = computed(() =>
+    bannerImage.value
+      ? ''
+      : bannerPresetBackground(
+          preview.value ? preview.value.banner_preset : config.value?.banner_preset,
+          colorScheme.value === 'dark',
+        ),
   )
-  const bannerBackground = computed(() => bannerPreset.value?.background || '')
-  const bannerTextColor = computed(() => (bannerImage.value ? '#fff' : 'var(--ink-gray-8)'))
+  // Uploaded images sit under a dark scrim, so take white text.
+  const bannerTextColor = computed(() => (bannerImage.value ? '#fff' : 'var(--ink-gray-9)'))
+  const bannerSubtitleColor = computed(() => (bannerImage.value ? 'rgba(255, 255, 255, 0.72)' : 'var(--ink-gray-6)'))
 
   const bannerTitle = computed(
     () => (preview.value?.banner_title ?? config.value?.banner_title) || defaultBannerTitle(),
@@ -135,6 +143,7 @@ export default function setup(context) {
     bannerImage,
     bannerBackground,
     bannerTextColor,
+    bannerSubtitleColor,
     bannerTitle,
     bannerSubtitle,
     homeCategories,
