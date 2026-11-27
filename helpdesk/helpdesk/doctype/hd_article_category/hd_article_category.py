@@ -130,7 +130,7 @@ class HDArticleCategory(NestedSet):
             {**ICON_ATTACHMENT, "attached_to_name": self.name},
         )
 
-    def hand_over_icons(self):
+    def handle_icon_delete(self):
         """Move this category's icon uploads to another category using them, before
         Frappe deletes the attachments of a deleted doc."""
         for file in frappe.get_all(
@@ -155,7 +155,7 @@ class HDArticleCategory(NestedSet):
 
     def on_trash(self):
         self.validate_general_category_delete()
-        self.hand_over_icons()
+        self.handle_icon_delete()
         if self.parent_article_category:
             move_category_articles(self.name, self.parent_article_category)
             # its moved articles, if any, fill the parent
